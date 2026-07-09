@@ -1,0 +1,1055 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VibeSpec</title>
+<style>
+  :root{
+    --bg:#ffffff; --panel:#f7f7f8; --line:#e6e6e9; --line2:#eeeef1;
+    --text:#1e1e22; --muted:#8a8a94; --sub:#6b6b74;
+    --accent:#7c5cff; --accent-soft:#efeaff; --accent-line:#d9cfff;
+    --ok:#16a34a; --warn:#e0a400; --chip:#f0f0f3;
+    --radius:12px; --shadow:0 1px 2px rgba(20,20,30,.06),0 8px 24px rgba(20,20,30,.06);
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    font-size:14px; line-height:1.55;
+  }
+  .app{display:flex;flex-direction:column;height:100vh}
+  /* top bar */
+  .topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#b49bff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+  .title{font-weight:650;font-size:15px}
+  .title small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  .tabs{display:flex;gap:4px;margin:0 auto;background:var(--panel);padding:4px;border-radius:10px}
+  .tab{border:0;background:transparent;color:var(--sub);padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
+  .tab[aria-selected="true"]{background:#fff;color:var(--text);box-shadow:var(--shadow)}
+  .topbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--sub);cursor:pointer}
+  .topbtn.primary{background:#151519;color:#fff;border-color:#151519}
+  .topbtn.danger{color:#c0392b;border-color:#f0d4d0}
+  .topbtn.danger:hover{background:#fdeeec}
+  /* body */
+  .view{flex:1 1 auto;overflow:auto}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}
+  .wrap.tree{max-width:none;padding:0}
+  .wrap.spec{max-width:none;padding:16px}
+  .wrap.flow{max-width:none;padding:0}
+  .wrap.ia{max-width:none;padding:0}
+  /* IA 사이트맵(위→아래 트리) */
+  .ia2{display:flex;height:calc(100vh - 92px)}
+  .ia-canvas{flex:1 1 auto;overflow:auto;background:#fbfbfd}
+  .ia-side{flex:0 0 330px;border-left:1px solid var(--line);overflow:auto;background:#fff}
+  .sitemap{padding:28px 30px 50px;min-width:max-content;display:flex;justify-content:center}
+  .sitemap ul{display:flex;justify-content:center;position:relative;padding-top:26px;margin:0;list-style:none}
+  .sitemap > ul{padding-top:0}
+  .sitemap li{position:relative;padding:26px 14px 0;text-align:center}
+  .sitemap li::before,.sitemap li::after{content:'';position:absolute;top:0;right:50%;width:50%;height:26px;border-top:1.5px solid var(--accent-line)}
+  .sitemap li::after{right:auto;left:50%;border-left:1.5px solid var(--accent-line)}
+  .sitemap li::before{border-right:1.5px solid var(--accent-line)}
+  .sitemap li:only-child::before,.sitemap li:only-child::after{display:none}
+  .sitemap li:only-child{padding-top:0}
+  .sitemap li:first-child::before,.sitemap li:last-child::after{border:0}
+  .sitemap li:last-child::before{border-right:1.5px solid var(--accent-line);border-radius:0 7px 0 0}
+  .sitemap li:first-child::after{border-radius:7px 0 0 0}
+  .sitemap ul ul::before{content:'';position:absolute;top:0;left:50%;width:0;height:26px;border-left:1.5px solid var(--accent-line)}
+  .snode{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:3px;border:1.5px solid var(--accent-line);border-radius:10px;padding:10px 16px;background:#fff;cursor:pointer;min-width:92px;box-shadow:var(--shadow)}
+  .snode:hover{border-color:var(--accent)}
+  .snode.sel{box-shadow:0 0 0 2px var(--accent)}
+  .snode.root{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
+  .snode.sec{background:var(--accent-soft);font-weight:700}
+  .snode.top{border-color:var(--accent);font-weight:700}
+  .snode.action{border-radius:999px}
+  .snode .stitle{font-size:12.5px;font-weight:600;white-space:nowrap}
+  .snode .stype{font-size:10px;font-weight:700;letter-spacing:.3px;opacity:.7}
+  .snode .srowbtns{position:absolute;top:-11px;right:-9px;display:flex;gap:3px;opacity:0;transition:opacity .15s}
+  .snode:hover .srowbtns{opacity:1}
+  .srowbtns .mini{width:20px;height:20px;font-size:12px;background:#fff}
+  .ia-hint{padding:14px 18px;color:var(--muted);font-size:12px;border-bottom:1px solid var(--line2)}
+  .ia-warn{background:#fff8ec;border-bottom:1px solid #f0e2c4;padding:12px 18px}
+  .iw-head{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#7a5b00}
+  .iw-head b{color:#a76f00}
+  .iw-btns{margin-left:auto;display:flex;gap:6px}
+  .addbtn.ghost{background:#fff;border-color:#e6d9b6;color:#8a6d1f}
+  .iw-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .warn-chip{background:#fff;border:1px solid #ecdcb4;color:#8a6d1f;border-radius:999px;padding:2px 9px;font-size:11px}
+  .warn-chip.more{background:#f4ead0}
+  .ia-ok{background:#eefaf0;border-bottom:1px solid #cfeccf;padding:11px 18px;color:#1f7a3a;font-size:12.5px;font-weight:600}
+  .ptype{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:2px}
+  .ptype.top{background:var(--accent);color:#fff}
+  .ptype.page{background:var(--accent-soft);color:var(--accent)}
+  .ptype.action{background:#eee;color:var(--sub)}
+  .ia-link{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;font-size:12.5px}
+  .ia-link:hover{background:var(--panel)}
+  .ia-link .ill{flex:1}
+  .ia-linkadd{margin-top:8px}
+  .ia-linkadd select{width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:12.5px;background:#fff}
+  .fref{margin-left:7px;background:rgba(255,255,255,.35);border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700}
+  .fnode.page .fref{background:#fff;color:var(--accent)}
+  .fnode.action .fref{background:var(--accent-soft);color:var(--accent)}
+  .topbtn:disabled{opacity:.35;cursor:default}
+  .hist-drawer{position:fixed;top:0;right:0;width:320px;height:100vh;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(20,20,30,.08);transform:translateX(100%);transition:transform .22s;z-index:60;display:flex;flex-direction:column}
+  .hist-drawer.open{transform:translateX(0)}
+  .hist-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;font-weight:650;font-size:14px;border-bottom:1px solid var(--line)}
+  .hist-sub{padding:10px 16px 6px;color:var(--muted);font-size:11.5px}
+  .hist-list{overflow:auto;padding:6px 10px 20px;flex:1}
+  .hist-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
+  .hist-item:hover{background:var(--panel)}
+  .hist-item.cur{background:var(--accent-soft);border-color:var(--accent-line)}
+  .hist-item .hi-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-line);flex:0 0 auto}
+  .hist-item.cur .hi-dot{background:var(--accent)}
+  .hist-item .hi-label{flex:1;font-weight:600}
+  .hist-item .hi-time{color:var(--muted);font-size:11px}
+  .sot-flash{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#151519;color:#fff;padding:9px 16px;border-radius:999px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;z-index:50}
+  .sot-flash.show{opacity:1;transform:translateX(-50%) translateY(-2px)}
+  .sot-flash b{color:#c7b8ff}
+
+  /* ============ PRD VIEW ============ */
+  .prd h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+  .prd .kv{color:var(--muted);font-size:12.5px;margin-bottom:22px}
+  .prd section{margin:26px 0}
+  .prd h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .prd h2::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--accent)}
+  .field{outline:none;border-radius:6px;padding:2px 4px;margin:-2px -4px;transition:background .15s}
+  .field:hover{background:var(--accent-soft)}
+  .field:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-line)}
+  .goals{margin:0;padding:0;list-style:none}
+  .goals li{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line2)}
+  .goals li::before{content:"◆";color:var(--accent);font-size:10px;margin-top:5px}
+  .persona{display:inline-block;background:var(--chip);border-radius:999px;padding:5px 12px;margin:0 6px 6px 0;font-size:12.5px}
+  .req-doc{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+  .req-doc h3{margin:0 0 4px;font-size:15px}
+  .req-doc .rd-desc{color:var(--sub);font-size:13px;margin-bottom:12px}
+  .prd-doc{max-width:820px}
+  .prd-row{display:flex;gap:16px;padding:9px 0;border-bottom:1px solid var(--line2)}
+  .prd-k{flex:0 0 108px;color:var(--muted);font-size:12.5px;font-weight:600;padding-top:2px}
+  .prd-field{flex:1;font-size:13.5px;line-height:1.6;outline:none;border-radius:6px;padding:2px 6px;margin:-2px 0}
+  .prd-field:hover{background:var(--accent-soft)}
+  .prd-field:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-line)}
+  .prd-sub{font-size:12.5px;color:var(--sub);margin:16px 0 6px;font-weight:650}
+  .prd-list{margin:0 0 8px;padding-left:20px}
+  .prd-list li{padding:4px 0;display:flex;gap:8px;align-items:flex-start}
+  .prd-list li .field{flex:1;outline:none;border-radius:5px;padding:1px 4px}
+  .prd-list li .field:hover{background:var(--accent-soft)}
+  .prd-list li .field:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-line)}
+  .prd-list .ac-del{opacity:0}
+  .prd-list li:hover .ac-del{opacity:1}
+  .prd-chips{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .chip-del{margin:0 8px 0 -4px;font-size:12px}
+  .feat-line{padding:9px 0;border-top:1px solid var(--line2)}
+  .feat-line .fl-head{display:flex;align-items:center;gap:8px;font-weight:600}
+  .feat-line .specs{color:var(--sub);font-size:12.5px;margin:4px 0 0 2px}
+  .prio{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+  .prio.high{background:#fdeaea;color:#c0392b}
+  .prio.mid{background:#fff4de;color:#a76f00}
+  .prio.low{background:#e9f3ff;color:#2b6cb0}
+  .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .st-todo{background:#c7c7cf}.st-doing{background:var(--warn)}.st-done{background:var(--ok)}
+
+  /* ============ SPEC TABLE VIEW ============ */
+  .spec-note{color:var(--sub);margin-bottom:14px}
+  table.spec{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  table.spec th{background:var(--panel);text-align:left;font-size:12px;color:var(--muted);font-weight:650;padding:11px 14px;border-bottom:1px solid var(--line)}
+  table.spec td{padding:9px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+  table.spec tr:last-child td{border-bottom:0}
+  .col-req{width:20%;font-weight:650}
+  .col-feat{width:24%;font-weight:600}
+  .col-spec{width:56%}
+  .spec-row{display:flex;align-items:center;gap:8px}
+  .spec-row .txt{flex:1}
+  .rowbtns{display:flex;gap:4px;opacity:0;transition:opacity .15s}
+  tr:hover .rowbtns{opacity:1}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:6px;width:22px;height:22px;line-height:1;font-size:13px;cursor:pointer;color:var(--sub)}
+  .mini:hover{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+  .addrow td{background:#fcfcfd}
+  .addbtn{border:1px dashed var(--accent-line);background:var(--accent-soft);color:var(--accent);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+
+  /* ============ USER FLOW VIEW ============ */
+  .flow-note{color:var(--sub);margin-bottom:18px}
+  .flow{display:flex;gap:0;overflow-x:auto;padding-bottom:20px}
+  .stage{min-width:240px;flex:0 0 auto;position:relative;padding:0 18px}
+  .stage:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:26px;color:var(--accent);font-size:20px}
+  .stage-head{background:var(--accent);color:#fff;border-radius:8px;padding:8px 12px;font-weight:650;font-size:13px;text-align:center;margin-bottom:14px}
+  .node{border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:12px;background:#fff;box-shadow:var(--shadow)}
+  .node .n-title{font-weight:650;font-size:13px;display:flex;align-items:center;gap:7px}
+  .node .n-step{color:var(--muted);font-size:11.5px;margin:4px 0 0}
+  .node ul{margin:8px 0 0;padding-left:16px;color:var(--sub);font-size:12px}
+  .node ul li{margin:2px 0}
+
+  /* ============ USER FLOW (typed nodes + sections) ============ */
+  .flow2{position:relative;padding:64px 48px 48px 156px;min-width:max-content}
+  .flow2 .branch{display:flex;flex-direction:row;align-items:center}
+  .flow2 .children{display:flex;flex-direction:column;justify-content:center;gap:12px;margin-left:58px}
+  .flow-legend{position:absolute;top:18px;right:34px;display:flex;gap:16px;font-size:11.5px;color:var(--sub);align-items:center;z-index:3}
+  .flow-legend .lg{display:flex;align-items:center;gap:6px}
+  .flow-legend .sw{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line)}
+  .sw.start{background:#1e1e22;border-color:#1e1e22}
+  .sw.top{background:var(--accent);border-color:var(--accent)}
+  .sw.page{background:var(--accent-soft);border-color:var(--accent-line)}
+  .sw.action{background:#fff;border-radius:50%}
+  .flow-band-sep{position:absolute;left:0;right:0;height:1px;background:var(--line2);z-index:0}
+  .flow-band-label{position:absolute;left:22px;font-size:12.5px;color:var(--sub);font-weight:600;z-index:2}
+  .fnode{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:9px;font-size:12.5px;font-weight:600;white-space:nowrap;box-shadow:var(--shadow);background:#fff;border:1px solid var(--line);margin:6px 0}
+  .fnode.start{background:#1e1e22;color:#fff;border-color:#1e1e22}
+  .fnode.top{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .fnode.page{background:var(--accent-soft);border-color:var(--accent-line)}
+  .fnode.action{background:#fff;border-radius:999px}
+  .fnode .ftitle{outline:none;border-radius:4px}
+  .fnode.top .ftitle:focus,.fnode.page .ftitle:focus,.fnode.action .ftitle:focus{box-shadow:0 0 0 2px var(--accent-line)}
+
+  /* ============ SPEC DIRECTORY (3-pane + detail) ============ */
+  .dir{display:flex;height:calc(100vh - 92px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
+  .dir-col{display:flex;flex-direction:column;min-width:0}
+  .dir-col.colA{flex:0 0 230px;border-right:1px solid var(--line)}
+  .dir-col.colB{flex:0 0 320px;border-right:1px solid var(--line)}
+  .dir-col.colC{flex:1 1 auto}
+  .dir-col.cReq{flex:0 0 190px;border-right:1px solid var(--line)}
+  .dir-col.cFeat{flex:0 0 220px;border-right:1px solid var(--line)}
+  .dir-col.cSpec{flex:0 0 250px;border-right:1px solid var(--line)}
+  .dir-col.cDetail{flex:1 1 auto;min-width:300px}
+  .dir-col.collapsed{flex:0 0 40px;border-right:1px solid var(--line);background:var(--panel);cursor:pointer;align-items:center}
+  .dir-col.collapsed:hover{background:var(--accent-soft)}
+  .cc-label{writing-mode:vertical-rl;margin:16px auto;font-size:12px;font-weight:650;color:var(--sub);white-space:nowrap;letter-spacing:1px}
+  .dir-head .hd-btns{display:flex;align-items:center;gap:6px}
+  .dir-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font-size:12.5px;font-weight:650;color:var(--sub);border-bottom:1px solid var(--line2);background:var(--panel)}
+  .dir-body{overflow:auto;padding:8px}
+  .addbtn.sm{padding:1px 9px;font-size:14px;line-height:1.3}
+  .dir-item,.dir-feat,.dir-spec{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px}
+  .dir-item:hover,.dir-feat:hover,.dir-spec:hover{background:var(--panel)}
+  .dir-item.sel,.dir-feat.sel,.dir-spec.sel{background:var(--accent-soft)}
+  .dir-item .rowbtns{margin-left:auto}
+  .dir-item:hover .rowbtns{opacity:1}
+  .di-title,.df-title{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .di-meta{color:var(--muted);font-size:11.5px}
+  .df-idx,.ds-idx{color:var(--muted);font-size:11px;min-width:26px}
+  .dir-feat{font-weight:600;margin-top:4px}
+  .dir-spec{padding-left:14px;font-weight:500;color:var(--sub)}
+  .detail{padding:20px 24px;overflow:auto;height:100%}
+  .dt-title{font-size:19px;font-weight:700;outline:none;border-radius:6px;padding:2px 4px;margin:-2px -4px}
+  .dt-title:hover{background:var(--accent-soft)}
+  .dt-title:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-line)}
+  .dt-goto{margin:12px 0 18px}
+  .dt-row{display:flex;align-items:center;gap:14px;padding:8px 0;border-bottom:1px solid var(--line2)}
+  .dt-k{width:56px;color:var(--muted);font-size:12.5px}
+  .dt-v{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--sub)}
+  .dt-row select{border:1px solid var(--line);border-radius:7px;padding:4px 9px;font-size:12.5px;background:#fff;cursor:pointer}
+  .dt-sec{margin:22px 0 8px;font-size:13px;font-weight:650;display:flex;align-items:center;gap:8px}
+  .dt-desc{font-size:13px;color:var(--text);line-height:1.65;outline:none;border-radius:8px;padding:9px 11px;background:var(--panel);min-height:54px}
+  .dt-desc:focus{box-shadow:0 0 0 2px var(--accent-line);background:#fff}
+  .ac-list{display:flex;flex-direction:column;gap:2px}
+  .ac-item{display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:8px}
+  .ac-item:hover{background:var(--panel)}
+  .ac-item input{margin-top:3px}
+  .ac-text{flex:1;font-size:13px;outline:none;border-radius:5px;padding:1px 3px}
+  .ac-text:focus{box-shadow:0 0 0 2px var(--accent-line)}
+  .ac-item.done .ac-text{color:var(--muted);text-decoration:line-through}
+  .ac-del{border:0;background:transparent;color:#c9c9d0;cursor:pointer;font-size:14px;opacity:0}
+  .ac-item:hover .ac-del{opacity:1}
+  .ac-del:hover{color:#c0392b}
+
+  /* ============ TREE / NODE CANVAS VIEW ============ */
+  .tree{position:relative;padding:64px 24px 40px;min-width:max-content}
+  .wires{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:0}
+  .wires path{fill:none;stroke:#cfc7e6;stroke-width:1.5}
+  .tree .branch{display:flex;flex-direction:row;align-items:center}
+  .tree .children{display:flex;flex-direction:column;justify-content:center;gap:10px;margin-left:52px}
+  .tnode{position:relative;z-index:1;display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px;box-shadow:var(--shadow);white-space:nowrap;margin:5px 0;cursor:pointer}
+  .tnode:hover{border-color:var(--accent-line)}
+  .tnode.prd{background:#fbfbfd}
+  .tnode .ic{width:12px;height:12px;border-radius:3px;background:var(--accent-soft);border:1px solid var(--accent-line);flex:0 0 auto}
+  .tnode.prd .ic{background:#e7e7ee;border-color:#d5d5de}
+  .tn-title{font-size:12.5px;font-weight:600;outline:none;min-width:36px;border-radius:4px;padding:1px 3px}
+  .tn-title:hover{background:var(--accent-soft)}
+  .tn-title:focus{box-shadow:0 0 0 2px var(--accent-line)}
+  .tn-id{font-size:10.5px;color:var(--muted)}
+  .tnode .star,.tnode .tadd,.tnode .tdel{border:0;background:transparent;cursor:pointer;font-size:12.5px;color:#c3c3cc;padding:0 1px;line-height:1;opacity:0;transition:opacity .15s}
+  .tnode:hover .star,.tnode:hover .tadd,.tnode:hover .tdel{opacity:1}
+  .tnode .star.on{opacity:1;color:#f5b301}
+  .tnode .tadd:hover{color:var(--accent)}
+  .tnode .tdel:hover{color:#c0392b}
+  .tcol-label{position:absolute;top:18px;background:var(--accent);color:#fff;font-size:12px;font-weight:650;padding:5px 12px;border-radius:7px;z-index:2}
+  .tree-hint{color:var(--muted);font-size:12px;position:absolute;top:22px;right:24px}
+  .empty{color:var(--muted);font-style:italic;padding:8px 0}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="logo">VS</div>
+    <div class="title" id="prodTitle" contenteditable="true" spellcheck="false">회의실 예약 앱
+      <small>VibeSpec · 기획 뷰어</small>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-view="prd" aria-selected="true">PRD</button>
+      <button class="tab" role="tab" data-view="spec">기능명세서</button>
+      <button class="tab" role="tab" data-view="tree">트리</button>
+      <button class="tab" role="tab" data-view="ia">IA</button>
+      <button class="tab" role="tab" data-view="flow">유저플로우</button>
+    </div>
+    <button class="topbtn" id="undoBtn" title="실행 취소 (Ctrl+Z)">↩</button>
+    <button class="topbtn" id="redoBtn" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
+    <button class="topbtn" id="histBtn" title="변경 히스토리">히스토리</button>
+    <button class="topbtn" id="saveBtn" title="JSON 파일로 저장">저장</button>
+    <button class="topbtn" id="loadBtn" title="JSON 파일 불러오기">불러오기</button>
+    <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
+    <button class="topbtn" id="sotBtn">SOT 보기</button>
+    <button class="topbtn primary" id="resetBtn">초기화</button>
+  </div>
+  <div class="view"><div class="wrap" id="stage"></div></div>
+</div>
+<div class="hist-drawer" id="histDrawer">
+  <div class="hist-head">변경 히스토리 <button class="topbtn" id="histClose">닫기</button></div>
+  <div class="hist-sub">항목을 클릭하면 그 시점으로 되돌립니다.</div>
+  <div class="hist-list" id="histList"></div>
+</div>
+<div class="sot-flash" id="flash"><b>SOT 갱신됨</b> · 모든 뷰 동기화 완료</div>
+<script type="application/json" id="embedded-sot"></script>
+
+<script>
+/* ========================================================================
+   SINGLE SOURCE OF TRUTH
+   PRD · 기능명세서 · IA · 유저플로우 · 트리 뷰가 전부 이 하나의 객체만 읽고 씁니다.
+   상단 "불러오기"로 스킬이 생성한 JSON을 열면 아래 SEED가 대체됩니다.
+   ======================================================================== */
+const SEED = {
+  overview: "사내 구성원이 회의실을 빠르게 검색·예약하고, 실시간 이용 현황을 확인할 수 있는 앱. 중복 예약과 노쇼를 줄이고, 회의실 활용도를 데이터로 관리하는 것을 목표로 한다.",
+  goals: [
+    "3번의 탭 이내로 회의실 예약을 완료할 수 있다.",
+    "예약 확정/변경/취소가 실시간 알림으로 전달된다.",
+    "관리자는 회의실별 이용률을 대시보드로 확인할 수 있다."
+  ],
+  personas: ["일반 직원 (예약자)", "팀 리더 (참석자 관리)", "총무/관리자 (회의실 운영)"],
+  prd: {
+    oneLiner: "사내 구성원이 3번의 탭으로 빈 회의실을 찾아 예약하고 실시간 현황을 확인하는 앱",
+    goal: "회의실 예약의 마찰과 노쇼를 줄이고, 회의실 활용도를 데이터로 관리한다.",
+    background: "회의실 예약이 메신저·구두로 이뤄져 중복 예약과 노쇼가 잦고, 이용률 데이터가 없어 공간 운영 의사결정이 어렵다.",
+    problem: "예약 현황이 흩어져 있어 빈 회의실을 찾기 어렵고, 중복 예약과 노쇼가 반복된다.",
+    solution: "실시간 현황 기반의 빠른 예약과 확정·리마인더 알림, 관리자용 이용 통계 대시보드를 제공한다.",
+    differentiator: "사내 계정(SSO) 연동과 회의실 현황을 결합해 '빈 방 즉시 예약'을 지원한다.",
+    targets: ["일반 직원 (예약자)", "팀 리더 (참석자 관리)", "총무·관리자 (회의실 운영)"],
+    scenarios: [
+      "직원 A는 오후 2시 회의를 위해 홈에서 빈 회의실을 확인하고, 3층 회의실을 골라 참석자 4명을 추가한 뒤 예약을 확정한다. 확정 알림이 참석자에게 전송된다.",
+      "관리자 B는 주간 대시보드에서 회의실별 이용률과 노쇼율을 확인하고, 이용률이 낮은 회의실의 운영 시간을 조정한다."
+    ],
+    kpis: ["예약 완료까지 평균 탭 수 ≤ 3", "월간 노쇼율 ≤ 5%", "주간 활성 예약자 비율(WAU/직원) ≥ 40%"],
+    risks: ["사내 계정(SSO) 연동 일정 불확실", "센서 미설치 공간의 현황 정확도 이슈", "초기 데이터 부족으로 통계 신뢰도 낮음"],
+    category: "사내 업무용 예약 관리 (B2B SaaS)",
+    roles: ["일반 직원", "팀 리더", "관리자"],
+    platforms: ["웹", "iOS", "Android"]
+  },
+  requirements: [
+    { id:"R1", title:"회원 관리", desc:"조직 구성원이 계정을 만들고 안전하게 로그인할 수 있어야 한다.",
+      features:[
+        { id:"F1", title:"회원가입", priority:"mid", status:"done",
+          specs:["이메일/비밀번호 기반 회원가입","소셜 로그인 (카카오, 구글)","사번 인증 및 부서 매핑"] },
+        { id:"F2", title:"로그인/로그아웃", priority:"mid", status:"done",
+          specs:["자동 로그인 / 로그아웃 처리","비밀번호 찾기 및 재설정"] },
+      ]},
+    { id:"R2", title:"예약 관리", desc:"원하는 회의실과 시간대를 골라 예약을 생성·변경할 수 있어야 한다.",
+      features:[
+        { id:"F3", title:"예약 생성", priority:"high", status:"doing",
+          specs:["회의실 및 시간대 선택","참석자 추가 및 인원 제한 설정","예약 확인 및 확정 알림 발송"] },
+        { id:"F4", title:"예약 조회/변경", priority:"high", status:"todo",
+          specs:["내 예약 목록 조회","예약 수정 및 취소","주간 캘린더 뷰"] },
+      ]},
+    { id:"R3", title:"회의실 관리", desc:"관리자가 회의실 정보를 등록하고 실시간 현황을 파악할 수 있어야 한다.",
+      features:[
+        { id:"F5", title:"회의실 등록", priority:"mid", status:"todo",
+          specs:["회의실 정보(위치/사진) 등록","수용 인원 및 장비 설정","사용 가능 시간대 설정"] },
+        { id:"F6", title:"실시간 현황", priority:"low", status:"todo",
+          specs:["회의실별 이용 현황 보드","잔여 시간 및 다음 예약 표시"] },
+      ]},
+    { id:"R4", title:"알림 및 관리자", desc:"예약 관련 알림을 보내고 운영 지표를 관리할 수 있어야 한다.",
+      features:[
+        { id:"F7", title:"알림", priority:"mid", status:"todo",
+          specs:["예약 시작 전 리마인더","변경/취소 알림"] },
+        { id:"F8", title:"운영 대시보드", priority:"low", status:"todo",
+          specs:["회의실별 이용률 통계","노쇼/취소율 리포트"] },
+      ]},
+  ],
+  ia: { sections: [
+    { id:"S1", title:"인증·온보딩", pages:[
+      { id:"P1", title:"랜딩 페이지", type:"top", refs:[], children:[
+        { id:"P2", title:"회원가입", type:"page", refs:["F1"], children:[
+          { id:"P3", title:"소셜 로그인", type:"action", refs:["F1:1"], children:[] } ] },
+        { id:"P4", title:"로그인", type:"page", refs:["F2"], children:[
+          { id:"P5", title:"비밀번호 재설정", type:"action", refs:["F2:1"], children:[] } ] } ] } ] },
+    { id:"S2", title:"예약", pages:[
+      { id:"P6", title:"홈 / 대시보드", type:"top", refs:[], children:[
+        { id:"P7", title:"예약하기", type:"page", refs:["F3"], children:[
+          { id:"P8", title:"회의실·시간 선택", type:"action", refs:["F3:0"], children:[] },
+          { id:"P9", title:"예약 확정", type:"action", refs:["F3:2"], children:[] } ] },
+        { id:"P10", title:"내 예약", type:"page", refs:["F4"], children:[
+          { id:"P11", title:"예약 취소", type:"action", refs:["F4:1"], children:[] } ] } ] } ] },
+    { id:"S3", title:"회의실 관리", pages:[
+      { id:"P12", title:"관리자 홈", type:"top", refs:[], children:[
+        { id:"P13", title:"회의실 등록", type:"page", refs:["F5"], children:[] },
+        { id:"P14", title:"실시간 현황", type:"page", refs:["F6"], children:[] } ] } ] },
+    { id:"S4", title:"알림·설정", pages:[
+      { id:"P15", title:"설정", type:"top", refs:[], children:[
+        { id:"P16", title:"알림 설정", type:"page", refs:["F7"], children:[] },
+        { id:"P17", title:"운영 대시보드", type:"page", refs:["F8"], children:[] } ] } ] }
+  ] }
+};
+
+/* enrich seed with detail-level fields (설명 / 수용 기준 / 상태 / 중요도) */
+(function seedDetail(){
+  const R=id=>SEED.requirements.find(r=>r.id===id);
+  const F=id=>SEED.requirements.flatMap(r=>r.features).find(f=>f.id===id);
+  R("R1").status="done"; R("R1").priority="mid";
+  R("R2").status="doing"; R("R2").priority="high";
+  R("R2").acceptance=[{text:"사용자는 회의실과 시간대를 선택해 예약할 수 있어야 한다.",done:true},{text:"중복된 시간대 예약은 차단되어야 한다.",done:false}];
+  F("F3").desc="사용자가 원하는 회의실과 시간대를 선택해 예약을 생성한다. 중복 예약을 방지하고, 확정 시 참석자에게 알림을 발송한다.";
+  F("F3").acceptance=[{text:"회의실 목록에서 하나를 선택할 수 있어야 한다.",done:true},{text:"시작/종료 시간 선택 시 중복 예약이 차단되어야 한다.",done:false},{text:"예약 확정 시 예약자에게 알림이 발송되어야 한다.",done:false}];
+  F("F1").desc="이메일/비밀번호 또는 소셜 계정으로 회원가입하고, 사번 인증으로 부서를 매핑한다.";
+  F("F1").acceptance=[{text:"이메일 형식과 비밀번호 규칙을 검증해야 한다.",done:true},{text:"사번 인증 실패 시 가입이 제한되어야 한다.",done:false}];
+})();
+
+function normalize(s){
+  s.requirements.forEach(r=>{
+    if(r.status==null) r.status="todo";
+    if(r.priority==null) r.priority="mid";
+    if(r.desc==null) r.desc="";
+    if(!r.acceptance) r.acceptance=[];
+    r.features.forEach(f=>{ if(f.desc==null) f.desc=""; if(!f.acceptance) f.acceptance=[];
+      f.specs = f.specs.map(sp=>{
+        if(typeof sp==="string") return {title:sp, desc:"", acceptance:[]};
+        if(sp.desc==null) sp.desc=""; if(!sp.acceptance) sp.acceptance=[]; return sp;
+      });
+    });
+  });
+  if(!s.prd) s.prd={};
+  const pd=s.prd; ["oneLiner","goal","background","problem","solution","differentiator","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
+  ["targets","scenarios","kpis","risks","roles","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
+  if(!s.ia) s.ia={sections:[]};
+  const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
+  s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
+  return s;
+}
+
+let SOT = normalize(structuredClone(SEED));
+let VIEW = "prd";
+let selReq, selFeat, selNode;
+let colReqCol = false, colFeatCol = false;
+let selSec, selPage;
+let idc = 100;
+const nid = p => p + (++idc);
+
+const PRIO = {high:{c:"high",t:"높음"}, mid:{c:"mid",t:"보통"}, low:{c:"low",t:"낮음"}};
+const STAT = {todo:{c:"st-todo",t:"시작전"}, doing:{c:"st-doing",t:"진행중"}, done:{c:"st-done",t:"완료"}};
+const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+
+/* ---- mutation helpers: every edit funnels through here, then render() ---- */
+function commit(){ normalize(SOT); render(); flash(); pushHistory(); }
+function flash(){ const f=document.getElementById("flash"); f.classList.add("show"); clearTimeout(flash._t); flash._t=setTimeout(()=>f.classList.remove("show"),1200); }
+
+/* ---- persistence + history ---- */
+const LS_KEY="sot-proto-v1";
+let HISTORY=[], HPTR=-1, restoring=false;
+const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
+function snapshot(){ return JSON.stringify(SOT); }
+function saveLocal(){ try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
+function pushHistory(label){
+  const snap=snapshot();
+  if(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===snap) return; // no change
+  HISTORY = HISTORY.slice(0, HPTR+1);
+  HISTORY.push({t:Date.now(), label: label || (VIEWNAME[VIEW]+" 편집"), sot:snap});
+  if(HISTORY.length>120){ HISTORY.shift(); }
+  HPTR = HISTORY.length-1;
+  saveLocal(); renderHistory(); updateUndoButtons();
+}
+function restoreTo(i){
+  if(i<0 || i>=HISTORY.length) return;
+  HPTR=i; SOT=normalize(JSON.parse(HISTORY[i].sot));
+  saveLocal(); render(); renderHistory(); updateUndoButtons();
+}
+function undo(){ if(HPTR>0) restoreTo(HPTR-1); }
+function redo(){ if(HPTR<HISTORY.length-1) restoreTo(HPTR+1); }
+function updateUndoButtons(){
+  const u=document.getElementById("undoBtn"), r=document.getElementById("redoBtn");
+  if(u) u.disabled = HPTR<=0;
+  if(r) r.disabled = HPTR>=HISTORY.length-1;
+}
+function renderHistory(){
+  const el=document.getElementById("histList"); if(!el) return;
+  el.innerHTML = HISTORY.map((h,i)=>{
+    const d=new Date(h.t); const tt=d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    return `<div class="hist-item ${i===HPTR?'cur':''}" data-hist="${i}">
+      <span class="hi-dot"></span><span class="hi-label">${esc(h.label)}</span><span class="hi-time">${tt}</span></div>`;
+  }).reverse().join("") || `<div class="empty" style="padding:10px">기록 없음</div>`;
+}
+function snapshotIfChanged(label){ const s=snapshot(); if(!(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===s)) pushHistory(label); }
+
+/* ============================ RENDER DISPATCH ============================ */
+function render(){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
+  const el = document.getElementById("stage");
+  el.className = "wrap " + VIEW;
+  if(VIEW==="prd") el.innerHTML = renderPRD();
+  else if(VIEW==="spec") el.innerHTML = renderSpec();
+  else if(VIEW==="tree"){ el.innerHTML = renderTree(); layoutTree(); }
+  else if(VIEW==="ia") el.innerHTML = renderIA();
+  else { el.innerHTML = renderFlow(); layoutFlow(); }
+}
+
+/* -------------------------------- PRD -------------------------------- */
+function prdField(k, ph){ return `<div class="prd-field field" contenteditable data-prd-field="${k}">${esc(SOT.prd[k]||"")}</div>`; }
+function prdList(k, ordered){
+  const arr=SOT.prd[k]||[];
+  const items=arr.map((x,i)=>`<li><span class="field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="ac-del" data-prd-del="${k}#${i}" title="삭제">×</button></li>`).join("") || `<li class="empty" style="list-style:none">비어 있음</li>`;
+  return `<${ordered?'ol':'ul'} class="prd-list">${items}</${ordered?'ol':'ul'}><button class="addbtn sm" data-prd-add="${k}">＋ 추가</button>`;
+}
+function prdChips(k){
+  const arr=SOT.prd[k]||[];
+  return `<div class="prd-chips">${arr.map((x,i)=>`<span class="persona field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="chip-del ac-del" data-prd-del="${k}#${i}" title="삭제">×</button>`).join("")}<button class="addbtn sm" data-prd-add="${k}">＋</button></div>`;
+}
+function renderPRD(){
+  return `<div class="prd-doc">
+    <h1><span class="field" contenteditable data-prod>${esc(SOT.title||"제품")}</span></h1>
+    <div class="kv">Product Requirements Document</div>
+
+    <section><h2>1. 개요</h2>
+      <div class="prd-row"><span class="prd-k">한 줄 정의</span>${prdField("oneLiner")}</div>
+      <div class="prd-row"><span class="prd-k">제품 목표</span>${prdField("goal")}</div>
+      <div class="prd-row"><span class="prd-k">배경</span>${prdField("background")}</div>
+    </section>
+
+    <section><h2>2. 핵심 가치</h2>
+      <div class="prd-row"><span class="prd-k">사용자 문제</span>${prdField("problem")}</div>
+      <div class="prd-row"><span class="prd-k">해결 방식</span>${prdField("solution")}</div>
+      <div class="prd-row"><span class="prd-k">차별점</span>${prdField("differentiator")}</div>
+    </section>
+
+    <section><h2>3. 타겟 및 시나리오</h2>
+      <h3 class="prd-sub">핵심 사용자 그룹</h3>${prdList("targets")}
+      <h3 class="prd-sub">사용 시나리오</h3>${prdList("scenarios", true)}
+    </section>
+
+    <section><h2>4. 성공 지표</h2>
+      <h3 class="prd-sub">핵심 KPI</h3>${prdList("kpis")}
+      <h3 class="prd-sub">리스크 및 오픈 이슈</h3>${prdList("risks")}
+    </section>
+
+    <section><h2>5. 속성 설정</h2>
+      <div class="prd-row"><span class="prd-k">제품 카테고리</span>${prdField("category")}</div>
+      <div class="prd-row"><span class="prd-k">사용자 역할</span>${prdChips("roles")}</div>
+      <div class="prd-row"><span class="prd-k">사용 환경</span>${prdChips("platforms")}</div>
+    </section>
+  </div>`;
+}
+
+/* --------------------- 기능명세서 (3분할 디렉터리 + 상세) --------------------- */
+function nodeInfo(id){
+  if(!id) return null;
+  if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); const ff=findF(fid); if(!ff.f||!ff.f.specs[+si]) return null; return {kind:"spec",id,ref:id,obj:ff.f.specs[+si]}; }
+  const r=find(id); if(r) return {kind:"req",id,obj:r};
+  const ff=findF(id); if(ff.f) return {kind:"feat",id,obj:ff.f};
+  return null;
+}
+function ownerOf(id){ if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); return findF(fid).f.specs[+si]; } return id[0]==="R"?find(id):findF(id).f; }
+function specTitle(sp){ return typeof sp==="string"?sp:(sp&&sp.title||""); }
+
+function renderSpec(){
+  if(!find(selReq)) selReq = SOT.requirements[0] ? SOT.requirements[0].id : null;
+  const req = find(selReq);
+  if(req && !req.features.find(f=>f.id===selFeat)) selFeat = req.features[0] ? req.features[0].id : null;
+  if(!nodeInfo(selNode)) selNode = selReq;
+  const feat = selFeat ? findF(selFeat).f : null;
+
+  // 1) 요구사항
+  let colReqHtml;
+  if(colReqCol){ colReqHtml = `<div class="dir-col collapsed" data-expand="req" title="펼치기"><div class="cc-label">요구사항 ▸</div></div>`; }
+  else{
+    const items = SOT.requirements.map(r=>`<div class="dir-item ${r.id===selReq?'sel':''}" data-selreq="${r.id}">
+      <span class="di-title">${esc(r.title)}</span><span class="di-meta">${r.features.length}</span></div>`).join("") || `<div class="empty">없음</div>`;
+    colReqHtml = `<div class="dir-col cReq">
+      <div class="dir-head">요구사항 <span class="hd-btns"><button class="mini" data-collapse="req" title="접기">‹</button><button class="addbtn sm" data-add-req>＋</button></span></div>
+      <div class="dir-body">${items}</div></div>`;
+  }
+  // 2) 기능
+  let colFeatHtml;
+  if(colFeatCol){ colFeatHtml = `<div class="dir-col collapsed" data-expand="feat" title="펼치기"><div class="cc-label">기능 ▸</div></div>`; }
+  else{
+    const items = req ? (req.features.map(f=>{
+      const s=STAT[f.status];
+      return `<div class="dir-item ${f.id===selFeat?'sel':''}" data-selfeat="${f.id}">
+        <span class="status-dot ${s.c}"></span><span class="di-title">${esc(f.title)}</span>
+        <span class="di-meta">${f.starred?'★ ':''}${f.specs.length}</span></div>`;
+    }).join("") || `<div class="empty">기능 없음</div>`) : `<div class="empty">요구사항 선택</div>`;
+    colFeatHtml = `<div class="dir-col cFeat">
+      <div class="dir-head">기능 <span class="hd-btns"><button class="mini" data-collapse="feat" title="접기">‹</button><button class="addbtn sm" data-add-feat="${selReq}">＋</button></span></div>
+      <div class="dir-body">${items}</div></div>`;
+  }
+  // 3) 상세 기능
+  const specItems = feat ? (feat.specs.map((sp,si)=>{
+    const sid = selFeat+":"+si;
+    return `<div class="dir-item ${sid===selNode?'sel':''}" data-selnode="${sid}">
+      <span class="ds-idx">${si+1}</span><span class="di-title">${esc(specTitle(sp))}</span></div>`;
+  }).join("") || `<div class="empty">상세기능 없음</div>`) : `<div class="empty">기능 선택</div>`;
+  const colSpecHtml = `<div class="dir-col cSpec">
+    <div class="dir-head">상세 기능 ${feat?`<button class="addbtn sm" data-add-spec="${selFeat}">＋</button>`:''}</div>
+    <div class="dir-body">${specItems}</div></div>`;
+
+  // 4) 상세 패널
+  const colDetailHtml = `<div class="dir-col cDetail">${renderDetail()}</div>`;
+
+  return `<div class="dir">${colReqHtml}${colFeatHtml}${colSpecHtml}${colDetailHtml}</div>`;
+}
+
+function renderDetail(){
+  const n = nodeInfo(selNode);
+  if(!n) return `<div class="detail"><p class="empty">왼쪽에서 항목을 선택하세요.</p></div>`;
+  if(n.kind==="spec"){
+    const s=n.obj;
+    const sac = (s.acceptance||[]).map((a,i)=>`<div class="ac-item ${a.done?'done':''}">
+        <input type="checkbox" data-ac-done="${n.ref}#${i}" ${a.done?'checked':''}>
+        <span class="ac-text" contenteditable data-ac-text="${n.ref}#${i}">${esc(a.text)}</span>
+        <button class="ac-del" data-ac-del="${n.ref}#${i}" title="삭제">×</button></div>`).join("")
+        || `<div class="empty">수용 기준이 없습니다. ＋로 추가하세요.</div>`;
+    return `<div class="detail">
+      <div class="dt-title field" contenteditable data-spec="${n.ref}">${esc(s.title)}</div>
+      <div class="dt-goto"><button class="topbtn" data-gototree>↗ 트리 뷰로 이동</button>
+        <button class="topbtn" data-del-spec="${n.ref}" style="margin-left:6px">상세기능 삭제</button></div>
+      <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${n.ref}</span></div>
+      <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">상세 기능 (Specification)</span></div>
+      <div class="dt-sec">설명</div>
+      <div class="dt-desc field" contenteditable data-spec-desc="${n.ref}">${esc(s.desc||'')}</div>
+      <div class="dt-sec">수용 기준 <button class="addbtn sm" data-add-ac="${n.ref}">＋</button></div>
+      <div class="ac-list">${sac}</div>
+    </div>`;
+  }
+  const o=n.obj, id=n.id;
+  const titleAttr = n.kind==="req"?`data-req-title="${id}"`:`data-feat-title="${id}"`;
+  const descAttr  = n.kind==="req"?`data-req-desc="${id}"`:`data-feat-desc="${id}"`;
+  const typeLabel = n.kind==="req"?"요구사항 (Requirement)":"기능 (Feature)";
+  const statusOpt = Object.keys(STAT).map(k=>`<option value="${k}" ${o.status===k?'selected':''}>${STAT[k].t}</option>`).join("");
+  const prioOpt   = Object.keys(PRIO).map(k=>`<option value="${k}" ${o.priority===k?'selected':''}>${PRIO[k].t}</option>`).join("");
+  const ac = (o.acceptance||[]).map((a,i)=>`<div class="ac-item ${a.done?'done':''}">
+      <input type="checkbox" data-ac-done="${id}#${i}" ${a.done?'checked':''}>
+      <span class="ac-text" contenteditable data-ac-text="${id}#${i}">${esc(a.text)}</span>
+      <button class="ac-del" data-ac-del="${id}#${i}" title="삭제">×</button></div>`).join("")
+      || `<div class="empty">수용 기준이 없습니다. ＋로 추가하세요.</div>`;
+  let screenBlock="";
+  if(n.kind==="feat"){
+    const linked=pagesRefTo(id);
+    const rows=linked.map(pg=>`<div class="ia-link"><span class="ill">${esc(pageLabel(pg.id))}</span><button class="ac-del" data-map-unlink="${pg.id}~${id}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">연결된 화면이 없습니다.</div>`;
+    const opts=allPages().filter(pg=>!linked.some(x=>x.id===pg.id)).map(pg=>`<option value="${pg.id}">${esc(pg.label)}</option>`).join("");
+    const secOpts=SOT.ia.sections.map(s=>`<option value="${s.id}">${esc(s.title)} 하위</option>`).join("");
+    screenBlock=`<div class="dt-sec">연결된 화면 (IA)</div>
+      <div class="ac-list">${rows}</div>
+      <div class="ia-linkadd"><select data-map-existing="${id}"><option value="">기존 화면에 연결…</option>${opts}</select></div>
+      <div class="ia-linkadd"><select data-map-newin="${id}"><option value="">＋ 새 화면 만들기 (섹션 선택)…</option>${secOpts}<option value="__new">＋ 새 섹션 만들어 추가</option></select></div>`;
+  }
+  return `<div class="detail">
+    <div class="dt-title field" contenteditable ${titleAttr}>${esc(o.title)}</div>
+    <div class="dt-goto"><button class="topbtn" data-gototree>↗ 트리 뷰로 이동</button></div>
+    <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${id}</span></div>
+    <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">${typeLabel}</span></div>
+    <div class="dt-row"><span class="dt-k">상태</span><select data-status="${id}">${statusOpt}</select></div>
+    <div class="dt-row"><span class="dt-k">중요도</span><select data-priority="${id}">${prioOpt}</select></div>
+    <div class="dt-sec">설명</div>
+    <div class="dt-desc field" contenteditable ${descAttr}>${esc(o.desc||'')}</div>
+    <div class="dt-sec">수용 기준 <button class="addbtn sm" data-add-ac="${id}">＋</button></div>
+    <div class="ac-list">${ac}</div>
+    ${screenBlock}
+  </div>`;
+}
+
+/* ------------------------------ IA (정보구조) ------------------------------ */
+const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
+function iaWalk(arr,sec,parent,id){ for(const p of arr){ if(p.id===id) return {page:p,arr,sec,parent}; const r=iaWalk(p.children||[],sec,p,id); if(r) return r; } return null; }
+function iaFindPage(id){ if(!id) return null; for(const sec of SOT.ia.sections){ const r=iaWalk(sec.pages,sec,null,id); if(r) return r; } return null; }
+function countPages(arr){ let n=arr.length; arr.forEach(p=>n+=countPages(p.children||[])); return n; }
+function specCatalog(){ const out=[]; SOT.requirements.forEach(r=>r.features.forEach(f=>{ out.push({id:f.id,label:r.title+" › "+f.title}); f.specs.forEach((sp,si)=>out.push({id:f.id+":"+si,label:f.title+" › "+specTitle(sp)})); })); return out; }
+function refLabel(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label:id; }
+function pagesRefTo(fid){ const out=[]; const walk=arr=>arr.forEach(p=>{ if((p.refs||[]).includes(fid)) out.push(p); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return out; }
+function allPages(){ const out=[]; const walk=(arr,st)=>arr.forEach(p=>{ out.push({id:p.id,label:st+" › "+p.title}); walk(p.children||[],st); }); SOT.ia.sections.forEach(s=>walk(s.pages,s.title)); return out; }
+function pageLabel(id){ const a=allPages().find(x=>x.id===id); return a?a.label:id; }
+function findPageByRef(id){ let res=null; const walk=arr=>arr.forEach(p=>{ if(!res&&(p.refs||[]).includes(id)) res=p; walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return res; }
+function coverage(){ const mapped=new Set(); const walk=arr=>arr.forEach(p=>{ (p.refs||[]).forEach(x=>mapped.add(x)); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); const unmapped=specCatalog().filter(c=>!mapped.has(c.id)); return {mapped,unmapped}; }
+function iaFillMissing(){
+  SOT.requirements.forEach(r=>{
+    r.features.forEach(f=>{
+      let fpage=findPageByRef(f.id);
+      if(!fpage){
+        let sec=SOT.ia.sections.find(s=>s.title===r.title);
+        if(!sec){ sec={id:nid("S"),title:r.title,pages:[]}; SOT.ia.sections.push(sec); }
+        fpage={id:nid("P"),title:f.title,type: sec.pages.length?"page":"top",refs:[f.id],children:[]};
+        sec.pages.push(fpage);
+      }
+      f.specs.forEach((sp,si)=>{ const sid=f.id+":"+si; if(!findPageByRef(sid)) fpage.children.push({id:nid("P"),title:specTitle(sp),type:"action",refs:[sid],children:[]}); });
+    });
+  });
+}
+function buildIAFromSpec(){
+  SOT.ia.sections = SOT.requirements.map(r=>({
+    id:nid("S"), title:r.title,
+    pages: r.features.map((f,fi)=>({
+      id:nid("P"), title:f.title, type: fi===0?"top":"page", refs:[f.id],
+      children: f.specs.map((sp,si)=>({ id:nid("P"), title:specTitle(sp), type:"action", refs:[f.id+":"+si], children:[] }))
+    }))
+  }));
+}
+
+function iaPageLi(p){
+  const kids = (p.children&&p.children.length)?`<ul>${p.children.map(iaPageLi).join("")}</ul>`:"";
+  const cls = p.type==="top"?"top":(p.type==="action"?"action":"page");
+  return `<li><div class="snode ${cls} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
+      <span class="stype">${PTYPE[p.type]}</span>
+      <span class="stitle">${esc(p.title)}</span>
+      <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="하위 추가">＋</button><button class="mini" data-del-page="${p.id}" title="삭제">×</button></span>
+    </div>${kids}</li>`;
+}
+function renderIA(){
+  if(selSec && !SOT.ia.sections.find(s=>s.id===selSec)) selSec=null;
+  if(selPage && !iaFindPage(selPage)) selPage=null;
+  const secLis = SOT.ia.sections.map(s=>{
+    const pages = s.pages.length?`<ul>${s.pages.map(iaPageLi).join("")}</ul>`:"";
+    return `<li><div class="snode sec ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
+        <span class="stype">Depth 1</span>
+        <span class="stitle">${esc(s.title)}</span>
+        <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="페이지 추가">＋</button><button class="mini" data-del-sec="${s.id}" title="섹션 삭제">×</button></span>
+      </div>${pages}</li>`;
+  }).join("");
+  const tree = `<div class="sitemap"><ul><li>
+      <div class="snode root">
+        <span class="stitle">${esc(SOT.title||"IA")}</span>
+        <span class="stype">Information Architecture</span>
+        <span class="srowbtns"><button class="mini" data-add-sec title="섹션 추가">＋</button></span>
+      </div>
+      ${SOT.ia.sections.length?`<ul>${secLis}</ul>`:""}
+    </li></ul></div>`;
+  const cov=coverage();
+  const warn = cov.unmapped.length
+    ? `<div class="ia-warn">
+        <div class="iw-head">⚠ 아직 화면에 매핑되지 않은 기능·상세기능 <b>${cov.unmapped.length}개</b>
+          <span class="iw-btns"><button class="addbtn sm" data-ia-fillmissing>누락 자동 채우기</button><button class="addbtn sm ghost" data-ia-rebuild>기능명세서로 재생성</button></span>
+        </div>
+        <div class="iw-list">${cov.unmapped.slice(0,14).map(c=>`<span class="warn-chip">${esc(c.label)}</span>`).join("")}${cov.unmapped.length>14?`<span class="warn-chip more">＋${cov.unmapped.length-14}</span>`:""}</div>
+      </div>`
+    : `<div class="ia-ok">✓ 기능명세서의 모든 기능·상세기능이 화면에 매핑되어 있습니다.</div>`;
+  return `<div class="ia2">
+    <div class="ia-canvas">
+      ${warn}
+      <div class="ia-hint">위에서 아래로 내려가는 정보구조도입니다. 노드에 마우스를 올리면 ＋추가·×삭제, 노드를 클릭하면 오른쪽에서 편집할 수 있어요.</div>
+      ${tree}
+    </div>
+    <div class="ia-side">${renderIADetail()}</div>
+  </div>`;
+}
+function renderIADetail(){
+  if(!selPage){
+    const sec=SOT.ia.sections.find(s=>s.id===selSec);
+    if(!sec) return `<div class="detail"><p class="empty">노드를 선택하세요.</p></div>`;
+    return `<div class="detail">
+      <div class="dt-title field" contenteditable data-sec-title="${sec.id}">${esc(sec.title)}</div>
+      <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">섹션 (Depth 1)</span></div>
+      <div class="dt-row"><span class="dt-k">페이지</span><span class="dt-v">${countPages(sec.pages)}개</span></div>
+      <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">＋ 최상위 페이지 추가</button>
+        <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">섹션 삭제</button></div>
+    </div>`;
+  }
+  const r = iaFindPage(selPage);
+  if(!r) return `<div class="detail"><p class="empty">노드를 선택하세요.</p></div>`;
+  const p=r.page;
+  const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${PTYPE[k]}</option>`).join("");
+  const cat = specCatalog();
+  const linked = (p.refs||[]).map((rid,i)=>`<div class="ia-link"><span class="ill">${esc(refLabel(rid))}</span><button class="ac-del" data-ia-unlink="${p.id}#${i}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">연결된 기능이 없습니다.</div>`;
+  const opts = cat.filter(c=>!(p.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("");
+  return `<div class="detail">
+    <div class="dt-title field" contenteditable data-ia-title="${p.id}">${esc(p.title)}</div>
+    <div class="dt-goto"><button class="topbtn" data-gotoflow>↗ 유저플로우에서 보기</button>
+      <button class="topbtn" data-add-page="${p.id}" style="margin-left:6px">＋ 하위 화면</button>
+      <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">화면 삭제</button></div>
+    <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
+    <div class="dt-row"><span class="dt-k">타입</span><select data-ia-type="${p.id}">${typeOpt}</select></div>
+    <div class="dt-sec">연결된 기능 <span class="di-meta" style="font-weight:400">· 기능명세서에서 연결</span></div>
+    <div class="ac-list">${linked}</div>
+    <div class="ia-linkadd"><select data-ia-link="${p.id}"><option value="">＋ 기능 연결…</option>${opts}</select></div>
+  </div>`;
+}
+
+/* --------------------- 유저플로우 (IA 파생: 타입 노드 + 섹션) --------------------- */
+let FEDGES = [];
+function renderFlow(){
+  FEDGES = [];
+  const nodeH = p=>{
+    (p.children||[]).forEach(c=>FEDGES.push({a:p.id,b:c.id,spine:false}));
+    const kids=(p.children||[]).map(nodeH).join(""); const ch=kids?`<div class="children">${kids}</div>`:"";
+    const cls = p.type==="top"?"top":(p.type==="action"?"action":"page");
+    const badge = (p.refs&&p.refs.length)?`<span class="fref">${p.refs.length}</span>`:"";
+    return `<div class="branch"><div class="fnode ${cls}" data-fn="${p.id}"><span class="ftitle" contenteditable data-ia-title="${p.id}">${esc(p.title)}</span>${badge}</div>${ch}</div>`;
+  };
+  const secFirsts=[];
+  const branches = SOT.ia.sections.map(sec=>{ if(sec.pages[0]) secFirsts.push(sec.pages[0].id); return sec.pages.map(nodeH).join(""); }).join("");
+  if(secFirsts[0]) FEDGES.push({a:"START",b:secFirsts[0],spine:false});
+  for(let i=0;i<secFirsts.length-1;i++) FEDGES.push({a:secFirsts[i],b:secFirsts[i+1],spine:true});
+
+  return `<div class="flow2" id="flow2">
+    <svg class="wires" id="fwires"></svg>
+    <div id="flowBands"></div>
+    <div class="flow-legend">
+      <span class="lg"><span class="sw start"></span>시작</span>
+      <span class="lg"><span class="sw top"></span>섹션 최상위 페이지</span>
+      <span class="lg"><span class="sw page"></span>페이지</span>
+      <span class="lg"><span class="sw action"></span>행동</span>
+      <span class="lg">→ 유저가 이동하는 흐름</span>
+    </div>
+    <div class="branch">
+      <div class="fnode start" data-fn="START">시작</div>
+      <div class="children">${branches || '<div class="empty" style="padding:20px">IA에 페이지를 추가하세요.</div>'}</div>
+    </div>
+  </div>`;
+}
+function layoutFlow(){
+  const cont = document.getElementById("flow2"); if(!cont) return;
+  requestAnimationFrame(()=>{
+    const svg = document.getElementById("fwires");
+    const cr = cont.getBoundingClientRect();
+    svg.setAttribute("width", cont.scrollWidth); svg.setAttribute("height", cont.scrollHeight);
+    let d="";
+    FEDGES.forEach(e=>{
+      const pe=cont.querySelector('[data-fn="'+e.a+'"]'), ce=cont.querySelector('[data-fn="'+e.b+'"]');
+      if(!pe||!ce) return;
+      const a=pe.getBoundingClientRect(), b=ce.getBoundingClientRect();
+      if(e.spine){
+        const x=a.left+a.width/2-cr.left, y1=a.bottom-cr.top, y2=b.top-cr.top, my=(y1+y2)/2;
+        d+=`<path d="M${x},${y1} C${x},${my} ${x},${my} ${x},${y2}"/>`;
+      } else {
+        const x1=a.right-cr.left, y1=a.top+a.height/2-cr.top, x2=b.left-cr.left, y2=b.top+b.height/2-cr.top, mx=(x1+x2)/2;
+        d+=`<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"/>`;
+      }
+    });
+    svg.innerHTML=d;
+    const bands=document.getElementById("flowBands"); if(!bands) return;
+    const secs=SOT.ia.sections;
+    const centers=secs.map(s=>{ const id=s.pages[0]?s.pages[0].id:null; const el=id?cont.querySelector('[data-fn="'+id+'"]'):null; return el?(el.getBoundingClientRect().top+el.getBoundingClientRect().height/2-cr.top):0; });
+    let html=secs.map((s,i)=>`<div class="flow-band-label" style="top:${centers[i]-9}px">${esc(s.title)}</div>`).join("");
+    for(let i=1;i<centers.length;i++){ const y=(centers[i-1]+centers[i])/2; html+=`<div class="flow-band-sep" style="top:${y}px"></div>`; }
+    bands.innerHTML=html;
+  });
+}
+
+/* ----------------------------- 트리 / 노드 캔버스 ----------------------------- */
+let EDGES = [];
+function renderTree(){
+  EDGES = [];
+  const specNode = (fid,sp,si)=>{
+    const id = fid+":"+si; EDGES.push([fid,id]);
+    return `<div class="branch"><div class="tnode spec" data-node="${id}" data-kind="spec">
+      <span class="ic"></span>
+      <span class="tn-title">${esc(specTitle(sp))}</span>
+      <button class="tdel" data-delnode="${id}" title="삭제">×</button>
+    </div></div>`;
+  };
+  const featNode = f=>{
+    f.specs.forEach((sp,si)=>{}); // edges added inside specNode
+    const kids = f.specs.map((sp,si)=>specNode(f.id,sp,si)).join("");
+    const children = kids?`<div class="children">${kids}</div>`:"";
+    return `<div class="branch"><div class="tnode feat" data-node="${f.id}" data-kind="feat">
+      <span class="ic"></span>
+      <span class="tn-title">${esc(f.title)}</span>
+      <span class="tn-id">${f.id}</span>
+      <button class="star ${f.starred?'on':''}" data-star="${f.id}" title="즐겨찾기">★</button>
+      <button class="tadd" data-addchild="${f.id}" title="상세기능 추가">＋</button>
+      <button class="tdel" data-delnode="${f.id}" title="삭제">×</button>
+    </div>${children}</div>`;
+  };
+  const reqNode = r=>{
+    r.features.forEach(f=>EDGES.push([r.id,f.id]));
+    const kids = r.features.map(featNode).join("");
+    const children = kids?`<div class="children">${kids}</div>`:"";
+    return `<div class="branch"><div class="tnode req" data-node="${r.id}" data-kind="req">
+      <span class="ic"></span>
+      <span class="tn-title">${esc(r.title)}</span>
+      <span class="tn-id">${r.id}</span>
+      <button class="star ${r.starred?'on':''}" data-star="${r.id}" title="즐겨찾기">★</button>
+      <button class="tadd" data-addchild="${r.id}" title="기능 추가">＋</button>
+      <button class="tdel" data-delnode="${r.id}" title="삭제">×</button>
+    </div>${children}</div>`;
+  };
+  SOT.requirements.forEach(r=>EDGES.push(["PRD",r.id]));
+  const kids = SOT.requirements.map(reqNode).join("");
+  return `<div class="tree" id="tree">
+    <svg class="wires" id="wires"></svg>
+    <div id="treeHdr"></div>
+    <div class="tree-hint">노드를 클릭하면 기능명세서로 이동 · 마우스오버 시 ＋추가 · ×삭제 · ★즐겨찾기</div>
+    <div class="branch"><div class="tnode prd" data-node="PRD" data-kind="prd">
+      <span class="ic"></span>
+      <span class="tn-title">${esc(SOT.title||"제품")}</span>
+      <span class="tn-id">PRD</span>
+      <button class="tadd" data-addchild="PRD" title="요구사항 추가">＋</button>
+    </div><div class="children">${kids}</div></div>
+  </div>`;
+}
+function layoutTree(){
+  const cont = document.getElementById("tree"); if(!cont) return;
+  requestAnimationFrame(()=>{
+    const svg = document.getElementById("wires");
+    const cr = cont.getBoundingClientRect();
+    const W = cont.scrollWidth, H = cont.scrollHeight;
+    svg.setAttribute("width",W); svg.setAttribute("height",H);
+    let d="";
+    EDGES.forEach(([p,c])=>{
+      const pe=cont.querySelector('[data-node="'+p+'"]'), ce=cont.querySelector('[data-node="'+c+'"]');
+      if(!pe||!ce) return;
+      const a=pe.getBoundingClientRect(), b=ce.getBoundingClientRect();
+      const x1=a.right-cr.left, y1=a.top+a.height/2-cr.top;
+      const x2=b.left-cr.left,  y2=b.top+b.height/2-cr.top;
+      const mx=(x1+x2)/2;
+      d+=`<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"/>`;
+    });
+    svg.innerHTML=d;
+    const hdr=document.getElementById("treeHdr");
+    if(hdr){ hdr.innerHTML=[["prd","PRD"],["req","요구사항"],["feat","기능"],["spec","상세 기능"]].map(([k,t])=>{
+      const el=cont.querySelector('[data-kind="'+k+'"]'); if(!el) return "";
+      const x=el.getBoundingClientRect().left-cr.left;
+      return `<div class="tcol-label" style="left:${x}px">${t}</div>`;
+    }).join(""); }
+  });
+}
+function addChild(pid){
+  if(pid==="PRD") SOT.requirements.push({id:nid("R"),title:"새 요구사항",desc:"설명을 입력하세요.",features:[]});
+  else if(pid[0]==="R") find(pid).features.push({id:nid("F"),title:"새 기능",priority:"mid",status:"todo",specs:[]});
+  else if(pid[0]==="F") findF(pid).f.specs.push({title:"새 상세기능",desc:"",acceptance:[]});
+  commit();
+}
+function delNode(id){
+  if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); findF(fid).f.specs.splice(+si,1); }
+  else if(id[0]==="R") SOT.requirements=SOT.requirements.filter(r=>r.id!==id);
+  else if(id[0]==="F"){ const r=findF(id).r; r.features=r.features.filter(f=>f.id!==id); }
+  commit();
+}
+function toggleStar(id){
+  const o = id[0]==="R"?find(id):(id[0]==="F"?findF(id).f:null);
+  if(o){ o.starred=!o.starred; commit(); }
+}
+function goToSpec(id){
+  if(id==="PRD"){ VIEW="prd"; render(); return; }
+  if(id.indexOf(":")>-1){ const fid=id.split(":")[0]; const ff=findF(fid); if(ff.f){ selReq=ff.r.id; selFeat=fid; selNode=id; } }
+  else if(id[0]==="R"){ const r=find(id); if(r){ selReq=id; selFeat=r.features[0]?r.features[0].id:null; selNode=id; } }
+  else if(id[0]==="F"){ const ff=findF(id); if(ff.f){ selReq=ff.r.id; selFeat=id; selNode=id; } }
+  VIEW="spec"; render();
+}
+
+/* ============================ EVENT WIRING ============================ */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;render();}));
+document.getElementById("resetBtn").addEventListener("click",()=>{ if(!HISTORY.length) return; restoreTo(0); const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title||"제품"; });
+document.getElementById("sotBtn").addEventListener("click",()=>{
+  const w=window.open("","_blank","width=520,height=640");
+  w.document.write("<title>SOT (Single Source of Truth)</title><pre style='font:12px/1.5 ui-monospace,Menlo,monospace;padding:16px;white-space:pre-wrap'>"+esc(JSON.stringify(SOT,null,2))+"</pre>");
+});
+document.getElementById("prodTitle").addEventListener("input",e=>{SOT.title=e.currentTarget.firstChild.textContent.trim();});
+
+/* delegated edits (contenteditable) */
+document.getElementById("stage").addEventListener("input",e=>{
+  const t=e.target; if(!t.dataset) return; const v=t.textContent;
+  if("prod" in t.dataset) SOT.title=v;
+  else if(t.dataset.prdField) SOT.prd[t.dataset.prdField]=v;
+  else if(t.dataset.prdList){ const[k,i]=t.dataset.prdList.split("#"); SOT.prd[k][+i]=v; }
+  else if(t.dataset.reqDesc) find(t.dataset.reqDesc).desc=v;
+  else if(t.dataset.reqTitle) find(t.dataset.reqTitle).title=v;
+  else if(t.dataset.featTitle) findF(t.dataset.featTitle).f.title=v;
+  else if(t.dataset.featDesc) findF(t.dataset.featDesc).f.desc=v;
+  else if(t.dataset.acText){ const[id,i]=t.dataset.acText.split("#"); ownerOf(id).acceptance[+i].text=v; }
+  else if(t.dataset.iaTitle){ const r=iaFindPage(t.dataset.iaTitle); if(r) r.page.title=v; }
+  else if(t.dataset.secTitle){ const s=SOT.ia.sections.find(x=>x.id===t.dataset.secTitle); if(s) s.title=v; }
+  else if(t.dataset.spec){ const[fid,si]=t.dataset.spec.split(":"); findF(fid).f.specs[+si].title=v; }
+  else if(t.dataset.specDesc){ const[fid,si]=t.dataset.specDesc.split(":"); findF(fid).f.specs[+si].desc=v; }
+  if(VIEW==="tree") layoutTree();
+  else if(VIEW==="flow") layoutFlow();
+});
+/* clicks: selection (rows) + add/delete (buttons) */
+document.getElementById("stage").addEventListener("click",e=>{
+  const b=e.target.closest("button");
+  if(!b){ // row selection / column expand in the directory view
+    const ex=e.target.closest("[data-expand]");
+    if(ex){ if(ex.dataset.expand==="req") colReqCol=false; else colFeatCol=false; render(); return; }
+    const sr=e.target.closest("[data-selreq]");
+    if(sr){ selReq=sr.dataset.selreq; const r=find(selReq); selFeat=r.features[0]?r.features[0].id:null; selNode=selReq; render(); return; }
+    const sf=e.target.closest("[data-selfeat]");
+    if(sf){ selFeat=sf.dataset.selfeat; selNode=selFeat; render(); return; }
+    const sn=e.target.closest("[data-selnode]");
+    if(sn){ selNode=sn.dataset.selnode; render(); return; }
+    const ss=e.target.closest("[data-selsec]");
+    if(ss){ selSec=ss.dataset.selsec; selPage=null; render(); return; }
+    const sp=e.target.closest("[data-selpage]");
+    if(sp){ selPage=sp.dataset.selpage; render(); return; }
+    const tn=e.target.closest("[data-node]");
+    if(tn){ goToSpec(tn.dataset.node); return; }
+    return;
+  }
+  const d=b.dataset;
+  if(d.prdAdd){ (SOT.prd[d.prdAdd]=SOT.prd[d.prdAdd]||[]).push("새 항목"); commit(); }
+  else if(d.prdDel){ const[k,i]=d.prdDel.split("#"); SOT.prd[k].splice(+i,1); commit(); }
+  else if("addReq" in d){ SOT.requirements.push({id:nid("R"),title:"새 요구사항",desc:"설명을 입력하세요.",status:"todo",priority:"mid",acceptance:[],features:[]}); commit(); }
+  else if(d.collapse){ if(d.collapse==="req") colReqCol=true; else colFeatCol=true; render(); }
+  else if(d.addFeat){ const f={id:nid("F"),title:"새 기능",priority:"mid",status:"todo",desc:"",acceptance:[],specs:[{title:"새 상세기능",desc:"",acceptance:[]}]}; find(d.addFeat).features.push(f); selFeat=f.id; selNode=f.id; commit(); }
+  else if(d.delFeat){ const r=findF(d.delFeat).r; r.features=r.features.filter(f=>f.id!==d.delFeat); commit(); }
+  else if(d.addSpec){ const ff=findF(d.addSpec).f; ff.specs.push({title:"새 상세기능",desc:"",acceptance:[]}); selNode=d.addSpec+":"+(ff.specs.length-1); commit(); }
+  else if(d.delSpec){ const[fid,si]=d.delSpec.split(":"); findF(fid).f.specs.splice(+si,1); if(selNode===d.delSpec) selNode=fid; commit(); }
+  else if(d.addchild){ addChild(d.addchild); }
+  else if(d.delnode){ delNode(d.delnode); }
+  else if(d.star){ toggleStar(d.star); }
+  else if("gototree" in d){ VIEW="tree"; render(); }
+  else if("gotoflow" in d){ VIEW="flow"; render(); }
+  else if(d.addAc){ ownerOf(d.addAc).acceptance.push({text:"새 수용 기준",done:false}); commit(); }
+  else if(d.acDel){ const[id,i]=d.acDel.split("#"); ownerOf(id).acceptance.splice(+i,1); commit(); }
+  else if("addSec" in d){ const s={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(s); selSec=s.id; selPage=null; commit(); }
+  else if(d.delSec){ SOT.ia.sections=SOT.ia.sections.filter(s=>s.id!==d.delSec); if(selSec===d.delSec){selSec=null;selPage=null;} commit(); }
+  else if(d.addToppage){ const s=SOT.ia.sections.find(x=>x.id===d.addToppage); const p={id:nid("P"),title:"새 페이지",type:"top",refs:[],children:[]}; s.pages.push(p); selPage=p.id; commit(); }
+  else if(d.addPage){ const r=iaFindPage(d.addPage); const p={id:nid("P"),title:"새 페이지",type:"page",refs:[],children:[]}; r.page.children.push(p); selPage=p.id; commit(); }
+  else if(d.delPage){ const r=iaFindPage(d.delPage); if(r){ const i=r.arr.indexOf(r.page); r.arr.splice(i,1); if(selPage===d.delPage) selPage=null; } commit(); }
+  else if(d.iaUnlink){ const[pid,i]=d.iaUnlink.split("#"); const r=iaFindPage(pid); if(r) r.page.refs.splice(+i,1); commit(); }
+  else if(d.mapUnlink){ const[pid,fid]=d.mapUnlink.split("~"); const r=iaFindPage(pid); if(r) r.page.refs=r.page.refs.filter(x=>x!==fid); commit(); }
+  else if("iaFillmissing" in d){ iaFillMissing(); commit(); }
+  else if("iaRebuild" in d){ if(window.confirm("기능명세서 기준으로 IA를 다시 생성합니다. 지금 IA 구조는 대체됩니다. 계속할까요?")){ buildIAFromSpec(); selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; commit(); } }
+});
+/* change: status / priority selects + acceptance checkboxes */
+document.getElementById("stage").addEventListener("change",e=>{
+  const d=e.target.dataset;
+  if(d.status){ ownerOf(d.status).status=e.target.value; commit(); }
+  else if(d.priority){ ownerOf(d.priority).priority=e.target.value; commit(); }
+  else if(d.acDone){ const[id,i]=d.acDone.split("#"); ownerOf(id).acceptance[+i].done=e.target.checked; commit(); }
+  else if(d.iaType){ const r=iaFindPage(d.iaType); if(r) r.page.type=e.target.value; commit(); }
+  else if(d.iaLink){ if(e.target.value){ const r=iaFindPage(d.iaLink); if(r) r.page.refs.push(e.target.value); commit(); } }
+  else if(d.mapExisting){ if(e.target.value){ const r=iaFindPage(e.target.value); if(r) r.page.refs.push(d.mapExisting); commit(); } }
+  else if(d.mapNewin){ if(e.target.value){ const fid=d.mapNewin; let sec; if(e.target.value==="__new"){ sec={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(sec); } else sec=SOT.ia.sections.find(s=>s.id===e.target.value); if(sec){ const c=specCatalog().find(x=>x.id===fid); const title=c?c.label.split("›").pop().trim():"새 화면"; sec.pages.push({id:nid("P"),title,type:"page",refs:[fid],children:[]}); commit(); } } }
+});
+/* history + save/load wiring */
+function resetSelections(){ selReq=SOT.requirements[0]?SOT.requirements[0].id:null; selFeat=SOT.requirements[0]&&SOT.requirements[0].features[0]?SOT.requirements[0].features[0].id:null; selNode=selReq; selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; }
+document.getElementById("stage").addEventListener("focusout",e=>{ if(e.target&&e.target.isContentEditable) snapshotIfChanged("텍스트 편집"); });
+document.getElementById("prodTitle").addEventListener("focusout",()=>snapshotIfChanged("제목 편집"));
+document.getElementById("undoBtn").addEventListener("click",undo);
+document.getElementById("redoBtn").addEventListener("click",redo);
+document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
+document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
+document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
+document.getElementById("saveBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(SOT,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=(SOT.title||"sot").replace(/\s+/g,"_")+"_"+new Date().toISOString().slice(0,10)+".json"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+document.getElementById("loadBtn").addEventListener("click",()=>document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ try{ SOT=normalize(JSON.parse(rd.result)); resetSelections(); pushHistory("불러오기"); render(); }catch(err){ alert("불러오기 실패: 올바른 JSON 파일이 아닙니다."); } e.target.value=""; };
+  rd.readAsText(f);
+});
+document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
+
+function find(id){ return SOT.requirements.find(r=>r.id===id); }
+function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x=>x.id===fid); if(f) return {r,f}; } return {}; }
+
+let _loaded=false;
+try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ SOT=normalize(JSON.parse(emb.textContent)); _loaded=true; } }catch(e){}
+if(!_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
+if(!SOT.title) SOT.title="제품";
+resetSelections();
+selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
+pushHistory("현재 상태");
+updateUndoButtons();
+render();
+</script>

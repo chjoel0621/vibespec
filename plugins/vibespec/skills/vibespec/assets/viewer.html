@@ -199,8 +199,14 @@
   .fnode .ftitle{outline:none;border-radius:4px}
   .fnode.top .ftitle:focus,.fnode.page .ftitle:focus,.fnode.action .ftitle:focus{box-shadow:0 0 0 2px var(--accent-line)}
   /* 전환 그래프 */
-  .flowwrap{position:relative;width:100%;height:calc(100vh - 92px)}
-  .flowg{position:absolute;left:0;top:0;right:0;bottom:0;width:100%;overflow:auto;cursor:grab;background:#fbfbfd}
+  .flowwrap{position:relative;width:100%;height:calc(100vh - 92px);display:flex;flex-direction:column}
+  .flow-warn{flex:0 0 auto;padding:9px 16px;font-size:12.5px;border-bottom:1px solid #f0e2c4;background:#fff8ec;color:#7a5b00}
+  .flow-warn.ok{background:#eefaf0;border-color:#cfeccf;color:#1f7a3a}
+  .flow-warn .iw-btns{margin-left:4px}
+  .warn-chip{display:inline-block;background:#fff;border:1px solid #ecdcb4;color:#8a6d1f;border-radius:999px;padding:1px 8px;font-size:11px;margin:4px 4px 0 0}
+  .flow-stage{position:relative;flex:1 1 auto;min-height:0;display:flex}
+  .flow-main{position:relative;flex:1 1 auto;min-width:0}
+  .flowg{position:absolute;inset:0;width:100%;overflow:auto;cursor:grab;background:#fbfbfd}
   .flowg-inner{position:relative;transform-origin:0 0}
   .flow-zoom{position:absolute;right:20px;bottom:20px;display:flex;gap:5px;z-index:6}
   .flow-zoom .zbtn{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:16px;font-weight:600;color:var(--sub);cursor:pointer;box-shadow:var(--shadow)}
@@ -225,6 +231,21 @@
   .flow-tools .ztg.on{background:var(--accent);color:#fff;border-color:var(--accent)}
   .flow-tools .ztg:hover{border-color:var(--accent-line)}
   .flow-tools .ft-hint{font-size:11px;color:var(--muted);margin-left:4px}
+  .elabel.reff{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+  .flow-editpanel{flex:0 0 340px;border-left:1px solid var(--line);overflow:auto;background:#fff;padding:14px 16px}
+  .fep-sec{font-size:12px;font-weight:700;color:var(--sub);margin:16px 0 6px}
+  .fep-sec:first-child{margin-top:0}
+  .flow-editpanel select,.flow-editpanel input{border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:12.5px;width:100%;background:#fff}
+  .fep-add{display:flex;flex-direction:column;gap:6px;background:var(--panel);padding:10px;border-radius:10px}
+  .fep-add .addbtn{border:1px dashed var(--accent-line);background:var(--accent-soft);color:var(--accent);border-radius:7px;padding:6px;font-size:12.5px;font-weight:600;cursor:pointer;width:100%}
+  .fep-list{display:flex;flex-direction:column;gap:6px}
+  .tr-row{border:1px solid var(--line);border-radius:9px;padding:7px 8px}
+  .tr-row:hover{background:var(--panel)}
+  .tr-head{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .tr-fromto{flex:1;font-size:11.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tr-head .mini{border:1px solid var(--line);background:#fff;border-radius:6px;width:22px;height:22px;font-size:13px;cursor:pointer;color:var(--sub);flex:0 0 auto}
+  .tr-head .mini:hover{color:#c0392b;border-color:#f0d4d0}
+  .fep-empty{color:var(--muted);font-style:italic;padding:6px 0;font-size:12px}
 
   /* ============ SPEC DIRECTORY (3-pane + detail) ============ */
   .dir{display:flex;height:calc(100vh - 92px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
@@ -468,11 +489,11 @@ function normalize(s){
   const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
   s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
   if(s.flow && Array.isArray(s.flow.transitions)){
-    s.flow.transitions = s.flow.transitions.map(t=>({
-      from: t.from||t.source||t.fromPage||t.fromId||t.start,
-      to:   t.to||t.target||t.toPage||t.toId||t.end,
-      label: t.label||t.action||t.name||t.trigger||t.title||""
-    })).filter(t=>t.from&&t.to);
+    s.flow.transitions = s.flow.transitions.map(t=>{
+      const o={ from: t.from||t.source||t.fromPage||t.fromId||t.start, to: t.to||t.target||t.toPage||t.toId||t.end };
+      if(t.ref) o.ref=t.ref; else { const l=t.label||t.action||t.name||t.trigger||t.title||""; if(l) o.label=l; }
+      return o;
+    }).filter(t=>t.from&&t.to);
     if(s.flow.start==null) s.flow.start=s.flow.entry||s.flow.from||null;
   }
   if(!s.flow || !Array.isArray(s.flow.transitions) || !s.flow.transitions.length) s.flow=deriveFlow(s);
@@ -858,7 +879,37 @@ function computeFlow(){
   });
   return {trans,nodes,layer,byL,start};
 }
-let flowZ=1, flowX=0, flowY=0, flowW=0, flowH=0, flowSel=null, flowLabels=false;
+let flowZ=1, flowX=0, flowY=0, flowW=0, flowH=0, flowSel=null, flowLabels=false, flowEdit=false;
+function refTitle(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label.split("›").pop().trim():id; }
+function transLabel(t){ return t.ref? refTitle(t.ref) : (t.label||""); }
+function flowCoverage(){
+  const pages=allPages(); const known=new Set(pages.map(p=>p.id));
+  const trans=(SOT.flow&&SOT.flow.transitions)||[];
+  const used=new Set(); trans.forEach(t=>{used.add(t.from);used.add(t.to);}); if(SOT.flow&&SOT.flow.start) used.add(SOT.flow.start);
+  const orphans=pages.filter(p=>!used.has(p.id));
+  const dangling=trans.filter(t=>!known.has(t.from)||!known.has(t.to));
+  let banner;
+  if(orphans.length||dangling.length){
+    const chips=orphans.slice(0,12).map(o=>`<span class="warn-chip">${esc(o.label.split("›").pop().trim())}</span>`).join("");
+    banner=`<div class="flow-warn">⚠ 흐름에 연결 안 된 화면 <b>${orphans.length}</b>개${dangling.length?` · 없는 화면 참조 <b>${dangling.length}</b>개`:''}<span class="iw-btns">${orphans.length?`<button class="addbtn sm" data-fcov="orphans">시작에 연결</button>`:''}${dangling.length?`<button class="addbtn sm ghost" data-fcov="clean">참조 정리</button>`:''}</span> ${chips}</div>`;
+  } else banner=`<div class="flow-warn ok">✓ 모든 화면이 흐름에 연결되어 있습니다.</div>`;
+  return {orphans,dangling,banner};
+}
+function triggerSelect(t,i){
+  const cat=specCatalog();
+  const isCustom=(!t.ref&&t.label);
+  const opts=cat.map(c=>`<option value="${c.id}" ${t.ref===c.id?'selected':''}>${esc(c.label)}</option>`).join("");
+  return `<select data-tref="${i}"><option value="" ${(!t.ref&&!t.label)?'selected':''}>— 자동/없음 —</option>${opts}<option value="__custom" ${isCustom?'selected':''}>직접 입력…</option></select>${isCustom?`<input data-tlabel="${i}" value="${esc(t.label)}" placeholder="라벨 직접 입력" style="margin-top:5px">`:''}`;
+}
+function renderFlowEditPanel(){
+  const pages=allPages();
+  const opts=pages.map(p=>`<option value="${p.id}">${esc(p.label)}</option>`).join("");
+  const startOpts=pages.map(p=>`<option value="${p.id}" ${(SOT.flow&&SOT.flow.start)===p.id?'selected':''}>${esc(p.label)}</option>`).join("");
+  const cat=specCatalog();
+  const trans=(SOT.flow&&SOT.flow.transitions)||[];
+  const rows=trans.map((t,i)=>`<div class="tr-row"><div class="tr-head"><span class="tr-fromto">${esc(flowMeta(t.from).title)} → ${esc(flowMeta(t.to).title)}</span><button class="mini" data-tdel="${i}" title="삭제">×</button></div>${triggerSelect(t,i)}</div>`).join("") || `<div class="fep-empty">전환이 없습니다.</div>`;
+  return `<div class="flow-editpanel"><div class="fep-sec">시작 화면</div><select data-flowstart>${startOpts}</select><div class="fep-sec">전환 추가</div><div class="fep-add"><select data-addfrom><option value="">출발 화면…</option>${opts}</select><select data-addto><option value="">도착 화면…</option>${opts}</select><select data-addref><option value="">트리거 기능 (선택)</option>${cat.map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("")}<option value="__custom">직접 입력…</option></select><input data-addlabel placeholder="직접 입력 라벨(트리거 미선택 시)"><button class="addbtn" data-addtrans>＋ 전환 추가</button></div><div class="fep-sec">전환 목록 (${trans.length}) · 트리거=기능이면 라벨 자동</div><div class="fep-list">${rows}</div></div>`;
+}
 function applyFlowFocus(){
   const vp=document.getElementById("flowVP"); if(!vp) return;
   const groups=vp.querySelectorAll(".fedgeg"), nodes=vp.querySelectorAll("[data-fn]");
@@ -910,30 +961,39 @@ function renderFlow(){
       lx=(sx+tx)/2; ly=dip-16;
     }
     paths+=`<g class="fedgeg" data-from="${t.from}" data-to="${t.to}"><path class="fedge-hit" d="${d}"/><path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
-    if(t.label) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel" xmlns="http://www.w3.org/1999/xhtml" title="${esc(t.label)}">${esc(t.label)}</div></foreignObject>`;
+    const lab=transLabel(t);
+    if(lab) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`;
     paths+=`</g>`;
   });
   let nds="";
   g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
     nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fn="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;
   });
+  const cov=flowCoverage();
   return `<div class="flowwrap">
-    <div class="flowg" id="flowVP">
-      <div class="flowg-inner" id="flowInner" style="width:${flowW}px;height:${flowH}px">
-        <svg width="${flowW}" height="${flowH}" style="position:absolute;left:0;top:0;overflow:visible">
-          <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
-          ${paths}
-        </svg>
-        ${nds}
+    ${cov.banner}
+    <div class="flow-stage">
+      <div class="flow-main">
+        <div class="flowg ${flowLabels?'labels':''}" id="flowVP">
+          <div class="flowg-inner" id="flowInner" style="width:${flowW}px;height:${flowH}px">
+            <svg width="${flowW}" height="${flowH}" style="position:absolute;left:0;top:0;overflow:visible">
+              <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
+              ${paths}
+            </svg>
+            ${nds}
+          </div>
+        </div>
+        <div class="flow-tools">
+          <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">라벨</button>
+          <button class="ztg ${flowEdit?'on':''}" data-ftool="edit">편집</button>
+          <button class="ztg" data-ftool="clear">선택 해제</button>
+          <span class="ft-hint">${flowEdit?'오른쪽 패널에서 전환 추가·삭제 · 트리거=기능이면 라벨 자동':'노드 클릭 = 연결된 흐름만 강조'}</span>
+        </div>
+        ${legend}
+        ${zoom}
       </div>
+      ${flowEdit?renderFlowEditPanel():''}
     </div>
-    <div class="flow-tools">
-      <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">라벨</button>
-      <button class="ztg" data-ftool="clear">선택 해제</button>
-      <span class="ft-hint">노드 클릭 = 연결된 흐름만 강조</span>
-    </div>
-    ${legend}
-    ${zoom}
   </div>`;
 }
 function applyFlowTransform(){ const el=document.getElementById("flowInner"); if(el) el.style.transform="scale("+flowZ+")"; }
@@ -1095,7 +1155,7 @@ document.getElementById("stage").addEventListener("click",e=>{
     if(sp){ selPage=sp.dataset.selpage; render(); return; }
     const tn=e.target.closest("[data-node]");
     if(tn){ goToSpec(tn.dataset.node); return; }
-    if(VIEW==="flow"){ const nd=e.target.closest("[data-fn]"); flowSel=(nd&&nd.dataset.fn===flowSel)?null:(nd?nd.dataset.fn:null); applyFlowFocus(); return; }
+    if(VIEW==="flow"){ if(!flowEdit){ const nd=e.target.closest("[data-fn]"); flowSel=(nd&&nd.dataset.fn===flowSel)?null:(nd?nd.dataset.fn:null); applyFlowFocus(); } return; }
     return;
   }
   const d=b.dataset;
@@ -1113,7 +1173,10 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if("gototree" in d){ VIEW="tree"; render(); }
   else if("gotoflow" in d){ VIEW="flow"; render(); }
   else if(d.zoom){ if(d.zoom==="in") flowZ=Math.min(2.2,flowZ*1.15); else if(d.zoom==="out") flowZ=Math.max(0.2,flowZ/1.15); else { flowFit(); return; } applyFlowTransform(); }
-  else if(d.ftool){ if(d.ftool==="labels"){ flowLabels=!flowLabels; document.getElementById("flowVP").classList.toggle("labels",flowLabels); b.classList.toggle("on",flowLabels); } else if(d.ftool==="clear"){ flowSel=null; applyFlowFocus(); } }
+  else if(d.ftool){ if(d.ftool==="labels"){ flowLabels=!flowLabels; document.getElementById("flowVP").classList.toggle("labels",flowLabels); b.classList.toggle("on",flowLabels); } else if(d.ftool==="edit"){ flowEdit=!flowEdit; render(); } else if(d.ftool==="clear"){ flowSel=null; applyFlowFocus(); } }
+  else if("addtrans" in d){ const stg=document.getElementById("stage"); const from=stg.querySelector("[data-addfrom]").value, to=stg.querySelector("[data-addto]").value, refv=stg.querySelector("[data-addref]").value, custom=stg.querySelector("[data-addlabel]").value; if(from&&to){ SOT.flow.transitions=SOT.flow.transitions||[]; if(!SOT.flow.transitions.some(t=>t.from===from&&t.to===to)){ const tr={from,to}; if(refv&&refv!=="__custom") tr.ref=refv; else if(custom) tr.label=custom; SOT.flow.transitions.push(tr); } commit(); } }
+  else if(d.tdel!==undefined){ SOT.flow.transitions.splice(+d.tdel,1); commit(); }
+  else if(d.fcov){ if(d.fcov==="orphans"){ const cov=flowCoverage(); const stt=(SOT.flow&&SOT.flow.start)||(SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]&&SOT.ia.sections[0].pages[0].id); SOT.flow.transitions=SOT.flow.transitions||[]; cov.orphans.forEach(o=>{ if(o.id!==stt) SOT.flow.transitions.push({from:stt,to:o.id}); }); } else if(d.fcov==="clean"){ const known=new Set(allPages().map(p=>p.id)); SOT.flow.transitions=(SOT.flow.transitions||[]).filter(t=>known.has(t.from)&&known.has(t.to)); } commit(); }
   else if(d.addAc){ ownerOf(d.addAc).acceptance.push({text:"새 수용 기준",done:false}); commit(); }
   else if(d.acDel){ const[id,i]=d.acDel.split("#"); ownerOf(id).acceptance.splice(+i,1); commit(); }
   else if("addSec" in d){ const s={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(s); selSec=s.id; selPage=null; commit(); }
@@ -1136,6 +1199,9 @@ document.getElementById("stage").addEventListener("change",e=>{
   else if(d.iaLink){ if(e.target.value){ const r=iaFindPage(d.iaLink); if(r) r.page.refs.push(e.target.value); commit(); } }
   else if(d.mapExisting){ if(e.target.value){ const r=iaFindPage(e.target.value); if(r) r.page.refs.push(d.mapExisting); commit(); } }
   else if(d.mapNewin){ if(e.target.value){ const fid=d.mapNewin; let sec; if(e.target.value==="__new"){ sec={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(sec); } else sec=SOT.ia.sections.find(s=>s.id===e.target.value); if(sec){ const c=specCatalog().find(x=>x.id===fid); const title=c?c.label.split("›").pop().trim():"새 화면"; sec.pages.push({id:nid("P"),title,type:"page",refs:[fid],children:[]}); commit(); } } }
+  else if(d.flowstart!==undefined){ SOT.flow.start=e.target.value; commit(); }
+  else if(d.tref!==undefined){ const t=SOT.flow.transitions[+d.tref]; const v=e.target.value; if(v==="__custom"){ t.ref=""; if(!t.label) t.label="새 라벨"; } else if(v){ t.ref=v; t.label=""; } else { t.ref=""; t.label=""; } commit(); }
+  else if(d.tlabel!==undefined){ SOT.flow.transitions[+d.tlabel].label=e.target.value; commit(); }
 });
 /* history + save/load wiring */
 function resetSelections(){ selReq=SOT.requirements[0]?SOT.requirements[0].id:null; selFeat=SOT.requirements[0]&&SOT.requirements[0].features[0]?SOT.requirements[0].features[0].id:null; selNode=selReq; selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; }

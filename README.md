@@ -88,21 +88,7 @@ vibespec/                          # 마켓플레이스 저장소
 └── README.md
 ```
 
----
 
-## 업데이트
-
-1. 파일을 수정합니다.
-2. `plugins/vibespec/.claude-plugin/plugin.json`의 `version`을 올립니다 (예: `0.1.0` → `0.1.1`).
-3. 커밋 후 푸시합니다.
-
-```bash
-git add .
-git commit -m "뷰어 개선"
-git push
-```
-
-사용자는 `/plugin marketplace update`로 최신본을 받습니다. (버전을 올리지 않으면 git 커밋마다 새 버전으로 취급됩니다.)
 
 ---
 

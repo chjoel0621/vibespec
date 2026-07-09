@@ -1,6 +1,6 @@
 {
   "name": "vibespec",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "VibeSpec — 제품 아이디어나 기획 문서로부터 단일 SOT(JSON)를 생성하고, PRD·기능명세서·IA·유저플로우를 한 화면에서 보는 HTML 뷰어로 열어 편집하는 바이브 기획 도구.",
   "author": { "name": "chjoel0621" },
   "license": "MIT",

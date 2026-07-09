@@ -20,17 +20,21 @@ description: VibeSpec — 제품 아이디어나 기획 문서(사업계획서, 
    - `requirements`는 요구사항 → 기능 → 상세기능 3계층. id는 `R1..`, `F1..`(전체에서 유일하게 증가). 상세기능 참조는 `기능id:인덱스`(예 `F1:0`).
    - `ia.sections`를 만들고 모든 기능/상세기능을 페이지(top/page/action)의 `refs`로 매핑한다.
    - **커버리지**: 모든 `F#`와 모든 `F#:idx`가 IA의 어떤 페이지 `refs`에든 최소 1번 등장해야 한다(뷰어의 "누락 경고"가 뜨지 않도록). 권장: 요구사항→섹션, 대표 기능→top, 나머지 기능→page, 각 상세기능→그 기능 페이지의 action 자식.
+   - **`flow`(유저플로우)** 를 만든다: 화면 전환 `transitions`(from→to, label)를 `prd.scenarios` 기반으로 정의한다. IA 포함관계가 아니라 유저의 실제 이동 경로다 — 해피패스 + 주요 분기·루프를 담아라. from/to는 ia 페이지 id.
    - 상세기능에도 가능하면 `desc`와 `acceptance`를 채워 완성도를 높인다.
 
 3. **산출물 저장** (outputs 폴더)
-   - `<제품명>.sot.json` — 생성한 SOT JSON(순수 데이터).
-   - `<제품명>-viewer.html` — 이 스킬의 `assets/viewer.html`을 그대로 복사.
-   - present_files로 두 파일을 함께 전달.
+   - `<제품명>.sot.json` — 생성한 SOT JSON(순수 데이터, 공유·백업용).
+   - `<제품명>.html` — 이 스킬의 `assets/viewer.html`을 복사하되, 파일 안의
+     `<script type="application/json" id="embedded-sot"></script>` 태그의 **내용으로 생성한 SOT JSON을 넣는다**.
+     (넣기 전 `JSON.stringify(sot).replace(/</g, "\\u003c")` 처럼 모든 `<` 문자를 `<` 로 치환해 `</script>` 조기 종료를 막는다. 뷰어는 이 태그를 최우선으로 읽어 데모 대신 사용자의 제품을 바로 표시한다.)
+   - present_files로 두 파일을 함께 전달한다.
+   - ⚠️ 반드시 embedded-sot 태그에 데이터를 심어라. 비워둔 채 복사하면 사용자에게 데모(회의실 예약 앱)만 보인다.
 
 4. **사용법 안내**(평이한 표현)
-   - 뷰어 HTML을 브라우저로 열고 상단 **불러오기**로 방금 만든 JSON을 선택하면 PRD·기능명세서·IA·유저플로우가 모두 표시된다.
+   - `<제품명>.html`을 브라우저로 열면 **회원님 제품이 바로 표시**된다(불러오기 불필요).
+   - 다른 사람과 데이터만 주고받을 때는 `<제품명>.sot.json`을 뷰어의 **불러오기**로 열면 된다.
    - 편집은 뷰어에서, 저장은 **저장**(JSON 내보내기)으로. 되돌리기·히스토리도 지원한다.
-   - 팀 공유: 뷰어 HTML을 한 번 공유하고, 이후에는 JSON 파일만 주고받으면 같은 화면을 본다.
 
 ## 참고
 - 상세 스키마와 예시는 `references/sot-schema.md`.

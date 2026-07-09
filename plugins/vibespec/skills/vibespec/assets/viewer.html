@@ -199,7 +199,13 @@
   .fnode .ftitle{outline:none;border-radius:4px}
   .fnode.top .ftitle:focus,.fnode.page .ftitle:focus,.fnode.action .ftitle:focus{box-shadow:0 0 0 2px var(--accent-line)}
   /* 전환 그래프 */
-  .flowg{padding:0}
+  .flowwrap{position:relative;height:calc(100vh - 92px)}
+  .flowg{position:absolute;inset:0;overflow:auto;cursor:grab;background:#fbfbfd}
+  .flowg-inner{position:relative;transform-origin:0 0}
+  .flow-zoom{position:absolute;right:20px;bottom:20px;display:flex;gap:5px;z-index:6}
+  .flow-zoom .zbtn{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:16px;font-weight:600;color:var(--sub);cursor:pointer;box-shadow:var(--shadow)}
+  .flow-zoom .zbtn[data-zoom="fit"]{width:auto;padding:0 12px;font-size:12.5px}
+  .flow-zoom .zbtn:hover{background:var(--accent-soft);color:var(--accent)}
   .flowg .fnode{position:absolute;margin:0;justify-content:flex-start;overflow:hidden;cursor:pointer}
   .flowg .fnode .ftitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%}
   .flowg .fnode.is-start{box-shadow:0 0 0 2px #1e1e22, var(--shadow)}
@@ -447,6 +453,14 @@ function normalize(s){
   if(!s.ia) s.ia={sections:[]};
   const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
   s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
+  if(s.flow && Array.isArray(s.flow.transitions)){
+    s.flow.transitions = s.flow.transitions.map(t=>({
+      from: t.from||t.source||t.fromPage||t.fromId||t.start,
+      to:   t.to||t.target||t.toPage||t.toId||t.end,
+      label: t.label||t.action||t.name||t.trigger||t.title||""
+    })).filter(t=>t.from&&t.to);
+    if(s.flow.start==null) s.flow.start=s.flow.entry||s.flow.from||null;
+  }
   if(!s.flow || !Array.isArray(s.flow.transitions) || !s.flow.transitions.length) s.flow=deriveFlow(s);
   return s;
 }
@@ -818,6 +832,7 @@ function computeFlow(){
   const byL={}; nodes.forEach(n=>{ (byL[layer[n]]=byL[layer[n]]||[]).push(n); });
   return {trans,nodes,layer,byL,start};
 }
+let flowZ=1, flowX=0, flowY=0, flowW=0, flowH=0;
 function renderFlow(){
   const g=computeFlow();
   const legend=`<div class="flow-legend">
@@ -827,13 +842,14 @@ function renderFlow(){
       <span class="lg"><span class="sw action"></span>행동</span>
       <span class="lg">→ 화면 이동(전환)</span>
     </div>`;
-  if(!g) return `<div class="flowg" style="position:relative">${legend}<div class="empty" style="padding:48px">전환(유저플로우) 데이터가 없습니다.</div></div>`;
-  const COLW=224, ROWH=94, padX=40, padY=66, NW=158, NH=46;
+  const zoom=`<div class="flow-zoom"><button class="zbtn" data-zoom="out">−</button><button class="zbtn" data-zoom="fit">맞춤</button><button class="zbtn" data-zoom="in">＋</button></div>`;
+  if(!g) return `<div class="flowg" id="flowVP">${legend}<div class="empty" style="padding:48px">전환(유저플로우) 데이터가 없습니다.</div></div>`;
+  const COLW=270, ROWH=86, padX=30, padY=30, NW=182, NH=48;
   const pos={};
   Object.keys(g.byL).map(Number).sort((a,b)=>a-b).forEach(L=>{ g.byL[L].forEach((n,i)=>{ pos[n]={x:padX+L*COLW, y:padY+i*ROWH}; }); });
   const maxL=Math.max(...Object.keys(g.byL).map(Number));
   const maxRows=Math.max(...Object.values(g.byL).map(a=>a.length));
-  const W=padX+(maxL+1)*COLW+10, H=padY+maxRows*ROWH+30;
+  flowW=padX+(maxL+1)*COLW+10; flowH=padY+maxRows*ROWH+40;
   let paths="";
   g.trans.forEach(t=>{
     const a=pos[t.from], b=pos[t.to]; if(!a||!b) return;
@@ -841,22 +857,36 @@ function renderFlow(){
     if(b.x>a.x){ const x1=a.x+NW,y1=a.y+NH/2,x2=b.x,y2=b.y+NH/2,mx=(x1+x2)/2; d=`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; lx=(x1+x2)/2; ly=(y1+y2)/2-2; }
     else { const sx=a.x+NW/2, sy=a.y+NH, tx=b.x+NW/2, ty=b.y+NH, dip=Math.max(sy,ty)+ROWH*0.5; d=`M${sx},${sy} C${sx},${dip} ${tx},${dip} ${tx},${ty}`; lx=(sx+tx)/2; ly=dip-2; }
     paths+=`<path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
-    if(t.label) paths+=`<foreignObject x="${lx-48}" y="${ly-11}" width="96" height="22"><div class="elabel" xmlns="http://www.w3.org/1999/xhtml">${esc(t.label)}</div></foreignObject>`;
+    if(t.label) paths+=`<foreignObject x="${lx-56}" y="${ly-11}" width="112" height="22"><div class="elabel" xmlns="http://www.w3.org/1999/xhtml">${esc(t.label)}</div></foreignObject>`;
   });
   let nds="";
   g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
     nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fgoto="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;
   });
-  return `<div class="flowg" style="position:relative;min-width:${W}px;height:${H}px">
-    <svg width="${W}" height="${H}" style="position:absolute;left:0;top:0;overflow:visible">
-      <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
-      ${paths}
-    </svg>
-    ${nds}
+  return `<div class="flowwrap">
+    <div class="flowg" id="flowVP">
+      <div class="flowg-inner" id="flowInner" style="width:${flowW}px;height:${flowH}px">
+        <svg width="${flowW}" height="${flowH}" style="position:absolute;left:0;top:0;overflow:visible">
+          <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
+          ${paths}
+        </svg>
+        ${nds}
+      </div>
+    </div>
     ${legend}
+    ${zoom}
   </div>`;
 }
-function layoutFlow(){}
+function applyFlowTransform(){ const el=document.getElementById("flowInner"); if(el) el.style.transform="scale("+flowZ+")"; }
+function flowFit(){ const vp=document.getElementById("flowVP"); if(!vp||!flowW) return; const z=Math.min((vp.clientWidth||900)/flowW,(vp.clientHeight||600)/flowH,1); flowZ=Math.max(0.2,z||1); applyFlowTransform(); vp.scrollTo(0,0); }
+function layoutFlow(){
+  const vp=document.getElementById("flowVP"); if(!vp) return;
+  if(!flowZ) flowZ=1; applyFlowTransform();
+  let dg=false,sx,sy,sl,st;
+  vp.onpointerdown=(e)=>{ if(e.target.closest("[data-fgoto]")) return; dg=true; sx=e.clientX; sy=e.clientY; sl=vp.scrollLeft; st=vp.scrollTop; vp.style.cursor="grabbing"; };
+  vp.onpointermove=(e)=>{ if(!dg) return; vp.scrollLeft=sl-(e.clientX-sx); vp.scrollTop=st-(e.clientY-sy); };
+  vp.onpointerup=vp.onpointercancel=()=>{ dg=false; vp.style.cursor="grab"; };
+}
 
 /* ----------------------------- 트리 / 노드 캔버스 ----------------------------- */
 let EDGES = [];
@@ -1023,6 +1053,7 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if(d.star){ toggleStar(d.star); }
   else if("gototree" in d){ VIEW="tree"; render(); }
   else if("gotoflow" in d){ VIEW="flow"; render(); }
+  else if(d.zoom){ if(d.zoom==="in") flowZ=Math.min(2.2,flowZ*1.15); else if(d.zoom==="out") flowZ=Math.max(0.2,flowZ/1.15); else { flowFit(); return; } applyFlowTransform(); }
   else if(d.addAc){ ownerOf(d.addAc).acceptance.push({text:"새 수용 기준",done:false}); commit(); }
   else if(d.acDel){ const[id,i]=d.acDel.split("#"); ownerOf(id).acceptance.splice(+i,1); commit(); }
   else if("addSec" in d){ const s={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(s); selSec=s.id; selPage=null; commit(); }

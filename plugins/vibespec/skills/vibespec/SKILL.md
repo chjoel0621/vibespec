@@ -15,27 +15,26 @@ description: VibeSpec — 제품 아이디어나 기획 문서(사업계획서, 
    - 정보가 부족할 때만(제품 목적·핵심 사용자·주요 기능이 불명확) 2~3개 핵심 질문을 한다. 충분하면 묻지 말고 진행한다.
 
 2. **SOT JSON 생성** — `references/sot-schema.md`의 스키마를 정확히 따른다.
-   - `title`, `prd`, `requirements`, `ia` 네 가지를 채운다.
+   - `title`, `prd`, `requirements`, `ia`, `flow` 를 채운다.
    - `prd`는 5개 영역을 모두 채운다: 개요(oneLiner·goal·background), 핵심가치(problem·solution·differentiator), 타겟및시나리오(targets·scenarios), 성공지표(kpis·risks), 속성설정(category·roles·platforms).
    - `requirements`는 요구사항 → 기능 → 상세기능 3계층. id는 `R1..`, `F1..`(전체에서 유일하게 증가). 상세기능 참조는 `기능id:인덱스`(예 `F1:0`).
    - `ia.sections`를 만들고 모든 기능/상세기능을 페이지(top/page/action)의 `refs`로 매핑한다.
-   - **커버리지**: 모든 `F#`와 모든 `F#:idx`가 IA의 어떤 페이지 `refs`에든 최소 1번 등장해야 한다(뷰어의 "누락 경고"가 뜨지 않도록). 권장: 요구사항→섹션, 대표 기능→top, 나머지 기능→page, 각 상세기능→그 기능 페이지의 action 자식.
-   - **`flow`(유저플로우)** 를 만든다: 화면 전환 `transitions`(from→to, label)를 `prd.scenarios` 기반으로 정의한다. IA 포함관계가 아니라 유저의 실제 이동 경로다 — 해피패스 + 주요 분기·루프를 담아라. from/to는 ia 페이지 id.
+   - **커버리지**: 모든 `F#`와 모든 `F#:idx`가 IA의 어떤 페이지 `refs`에든 최소 1번 등장해야 한다(뷰어의 "누락 경고"가 뜨지 않도록).
+   - **`flow`(유저플로우)** 를 만든다: 화면 전환 `transitions`(from→to, label)를 `prd.scenarios` 기반으로 정의한다. IA 포함관계가 아니라 유저의 실제 이동 경로다 — 해피패스 + 주요 분기·루프를 담아라. from/to는 ia 페이지 id(P#).
+     - ⚠️ 각 transition 객체는 **정확히 `{ "from": "P#", "to": "P#", "label": "..." }`** 형태만 사용한다. `source/target`, `fromPage/toPage`, `action`, `name` 같은 다른 필드명을 절대 쓰지 말 것 — 뷰어가 걸러내 빈 화면이 된다.
+     - from/to는 반드시 **ia.sections 안에 실제로 존재하는 페이지 id(`P#`)**. 기능 id(`F#`)나 화면 제목 문자열을 넣지 말 것.
    - 상세기능에도 가능하면 `desc`와 `acceptance`를 채워 완성도를 높인다.
 
 3. **산출물 저장** (outputs 폴더)
    - `<제품명>.sot.json` — 생성한 SOT JSON(순수 데이터, 공유·백업용).
-   - `<제품명>.html` — 이 스킬의 `assets/viewer.html`을 복사하되, 파일 안의
-     `<script type="application/json" id="embedded-sot"></script>` 태그의 **내용으로 생성한 SOT JSON을 넣는다**.
-     (넣기 전 `JSON.stringify(sot).replace(/</g, "\\u003c")` 처럼 모든 `<` 문자를 `<` 로 치환해 `</script>` 조기 종료를 막는다. 뷰어는 이 태그를 최우선으로 읽어 데모 대신 사용자의 제품을 바로 표시한다.)
+   - `<제품명>.html` — 이 스킬의 `assets/viewer.html`을 복사하되, 파일 안의 `<script type="application/json" id="embedded-sot"></script>` 태그의 내용으로 생성한 SOT JSON을 넣는다. (넣기 전 `JSON.stringify(sot).replace(/</g, "\u003c")` 로 `<`를 이스케이프해 `</script>` 조기 종료를 막는다. 뷰어는 이 태그를 최우선으로 읽어 데모 대신 사용자의 제품을 바로 표시한다.)
+   - ⚠️ 반드시 embedded-sot 태그에 데이터를 심어라. 비워두면 데모만 보인다.
    - present_files로 두 파일을 함께 전달한다.
-   - ⚠️ 반드시 embedded-sot 태그에 데이터를 심어라. 비워둔 채 복사하면 사용자에게 데모(회의실 예약 앱)만 보인다.
 
 4. **사용법 안내**(평이한 표현)
-   - `<제품명>.html`을 브라우저로 열면 **회원님 제품이 바로 표시**된다(불러오기 불필요).
-   - 다른 사람과 데이터만 주고받을 때는 `<제품명>.sot.json`을 뷰어의 **불러오기**로 열면 된다.
-   - 편집은 뷰어에서, 저장은 **저장**(JSON 내보내기)으로. 되돌리기·히스토리도 지원한다.
+   - `<제품명>.html`을 브라우저로 열면 사용자 제품이 바로 표시된다(불러오기 불필요).
+   - 편집은 뷰어에서, 저장은 저장(JSON 내보내기)으로. 되돌리기·히스토리도 지원한다.
 
 ## 참고
 - 상세 스키마와 예시는 `references/sot-schema.md`.
-- IA와 기능명세서는 refs로 연결된 별개 축이다. 생성 시 커버리지를 반드시 맞춘다.
+- IA와 기능명세서는 refs로 연결된 별개 축이다. flow는 실제 이동 경로로 채운다.

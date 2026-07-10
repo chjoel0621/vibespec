@@ -79,7 +79,9 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 - **Version-control your `*.sot.json`.** Keeping the SOT file in git or a drive gives you change history and backups. This JSON is exactly the spec you'll hand off to developers or AI coding agents.
 
-## Version control (Git)
+## Optional: version control with Git (for teams)
+
+**Git is not required.** Working solo, the viewer's undo/history (auto-saved in your browser) is enough, and sharing just means handing someone the `*.sot.json` file by any means you like. What follows is for **editing together** or when you want **durable history**.
 
 Because the data lives in a plain `*.sot.json` file, you can put it under Git and let Git handle history, branching, review, and rollback — no extra tooling needed.
 

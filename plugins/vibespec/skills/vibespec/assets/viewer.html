@@ -370,20 +370,26 @@ const SEED = {
   personas: ["일반 직원 (예약자)", "팀 리더 (참석자 관리)", "총무/관리자 (회의실 운영)"],
   prd: {
     oneLiner: "사내 구성원이 3번의 탭으로 빈 회의실을 찾아 예약하고 실시간 현황을 확인하는 앱",
-    goal: "회의실 예약의 마찰과 노쇼를 줄이고, 회의실 활용도를 데이터로 관리한다.",
-    background: "회의실 예약이 메신저·구두로 이뤄져 중복 예약과 노쇼가 잦고, 이용률 데이터가 없어 공간 운영 의사결정이 어렵다.",
-    problem: "예약 현황이 흩어져 있어 빈 회의실을 찾기 어렵고, 중복 예약과 노쇼가 반복된다.",
+    goal: "출시 6개월 내 사내 회의실 예약의 80%를 앱으로 전환하고 노쇼율을 5% 이하로 낮춘다.",
+    whyNow: "하이브리드 근무로 회의실 수요가 몰리는데 예약이 메신저·구두로 이뤄져 중복·노쇼가 늘었고, 공간 운영 데이터의 필요가 커졌다.",
+    problem: "예약 현황이 흩어져 있어 빈 회의실을 찾기 어렵고(직원의 Job: 지금 당장 빈 방을 잡고 싶다), 중복 예약과 노쇼가 반복된다.",
     solution: "실시간 현황 기반의 빠른 예약과 확정·리마인더 알림, 관리자용 이용 통계 대시보드를 제공한다.",
-    differentiator: "사내 계정(SSO) 연동과 회의실 현황을 결합해 '빈 방 즉시 예약'을 지원한다.",
+    alternatives: "현재는 사내 메신저 공지·종이 예약표·범용 캘린더(구글 캘린더)로 대체 — 실시간 현황과 노쇼 관리가 안 된다.",
+    differentiator: "사내 계정(SSO)과 회의실 현황을 결합해 '빈 방 즉시 예약'과 노쇼 자동 집계를 지원한다.",
     targets: ["일반 직원 (예약자)", "팀 리더 (참석자 관리)", "총무·관리자 (회의실 운영)"],
     scenarios: [
       "직원 A는 오후 2시 회의를 위해 홈에서 빈 회의실을 확인하고, 3층 회의실을 골라 참석자 4명을 추가한 뒤 예약을 확정한다. 확정 알림이 참석자에게 전송된다.",
       "관리자 B는 주간 대시보드에서 회의실별 이용률과 노쇼율을 확인하고, 이용률이 낮은 회의실의 운영 시간을 조정한다."
     ],
-    kpis: ["예약 완료까지 평균 탭 수 ≤ 3", "월간 노쇼율 ≤ 5%", "주간 활성 예약자 비율(WAU/직원) ≥ 40%"],
+    northStar: "주간 앱 예약 완료 건수 (Weekly Completed Bookings)",
+    kpis: ["예약 완료까지 평균 탭 수 ≤ 3", "월간 노쇼율 ≤ 5% (기준 18%)", "주간 활성 예약자 비율(WAU/직원) ≥ 40%"],
+    inScope: ["실시간 회의실 현황 조회", "예약 생성·취소·변경", "확정/리마인더 알림", "관리자 이용 통계 대시보드"],
+    nonGoals: ["외부 게스트 예약", "유료 결제·정산", "화상회의 솔루션 연동(초기 제외)", "좌석(데스크) 예약"],
+    assumptions: ["전 직원이 사내 SSO 계정을 보유한다", "회의실 목록·수용 인원 데이터를 총무팀이 제공한다", "노쇼는 예약 후 미체크인으로 판별 가능하다"],
     risks: ["사내 계정(SSO) 연동 일정 불확실", "센서 미설치 공간의 현황 정확도 이슈", "초기 데이터 부족으로 통계 신뢰도 낮음"],
+    openQuestions: ["체크인은 QR·NFC 중 무엇으로 할까?", "노쇼 패널티 정책을 둘 것인가?", "예약 시간 단위는 15/30분?"],
+    constraints: ["사내망(VPN) 환경에서 동작해야 함", "개인정보는 사내 정책상 외부 저장 불가", "iOS·Android·웹 동시 지원 필요"],
     category: "사내 업무용 예약 관리 (B2B SaaS)",
-    roles: ["일반 직원", "팀 리더", "관리자"],
     platforms: ["웹", "iOS", "Android"]
   },
   requirements: [
@@ -483,8 +489,11 @@ function normalize(s){
     });
   });
   if(!s.prd) s.prd={};
-  const pd=s.prd; ["oneLiner","goal","background","problem","solution","differentiator","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
-  ["targets","scenarios","kpis","risks","roles","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
+  const pd=s.prd;
+  if(pd.background && !pd.whyNow) pd.whyNow=pd.background;
+  if(Array.isArray(pd.roles) && pd.roles.length){ if(!Array.isArray(pd.targets)) pd.targets=[]; pd.roles.forEach(r=>{ if(!pd.targets.includes(r)) pd.targets.push(r); }); }
+  ["oneLiner","goal","whyNow","problem","solution","alternatives","differentiator","northStar","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
+  ["targets","scenarios","kpis","inScope","nonGoals","assumptions","risks","openQuestions","constraints","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
   if(!s.ia) s.ia={sections:[]};
   const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
   s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
@@ -592,30 +601,39 @@ function renderPRD(){
 
     <section><h2>1. 개요</h2>
       <div class="prd-row"><span class="prd-k">한 줄 정의</span>${prdField("oneLiner")}</div>
-      <div class="prd-row"><span class="prd-k">제품 목표</span>${prdField("goal")}</div>
-      <div class="prd-row"><span class="prd-k">배경</span>${prdField("background")}</div>
+      <div class="prd-row"><span class="prd-k">성과 목표</span>${prdField("goal")}</div>
+      <div class="prd-row"><span class="prd-k">왜 지금</span>${prdField("whyNow")}</div>
+      <div class="prd-row"><span class="prd-k">카테고리</span>${prdField("category")}</div>
+      <div class="prd-row"><span class="prd-k">사용 환경</span>${prdChips("platforms")}</div>
     </section>
 
-    <section><h2>2. 핵심 가치</h2>
+    <section><h2>2. 문제 · 가치</h2>
       <div class="prd-row"><span class="prd-k">사용자 문제</span>${prdField("problem")}</div>
       <div class="prd-row"><span class="prd-k">해결 방식</span>${prdField("solution")}</div>
+      <div class="prd-row"><span class="prd-k">대안 · 경쟁</span>${prdField("alternatives")}</div>
       <div class="prd-row"><span class="prd-k">차별점</span>${prdField("differentiator")}</div>
     </section>
 
-    <section><h2>3. 타겟 및 시나리오</h2>
-      <h3 class="prd-sub">핵심 사용자 그룹</h3>${prdList("targets")}
-      <h3 class="prd-sub">사용 시나리오</h3>${prdList("scenarios", true)}
+    <section><h2>3. 사용자</h2>
+      <h3 class="prd-sub">타겟 · 페르소나</h3>${prdList("targets")}
+      <h3 class="prd-sub">유저 스토리 · 시나리오</h3>${prdList("scenarios", true)}
     </section>
 
     <section><h2>4. 성공 지표</h2>
-      <h3 class="prd-sub">핵심 KPI</h3>${prdList("kpis")}
-      <h3 class="prd-sub">리스크 및 오픈 이슈</h3>${prdList("risks")}
+      <div class="prd-row"><span class="prd-k">North Star</span>${prdField("northStar")}</div>
+      <h3 class="prd-sub">핵심 KPI (지표 · 목표치)</h3>${prdList("kpis")}
     </section>
 
-    <section><h2>5. 속성 설정</h2>
-      <div class="prd-row"><span class="prd-k">제품 카테고리</span>${prdField("category")}</div>
-      <div class="prd-row"><span class="prd-k">사용자 역할</span>${prdChips("roles")}</div>
-      <div class="prd-row"><span class="prd-k">사용 환경</span>${prdChips("platforms")}</div>
+    <section><h2>5. 범위</h2>
+      <h3 class="prd-sub">포함 범위 · MVP</h3>${prdList("inScope")}
+      <h3 class="prd-sub">비목표 (범위 밖)</h3>${prdList("nonGoals")}
+    </section>
+
+    <section><h2>6. 리스크 · 가정</h2>
+      <h3 class="prd-sub">가정</h3>${prdList("assumptions")}
+      <h3 class="prd-sub">리스크</h3>${prdList("risks")}
+      <h3 class="prd-sub">미해결 질문</h3>${prdList("openQuestions")}
+      <h3 class="prd-sub">제약 · 의존성</h3>${prdList("constraints")}
     </section>
   </div>`;
 }

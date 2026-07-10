@@ -10,15 +10,23 @@
 
 ## prd (제품 정의)
 
+6개 섹션으로 구성한다.
+
 ```json
 "prd": {
-  "oneLiner": "한 문장 정의", "goal": "제품 목표", "background": "배경",
-  "problem": "사용자 문제", "solution": "해결 방식", "differentiator": "차별점",
-  "targets": ["핵심 사용자 그룹"], "scenarios": ["사용 시나리오"],
-  "kpis": ["성공 KPI"], "risks": ["리스크"],
-  "category": "카테고리", "roles": ["역할"], "platforms": ["웹","iOS"]
+  "oneLiner": "한 문장 정의", "goal": "비즈니스 성과 목표(수치·기한)", "whyNow": "왜 지금(시장·타이밍)",
+  "category": "카테고리", "platforms": ["웹","iOS"],
+  "problem": "사용자 Job/문제", "solution": "해결 방식", "alternatives": "현재 대안·경쟁", "differentiator": "차별점",
+  "targets": ["타겟·페르소나"], "scenarios": ["유저 스토리·시나리오"],
+  "northStar": "북극성 지표(하나)", "kpis": ["KPI (목표치 포함)"],
+  "inScope": ["포함 범위·MVP"], "nonGoals": ["비목표(범위 밖)"],
+  "assumptions": ["가정"], "risks": ["리스크"], "openQuestions": ["미해결 질문"], "constraints": ["제약·의존성"]
 }
 ```
+
+- 섹션: ①개요(oneLiner·goal·whyNow·category·platforms) ②문제·가치(problem·solution·alternatives·differentiator) ③사용자(targets·scenarios) ④성공지표(northStar·kpis) ⑤범위(inScope·nonGoals) ⑥리스크·가정(assumptions·risks·openQuestions·constraints).
+- `goal`은 성과(왜)와 `solution`(어떻게)을 구분한다. `nonGoals`로 범위를 명확히 하고, `assumptions`/`openQuestions`로 불확실성을 남긴다.
+- (구버전 `background`→`whyNow`, `roles`→`targets`로 자동 이관됨. 새로 생성할 땐 새 필드명만 쓴다.)
 
 ## requirements (요구사항 → 기능 → 상세기능)
 

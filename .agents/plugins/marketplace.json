@@ -1,0 +1,20 @@
+{
+  "name": "vibespec",
+  "interface": {
+    "displayName": "VibeSpec"
+  },
+  "plugins": [
+    {
+      "name": "vibespec",
+      "source": {
+        "source": "local",
+        "path": "./plugins/vibespec"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

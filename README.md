@@ -5,7 +5,7 @@
 > Like vibe coding — but for **product planning.**
 > Drop in a product idea or a planning document, and VibeSpec organizes it into a single **SOT (Single Source of Truth, JSON)**, then lets you view and edit the **PRD · Feature Spec · IA (Information Architecture) · User Flow** all in one screen.
 
-VibeSpec is a **plugin marketplace** for Claude Cowork / Claude Code. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
+VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code and OpenAI Codex. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
 ## Core idea
 
@@ -25,7 +25,7 @@ VibeSpec is a **plugin marketplace** for Claude Cowork / Claude Code. Describe a
 
 ## Installation
 
-How you install depends on your environment. The `/plugin` slash commands are **Claude Code terminal only** and do **not** work in Cowork.
+How you install depends on your environment. Claude and Codex use different plugin commands; the `/plugin` slash commands below are **Claude Code terminal only** and do **not** work in Cowork or Codex.
 
 ### Cowork (desktop app)
 
@@ -50,6 +50,18 @@ Run these in the input box (terminal), one after another:
 
 To update, run `/plugin marketplace update vibespec`, then update it from the Installed tab of the `/plugin` manager.
 
+### OpenAI Codex (CLI / desktop app)
+
+Clone the repository, register its repo-local marketplace, and install the plugin:
+
+```
+git clone https://github.com/chjoel0621/vibespec.git
+codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
+codex plugin add vibespec@vibespec
+```
+
+Start a new Codex task after installing or updating so the plugin skills are loaded. Invoke it naturally or explicitly with `$vibespec`.
+
 ## Usage
 
 Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. Open it and all five views appear immediately — edit, save, and load right there.
@@ -60,6 +72,7 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 - **Cowork (desktop app):** type `/` in the prompt box or click the **`+`** button, then pick **VibeSpec** from the skills list.
 - **Claude Code (terminal):** run `/vibespec:vibespec`.
+- **Codex:** select the VibeSpec plugin/skill or invoke `$vibespec` in a new task.
 
 ## Tips for getting the most out of it
 
@@ -99,12 +112,18 @@ Because the data lives in a plain `*.sot.json` file, you can put it under Git an
 
 ```
 vibespec/
+├── .agents/plugins/marketplace.json   # Codex repository marketplace
 ├── .claude-plugin/marketplace.json     # Plugin catalog
 ├── plugins/vibespec/
+│   ├── .codex-plugin/plugin.json       # Codex plugin manifest
 │   ├── .claude-plugin/plugin.json
 │   └── skills/vibespec/
+│       ├── agents/openai.yaml          # Codex skill UI metadata
 │       ├── SKILL.md                    # Skill: idea/document → SOT JSON
 │       ├── references/sot-schema.md    # JSON data contract (schema)
+│       ├── references/sot.schema.json  # Machine-readable JSON Schema
+│       ├── scripts/validate-sot.mjs    # Structure, reference, and coverage validator
+│       ├── tests/                      # Validator regression tests and fixture
 │       ├── assets/viewer.html          # HTML viewer (app) — BUILT OUTPUT
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
@@ -120,10 +139,19 @@ vibespec/
 
 ```
 cd plugins/vibespec/skills/vibespec
-npm run check    # build + syntax-check the concatenated app
+npm run check       # build + syntax + schema/round-trip + Claude/Codex plugin contracts
+npm run check:all   # check + Chrome/Edge dense-flow layout regression
 ```
 
-The build concatenates `src/js/*.js` in filename order into one shared scope, so `90-init.js` (event wiring and boot) must always sort last. No dependencies, no install step.
+Validate a generated or edited **SOT 1.0** file with the command below. It enforces the JSON Schema and checks duplicate IDs, IA feature coverage, and KPI, scenario, and user-flow references.
+
+```
+npm run validate -- path/to/product.sot.json
+```
+
+For an older SOT, load it in the viewer and save it once to promote it to the 1.0 format, then validate the newly saved file. Loading normalizes legacy KPI, scenario, and field shapes.
+
+The build concatenates `src/js/*.js` in filename order into one shared scope, so `90-init.js` (event wiring and boot) must always sort last. There are no npm dependencies or install step. A local Chrome or Edge installation is required only for `npm run check:browser` or `npm run check:all`.
 
 ## License
 

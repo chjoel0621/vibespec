@@ -1,0 +1,29 @@
+{
+  "name": "vibespec",
+  "version": "0.4.0",
+  "description": "Turn a product idea or planning document into a validated SOT JSON and a self-contained HTML viewer for PRD, Feature Spec, IA, and User Flow.",
+  "author": {
+    "name": "chjoel0621",
+    "url": "https://github.com/chjoel0621"
+  },
+  "homepage": "https://github.com/chjoel0621/vibespec",
+  "repository": "https://github.com/chjoel0621/vibespec",
+  "license": "MIT",
+  "keywords": ["vibespec", "prd", "spec", "ia", "user-flow", "sot", "planning"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "VibeSpec",
+    "shortDescription": "Turn product ideas into a validated SOT and viewer.",
+    "longDescription": "VibeSpec turns an idea or planning document into one validated source of truth with PRD, feature specifications, information architecture, and user flows, plus a self-contained editable HTML viewer.",
+    "developerName": "chjoel0621",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/chjoel0621/vibespec",
+    "brandColor": "#7957F2",
+    "defaultPrompt": [
+      "Turn my product idea into a validated VibeSpec SOT and HTML viewer.",
+      "Create a PRD, feature spec, IA, and user flow from this document.",
+      "Review this VibeSpec SOT and fix its validation or coverage issues."
+    ]
+  }
+}

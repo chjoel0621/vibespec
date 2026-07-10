@@ -9,7 +9,7 @@
     "validate": "node scripts/validate-sot.mjs",
     "test": "node tests/run-tests.mjs",
     "test:browser": "npm run check:browser",
-    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs",
+    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/plugin-contract.mjs",
     "check:browser": "node tests/browser-flow.mjs",
     "check:all": "npm run check && npm run check:browser"
   }

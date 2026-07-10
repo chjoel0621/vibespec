@@ -83,7 +83,7 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 Because the data lives in a plain `*.sot.json` file, you can put it under Git and let Git handle history, branching, review, and rollback — no extra tooling needed.
 
-- **Save produces a Git-friendly file.** Export (Save) writes canonical JSON — stable key order and pretty-printing, with a `schemaVersion`. The filename is stable (`<title>.sot.json`, no date), so it overwrites the tracked file in place and diffs stay meaningful (the same content always serializes identically).
+- **Save produces a Git-friendly file.** Export (Save) writes canonical JSON — stable key order and pretty-printing, with a `schemaVersion`. The filename is stable (`<title>.sot.json`, no date), so you drop the downloaded file straight over the tracked one and Git sees an edit rather than a delete-plus-add. The same content always serializes identically, so a diff shows only what actually changed.
 - **Recommended workflow.** Edit in the viewer → **Save** → replace the `*.sot.json` in your repo → commit / open a PR. Teammates pull and open the file in the same viewer to see the exact same five views.
 - **`.gitattributes`.** Add this so the SOT is treated as text with consistent line endings:
 
@@ -91,7 +91,7 @@ Because the data lives in a plain `*.sot.json` file, you can put it under Git an
   *.sot.json text eol=lf
   ```
 
-- **Merges.** The canonical format keeps most diffs readable and conflicts hand-resolvable. For heavy multi-person editing, an in-viewer id-based merge (reconcile two SOTs by `id`, resolve field conflicts) is planned.
+- **Merges.** The canonical format keeps most diffs readable and conflicts hand-resolvable.
 
 ## Repository structure
 

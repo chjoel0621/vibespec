@@ -1,12 +1,14 @@
 ---
 name: vibespec
-description: VibeSpec — 제품 아이디어나 기획 문서(사업계획서, PRD 초안, 회의록 등)를 받아 단일 SOT(JSON)로 변환하고, PRD·기능명세서·IA(정보구조)·유저플로우를 한 화면에서 보는 HTML 뷰어와 함께 산출한다. "기획도구 만들어줘", "SOT 기획서 생성", "사업계획서로 기획 문서 만들어줘", "PRD 기능명세 IA 유저플로우 만들어줘", "제품 설명으로 스펙 생성해줘" 같은 요청이나, 기획 문서를 첨부하며 기획 산출물을 요청할 때 사용한다.
+description: 제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성, 사업계획서로 기획, make a planning tool, generate a PRD/spec, create IA and user flow. 기획 문서를 첨부하며 산출물을 요청할 때도 사용.
 ---
 
 # SOT 기획 도구 생성
 
 사용자의 제품 아이디어나 첨부된 기획 문서를 단일 SOT JSON으로 변환하고, 편집용 뷰어 HTML과 함께 전달한다.
 뷰어는 고정 뼈대다 — 절대 뷰어 HTML을 수정하지 말고 데이터(JSON)만 생성한다.
+
+**언어(Language).** 뷰어 UI는 한/영 토글을 지원한다. 사용자가 영어로 요청하면 SOT의 텍스트(title·prd·requirements·ia·flow의 라벨)를 영어로 생성하고, SOT 최상위에 `"lang": "en"` 을 넣어 뷰어가 영어로 열리게 한다. 한국어면 `lang` 을 생략하거나 `"ko"` 로 둔다. (If the user writes in English, generate all SOT text in English and set top-level `"lang": "en"` so the viewer opens in English.)
 
 ## 절차
 

@@ -1,91 +1,100 @@
 # VibeSpec
 
-> 바이브 코딩처럼, **기획도 바이브로.**
-> 제품 아이디어나 기획 문서를 넣으면 하나의 **SOT(Single Source of Truth, JSON)** 로 정리하고,
-> **PRD · 기능명세서 · IA(정보구조) · 유저플로우**를 한 화면에서 보고 편집하는 기획 도구입니다.
+**🌐 언어 / Language: English (current) · [한국어](./README.ko.md)**
 
-VibeSpec은 Claude Cowork / Claude Code용 **플러그인 마켓플레이스**입니다. 아이디어를 설명하거나 사업계획서·PRD 초안 같은 문서를 첨부하면, AI가 스키마에 맞는 SOT JSON을 생성하고 전용 HTML 뷰어로 열어 바로 편집할 수 있습니다.
+> Like vibe coding — but for **product planning.**
+> Drop in a product idea or a planning document, and VibeSpec organizes it into a single **SOT (Single Source of Truth, JSON)**, then lets you view and edit the **PRD · Feature Spec · IA (Information Architecture) · User Flow** all in one screen.
 
-## 핵심 개념
+VibeSpec is a **plugin marketplace** for Claude Cowork / Claude Code. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
-- **HTML = 앱(뷰어/편집기)** · **JSON = 데이터(SOT)** — 둘을 분리했습니다.
-- 모든 화면이 **하나의 SOT**만 읽고 씁니다. 한 곳에서 고치면 나머지 뷰가 전부 동기화됩니다.
-- 뷰어(앱)는 한 번만 공유하고, 이후에는 **JSON 파일만 주고받으면** 같은 화면을 봅니다.
+## Core idea
 
-## 5개 뷰
+- **HTML = the app (viewer/editor)** · **JSON = the data (SOT)** — the two are kept separate.
+- Every view reads and writes **one SOT**. Fix something in one place and the rest sync automatically.
+- Share the viewer (app) once; after that, **just exchange the JSON file** to see the same thing.
 
-| 뷰 | 내용 |
+## Five views
+
+| View | What it shows |
 | --- | --- |
-| **PRD** | 개요 · 문제/가치 · 사용자 · 성공 지표 · 범위 · 리스크/가정 (6섹션). 페르소나 카드, 시나리오→유저플로우 연결, KPI 구조화(목표치·측정 + 기능 연결) |
-| **기능명세서** | 요구사항 → 기능 → 상세기능 (상태·중요도·설명·수용 기준). 상세 패널에서 **연결(IA 화면·유저플로우·KPI)**과 **진행 요약**(상태 분포·수용 기준 달성률) 표시, 칩 클릭 시 해당 뷰로 이동 |
-| **트리** | 요구사항 계층 노드 캔버스. 노드 클릭 시 기능명세서로 이동 |
-| **IA (정보구조도)** | 섹션 → 페이지 → 행동 사이트맵. 기능↔화면 매핑, 누락 경고·자동 채우기 |
-| **유저플로우** | 화면 전환 그래프 (시작 → 화면 이동, 분기·루프, 줌/이동). 패널에서 전환 추가·삭제, 트리거를 기능에 연결하면 라벨 자동 동기화, 미연결·누락 경고 |
+| **PRD** | Overview · Problem/Value · Users · Success Metrics · Scope · Risks/Assumptions (6 sections). Persona cards, scenario → user-flow linking, structured KPIs (target · measurement + feature links). |
+| **Feature Spec** | Requirement → Feature → Sub-feature (status · priority · description · acceptance criteria). The detail panel shows **connections (IA screens · user flow · KPIs)** and a **progress summary** (status breakdown · acceptance-criteria completion); click a chip to jump to that view. |
+| **Tree** | A node canvas of the requirement hierarchy. Click a node to jump to the Feature Spec. |
+| **IA (Information Architecture)** | Section → Page → Action sitemap. Feature-to-screen mapping, missing-coverage warnings, and auto-fill. |
+| **User Flow** | A screen-transition graph (start → screen navigation, branches/loops, zoom/pan). Add or remove transitions from a panel; link a trigger to a feature and its label auto-syncs; warnings for unconnected/missing screens. |
 
-## 설치
+## Installation
 
-설치 방법은 사용하는 환경에 따라 다릅니다. `/plugin` 슬래시 명령은 **Claude Code 터미널 전용**이며 Cowork에서는 동작하지 않습니다.
+How you install depends on your environment. The `/plugin` slash commands are **Claude Code terminal only** and do **not** work in Cowork.
 
-### Cowork (데스크탑 앱)
+### Cowork (desktop app)
 
-UI에서 클릭으로 설치합니다.
+Install through the UI:
 
-1. 왼쪽 사이드바에서 **Customize(커스터마이즈)** 를 엽니다.
-2. **Plugins(플러그인)** 탭 → **개인 플러그인(Personal plugins)** 에서 **`+`** 버튼 → **Add marketplace(마켓플레이스 추가)** 를 누릅니다.
-3. **GitHub 저장소**로 추가를 선택하고 `https://github.com/chjoel0621/vibespec.git` 를 입력합니다.
-4. 추가된 마켓플레이스에서 `vibespec` 의 **Install(설치)** 을 누릅니다.
-5. 업데이트도 같은 Plugins 화면에서 진행합니다.
+1. Open **Customize** in the left sidebar.
+2. Go to the **Plugins** tab → under **Personal plugins**, click **`+`** → **Add marketplace**.
+3. Choose to add from a **GitHub repository** and enter `https://github.com/chjoel0621/vibespec.git`.
+4. From the added marketplace, click **Install** on `vibespec`.
+5. Updates are done from the same Plugins screen.
 
-> 참고: Cowork에서는 `/plugin` 명령이 인식되지 않습니다("Claude Code 터미널에서만 작동"). 반드시 위 UI 경로를 사용하세요.
+> Note: In Cowork, `/plugin` is not recognized ("only works in the Claude Code terminal"). Use the UI path above.
 
-### Claude Code (CLI · 터미널)
+### Claude Code (CLI · terminal)
 
-입력창(터미널)에 아래를 차례로 실행합니다.
+Run these in the input box (terminal), one after another:
 
 ```
 /plugin marketplace add https://github.com/chjoel0621/vibespec.git
 /plugin install vibespec@vibespec
 ```
 
-업데이트는 `/plugin marketplace update vibespec` 후 `/plugin` 관리 화면의 Installed 탭에서 갱신합니다.
+To update, run `/plugin marketplace update vibespec`, then update it from the Installed tab of the `/plugin` manager.
 
-## 사용
+## Usage
 
-"내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 열면 바로 5개 뷰가 표시되고, 편집·저장·불러오기가 됩니다.
+Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. Open it and all five views appear immediately — edit, save, and load right there.
 
-## 활용 팁
+### If the skill doesn't auto-trigger (invoke it manually)
 
-- **팀 협업은 JSON 파일만 공유하세요.** 뷰어(HTML)는 앱이라 한 번만 나눠 가지면 됩니다. 이후에는 저장(JSON 내보내기)으로 받은 `*.sot.json` 파일만 주고받으면, 상대가 같은 뷰어에서 불러오기로 열어 **똑같은 5개 뷰**를 봅니다. 무거운 문서를 계속 복사할 필요가 없습니다.
+The skill fires automatically on natural-language requests, but if it doesn't, you can call it directly.
 
-- **수정은 기능명세서에서 한 번만.** 모든 뷰가 하나의 SOT를 읽고 쓰기 때문에, 기능 이름을 바꾸면 유저플로우 라벨·KPI 연결·IA 매핑이 전부 자동으로 따라옵니다. 같은 내용을 여러 곳에 다시 쓰지 마세요.
+- **Cowork (desktop app):** type `/` in the prompt box or click the **`+`** button, then pick **VibeSpec** from the skills list.
+- **Claude Code (terminal):** run `/vibespec:vibespec`.
 
-- **AI로 초안부터 만들고 뷰어에서 다듬으세요.** 처음부터 완벽하게 쓰려 하지 말고, 아이디어나 사업계획서로 SOT를 생성한 뒤 뷰어에서 편집하는 흐름이 가장 빠릅니다.
+## Tips for getting the most out of it
 
-- **큰 변경 전에는 히스토리를 믿으세요.** 되돌리기·히스토리로 특정 시점으로 복원할 수 있고, 초기화는 첫 버전으로 되돌립니다. 과감히 바꿔도 됩니다.
+- **For team collaboration, share only the JSON file.** The viewer (HTML) is the app, so you only need to hand it out once. After that, exchange the `*.sot.json` file you get from Save (JSON export); the other person opens it in the same viewer via Load and sees the **exact same five views**. No more copying around heavy documents.
 
-- **경고를 로드맵처럼 쓰세요.** IA의 "누락 경고"와 유저플로우의 "미연결" 표시는 빠진 화면·전환을 알려줍니다. 자동 채우기로 뼈대를 빠르게 세운 뒤 다듬으면 됩니다.
+- **Edit once, in the Feature Spec.** Because every view reads and writes one SOT, renaming a feature automatically updates the user-flow label, the KPI link, and the IA mapping. Never retype the same thing in multiple places.
 
-- **연결(추적성)으로 영향 범위를 확인하세요.** 기능명세서 상세 패널의 연결(IA·유저플로우·KPI)과 진행 요약을 보면 "이 기능을 빼면 어디가 영향받나"를 개발 착수 전에 점검할 수 있습니다.
+- **Draft with AI, then refine in the viewer.** Don't try to write it perfectly from scratch — generating an SOT from an idea or business plan and then editing in the viewer is the fastest path.
 
-- **KPI엔 기능을, 시나리오엔 시작화면을 연결해 두세요.** 지표-기능, 시나리오-플로우를 이어두면 이름이 바뀌어도 자동 반영되고, 칩을 눌러 바로 이동합니다. PRD가 살아 있는 허브가 됩니다.
+- **Trust the history before big changes.** Undo/history can restore any point in time, and Reset returns to the first version. Change things boldly.
 
-- **`*.sot.json`을 버전 관리하세요.** SOT 파일을 git이나 드라이브에 두면 변경 이력과 백업이 됩니다. 이 JSON이 곧 개발자·AI 코딩 에이전트에게 넘길 스펙 원본입니다.
+- **Use the warnings as a roadmap.** The IA "missing coverage" and user-flow "unconnected" indicators tell you which screens/transitions are missing. Use auto-fill to lay down a skeleton quickly, then refine.
 
-## 저장소 구조
+- **Check impact with connections (traceability).** The connection (IA · user flow · KPI) and progress summary in the Feature Spec detail panel let you answer "what breaks if I drop this feature?" before development starts.
+
+- **Link features to KPIs and start-screens to scenarios.** Once metric-to-feature and scenario-to-flow are connected, they auto-update when names change, and you can click a chip to jump straight there. Your PRD becomes a living hub.
+
+- **Version-control your `*.sot.json`.** Keeping the SOT file in git or a drive gives you change history and backups. This JSON is exactly the spec you'll hand off to developers or AI coding agents.
+
+## Repository structure
 
 ```
 vibespec/
-├── .claude-plugin/marketplace.json     # 플러그인 카탈로그
+├── .claude-plugin/marketplace.json     # Plugin catalog
 ├── plugins/vibespec/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/vibespec/
-│       ├── SKILL.md                    # 아이디어/문서 → SOT JSON 생성 스킬
-│       ├── references/sot-schema.md    # JSON 데이터 계약(스키마)
-│       └── assets/viewer.html          # HTML 뷰어(앱)
+│       ├── SKILL.md                    # Skill: idea/document → SOT JSON
+│       ├── references/sot-schema.md    # JSON data contract (schema)
+│       └── assets/viewer.html          # HTML viewer (app)
 ├── LICENSE
-└── README.md
+├── README.md                           # English (default)
+└── README.ko.md                        # Korean
 ```
 
-## 라이선스
+## License
 
 [MIT](./LICENSE) © 2026 chjoel0621

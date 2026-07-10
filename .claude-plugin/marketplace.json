@@ -5,7 +5,7 @@
     {
       "name": "vibespec",
       "source": "./plugins/vibespec",
-      "description": "VibeSpec — 아이디어/기획 문서를 SOT JSON으로 생성하고 PRD·기능명세서·IA·유저플로우를 HTML 뷰어로 편집."
+      "description": "VibeSpec — turn an idea/planning doc into SOT JSON and edit PRD, Feature Spec, IA, and User Flow in an HTML viewer (KO/EN). 아이디어/기획 문서를 SOT JSON으로 생성하고 PRD·기능명세서·IA·유저플로우를 HTML 뷰어로 편집. 한/영 지원."
     }
   ]
 }

@@ -372,29 +372,30 @@
   <div class="topbar">
     <div class="logo">VS</div>
     <div class="title" id="prodTitle" contenteditable="true" spellcheck="false">회의실 예약 앱
-      <small>VibeSpec · 기획 뷰어</small>
+      <small data-i18n="VibeSpec · 기획 뷰어|VibeSpec · Planning Viewer">VibeSpec · 기획 뷰어</small>
     </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-view="prd" aria-selected="true">PRD</button>
-      <button class="tab" role="tab" data-view="spec">기능명세서</button>
-      <button class="tab" role="tab" data-view="tree">트리</button>
+      <button class="tab" role="tab" data-view="spec" data-i18n="기능명세서|Feature Spec">기능명세서</button>
+      <button class="tab" role="tab" data-view="tree" data-i18n="트리|Tree">트리</button>
       <button class="tab" role="tab" data-view="ia">IA</button>
-      <button class="tab" role="tab" data-view="flow">유저플로우</button>
+      <button class="tab" role="tab" data-view="flow" data-i18n="유저플로우|User Flow">유저플로우</button>
     </div>
-    <button class="topbtn" id="undoBtn" title="실행 취소 (Ctrl+Z)">↩</button>
-    <button class="topbtn" id="redoBtn" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
-    <button class="topbtn" id="histBtn" title="변경 히스토리">히스토리</button>
-    <button class="topbtn" id="saveBtn" title="JSON 파일로 저장">저장</button>
-    <button class="topbtn" id="loadBtn" title="JSON 파일 불러오기">불러오기</button>
+    <button class="topbtn" id="langBtn" title="Language">EN</button>
+    <button class="topbtn" id="undoBtn" data-i18n-title="실행 취소 (Ctrl+Z)|Undo (Ctrl+Z)" title="실행 취소 (Ctrl+Z)">↩</button>
+    <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
+    <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
+    <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
+    <button class="topbtn" id="loadBtn" data-i18n="불러오기|Load" data-i18n-title="JSON 파일 불러오기|Load JSON" title="JSON 파일 불러오기">불러오기</button>
     <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
-    <button class="topbtn" id="sotBtn">SOT 보기</button>
-    <button class="topbtn primary" id="resetBtn">초기화</button>
+    <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
+    <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>
   </div>
   <div class="view"><div class="wrap" id="stage"></div></div>
 </div>
 <div class="hist-drawer" id="histDrawer">
-  <div class="hist-head">변경 히스토리 <button class="topbtn" id="histClose">닫기</button></div>
-  <div class="hist-sub">항목을 클릭하면 그 시점으로 되돌립니다.</div>
+  <div class="hist-head"><span data-i18n="변경 히스토리|Change history">변경 히스토리</span> <button class="topbtn" id="histClose" data-i18n="닫기|Close">닫기</button></div>
+  <div class="hist-sub" data-i18n="항목을 클릭하면 그 시점으로 되돌립니다.|Click an entry to restore that point.">항목을 클릭하면 그 시점으로 되돌립니다.</div>
   <div class="hist-list" id="histList"></div>
 </div>
 <div class="sot-flash" id="flash"><b>SOT 갱신됨</b> · 모든 뷰 동기화 완료</div>
@@ -577,14 +578,21 @@ function deriveFlow(s){
 
 let SOT = normalize(structuredClone(SEED));
 let VIEW = "prd";
+let LANG = "ko"; const LANG_KEY = "vibespec-lang";
+function t(ko,en){ return LANG==="en" ? en : ko; }
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ const p=el.dataset.i18n.split("|"); el.textContent = LANG==="en"?(p[1]||p[0]):p[0]; });
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ const p=el.dataset.i18nTitle.split("|"); el.title = LANG==="en"?(p[1]||p[0]):p[0]; });
+  const lb=document.getElementById("langBtn"); if(lb) lb.textContent = LANG==="en"?"한글":"EN";
+}
 let selReq, selFeat, selNode;
 let colReqCol = false, colFeatCol = false;
 let selSec, selPage;
 let idc = 100;
 const nid = p => p + (++idc);
 
-const PRIO = {high:{c:"high",t:"높음"}, mid:{c:"mid",t:"보통"}, low:{c:"low",t:"낮음"}};
-const STAT = {todo:{c:"st-todo",t:"시작전"}, doing:{c:"st-doing",t:"진행중"}, done:{c:"st-done",t:"완료"}};
+const PRIO = {high:{c:"high",t:"높음",e:"High"}, mid:{c:"mid",t:"보통",e:"Mid"}, low:{c:"low",t:"낮음",e:"Low"}};
+const STAT = {todo:{c:"st-todo",t:"시작전",e:"To do"}, doing:{c:"st-doing",t:"진행중",e:"In progress"}, done:{c:"st-done",t:"완료",e:"Done"}};
 const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
 
 /* ---- mutation helpers: every edit funnels through here, then render() ---- */
@@ -595,13 +603,14 @@ function flash(){ const f=document.getElementById("flash"); f.classList.add("sho
 const LS_KEY="sot-proto-v3-flow";
 let HISTORY=[], HPTR=-1, restoring=false;
 const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
+const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
 function snapshot(){ return JSON.stringify(SOT); }
 function saveLocal(){ try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
 function pushHistory(label){
   const snap=snapshot();
   if(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===snap) return; // no change
   HISTORY = HISTORY.slice(0, HPTR+1);
-  HISTORY.push({t:Date.now(), label: label || (VIEWNAME[VIEW]+" 편집"), sot:snap});
+  HISTORY.push({t:Date.now(), label: label || (t(VIEWNAME[VIEW],VIEWNAME_EN[VIEW])+t(" 편집"," edit")), sot:snap});
   if(HISTORY.length>120){ HISTORY.shift(); }
   HPTR = HISTORY.length-1;
   saveLocal(); renderHistory(); updateUndoButtons();
@@ -624,7 +633,7 @@ function renderHistory(){
     const d=new Date(h.t); const tt=d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
     return `<div class="hist-item ${i===HPTR?'cur':''}" data-hist="${i}">
       <span class="hi-dot"></span><span class="hi-label">${esc(h.label)}</span><span class="hi-time">${tt}</span></div>`;
-  }).reverse().join("") || `<div class="empty" style="padding:10px">기록 없음</div>`;
+  }).reverse().join("") || `<div class="empty" style="padding:10px">${t('기록 없음','No history')}</div>`;
 }
 function snapshotIfChanged(label){ const s=snapshot(); if(!(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===s)) pushHistory(label); }
 
@@ -644,68 +653,68 @@ function render(){
 function prdField(k, ph){ return `<div class="prd-field field" contenteditable data-prd-field="${k}">${esc(SOT.prd[k]||"")}</div>`; }
 function prdList(k, ordered){
   const arr=SOT.prd[k]||[];
-  const items=arr.map((x,i)=>`<li><span class="field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="ac-del" data-prd-del="${k}#${i}" title="삭제">×</button></li>`).join("") || `<li class="empty" style="list-style:none">비어 있음</li>`;
-  return `<${ordered?'ol':'ul'} class="prd-list">${items}</${ordered?'ol':'ul'}><button class="addbtn sm" data-prd-add="${k}">＋ 추가</button>`;
+  const items=arr.map((x,i)=>`<li><span class="field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="ac-del" data-prd-del="${k}#${i}" title="${t('삭제','Delete')}">×</button></li>`).join("") || `<li class="empty" style="list-style:none">${t('비어 있음','Empty')}</li>`;
+  return `<${ordered?'ol':'ul'} class="prd-list">${items}</${ordered?'ol':'ul'}><button class="addbtn sm" data-prd-add="${k}">${t('＋ 추가','＋ Add')}</button>`;
 }
 function prdChips(k){
   const arr=SOT.prd[k]||[];
-  return `<div class="prd-chips">${arr.map((x,i)=>`<span class="persona field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="chip-del ac-del" data-prd-del="${k}#${i}" title="삭제">×</button>`).join("")}<button class="addbtn sm" data-prd-add="${k}">＋</button></div>`;
+  return `<div class="prd-chips">${arr.map((x,i)=>`<span class="persona field" contenteditable data-prd-list="${k}#${i}">${esc(x)}</span><button class="chip-del ac-del" data-prd-del="${k}#${i}" title="${t('삭제','Delete')}">×</button>`).join("")}<button class="addbtn sm" data-prd-add="${k}">＋</button></div>`;
 }
 function renderPersonas(){
   const arr=SOT.prd.targets||[];
-  const cards=arr.map((p,i)=>`<div class="pcard"><div class="pcard-h"><span class="field pc-name" contenteditable data-persona="${i}#name">${esc(p.name)}</span><span class="pc-role field" contenteditable data-persona="${i}#role">${esc(p.role)}</span><button class="mini" data-persona-del="${i}" title="삭제">×</button></div><div class="pcard-row"><span class="pc-k">니즈</span><span class="field" contenteditable data-persona="${i}#needs">${esc(p.needs)}</span></div><div class="pcard-row"><span class="pc-k">페인</span><span class="field" contenteditable data-persona="${i}#pain">${esc(p.pain)}</span></div></div>`).join("") || `<div class="empty">페르소나가 없습니다.</div>`;
-  return `<div class="pgrid">${cards}</div><button class="addbtn sm" data-persona-add>＋ 페르소나</button>`;
+  const cards=arr.map((p,i)=>`<div class="pcard"><div class="pcard-h"><span class="field pc-name" contenteditable data-persona="${i}#name">${esc(p.name)}</span><span class="pc-role field" contenteditable data-persona="${i}#role">${esc(p.role)}</span><button class="mini" data-persona-del="${i}" title="${t('삭제','Delete')}">×</button></div><div class="pcard-row"><span class="pc-k">${t('니즈','Needs')}</span><span class="field" contenteditable data-persona="${i}#needs">${esc(p.needs)}</span></div><div class="pcard-row"><span class="pc-k">${t('페인','Pain')}</span><span class="field" contenteditable data-persona="${i}#pain">${esc(p.pain)}</span></div></div>`).join("") || `<div class="empty">${t('페르소나가 없습니다.','No personas yet.')}</div>`;
+  return `<div class="pgrid">${cards}</div><button class="addbtn sm" data-persona-add>${t('＋ 페르소나','＋ Persona')}</button>`;
 }
 function renderScenarios(){
   const arr=SOT.prd.scenarios||[]; const pages=allPages();
-  const rows=arr.map((s,i)=>{ const opts=pages.map(p=>`<option value="${p.id}" ${s.start===p.id?'selected':''}>${esc(p.label)}</option>`).join(""); const go=s.start?`<button class="scn-go" data-scn-go="${s.start}" title="유저플로우에서 보기">▶ 플로우</button>`:""; return `<li class="scn-row"><span class="field scn-text" contenteditable data-scn-text="${i}">${esc(s.text)}</span><span class="scn-ctl"><select data-scn-start="${i}"><option value="">시작화면 연결…</option>${opts}</select>${go}<button class="mini" data-scn-del="${i}" title="삭제">×</button></span></li>`; }).join("") || `<li class="empty" style="list-style:none">시나리오가 없습니다.</li>`;
-  return `<ol class="prd-list scn-list">${rows}</ol><button class="addbtn sm" data-scn-add>＋ 시나리오</button>`;
+  const rows=arr.map((s,i)=>{ const opts=pages.map(p=>`<option value="${p.id}" ${s.start===p.id?'selected':''}>${esc(p.label)}</option>`).join(""); const go=s.start?`<button class="scn-go" data-scn-go="${s.start}" title="${t('유저플로우에서 보기','View in user flow')}">${t('▶ 플로우','▶ Flow')}</button>`:""; return `<li class="scn-row"><span class="field scn-text" contenteditable data-scn-text="${i}">${esc(s.text)}</span><span class="scn-ctl"><select data-scn-start="${i}"><option value="">${t('시작화면 연결…','Link start screen…')}</option>${opts}</select>${go}<button class="mini" data-scn-del="${i}" title="${t('삭제','Delete')}">×</button></span></li>`; }).join("") || `<li class="empty" style="list-style:none">${t('시나리오가 없습니다.','No scenarios yet.')}</li>`;
+  return `<ol class="prd-list scn-list">${rows}</ol><button class="addbtn sm" data-scn-add>${t('＋ 시나리오','＋ Scenario')}</button>`;
 }
 function renderKpis(){
   const arr=SOT.prd.kpis||[]; const cat=specCatalog();
-  const rows=arr.map((k,i)=>{ const chips=(k.refs||[]).map((rid,j)=>`<span class="kpi-ref">${esc(refTitle(rid))}<button class="ac-del" data-kpi-refdel="${i}#${j}" title="연결 해제">×</button></span>`).join(""); const avail=cat.filter(c=>!(k.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join(""); return `<div class="kcard"><div class="kcard-h"><span class="field k-name" contenteditable data-kpi="${i}#name">${esc(k.name)}</span><button class="mini" data-kpi-del="${i}" title="삭제">×</button></div><div class="kcard-grid"><label>목표치<span class="field" contenteditable data-kpi="${i}#target">${esc(k.target)}</span></label><label>기준값<span class="field" contenteditable data-kpi="${i}#baseline">${esc(k.baseline)}</span></label><label>측정<span class="field" contenteditable data-kpi="${i}#method">${esc(k.method)}</span></label></div><div class="kcard-refs"><span class="kpi-reflabel">관련 기능</span>${chips}<select data-kpi-refadd="${i}"><option value="">＋ 기능 연결</option>${avail}</select></div></div>`; }).join("") || `<div class="empty">KPI가 없습니다.</div>`;
-  return `<div class="kgrid">${rows}</div><button class="addbtn sm" data-kpi-add>＋ KPI</button>`;
+  const rows=arr.map((k,i)=>{ const chips=(k.refs||[]).map((rid,j)=>`<span class="kpi-ref">${esc(refTitle(rid))}<button class="ac-del" data-kpi-refdel="${i}#${j}" title="${t('연결 해제','Unlink')}">×</button></span>`).join(""); const avail=cat.filter(c=>!(k.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join(""); return `<div class="kcard"><div class="kcard-h"><span class="field k-name" contenteditable data-kpi="${i}#name">${esc(k.name)}</span><button class="mini" data-kpi-del="${i}" title="${t('삭제','Delete')}">×</button></div><div class="kcard-grid"><label>${t('목표치','Target')}<span class="field" contenteditable data-kpi="${i}#target">${esc(k.target)}</span></label><label>${t('기준값','Baseline')}<span class="field" contenteditable data-kpi="${i}#baseline">${esc(k.baseline)}</span></label><label>${t('측정','Measure')}<span class="field" contenteditable data-kpi="${i}#method">${esc(k.method)}</span></label></div><div class="kcard-refs"><span class="kpi-reflabel">${t('관련 기능','Related features')}</span>${chips}<select data-kpi-refadd="${i}"><option value="">${t('＋ 기능 연결','＋ Link feature')}</option>${avail}</select></div></div>`; }).join("") || `<div class="empty">${t('KPI가 없습니다.','No KPIs yet.')}</div>`;
+  return `<div class="kgrid">${rows}</div><button class="addbtn sm" data-kpi-add>${t('＋ KPI','＋ KPI')}</button>`;
 }
 function renderPRD(){
   return `<div class="prd-doc">
     <h1><span class="field" contenteditable data-prod>${esc(SOT.title||"제품")}</span></h1>
     <div class="kv">Product Requirements Document</div>
 
-    <section><h2>1. 개요</h2>
-      <div class="prd-row"><span class="prd-k">한 줄 정의</span>${prdField("oneLiner")}</div>
-      <div class="prd-row"><span class="prd-k">성과 목표</span>${prdField("goal")}</div>
-      <div class="prd-row"><span class="prd-k">왜 지금</span>${prdField("whyNow")}</div>
-      <div class="prd-row"><span class="prd-k">카테고리</span>${prdField("category")}</div>
-      <div class="prd-row"><span class="prd-k">사용 환경</span>${prdChips("platforms")}</div>
+    <section><h2>${t('1. 개요','1. Overview')}</h2>
+      <div class="prd-row"><span class="prd-k">${t('한 줄 정의','One-liner')}</span>${prdField("oneLiner")}</div>
+      <div class="prd-row"><span class="prd-k">${t('성과 목표','Goal (outcome)')}</span>${prdField("goal")}</div>
+      <div class="prd-row"><span class="prd-k">${t('왜 지금','Why now')}</span>${prdField("whyNow")}</div>
+      <div class="prd-row"><span class="prd-k">${t('카테고리','Category')}</span>${prdField("category")}</div>
+      <div class="prd-row"><span class="prd-k">${t('사용 환경','Platforms')}</span>${prdChips("platforms")}</div>
     </section>
 
-    <section><h2>2. 문제 · 가치</h2>
-      <div class="prd-row"><span class="prd-k">사용자 문제</span>${prdField("problem")}</div>
-      <div class="prd-row"><span class="prd-k">해결 방식</span>${prdField("solution")}</div>
-      <div class="prd-row"><span class="prd-k">대안 · 경쟁</span>${prdField("alternatives")}</div>
-      <div class="prd-row"><span class="prd-k">차별점</span>${prdField("differentiator")}</div>
+    <section><h2>${t('2. 문제 · 가치','2. Problem · Value')}</h2>
+      <div class="prd-row"><span class="prd-k">${t('사용자 문제','User problem')}</span>${prdField("problem")}</div>
+      <div class="prd-row"><span class="prd-k">${t('해결 방식','Solution')}</span>${prdField("solution")}</div>
+      <div class="prd-row"><span class="prd-k">${t('대안 · 경쟁','Alternatives')}</span>${prdField("alternatives")}</div>
+      <div class="prd-row"><span class="prd-k">${t('차별점','Differentiator')}</span>${prdField("differentiator")}</div>
     </section>
 
-    <section><h2>3. 사용자</h2>
-      <h3 class="prd-sub">타겟 · 페르소나</h3>${renderPersonas()}
-      <h3 class="prd-sub">유저 스토리 · 시나리오 <span class="prd-hint">(시작화면을 연결하면 유저플로우로 이동)</span></h3>${renderScenarios()}
+    <section><h2>${t('3. 사용자','3. Users')}</h2>
+      <h3 class="prd-sub">${t('타겟 · 페르소나','Targets · Personas')}</h3>${renderPersonas()}
+      <h3 class="prd-sub">${t('유저 스토리 · 시나리오','User stories · Scenarios')} <span class="prd-hint">${t('(시작화면을 연결하면 유저플로우로 이동)','(link a start screen to jump to the user flow)')}</span></h3>${renderScenarios()}
     </section>
 
-    <section><h2>4. 성공 지표</h2>
+    <section><h2>${t('4. 성공 지표','4. Success Metrics')}</h2>
       <div class="prd-row"><span class="prd-k">North Star</span>${prdField("northStar")}</div>
-      <h3 class="prd-sub">핵심 KPI <span class="prd-hint">(지표·목표치·기준·측정 + 관련 기능 연결)</span></h3>${renderKpis()}
+      <h3 class="prd-sub">${t('핵심 KPI','Key KPIs')} <span class="prd-hint">${t('(지표·목표치·기준·측정 + 관련 기능 연결)','(metric · target · baseline · measure + feature links)')}</span></h3>${renderKpis()}
     </section>
 
-    <section><h2>5. 범위</h2>
-      <h3 class="prd-sub">포함 범위 · MVP</h3>${prdList("inScope")}
-      <h3 class="prd-sub">비목표 (범위 밖)</h3>${prdList("nonGoals")}
+    <section><h2>${t('5. 범위','5. Scope')}</h2>
+      <h3 class="prd-sub">${t('포함 범위 · MVP','In scope · MVP')}</h3>${prdList("inScope")}
+      <h3 class="prd-sub">${t('비목표 (범위 밖)','Non-goals (out of scope)')}</h3>${prdList("nonGoals")}
     </section>
 
-    <section><h2>6. 리스크 · 가정</h2>
-      <h3 class="prd-sub">가정</h3>${prdList("assumptions")}
-      <h3 class="prd-sub">리스크</h3>${prdList("risks")}
-      <h3 class="prd-sub">미해결 질문</h3>${prdList("openQuestions")}
-      <h3 class="prd-sub">제약 · 의존성</h3>${prdList("constraints")}
+    <section><h2>${t('6. 리스크 · 가정','6. Risks · Assumptions')}</h2>
+      <h3 class="prd-sub">${t('가정','Assumptions')}</h3>${prdList("assumptions")}
+      <h3 class="prd-sub">${t('리스크','Risks')}</h3>${prdList("risks")}
+      <h3 class="prd-sub">${t('미해결 질문','Open questions')}</h3>${prdList("openQuestions")}
+      <h3 class="prd-sub">${t('제약 · 의존성','Constraints · Dependencies')}</h3>${prdList("constraints")}
     </section>
   </div>`;
 }
@@ -730,26 +739,26 @@ function renderSpec(){
 
   // 1) 요구사항
   let colReqHtml;
-  if(colReqCol){ colReqHtml = `<div class="dir-col collapsed" data-expand="req" title="펼치기"><div class="cc-label">요구사항 ▸</div></div>`; }
+  if(colReqCol){ colReqHtml = `<div class="dir-col collapsed" data-expand="req" title="${t('펼치기','Expand')}"><div class="cc-label">${t('요구사항','Requirements')} ▸</div></div>`; }
   else{
     const items = SOT.requirements.map(r=>`<div class="dir-item ${r.id===selReq?'sel':''}" data-selreq="${r.id}">
-      <span class="di-title">${esc(r.title)}</span><span class="di-meta">${r.features.length}</span></div>`).join("") || `<div class="empty">없음</div>`;
+      <span class="di-title">${esc(r.title)}</span><span class="di-meta">${r.features.length}</span></div>`).join("") || `<div class="empty">${t('없음','None')}</div>`;
     colReqHtml = `<div class="dir-col cReq">
-      <div class="dir-head">요구사항 <span class="hd-btns"><button class="mini" data-collapse="req" title="접기">‹</button><button class="addbtn sm" data-add-req>＋</button></span></div>
+      <div class="dir-head">${t('요구사항','Requirements')} <span class="hd-btns"><button class="mini" data-collapse="req" title="${t('접기','Collapse')}">‹</button><button class="addbtn sm" data-add-req>＋</button></span></div>
       <div class="dir-body">${items}</div></div>`;
   }
   // 2) 기능
   let colFeatHtml;
-  if(colFeatCol){ colFeatHtml = `<div class="dir-col collapsed" data-expand="feat" title="펼치기"><div class="cc-label">기능 ▸</div></div>`; }
+  if(colFeatCol){ colFeatHtml = `<div class="dir-col collapsed" data-expand="feat" title="${t('펼치기','Expand')}"><div class="cc-label">${t('기능','Features')} ▸</div></div>`; }
   else{
     const items = req ? (req.features.map(f=>{
       const s=STAT[f.status];
       return `<div class="dir-item ${f.id===selFeat?'sel':''}" data-selfeat="${f.id}">
         <span class="status-dot ${s.c}"></span><span class="di-title">${esc(f.title)}</span>
         <span class="di-meta">${f.starred?'★ ':''}${f.specs.length}</span></div>`;
-    }).join("") || `<div class="empty">기능 없음</div>`) : `<div class="empty">요구사항 선택</div>`;
+    }).join("") || `<div class="empty">${t('기능 없음','No features')}</div>`) : `<div class="empty">${t('요구사항 선택','Select a requirement')}</div>`;
     colFeatHtml = `<div class="dir-col cFeat">
-      <div class="dir-head">기능 <span class="hd-btns"><button class="mini" data-collapse="feat" title="접기">‹</button><button class="addbtn sm" data-add-feat="${selReq}">＋</button></span></div>
+      <div class="dir-head">${t('기능','Features')} <span class="hd-btns"><button class="mini" data-collapse="feat" title="${t('접기','Collapse')}">‹</button><button class="addbtn sm" data-add-feat="${selReq}">＋</button></span></div>
       <div class="dir-body">${items}</div></div>`;
   }
   // 3) 상세 기능
@@ -757,9 +766,9 @@ function renderSpec(){
     const sid = selFeat+":"+si;
     return `<div class="dir-item ${sid===selNode?'sel':''}" data-selnode="${sid}">
       <span class="ds-idx">${si+1}</span><span class="di-title">${esc(specTitle(sp))}</span></div>`;
-  }).join("") || `<div class="empty">상세기능 없음</div>`) : `<div class="empty">기능 선택</div>`;
+  }).join("") || `<div class="empty">${t('상세기능 없음','No sub-features')}</div>`) : `<div class="empty">${t('기능 선택','Select a feature')}</div>`;
   const colSpecHtml = `<div class="dir-col cSpec">
-    <div class="dir-head">상세 기능 ${feat?`<button class="addbtn sm" data-add-spec="${selFeat}">＋</button>`:''}</div>
+    <div class="dir-head">${t('상세 기능','Sub-features')} ${feat?`<button class="addbtn sm" data-add-spec="${selFeat}">＋</button>`:''}</div>
     <div class="dir-body">${specItems}</div></div>`;
 
   // 4) 상세 패널
@@ -771,41 +780,41 @@ function renderSpec(){
 function childIds(node){ if(node.kind==="req"){ const ids=[]; node.obj.features.forEach(f=>{ ids.push(f.id); f.specs.forEach((sp,i)=>ids.push(f.id+":"+i)); }); return ids; } if(node.kind==="feat"){ const ids=[node.id]; node.obj.specs.forEach((sp,i)=>ids.push(node.id+":"+i)); return ids; } return [node.id]; }
 function traceFor(node){ const ids=new Set(childIds(node)); const pgMap={}; ids.forEach(id=>pagesRefTo(id).forEach(p=>pgMap[p.id]=p)); const trans=((SOT.flow&&SOT.flow.transitions)||[]).filter(t=>t.ref&&ids.has(t.ref)); const kpis=((SOT.prd&&SOT.prd.kpis)||[]).filter(k=>(k.refs||[]).some(r=>ids.has(r))); return {pages:Object.values(pgMap),trans,kpis}; }
 function renderTrace(node,includeIA){
-  const t=traceFor(node); let rows="";
-  if(includeIA){ const pg=t.pages.map(p=>`<button class="trace-chip" data-goia="${p.id}">${esc(p.title)}</button>`).join("")||`<span class="empty-inline">없음</span>`; rows+=`<div class="trace-row"><span class="trace-k">화면(IA)</span><span class="trace-v">${pg}</span></div>`; }
-  const fl=t.trans.map(tr=>`<button class="trace-chip" data-goflow="${tr.from}">${esc(flowMeta(tr.from).title)} → ${esc(flowMeta(tr.to).title)}</button>`).join("")||`<span class="empty-inline">없음</span>`;
-  const kp=t.kpis.map(k=>`<button class="trace-chip kpi" data-gokpi="1">${esc(k.name)}</button>`).join("")||`<span class="empty-inline">없음</span>`;
-  rows+=`<div class="trace-row"><span class="trace-k">플로우</span><span class="trace-v">${fl}</span></div>`;
+  const tc=traceFor(node); let rows="";
+  if(includeIA){ const pg=tc.pages.map(p=>`<button class="trace-chip" data-goia="${p.id}">${esc(p.title)}</button>`).join("")||`<span class="empty-inline">${t('없음','None')}</span>`; rows+=`<div class="trace-row"><span class="trace-k">${t('화면(IA)','Screens (IA)')}</span><span class="trace-v">${pg}</span></div>`; }
+  const fl=tc.trans.map(tr=>`<button class="trace-chip" data-goflow="${tr.from}">${esc(flowMeta(tr.from).title)} → ${esc(flowMeta(tr.to).title)}</button>`).join("")||`<span class="empty-inline">${t('없음','None')}</span>`;
+  const kp=tc.kpis.map(k=>`<button class="trace-chip kpi" data-gokpi="1">${esc(k.name)}</button>`).join("")||`<span class="empty-inline">${t('없음','None')}</span>`;
+  rows+=`<div class="trace-row"><span class="trace-k">${t('플로우','Flow')}</span><span class="trace-v">${fl}</span></div>`;
   rows+=`<div class="trace-row"><span class="trace-k">KPI</span><span class="trace-v">${kp}</span></div>`;
-  return `<div class="dt-sec">연결 (추적성)</div>${rows}`;
+  return `<div class="dt-sec">${t('연결 (추적성)','Connections (traceability)')}</div>${rows}`;
 }
 function renderProgress(node){
   const ac=node.obj.acceptance||[]; const acDone=ac.filter(a=>a.done).length; let bar="";
-  if(node.kind==="req"){ const fs=node.obj.features; const c={todo:0,doing:0,done:0}; fs.forEach(f=>{ c[f.status]=(c[f.status]||0)+1; }); const tot=fs.length||1; const seg=k=>c[k]?`<span class="pb ${k}" style="width:${(c[k]/tot*100).toFixed(1)}%"></span>`:''; bar=`<div class="prog-bar">${seg('done')}${seg('doing')}${seg('todo')}</div><div class="prog-legend">완료 ${c.done} · 진행 ${c.doing} · 할일 ${c.todo} <span class="pl-dim">(기능 ${fs.length})</span></div>`; }
-  else if(node.kind==="feat"){ bar=`<div class="prog-legend">상세기능 ${node.obj.specs.length}개</div>`; }
-  const acLine=ac.length?`<div class="prog-legend">수용 기준 ${acDone}/${ac.length} 완료</div>`:'';
+  if(node.kind==="req"){ const fs=node.obj.features; const c={todo:0,doing:0,done:0}; fs.forEach(f=>{ c[f.status]=(c[f.status]||0)+1; }); const tot=fs.length||1; const seg=k=>c[k]?`<span class="pb ${k}" style="width:${(c[k]/tot*100).toFixed(1)}%"></span>`:''; bar=`<div class="prog-bar">${seg('done')}${seg('doing')}${seg('todo')}</div><div class="prog-legend">${t('완료','Done')} ${c.done} · ${t('진행','In progress')} ${c.doing} · ${t('할일','To do')} ${c.todo} <span class="pl-dim">(${t('기능','features')} ${fs.length})</span></div>`; }
+  else if(node.kind==="feat"){ bar=`<div class="prog-legend">${t('상세기능','Sub-features')} ${node.obj.specs.length}${t('개','')}</div>`; }
+  const acLine=ac.length?`<div class="prog-legend">${t('수용 기준','Acceptance')} ${acDone}/${ac.length} ${t('완료','done')}</div>`:'';
   if(!bar && !acLine) return "";
-  return `<div class="dt-sec">진행 요약</div>${bar}${acLine}`;
+  return `<div class="dt-sec">${t('진행 요약','Progress summary')}</div>${bar}${acLine}`;
 }
 function renderDetail(){
   const n = nodeInfo(selNode);
-  if(!n) return `<div class="detail"><p class="empty">왼쪽에서 항목을 선택하세요.</p></div>`;
+  if(!n) return `<div class="detail"><p class="empty">${t('왼쪽에서 항목을 선택하세요.','Select an item on the left.')}</p></div>`;
   if(n.kind==="spec"){
     const s=n.obj;
     const sac = (s.acceptance||[]).map((a,i)=>`<div class="ac-item ${a.done?'done':''}">
         <input type="checkbox" data-ac-done="${n.ref}#${i}" ${a.done?'checked':''}>
         <span class="ac-text" contenteditable data-ac-text="${n.ref}#${i}">${esc(a.text)}</span>
-        <button class="ac-del" data-ac-del="${n.ref}#${i}" title="삭제">×</button></div>`).join("")
-        || `<div class="empty">수용 기준이 없습니다. ＋로 추가하세요.</div>`;
+        <button class="ac-del" data-ac-del="${n.ref}#${i}" title="${t('삭제','Delete')}">×</button></div>`).join("")
+        || `<div class="empty">${t('수용 기준이 없습니다. ＋로 추가하세요.','No acceptance criteria. Add with ＋.')}</div>`;
     return `<div class="detail">
       <div class="dt-title field" contenteditable data-spec="${n.ref}">${esc(s.title)}</div>
-      <div class="dt-goto"><button class="topbtn" data-gototree>↗ 트리 뷰로 이동</button>
-        <button class="topbtn" data-del-spec="${n.ref}" style="margin-left:6px">상세기능 삭제</button></div>
+      <div class="dt-goto"><button class="topbtn" data-gototree>${t('↗ 트리 뷰로 이동','↗ Go to tree view')}</button>
+        <button class="topbtn" data-del-spec="${n.ref}" style="margin-left:6px">${t('상세기능 삭제','Delete sub-feature')}</button></div>
       <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${n.ref}</span></div>
-      <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">상세 기능 (Specification)</span></div>
-      <div class="dt-sec">설명</div>
+      <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${t('상세 기능 (Specification)','Sub-feature (Specification)')}</span></div>
+      <div class="dt-sec">${t('설명','Description')}</div>
       <div class="dt-desc field" contenteditable data-spec-desc="${n.ref}">${esc(s.desc||'')}</div>
-      <div class="dt-sec">수용 기준 <button class="addbtn sm" data-add-ac="${n.ref}">＋</button></div>
+      <div class="dt-sec">${t('수용 기준','Acceptance criteria')} <button class="addbtn sm" data-add-ac="${n.ref}">＋</button></div>
       <div class="ac-list">${sac}</div>
       ${renderProgress(n)}
       ${renderTrace(n,true)}
@@ -814,35 +823,35 @@ function renderDetail(){
   const o=n.obj, id=n.id;
   const titleAttr = n.kind==="req"?`data-req-title="${id}"`:`data-feat-title="${id}"`;
   const descAttr  = n.kind==="req"?`data-req-desc="${id}"`:`data-feat-desc="${id}"`;
-  const typeLabel = n.kind==="req"?"요구사항 (Requirement)":"기능 (Feature)";
-  const statusOpt = Object.keys(STAT).map(k=>`<option value="${k}" ${o.status===k?'selected':''}>${STAT[k].t}</option>`).join("");
-  const prioOpt   = Object.keys(PRIO).map(k=>`<option value="${k}" ${o.priority===k?'selected':''}>${PRIO[k].t}</option>`).join("");
+  const typeLabel = n.kind==="req"?t("요구사항 (Requirement)","Requirement"):t("기능 (Feature)","Feature");
+  const statusOpt = Object.keys(STAT).map(k=>`<option value="${k}" ${o.status===k?'selected':''}>${t(STAT[k].t,STAT[k].e)}</option>`).join("");
+  const prioOpt   = Object.keys(PRIO).map(k=>`<option value="${k}" ${o.priority===k?'selected':''}>${t(PRIO[k].t,PRIO[k].e)}</option>`).join("");
   const ac = (o.acceptance||[]).map((a,i)=>`<div class="ac-item ${a.done?'done':''}">
       <input type="checkbox" data-ac-done="${id}#${i}" ${a.done?'checked':''}>
       <span class="ac-text" contenteditable data-ac-text="${id}#${i}">${esc(a.text)}</span>
-      <button class="ac-del" data-ac-del="${id}#${i}" title="삭제">×</button></div>`).join("")
-      || `<div class="empty">수용 기준이 없습니다. ＋로 추가하세요.</div>`;
+      <button class="ac-del" data-ac-del="${id}#${i}" title="${t('삭제','Delete')}">×</button></div>`).join("")
+      || `<div class="empty">${t('수용 기준이 없습니다. ＋로 추가하세요.','No acceptance criteria. Add with ＋.')}</div>`;
   let screenBlock="";
   if(n.kind==="feat"){
     const linked=pagesRefTo(id);
-    const rows=linked.map(pg=>`<div class="ia-link"><span class="ill">${esc(pageLabel(pg.id))}</span><button class="ac-del" data-map-unlink="${pg.id}~${id}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">연결된 화면이 없습니다.</div>`;
+    const rows=linked.map(pg=>`<div class="ia-link"><span class="ill">${esc(pageLabel(pg.id))}</span><button class="ac-del" data-map-unlink="${pg.id}~${id}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">${t('연결된 화면이 없습니다.','No linked screens.')}</div>`;
     const opts=allPages().filter(pg=>!linked.some(x=>x.id===pg.id)).map(pg=>`<option value="${pg.id}">${esc(pg.label)}</option>`).join("");
-    const secOpts=SOT.ia.sections.map(s=>`<option value="${s.id}">${esc(s.title)} 하위</option>`).join("");
-    screenBlock=`<div class="dt-sec">연결된 화면 (IA)</div>
+    const secOpts=SOT.ia.sections.map(s=>`<option value="${s.id}">${esc(s.title)} ${t('하위','›')}</option>`).join("");
+    screenBlock=`<div class="dt-sec">${t('연결된 화면 (IA)','Linked screens (IA)')}</div>
       <div class="ac-list">${rows}</div>
-      <div class="ia-linkadd"><select data-map-existing="${id}"><option value="">기존 화면에 연결…</option>${opts}</select></div>
-      <div class="ia-linkadd"><select data-map-newin="${id}"><option value="">＋ 새 화면 만들기 (섹션 선택)…</option>${secOpts}<option value="__new">＋ 새 섹션 만들어 추가</option></select></div>`;
+      <div class="ia-linkadd"><select data-map-existing="${id}"><option value="">${t('기존 화면에 연결…','Link to existing screen…')}</option>${opts}</select></div>
+      <div class="ia-linkadd"><select data-map-newin="${id}"><option value="">${t('＋ 새 화면 만들기 (섹션 선택)…','＋ Create new screen (pick section)…')}</option>${secOpts}<option value="__new">${t('＋ 새 섹션 만들어 추가','＋ Create new section')}</option></select></div>`;
   }
   return `<div class="detail">
     <div class="dt-title field" contenteditable ${titleAttr}>${esc(o.title)}</div>
-    <div class="dt-goto"><button class="topbtn" data-gototree>↗ 트리 뷰로 이동</button></div>
+    <div class="dt-goto"><button class="topbtn" data-gototree>${t('↗ 트리 뷰로 이동','↗ Go to tree view')}</button></div>
     <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${id}</span></div>
-    <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">${typeLabel}</span></div>
-    <div class="dt-row"><span class="dt-k">상태</span><select data-status="${id}">${statusOpt}</select></div>
-    <div class="dt-row"><span class="dt-k">중요도</span><select data-priority="${id}">${prioOpt}</select></div>
-    <div class="dt-sec">설명</div>
+    <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${typeLabel}</span></div>
+    <div class="dt-row"><span class="dt-k">${t('상태','Status')}</span><select data-status="${id}">${statusOpt}</select></div>
+    <div class="dt-row"><span class="dt-k">${t('중요도','Priority')}</span><select data-priority="${id}">${prioOpt}</select></div>
+    <div class="dt-sec">${t('설명','Description')}</div>
     <div class="dt-desc field" contenteditable ${descAttr}>${esc(o.desc||'')}</div>
-    <div class="dt-sec">수용 기준 <button class="addbtn sm" data-add-ac="${id}">＋</button></div>
+    <div class="dt-sec">${t('수용 기준','Acceptance criteria')} <button class="addbtn sm" data-add-ac="${id}">＋</button></div>
     <div class="ac-list">${ac}</div>
     ${screenBlock}
     ${renderProgress(n)}
@@ -852,6 +861,8 @@ function renderDetail(){
 
 /* ------------------------------ IA (정보구조) ------------------------------ */
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
+const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
+function ptype(k){ return t(PTYPE[k]||k, PTYPE_EN[k]||k); }
 function iaWalk(arr,sec,parent,id){ for(const p of arr){ if(p.id===id) return {page:p,arr,sec,parent}; const r=iaWalk(p.children||[],sec,p,id); if(r) return r; } return null; }
 function iaFindPage(id){ if(!id) return null; for(const sec of SOT.ia.sections){ const r=iaWalk(sec.pages,sec,null,id); if(r) return r; } return null; }
 function countPages(arr){ let n=arr.length; arr.forEach(p=>n+=countPages(p.children||[])); return n; }
@@ -890,9 +901,9 @@ function iaPageLi(p){
   const kids = (p.children&&p.children.length)?`<ul>${p.children.map(iaPageLi).join("")}</ul>`:"";
   const cls = p.type==="top"?"top":(p.type==="action"?"action":"page");
   return `<li><div class="snode ${cls} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
-      <span class="stype">${PTYPE[p.type]}</span>
+      <span class="stype">${ptype(p.type)}</span>
       <span class="stitle">${esc(p.title)}</span>
-      <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="하위 추가">＋</button><button class="mini" data-del-page="${p.id}" title="삭제">×</button></span>
+      <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="${t('하위 추가','Add child')}">＋</button><button class="mini" data-del-page="${p.id}" title="${t('삭제','Delete')}">×</button></span>
     </div>${kids}</li>`;
 }
 function renderIA(){
@@ -903,30 +914,30 @@ function renderIA(){
     return `<li><div class="snode sec ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
         <span class="stype">Depth 1</span>
         <span class="stitle">${esc(s.title)}</span>
-        <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="페이지 추가">＋</button><button class="mini" data-del-sec="${s.id}" title="섹션 삭제">×</button></span>
+        <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="${t('페이지 추가','Add page')}">＋</button><button class="mini" data-del-sec="${s.id}" title="${t('섹션 삭제','Delete section')}">×</button></span>
       </div>${pages}</li>`;
   }).join("");
   const tree = `<div class="sitemap"><ul><li>
       <div class="snode root">
         <span class="stitle">${esc(SOT.title||"IA")}</span>
         <span class="stype">Information Architecture</span>
-        <span class="srowbtns"><button class="mini" data-add-sec title="섹션 추가">＋</button></span>
+        <span class="srowbtns"><button class="mini" data-add-sec title="${t('섹션 추가','Add section')}">＋</button></span>
       </div>
       ${SOT.ia.sections.length?`<ul>${secLis}</ul>`:""}
     </li></ul></div>`;
   const cov=coverage();
   const warn = cov.unmapped.length
     ? `<div class="ia-warn">
-        <div class="iw-head">⚠ 아직 화면에 매핑되지 않은 기능·상세기능 <b>${cov.unmapped.length}개</b>
-          <span class="iw-btns"><button class="addbtn sm" data-ia-fillmissing>누락 자동 채우기</button><button class="addbtn sm ghost" data-ia-rebuild>기능명세서로 재생성</button></span>
+        <div class="iw-head">⚠ ${t('아직 화면에 매핑되지 않은 기능·상세기능','Features/sub-features not yet mapped to a screen')} <b>${cov.unmapped.length}${t('개','')}</b>
+          <span class="iw-btns"><button class="addbtn sm" data-ia-fillmissing>${t('누락 자동 채우기','Auto-fill missing')}</button><button class="addbtn sm ghost" data-ia-rebuild>${t('기능명세서로 재생성','Rebuild from spec')}</button></span>
         </div>
         <div class="iw-list">${cov.unmapped.slice(0,14).map(c=>`<span class="warn-chip">${esc(c.label)}</span>`).join("")}${cov.unmapped.length>14?`<span class="warn-chip more">＋${cov.unmapped.length-14}</span>`:""}</div>
       </div>`
-    : `<div class="ia-ok">✓ 기능명세서의 모든 기능·상세기능이 화면에 매핑되어 있습니다.</div>`;
+    : `<div class="ia-ok">✓ ${t('기능명세서의 모든 기능·상세기능이 화면에 매핑되어 있습니다.','Every feature/sub-feature is mapped to a screen.')}</div>`;
   return `<div class="ia2">
     <div class="ia-canvas">
       ${warn}
-      <div class="ia-hint">위에서 아래로 내려가는 정보구조도입니다. 노드에 마우스를 올리면 ＋추가·×삭제, 노드를 클릭하면 오른쪽에서 편집할 수 있어요.</div>
+      <div class="ia-hint">${t('위에서 아래로 내려가는 정보구조도입니다. 노드에 마우스를 올리면 ＋추가·×삭제, 노드를 클릭하면 오른쪽에서 편집할 수 있어요.','Top-down information architecture. Hover a node to ＋add/×delete; click a node to edit on the right.')}</div>
       ${tree}
     </div>
     <div class="ia-side">${renderIADetail()}</div>
@@ -935,32 +946,32 @@ function renderIA(){
 function renderIADetail(){
   if(!selPage){
     const sec=SOT.ia.sections.find(s=>s.id===selSec);
-    if(!sec) return `<div class="detail"><p class="empty">노드를 선택하세요.</p></div>`;
+    if(!sec) return `<div class="detail"><p class="empty">${t('노드를 선택하세요.','Select a node.')}</p></div>`;
     return `<div class="detail">
       <div class="dt-title field" contenteditable data-sec-title="${sec.id}">${esc(sec.title)}</div>
-      <div class="dt-row"><span class="dt-k">유형</span><span class="dt-v">섹션 (Depth 1)</span></div>
-      <div class="dt-row"><span class="dt-k">페이지</span><span class="dt-v">${countPages(sec.pages)}개</span></div>
-      <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">＋ 최상위 페이지 추가</button>
-        <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">섹션 삭제</button></div>
+      <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${t('섹션 (Depth 1)','Section (Depth 1)')}</span></div>
+      <div class="dt-row"><span class="dt-k">${t('페이지','Pages')}</span><span class="dt-v">${countPages(sec.pages)}${t('개','')}</span></div>
+      <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">${t('＋ 최상위 페이지 추가','＋ Add top page')}</button>
+        <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">${t('섹션 삭제','Delete section')}</button></div>
     </div>`;
   }
   const r = iaFindPage(selPage);
-  if(!r) return `<div class="detail"><p class="empty">노드를 선택하세요.</p></div>`;
+  if(!r) return `<div class="detail"><p class="empty">${t('노드를 선택하세요.','Select a node.')}</p></div>`;
   const p=r.page;
-  const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${PTYPE[k]}</option>`).join("");
+  const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${ptype(k)}</option>`).join("");
   const cat = specCatalog();
-  const linked = (p.refs||[]).map((rid,i)=>`<div class="ia-link"><span class="ill">${esc(refLabel(rid))}</span><button class="ac-del" data-ia-unlink="${p.id}#${i}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">연결된 기능이 없습니다.</div>`;
+  const linked = (p.refs||[]).map((rid,i)=>`<div class="ia-link"><span class="ill">${esc(refLabel(rid))}</span><button class="ac-del" data-ia-unlink="${p.id}#${i}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">${t('연결된 기능이 없습니다.','No linked features.')}</div>`;
   const opts = cat.filter(c=>!(p.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("");
   return `<div class="detail">
     <div class="dt-title field" contenteditable data-ia-title="${p.id}">${esc(p.title)}</div>
-    <div class="dt-goto"><button class="topbtn" data-gotoflow>↗ 유저플로우에서 보기</button>
-      <button class="topbtn" data-add-page="${p.id}" style="margin-left:6px">＋ 하위 화면</button>
-      <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">화면 삭제</button></div>
+    <div class="dt-goto"><button class="topbtn" data-gotoflow>${t('↗ 유저플로우에서 보기','↗ View in user flow')}</button>
+      <button class="topbtn" data-add-page="${p.id}" style="margin-left:6px">${t('＋ 하위 화면','＋ Child screen')}</button>
+      <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">${t('화면 삭제','Delete screen')}</button></div>
     <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
-    <div class="dt-row"><span class="dt-k">타입</span><select data-ia-type="${p.id}">${typeOpt}</select></div>
-    <div class="dt-sec">연결된 기능 <span class="di-meta" style="font-weight:400">· 기능명세서에서 연결</span></div>
+    <div class="dt-row"><span class="dt-k">${t('타입','Type')}</span><select data-ia-type="${p.id}">${typeOpt}</select></div>
+    <div class="dt-sec">${t('연결된 기능','Linked features')} <span class="di-meta" style="font-weight:400">${t('· 기능명세서에서 연결','· link in Feature Spec')}</span></div>
     <div class="ac-list">${linked}</div>
-    <div class="ia-linkadd"><select data-ia-link="${p.id}"><option value="">＋ 기능 연결…</option>${opts}</select></div>
+    <div class="ia-linkadd"><select data-ia-link="${p.id}"><option value="">${t('＋ 기능 연결…','＋ Link feature…')}</option>${opts}</select></div>
   </div>`;
 }
 
@@ -1004,15 +1015,15 @@ function flowCoverage(){
   let banner;
   if(orphans.length||dangling.length){
     const chips=orphans.slice(0,12).map(o=>`<span class="warn-chip">${esc(o.label.split("›").pop().trim())}</span>`).join("");
-    banner=`<div class="flow-warn">⚠ 흐름에 연결 안 된 화면 <b>${orphans.length}</b>개${dangling.length?` · 없는 화면 참조 <b>${dangling.length}</b>개`:''}<span class="iw-btns">${orphans.length?`<button class="addbtn sm" data-fcov="orphans">시작에 연결</button>`:''}${dangling.length?`<button class="addbtn sm ghost" data-fcov="clean">참조 정리</button>`:''}</span> ${chips}</div>`;
-  } else banner=`<div class="flow-warn ok">✓ 모든 화면이 흐름에 연결되어 있습니다.</div>`;
+    banner=`<div class="flow-warn">⚠ ${t('흐름에 연결 안 된 화면','Screens not connected in the flow')} <b>${orphans.length}</b>${t('개','')}${dangling.length?` · ${t('없는 화면 참조','dangling refs')} <b>${dangling.length}</b>${t('개','')}`:''}<span class="iw-btns">${orphans.length?`<button class="addbtn sm" data-fcov="orphans">${t('시작에 연결','Connect to start')}</button>`:''}${dangling.length?`<button class="addbtn sm ghost" data-fcov="clean">${t('참조 정리','Clean refs')}</button>`:''}</span> ${chips}</div>`;
+  } else banner=`<div class="flow-warn ok">✓ ${t('모든 화면이 흐름에 연결되어 있습니다.','All screens are connected in the flow.')}</div>`;
   return {orphans,dangling,banner};
 }
-function triggerSelect(t,i){
+function triggerSelect(tr,i){
   const cat=specCatalog();
-  const isCustom=(!t.ref&&t.label);
-  const opts=cat.map(c=>`<option value="${c.id}" ${t.ref===c.id?'selected':''}>${esc(c.label)}</option>`).join("");
-  return `<select data-tref="${i}"><option value="" ${(!t.ref&&!t.label)?'selected':''}>— 자동/없음 —</option>${opts}<option value="__custom" ${isCustom?'selected':''}>직접 입력…</option></select>${isCustom?`<input data-tlabel="${i}" value="${esc(t.label)}" placeholder="라벨 직접 입력" style="margin-top:5px">`:''}`;
+  const isCustom=(!tr.ref&&tr.label);
+  const opts=cat.map(c=>`<option value="${c.id}" ${tr.ref===c.id?'selected':''}>${esc(c.label)}</option>`).join("");
+  return `<select data-tref="${i}"><option value="" ${(!tr.ref&&!tr.label)?'selected':''}>${t('— 자동/없음 —','— Auto/None —')}</option>${opts}<option value="__custom" ${isCustom?'selected':''}>${t('직접 입력…','Custom…')}</option></select>${isCustom?`<input data-tlabel="${i}" value="${esc(tr.label)}" placeholder="${t('라벨 직접 입력','Enter label')}" style="margin-top:5px">`:''}`;
 }
 function renderFlowEditPanel(){
   const pages=allPages();
@@ -1020,8 +1031,8 @@ function renderFlowEditPanel(){
   const startOpts=pages.map(p=>`<option value="${p.id}" ${(SOT.flow&&SOT.flow.start)===p.id?'selected':''}>${esc(p.label)}</option>`).join("");
   const cat=specCatalog();
   const trans=(SOT.flow&&SOT.flow.transitions)||[];
-  const rows=trans.map((t,i)=>`<div class="tr-row"><div class="tr-head"><span class="tr-fromto">${esc(flowMeta(t.from).title)} → ${esc(flowMeta(t.to).title)}</span><button class="mini" data-tdel="${i}" title="삭제">×</button></div>${triggerSelect(t,i)}</div>`).join("") || `<div class="fep-empty">전환이 없습니다.</div>`;
-  return `<div class="flow-editpanel"><div class="fep-sec">시작 화면</div><select data-flowstart>${startOpts}</select><div class="fep-sec">전환 추가</div><div class="fep-add"><select data-addfrom><option value="">출발 화면…</option>${opts}</select><select data-addto><option value="">도착 화면…</option>${opts}</select><select data-addref><option value="">트리거 기능 (선택)</option>${cat.map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("")}<option value="__custom">직접 입력…</option></select><input data-addlabel placeholder="직접 입력 라벨(트리거 미선택 시)"><button class="addbtn" data-addtrans>＋ 전환 추가</button></div><div class="fep-sec">전환 목록 (${trans.length}) · 트리거=기능이면 라벨 자동</div><div class="fep-list">${rows}</div></div>`;
+  const rows=trans.map((tr,i)=>`<div class="tr-row"><div class="tr-head"><span class="tr-fromto">${esc(flowMeta(tr.from).title)} → ${esc(flowMeta(tr.to).title)}</span><button class="mini" data-tdel="${i}" title="${t('삭제','Delete')}">×</button></div>${triggerSelect(tr,i)}</div>`).join("") || `<div class="fep-empty">${t('전환이 없습니다.','No transitions.')}</div>`;
+  return `<div class="flow-editpanel"><div class="fep-sec">${t('시작 화면','Start screen')}</div><select data-flowstart>${startOpts}</select><div class="fep-sec">${t('전환 추가','Add transition')}</div><div class="fep-add"><select data-addfrom><option value="">${t('출발 화면…','From screen…')}</option>${opts}</select><select data-addto><option value="">${t('도착 화면…','To screen…')}</option>${opts}</select><select data-addref><option value="">${t('트리거 기능 (선택)','Trigger feature (optional)')}</option>${cat.map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("")}<option value="__custom">${t('직접 입력…','Custom…')}</option></select><input data-addlabel placeholder="${t('직접 입력 라벨(트리거 미선택 시)','Custom label (if no trigger)')}"><button class="addbtn" data-addtrans>${t('＋ 전환 추가','＋ Add transition')}</button></div><div class="fep-sec">${t('전환 목록','Transitions')} (${trans.length}) · ${t('트리거=기능이면 라벨 자동','feature trigger = auto label')}</div><div class="fep-list">${rows}</div></div>`;
 }
 function applyFlowFocus(){
   const vp=document.getElementById("flowVP"); if(!vp) return;
@@ -1035,14 +1046,14 @@ function applyFlowFocus(){
 function renderFlow(){
   const g=computeFlow();
   const legend=`<div class="flow-legend">
-      <span class="lg"><span class="sw start"></span>시작</span>
-      <span class="lg"><span class="sw top"></span>섹션 최상위</span>
-      <span class="lg"><span class="sw page"></span>페이지</span>
-      <span class="lg"><span class="sw action"></span>행동</span>
-      <span class="lg">→ 화면 이동(전환)</span>
+      <span class="lg"><span class="sw start"></span>${t('시작','Start')}</span>
+      <span class="lg"><span class="sw top"></span>${t('섹션 최상위','Section top')}</span>
+      <span class="lg"><span class="sw page"></span>${t('페이지','Page')}</span>
+      <span class="lg"><span class="sw action"></span>${t('행동','Action')}</span>
+      <span class="lg">${t('→ 화면 이동(전환)','→ Navigation (transition)')}</span>
     </div>`;
-  const zoom=`<div class="flow-zoom"><button class="zbtn" data-zoom="out">−</button><button class="zbtn" data-zoom="fit">맞춤</button><button class="zbtn" data-zoom="in">＋</button></div>`;
-  if(!g) return `<div class="flowg" id="flowVP">${legend}<div class="empty" style="padding:48px">전환(유저플로우) 데이터가 없습니다.</div></div>`;
+  const zoom=`<div class="flow-zoom"><button class="zbtn" data-zoom="out">−</button><button class="zbtn" data-zoom="fit">${t('맞춤','Fit')}</button><button class="zbtn" data-zoom="in">＋</button></div>`;
+  if(!g) return `<div class="flowg" id="flowVP">${legend}<div class="empty" style="padding:48px">${t('전환(유저플로우) 데이터가 없습니다.','No user-flow transition data.')}</div></div>`;
   const COLW=390, ROWH=124, padX=46, padY=58, NW=206, NH=52;
   const pos={};
   Object.keys(g.byL).map(Number).sort((a,b)=>a-b).forEach(L=>{ g.byL[L].forEach((n,i)=>{ pos[n]={x:padX+L*COLW, y:padY+i*ROWH}; }); });
@@ -1097,10 +1108,10 @@ function renderFlow(){
           </div>
         </div>
         <div class="flow-tools">
-          <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">라벨</button>
-          <button class="ztg ${flowEdit?'on':''}" data-ftool="edit">편집</button>
-          <button class="ztg" data-ftool="clear">선택 해제</button>
-          <span class="ft-hint">${flowEdit?'오른쪽 패널에서 전환 추가·삭제 · 트리거=기능이면 라벨 자동':'노드 클릭 = 연결된 흐름만 강조'}</span>
+          <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">${t('라벨','Labels')}</button>
+          <button class="ztg ${flowEdit?'on':''}" data-ftool="edit">${t('편집','Edit')}</button>
+          <button class="ztg" data-ftool="clear">${t('선택 해제','Clear')}</button>
+          <span class="ft-hint">${flowEdit?t('오른쪽 패널에서 전환 추가·삭제 · 트리거=기능이면 라벨 자동','Add/remove transitions in the right panel · feature trigger = auto label'):t('노드 클릭 = 연결된 흐름만 강조','Click a node to highlight its flow')}</span>
         </div>
         ${legend}
         ${zoom}
@@ -1130,7 +1141,7 @@ function renderTree(){
     return `<div class="branch"><div class="tnode spec" data-node="${id}" data-kind="spec">
       <span class="ic"></span>
       <span class="tn-title">${esc(specTitle(sp))}</span>
-      <button class="tdel" data-delnode="${id}" title="삭제">×</button>
+      <button class="tdel" data-delnode="${id}" title="${t('삭제','Delete')}">×</button>
     </div></div>`;
   };
   const featNode = f=>{
@@ -1141,9 +1152,9 @@ function renderTree(){
       <span class="ic"></span>
       <span class="tn-title">${esc(f.title)}</span>
       <span class="tn-id">${f.id}</span>
-      <button class="star ${f.starred?'on':''}" data-star="${f.id}" title="즐겨찾기">★</button>
-      <button class="tadd" data-addchild="${f.id}" title="상세기능 추가">＋</button>
-      <button class="tdel" data-delnode="${f.id}" title="삭제">×</button>
+      <button class="star ${f.starred?'on':''}" data-star="${f.id}" title="${t('즐겨찾기','Favorite')}">★</button>
+      <button class="tadd" data-addchild="${f.id}" title="${t('상세기능 추가','Add sub-feature')}">＋</button>
+      <button class="tdel" data-delnode="${f.id}" title="${t('삭제','Delete')}">×</button>
     </div>${children}</div>`;
   };
   const reqNode = r=>{
@@ -1154,9 +1165,9 @@ function renderTree(){
       <span class="ic"></span>
       <span class="tn-title">${esc(r.title)}</span>
       <span class="tn-id">${r.id}</span>
-      <button class="star ${r.starred?'on':''}" data-star="${r.id}" title="즐겨찾기">★</button>
-      <button class="tadd" data-addchild="${r.id}" title="기능 추가">＋</button>
-      <button class="tdel" data-delnode="${r.id}" title="삭제">×</button>
+      <button class="star ${r.starred?'on':''}" data-star="${r.id}" title="${t('즐겨찾기','Favorite')}">★</button>
+      <button class="tadd" data-addchild="${r.id}" title="${t('기능 추가','Add feature')}">＋</button>
+      <button class="tdel" data-delnode="${r.id}" title="${t('삭제','Delete')}">×</button>
     </div>${children}</div>`;
   };
   SOT.requirements.forEach(r=>EDGES.push(["PRD",r.id]));
@@ -1164,12 +1175,12 @@ function renderTree(){
   return `<div class="tree" id="tree">
     <svg class="wires" id="wires"></svg>
     <div id="treeHdr"></div>
-    <div class="tree-hint">노드를 클릭하면 기능명세서로 이동 · 마우스오버 시 ＋추가 · ×삭제 · ★즐겨찾기</div>
+    <div class="tree-hint">${t('노드를 클릭하면 기능명세서로 이동 · 마우스오버 시 ＋추가 · ×삭제 · ★즐겨찾기','Click a node to open the Feature Spec · hover for ＋add · ×delete · ★favorite')}</div>
     <div class="branch"><div class="tnode prd" data-node="PRD" data-kind="prd">
       <span class="ic"></span>
       <span class="tn-title">${esc(SOT.title||"제품")}</span>
       <span class="tn-id">PRD</span>
-      <button class="tadd" data-addchild="PRD" title="요구사항 추가">＋</button>
+      <button class="tadd" data-addchild="PRD" title="${t('요구사항 추가','Add requirement')}">＋</button>
     </div><div class="children">${kids}</div></div>
   </div>`;
 }
@@ -1192,10 +1203,10 @@ function layoutTree(){
     });
     svg.innerHTML=d;
     const hdr=document.getElementById("treeHdr");
-    if(hdr){ hdr.innerHTML=[["prd","PRD"],["req","요구사항"],["feat","기능"],["spec","상세 기능"]].map(([k,t])=>{
+    if(hdr){ hdr.innerHTML=[["prd","PRD","PRD"],["req","요구사항","Requirements"],["feat","기능","Features"],["spec","상세 기능","Sub-features"]].map(([k,ko,en])=>{
       const el=cont.querySelector('[data-kind="'+k+'"]'); if(!el) return "";
       const x=el.getBoundingClientRect().left-cr.left;
-      return `<div class="tcol-label" style="left:${x}px">${t}</div>`;
+      return `<div class="tcol-label" style="left:${x}px">${t(ko,en)}</div>`;
     }).join(""); }
   });
 }
@@ -1314,7 +1325,7 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if(d.iaUnlink){ const[pid,i]=d.iaUnlink.split("#"); const r=iaFindPage(pid); if(r) r.page.refs.splice(+i,1); commit(); }
   else if(d.mapUnlink){ const[pid,fid]=d.mapUnlink.split("~"); const r=iaFindPage(pid); if(r) r.page.refs=r.page.refs.filter(x=>x!==fid); commit(); }
   else if("iaFillmissing" in d){ iaFillMissing(); commit(); }
-  else if("iaRebuild" in d){ if(window.confirm("기능명세서 기준으로 IA를 다시 생성합니다. 지금 IA 구조는 대체됩니다. 계속할까요?")){ buildIAFromSpec(); selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; commit(); } }
+  else if("iaRebuild" in d){ if(window.confirm(t("기능명세서 기준으로 IA를 다시 생성합니다. 지금 IA 구조는 대체됩니다. 계속할까요?","This rebuilds the IA from the Feature Spec and replaces the current IA. Continue?"))){ buildIAFromSpec(); selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; commit(); } }
 });
 /* change: status / priority selects + acceptance checkboxes */
 document.getElementById("stage").addEventListener("change",e=>{
@@ -1334,8 +1345,8 @@ document.getElementById("stage").addEventListener("change",e=>{
 });
 /* history + save/load wiring */
 function resetSelections(){ selReq=SOT.requirements[0]?SOT.requirements[0].id:null; selFeat=SOT.requirements[0]&&SOT.requirements[0].features[0]?SOT.requirements[0].features[0].id:null; selNode=selReq; selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; }
-document.getElementById("stage").addEventListener("focusout",e=>{ if(e.target&&e.target.isContentEditable) snapshotIfChanged("텍스트 편집"); });
-document.getElementById("prodTitle").addEventListener("focusout",()=>snapshotIfChanged("제목 편집"));
+document.getElementById("stage").addEventListener("focusout",e=>{ if(e.target&&e.target.isContentEditable) snapshotIfChanged(t("텍스트 편집","Text edit")); });
+document.getElementById("prodTitle").addEventListener("focusout",()=>snapshotIfChanged(t("제목 편집","Title edit")));
 document.getElementById("undoBtn").addEventListener("click",undo);
 document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
@@ -1350,7 +1361,7 @@ document.getElementById("saveBtn").addEventListener("click",()=>{
 document.getElementById("loadBtn").addEventListener("click",()=>document.getElementById("fileInput").click());
 document.getElementById("fileInput").addEventListener("change",e=>{
   const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ SOT=normalize(JSON.parse(rd.result)); resetSelections(); pushHistory("불러오기"); render(); }catch(err){ alert("불러오기 실패: 올바른 JSON 파일이 아닙니다."); } e.target.value=""; };
+  rd.onload=()=>{ try{ SOT=normalize(JSON.parse(rd.result)); resetSelections(); pushHistory(t("불러오기","Load")); render(); }catch(err){ alert(t("불러오기 실패: 올바른 JSON 파일이 아닙니다.","Load failed: not a valid JSON file.")); } e.target.value=""; };
   rd.readAsText(f);
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
@@ -1365,7 +1376,10 @@ if(!SOT.title) SOT.title="제품";
 (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
 resetSelections();
 selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
-pushHistory("현재 상태");
+pushHistory(t("현재 상태","Current state"));
 updateUndoButtons();
+try{ LANG = localStorage.getItem(LANG_KEY) || (SOT&&SOT.lang) || "ko"; }catch(e){}
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); render(); });
+applyStaticI18n();
 render();
 </script>

@@ -1,0 +1,6 @@
+# 기여자의 core.autocrlf 설정과 무관하게 모든 텍스트 파일을 LF로 고정한다.
+# 뷰어가 내보내는 SOT JSON도 LF라, 이래야 저장할 때마다 파일 전체가 diff로 잡히지 않는다.
+* text=auto eol=lf
+
+# SOT 데이터 파일 (README가 사용자에게도 권장하는 설정)
+*.sot.json text eol=lf

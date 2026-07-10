@@ -5,8 +5,12 @@
 ## 최상위 구조
 
 ```json
-{ "title": "제품 이름", "prd": { }, "requirements": [ ], "ia": { "sections": [ ] }, "flow": { } }
+{ "schemaVersion": "1.0", "title": "제품 이름", "lang": "ko", "prd": { }, "requirements": [ ], "ia": { "sections": [ ] }, "flow": { } }
 ```
+
+- `schemaVersion`: 스키마 버전(현재 `"1.0"`). 뷰어가 저장할 때 자동으로 넣는다. 생성 시 포함해도 되고 생략해도 된다.
+- `lang`: 뷰어 기본 표시 언어(`"ko"`/`"en"`, 선택). 영어로 생성하면 `"en"`.
+- 파일은 Git 형상관리를 위해 **키 정렬 고정 + pretty-print**된 `<제품명>.sot.json`으로 저장한다(뷰어의 저장 기능이 이 표준형을 출력한다).
 
 ## prd (제품 정의)
 

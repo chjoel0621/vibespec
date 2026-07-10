@@ -79,6 +79,20 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 - **Version-control your `*.sot.json`.** Keeping the SOT file in git or a drive gives you change history and backups. This JSON is exactly the spec you'll hand off to developers or AI coding agents.
 
+## Version control (Git)
+
+Because the data lives in a plain `*.sot.json` file, you can put it under Git and let Git handle history, branching, review, and rollback — no extra tooling needed.
+
+- **Save produces a Git-friendly file.** Export (Save) writes canonical JSON — stable key order and pretty-printing, with a `schemaVersion`. The filename is stable (`<title>.sot.json`, no date), so it overwrites the tracked file in place and diffs stay meaningful (the same content always serializes identically).
+- **Recommended workflow.** Edit in the viewer → **Save** → replace the `*.sot.json` in your repo → commit / open a PR. Teammates pull and open the file in the same viewer to see the exact same five views.
+- **`.gitattributes`.** Add this so the SOT is treated as text with consistent line endings:
+
+  ```
+  *.sot.json text eol=lf
+  ```
+
+- **Merges.** The canonical format keeps most diffs readable and conflicts hand-resolvable. For heavy multi-person editing, an in-viewer id-based merge (reconcile two SOTs by `id`, resolve field conflicts) is planned.
+
 ## Repository structure
 
 ```

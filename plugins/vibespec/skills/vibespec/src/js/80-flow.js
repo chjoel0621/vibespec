@@ -53,15 +53,25 @@ function renderFlow(){
   const maxRows=Math.max(...Object.values(g.byL).map(a=>a.length));
   flowW=padX+(maxL+1)*COLW+140; flowH=padY+maxRows*ROWH+120;
   let paths="";
-  const outRank={}, inRank={}, outCount={}, inCount={};
+  const nodeBoxes=Object.values(pos).map(p=>({x:p.x-4,y:p.y-4,w:NW+8,h:NH+8}));
+  const labelBoxes=[];
+  const boxOverlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  const placeLabel=(x,y)=>{
+    const offsets=[0,-24,24,-48,48,-72,72,-96,96,-120,120,-144,144];
+    for(const offset of offsets){
+      const box={x,y:Math.max(4,y+offset),w:156,h:22};
+      if(!nodeBoxes.some(node=>boxOverlap(box,node))&&!labelBoxes.some(label=>boxOverlap(box,label))){ labelBoxes.push(box); return box; }
+    }
+    const box={x,y:Math.max(4,y+offsets[offsets.length-1]),w:156,h:22}; labelBoxes.push(box); return box;
+  };
+  const outRank=[], inRank=[], outCount={}, inCount={};
   g.trans.forEach(t=>{ outCount[t.from]=(outCount[t.from]||0)+1; inCount[t.to]=(inCount[t.to]||0)+1; });
   const nextOut={}, nextIn={};
-  g.trans.forEach(t=>{ outRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
+  g.trans.forEach((t,index)=>{ outRank[index]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[index]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
   g.trans.forEach((t,ei)=>{
     const a=pos[t.from], b=pos[t.to]; if(!a||!b) return;
-    const key=t.from+"~"+t.to+"~"+(t.label||"");
-    const so=(outRank[key]-(outCount[t.from]-1)/2)*7;
-    const ti=(inRank[key]-(inCount[t.to]-1)/2)*7;
+    const so=(outRank[ei]-(outCount[t.from]-1)/2)*7;
+    const ti=(inRank[ei]-(inCount[t.to]-1)/2)*7;
     let d, lx, ly;
     if(b.x>a.x){
       const x1=a.x+NW, y1=a.y+NH/2+so, x2=b.x, y2=b.y+NH/2+ti;
@@ -78,9 +88,10 @@ function renderFlow(){
     }
     paths+=`<g class="fedgeg" data-from="${t.from}" data-to="${t.to}"><path class="fedge-hit" d="${d}"/><path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
     const lab=transLabel(t);
-    if(lab) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`;
+    if(lab){ const box=placeLabel(lx-78,ly); paths+=`<foreignObject x="${box.x}" y="${box.y}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`; }
     paths+=`</g>`;
   });
+  if(labelBoxes.length) flowH=Math.max(flowH,Math.max(...labelBoxes.map(box=>box.y+box.h))+40);
   let nds="";
   g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
     nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fn="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;

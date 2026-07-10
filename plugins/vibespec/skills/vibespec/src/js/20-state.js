@@ -4,6 +4,9 @@
    상단 "불러오기"로 스킬이 생성한 JSON을 열면 아래 SEED가 대체됩니다.
    ======================================================================== */
 const SEED = {
+  schemaVersion: "1.0",
+  title: "회의실 예약 관리",
+  lang: "ko",
   overview: "사내 구성원이 회의실을 빠르게 검색·예약하고, 실시간 이용 현황을 확인할 수 있는 앱. 중복 예약과 노쇼를 줄이고, 회의실 활용도를 데이터로 관리하는 것을 목표로 한다.",
   goals: [
     "3번의 탭 이내로 회의실 예약을 완료할 수 있다.",
@@ -76,25 +79,25 @@ const SEED = {
   ia: { sections: [
     { id:"S1", title:"인증·온보딩", pages:[
       { id:"P1", title:"랜딩 페이지", type:"top", refs:[], children:[
-        { id:"P2", title:"회원가입", type:"page", refs:["F1"], children:[
+        { id:"P2", title:"회원가입", type:"page", refs:["F1","F1:0","F1:2"], children:[
           { id:"P3", title:"소셜 로그인", type:"action", refs:["F1:1"], children:[] } ] },
-        { id:"P4", title:"로그인", type:"page", refs:["F2"], children:[
+        { id:"P4", title:"로그인", type:"page", refs:["F2","F2:0"], children:[
           { id:"P5", title:"비밀번호 재설정", type:"action", refs:["F2:1"], children:[] } ] } ] } ] },
     { id:"S2", title:"예약", pages:[
       { id:"P6", title:"홈 / 대시보드", type:"top", refs:[], children:[
-        { id:"P7", title:"예약하기", type:"page", refs:["F3"], children:[
+        { id:"P7", title:"예약하기", type:"page", refs:["F3","F3:1"], children:[
           { id:"P8", title:"회의실·시간 선택", type:"action", refs:["F3:0"], children:[] },
           { id:"P9", title:"예약 확정", type:"action", refs:["F3:2"], children:[] } ] },
-        { id:"P10", title:"내 예약", type:"page", refs:["F4"], children:[
+        { id:"P10", title:"내 예약", type:"page", refs:["F4","F4:0","F4:2"], children:[
           { id:"P11", title:"예약 취소", type:"action", refs:["F4:1"], children:[] } ] } ] } ] },
     { id:"S3", title:"회의실 관리", pages:[
       { id:"P12", title:"관리자 홈", type:"top", refs:[], children:[
-        { id:"P13", title:"회의실 등록", type:"page", refs:["F5"], children:[] },
-        { id:"P14", title:"실시간 현황", type:"page", refs:["F6"], children:[] } ] } ] },
+        { id:"P13", title:"회의실 등록", type:"page", refs:["F5","F5:0","F5:1","F5:2"], children:[] },
+        { id:"P14", title:"실시간 현황", type:"page", refs:["F6","F6:0","F6:1"], children:[] } ] } ] },
     { id:"S4", title:"알림·설정", pages:[
       { id:"P15", title:"설정", type:"top", refs:[], children:[
-        { id:"P16", title:"알림 설정", type:"page", refs:["F7"], children:[] },
-        { id:"P17", title:"운영 대시보드", type:"page", refs:["F8"], children:[] } ] } ] }
+        { id:"P16", title:"알림 설정", type:"page", refs:["F7","F7:0","F7:1"], children:[] },
+        { id:"P17", title:"운영 대시보드", type:"page", refs:["F8","F8:0","F8:1"], children:[] } ] } ] }
   ] },
   flow: { start:"P1", transitions:[
     {from:"P1",to:"P2",label:"회원가입"},
@@ -125,6 +128,12 @@ const SEED = {
   F("F1").acceptance=[{text:"이메일 형식과 비밀번호 규칙을 검증해야 한다.",done:true},{text:"사번 인증 실패 시 가입이 제한되어야 한다.",done:false}];
 })();
 function normalize(s){
+  if(!s.prd) s.prd={};
+  const pd=s.prd;
+  if(s.overview && !pd.oneLiner) pd.oneLiner=s.overview;
+  if(Array.isArray(s.goals) && s.goals.length && !pd.goal) pd.goal=s.goals.join(" / ");
+  if(Array.isArray(s.personas) && s.personas.length && (!Array.isArray(pd.targets)||!pd.targets.length)) pd.targets=s.personas.slice();
+  delete s.overview; delete s.goals; delete s.personas;
   s.requirements.forEach(r=>{
     if(r.status==null) r.status="todo";
     if(r.priority==null) r.priority="mid";
@@ -137,15 +146,16 @@ function normalize(s){
       });
     });
   });
-  if(!s.prd) s.prd={};
-  const pd=s.prd;
   if(pd.background && !pd.whyNow) pd.whyNow=pd.background;
   if(Array.isArray(pd.roles) && pd.roles.length){ if(!Array.isArray(pd.targets)) pd.targets=[]; pd.roles.forEach(r=>{ if(!pd.targets.includes(r)) pd.targets.push(r); }); }
+  delete pd.background; delete pd.roles;
   ["oneLiner","goal","whyNow","problem","solution","alternatives","differentiator","northStar","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
   ["targets","scenarios","kpis","inScope","nonGoals","assumptions","risks","openQuestions","constraints","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
   pd.kpis = pd.kpis.map(k=> typeof k==="string" ? {name:k,target:"",baseline:"",method:"",refs:[]} : {name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]});
   pd.scenarios = pd.scenarios.map(x=> typeof x==="string" ? {text:x,start:""} : {text:x.text||"",start:x.start||""});
   pd.targets = pd.targets.map(t=> typeof t==="string" ? {name:t,role:"",needs:"",pain:""} : {name:t.name||"",role:t.role||"",needs:t.needs||"",pain:t.pain||""});
+  if(!s.title) s.title=pd.oneLiner||"Untitled VibeSpec";
+  if(s.lang!=="en") s.lang="ko";
   if(!s.ia) s.ia={sections:[]};
   const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
   s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
@@ -163,11 +173,17 @@ function normalize(s){
 function deriveFlow(s){
   const trans=[], tops=[];
   s.ia.sections.forEach(sec=>{ if(sec.pages[0]) tops.push(sec.pages[0].id);
-    const walk=p=>{ (p.children||[]).forEach(c=>{ trans.push({from:p.id,to:c.id,label:""}); walk(c); }); };
+    const walk=p=>{ (p.children||[]).forEach(c=>{ trans.push(flowTransition(p.id,c.id)); walk(c); }); };
     sec.pages.forEach(walk);
   });
-  for(let i=0;i<tops.length-1;i++) trans.push({from:tops[i],to:tops[i+1],label:""});
+  for(let i=0;i<tops.length-1;i++) trans.push(flowTransition(tops[i],tops[i+1]));
   return {start:tops[0]||null, transitions:trans};
+}
+function flowTransition(from,to,ref="",label=""){
+  const transition={from,to};
+  if(ref) transition.ref=ref;
+  else if(label) transition.label=label;
+  return transition;
 }
 let SOT = normalize(structuredClone(SEED));
 let VIEW = "prd";

@@ -431,6 +431,9 @@ function ptype(k){ return t(PTYPE[k]||k, PTYPE_EN[k]||k); }
    상단 "불러오기"로 스킬이 생성한 JSON을 열면 아래 SEED가 대체됩니다.
    ======================================================================== */
 const SEED = {
+  schemaVersion: "1.0",
+  title: "회의실 예약 관리",
+  lang: "ko",
   overview: "사내 구성원이 회의실을 빠르게 검색·예약하고, 실시간 이용 현황을 확인할 수 있는 앱. 중복 예약과 노쇼를 줄이고, 회의실 활용도를 데이터로 관리하는 것을 목표로 한다.",
   goals: [
     "3번의 탭 이내로 회의실 예약을 완료할 수 있다.",
@@ -503,25 +506,25 @@ const SEED = {
   ia: { sections: [
     { id:"S1", title:"인증·온보딩", pages:[
       { id:"P1", title:"랜딩 페이지", type:"top", refs:[], children:[
-        { id:"P2", title:"회원가입", type:"page", refs:["F1"], children:[
+        { id:"P2", title:"회원가입", type:"page", refs:["F1","F1:0","F1:2"], children:[
           { id:"P3", title:"소셜 로그인", type:"action", refs:["F1:1"], children:[] } ] },
-        { id:"P4", title:"로그인", type:"page", refs:["F2"], children:[
+        { id:"P4", title:"로그인", type:"page", refs:["F2","F2:0"], children:[
           { id:"P5", title:"비밀번호 재설정", type:"action", refs:["F2:1"], children:[] } ] } ] } ] },
     { id:"S2", title:"예약", pages:[
       { id:"P6", title:"홈 / 대시보드", type:"top", refs:[], children:[
-        { id:"P7", title:"예약하기", type:"page", refs:["F3"], children:[
+        { id:"P7", title:"예약하기", type:"page", refs:["F3","F3:1"], children:[
           { id:"P8", title:"회의실·시간 선택", type:"action", refs:["F3:0"], children:[] },
           { id:"P9", title:"예약 확정", type:"action", refs:["F3:2"], children:[] } ] },
-        { id:"P10", title:"내 예약", type:"page", refs:["F4"], children:[
+        { id:"P10", title:"내 예약", type:"page", refs:["F4","F4:0","F4:2"], children:[
           { id:"P11", title:"예약 취소", type:"action", refs:["F4:1"], children:[] } ] } ] } ] },
     { id:"S3", title:"회의실 관리", pages:[
       { id:"P12", title:"관리자 홈", type:"top", refs:[], children:[
-        { id:"P13", title:"회의실 등록", type:"page", refs:["F5"], children:[] },
-        { id:"P14", title:"실시간 현황", type:"page", refs:["F6"], children:[] } ] } ] },
+        { id:"P13", title:"회의실 등록", type:"page", refs:["F5","F5:0","F5:1","F5:2"], children:[] },
+        { id:"P14", title:"실시간 현황", type:"page", refs:["F6","F6:0","F6:1"], children:[] } ] } ] },
     { id:"S4", title:"알림·설정", pages:[
       { id:"P15", title:"설정", type:"top", refs:[], children:[
-        { id:"P16", title:"알림 설정", type:"page", refs:["F7"], children:[] },
-        { id:"P17", title:"운영 대시보드", type:"page", refs:["F8"], children:[] } ] } ] }
+        { id:"P16", title:"알림 설정", type:"page", refs:["F7","F7:0","F7:1"], children:[] },
+        { id:"P17", title:"운영 대시보드", type:"page", refs:["F8","F8:0","F8:1"], children:[] } ] } ] }
   ] },
   flow: { start:"P1", transitions:[
     {from:"P1",to:"P2",label:"회원가입"},
@@ -552,6 +555,12 @@ const SEED = {
   F("F1").acceptance=[{text:"이메일 형식과 비밀번호 규칙을 검증해야 한다.",done:true},{text:"사번 인증 실패 시 가입이 제한되어야 한다.",done:false}];
 })();
 function normalize(s){
+  if(!s.prd) s.prd={};
+  const pd=s.prd;
+  if(s.overview && !pd.oneLiner) pd.oneLiner=s.overview;
+  if(Array.isArray(s.goals) && s.goals.length && !pd.goal) pd.goal=s.goals.join(" / ");
+  if(Array.isArray(s.personas) && s.personas.length && (!Array.isArray(pd.targets)||!pd.targets.length)) pd.targets=s.personas.slice();
+  delete s.overview; delete s.goals; delete s.personas;
   s.requirements.forEach(r=>{
     if(r.status==null) r.status="todo";
     if(r.priority==null) r.priority="mid";
@@ -564,15 +573,16 @@ function normalize(s){
       });
     });
   });
-  if(!s.prd) s.prd={};
-  const pd=s.prd;
   if(pd.background && !pd.whyNow) pd.whyNow=pd.background;
   if(Array.isArray(pd.roles) && pd.roles.length){ if(!Array.isArray(pd.targets)) pd.targets=[]; pd.roles.forEach(r=>{ if(!pd.targets.includes(r)) pd.targets.push(r); }); }
+  delete pd.background; delete pd.roles;
   ["oneLiner","goal","whyNow","problem","solution","alternatives","differentiator","northStar","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
   ["targets","scenarios","kpis","inScope","nonGoals","assumptions","risks","openQuestions","constraints","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
   pd.kpis = pd.kpis.map(k=> typeof k==="string" ? {name:k,target:"",baseline:"",method:"",refs:[]} : {name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]});
   pd.scenarios = pd.scenarios.map(x=> typeof x==="string" ? {text:x,start:""} : {text:x.text||"",start:x.start||""});
   pd.targets = pd.targets.map(t=> typeof t==="string" ? {name:t,role:"",needs:"",pain:""} : {name:t.name||"",role:t.role||"",needs:t.needs||"",pain:t.pain||""});
+  if(!s.title) s.title=pd.oneLiner||"Untitled VibeSpec";
+  if(s.lang!=="en") s.lang="ko";
   if(!s.ia) s.ia={sections:[]};
   const fix=arr=>arr.forEach(p=>{ if(!p.type)p.type="page"; if(!p.refs)p.refs=[]; if(!p.children)p.children=[]; fix(p.children); });
   s.ia.sections.forEach(sec=>{ if(!sec.pages)sec.pages=[]; fix(sec.pages); });
@@ -590,11 +600,17 @@ function normalize(s){
 function deriveFlow(s){
   const trans=[], tops=[];
   s.ia.sections.forEach(sec=>{ if(sec.pages[0]) tops.push(sec.pages[0].id);
-    const walk=p=>{ (p.children||[]).forEach(c=>{ trans.push({from:p.id,to:c.id,label:""}); walk(c); }); };
+    const walk=p=>{ (p.children||[]).forEach(c=>{ trans.push(flowTransition(p.id,c.id)); walk(c); }); };
     sec.pages.forEach(walk);
   });
-  for(let i=0;i<tops.length-1;i++) trans.push({from:tops[i],to:tops[i+1],label:""});
+  for(let i=0;i<tops.length-1;i++) trans.push(flowTransition(tops[i],tops[i+1]));
   return {start:tops[0]||null, transitions:trans};
+}
+function flowTransition(from,to,ref="",label=""){
+  const transition={from,to};
+  if(ref) transition.ref=ref;
+  else if(label) transition.label=label;
+  return transition;
 }
 let SOT = normalize(structuredClone(SEED));
 let VIEW = "prd";
@@ -654,7 +670,7 @@ function stableStringify(obj){
   const ser=v=>{ if(Array.isArray(v)) return v.map(ser); if(v&&typeof v==="object"){ const o={}; Object.keys(v).sort((a,b)=>(rank(a)-rank(b))||(a<b?-1:a>b?1:0)).forEach(k=>{o[k]=ser(v[k]);}); return o; } return v; };
   return JSON.stringify(ser(obj),null,2);
 }
-function canonicalSOT(){ const c=JSON.parse(JSON.stringify(SOT)); c.schemaVersion=SCHEMA_VERSION; return stableStringify(c); }
+function canonicalSOT(){ const c=normalize(JSON.parse(JSON.stringify(SOT))); c.schemaVersion=SCHEMA_VERSION; return stableStringify(c); }
 
 
 /* ==== 50-render.js ==== */
@@ -1163,15 +1179,25 @@ function renderFlow(){
   const maxRows=Math.max(...Object.values(g.byL).map(a=>a.length));
   flowW=padX+(maxL+1)*COLW+140; flowH=padY+maxRows*ROWH+120;
   let paths="";
-  const outRank={}, inRank={}, outCount={}, inCount={};
+  const nodeBoxes=Object.values(pos).map(p=>({x:p.x-4,y:p.y-4,w:NW+8,h:NH+8}));
+  const labelBoxes=[];
+  const boxOverlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+  const placeLabel=(x,y)=>{
+    const offsets=[0,-24,24,-48,48,-72,72,-96,96,-120,120,-144,144];
+    for(const offset of offsets){
+      const box={x,y:Math.max(4,y+offset),w:156,h:22};
+      if(!nodeBoxes.some(node=>boxOverlap(box,node))&&!labelBoxes.some(label=>boxOverlap(box,label))){ labelBoxes.push(box); return box; }
+    }
+    const box={x,y:Math.max(4,y+offsets[offsets.length-1]),w:156,h:22}; labelBoxes.push(box); return box;
+  };
+  const outRank=[], inRank=[], outCount={}, inCount={};
   g.trans.forEach(t=>{ outCount[t.from]=(outCount[t.from]||0)+1; inCount[t.to]=(inCount[t.to]||0)+1; });
   const nextOut={}, nextIn={};
-  g.trans.forEach(t=>{ outRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
+  g.trans.forEach((t,index)=>{ outRank[index]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[index]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
   g.trans.forEach((t,ei)=>{
     const a=pos[t.from], b=pos[t.to]; if(!a||!b) return;
-    const key=t.from+"~"+t.to+"~"+(t.label||"");
-    const so=(outRank[key]-(outCount[t.from]-1)/2)*7;
-    const ti=(inRank[key]-(inCount[t.to]-1)/2)*7;
+    const so=(outRank[ei]-(outCount[t.from]-1)/2)*7;
+    const ti=(inRank[ei]-(inCount[t.to]-1)/2)*7;
     let d, lx, ly;
     if(b.x>a.x){
       const x1=a.x+NW, y1=a.y+NH/2+so, x2=b.x, y2=b.y+NH/2+ti;
@@ -1188,9 +1214,10 @@ function renderFlow(){
     }
     paths+=`<g class="fedgeg" data-from="${t.from}" data-to="${t.to}"><path class="fedge-hit" d="${d}"/><path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
     const lab=transLabel(t);
-    if(lab) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`;
+    if(lab){ const box=placeLabel(lx-78,ly); paths+=`<foreignObject x="${box.x}" y="${box.y}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`; }
     paths+=`</g>`;
   });
+  if(labelBoxes.length) flowH=Math.max(flowH,Math.max(...labelBoxes.map(box=>box.y+box.h))+40);
   let nds="";
   g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
     nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fn="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;
@@ -1345,9 +1372,9 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if("gokpi" in d){ VIEW="prd"; render(); }
   else if(d.zoom){ if(d.zoom==="in") flowZ=Math.min(2.2,flowZ*1.15); else if(d.zoom==="out") flowZ=Math.max(0.2,flowZ/1.15); else { flowFit(); return; } applyFlowTransform(); }
   else if(d.ftool){ if(d.ftool==="labels"){ flowLabels=!flowLabels; document.getElementById("flowVP").classList.toggle("labels",flowLabels); b.classList.toggle("on",flowLabels); } else if(d.ftool==="edit"){ flowEdit=!flowEdit; render(); } else if(d.ftool==="clear"){ flowSel=null; applyFlowFocus(); } }
-  else if("addtrans" in d){ const stg=document.getElementById("stage"); const from=stg.querySelector("[data-addfrom]").value, to=stg.querySelector("[data-addto]").value, refv=stg.querySelector("[data-addref]").value, custom=stg.querySelector("[data-addlabel]").value; if(from&&to){ SOT.flow.transitions=SOT.flow.transitions||[]; if(!SOT.flow.transitions.some(t=>t.from===from&&t.to===to)){ const tr={from,to}; if(refv&&refv!=="__custom") tr.ref=refv; else if(custom) tr.label=custom; SOT.flow.transitions.push(tr); } commit(); } }
+  else if("addtrans" in d){ const stg=document.getElementById("stage"); const from=stg.querySelector("[data-addfrom]").value, to=stg.querySelector("[data-addto]").value, refv=stg.querySelector("[data-addref]").value, custom=stg.querySelector("[data-addlabel]").value; if(from&&to){ SOT.flow.transitions=SOT.flow.transitions||[]; if(!SOT.flow.transitions.some(t=>t.from===from&&t.to===to)){ SOT.flow.transitions.push(flowTransition(from,to,refv&&refv!=="__custom"?refv:"",custom)); } commit(); } }
   else if(d.tdel!==undefined){ SOT.flow.transitions.splice(+d.tdel,1); commit(); }
-  else if(d.fcov){ if(d.fcov==="orphans"){ const cov=flowCoverage(); const stt=(SOT.flow&&SOT.flow.start)||(SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]&&SOT.ia.sections[0].pages[0].id); SOT.flow.transitions=SOT.flow.transitions||[]; cov.orphans.forEach(o=>{ if(o.id!==stt) SOT.flow.transitions.push({from:stt,to:o.id}); }); } else if(d.fcov==="clean"){ const known=new Set(allPages().map(p=>p.id)); SOT.flow.transitions=(SOT.flow.transitions||[]).filter(t=>known.has(t.from)&&known.has(t.to)); } commit(); }
+  else if(d.fcov){ if(d.fcov==="orphans"){ const cov=flowCoverage(); const stt=(SOT.flow&&SOT.flow.start)||(SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]&&SOT.ia.sections[0].pages[0].id); SOT.flow.transitions=SOT.flow.transitions||[]; cov.orphans.forEach(o=>{ if(o.id!==stt) SOT.flow.transitions.push(flowTransition(stt,o.id)); }); } else if(d.fcov==="clean"){ const known=new Set(allPages().map(p=>p.id)); SOT.flow.transitions=(SOT.flow.transitions||[]).filter(t=>known.has(t.from)&&known.has(t.to)); } commit(); }
   else if(d.addAc){ ownerOf(d.addAc).acceptance.push({text:"새 수용 기준",done:false}); commit(); }
   else if(d.acDel){ const[id,i]=d.acDel.split("#"); ownerOf(id).acceptance.splice(+i,1); commit(); }
   else if("addSec" in d){ const s={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(s); selSec=s.id; selPage=null; commit(); }

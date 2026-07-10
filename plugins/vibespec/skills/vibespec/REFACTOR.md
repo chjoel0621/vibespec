@@ -27,13 +27,17 @@ skills/vibespec/
 │       ├── 85-flow-edit.js # flowCoverage, triggerSelect, renderFlowEditPanel
 │       └── 90-init.js    # ALL event listeners + boot sequence (must be LAST)
 ├── build.mjs             # zero-dependency Node build (no npm install needed)
+├── references/           # human-readable contract + executable JSON Schema
+├── scripts/              # SOT 1.0 validator
+├── tests/                # schema, viewer round-trip, and browser flow regression tests
 ├── package.json          # npm run build / npm run check
 └── assets/viewer.html    # BUILT OUTPUT (do not hand-edit after migration)
 ```
 
 ## Build
 - `npm run build` → `node build.mjs` inlines `styles.css` + `head.html` + concatenated `js/*.js` (filename order) into `assets/viewer.html` as one self-contained file. Zero dependencies (offline).
-- `npm run check` → build + `node --check .build/app.js` (syntax-validates the concatenated app). This runs in any Node env and replaces the fragile "open in browser to see if it broke" loop.
+- `npm run check` → build + syntax check + JSON Schema/semantic tests + viewer export and legacy-promotion round trips + Claude/Codex manifest and marketplace contracts. It needs no browser.
+- `npm run check:all` → `check` + a headless Chrome/Edge 45-node/53-edge layout regression at desktop and mobile viewports.
 - The skill embeds the generated SOT into the built file's `<script id="embedded-sot">` exactly as today.
 
 ## Why concatenation (not ES modules/bundler)

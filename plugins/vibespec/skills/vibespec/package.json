@@ -1,11 +1,16 @@
 {
   "name": "vibespec-viewer",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Modular source for the VibeSpec viewer. Build inlines src/ into a single self-contained assets/viewer.html.",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "check": "node build.mjs && node --check .build/app.js"
+    "validate": "node scripts/validate-sot.mjs",
+    "test": "node tests/run-tests.mjs",
+    "test:browser": "npm run check:browser",
+    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs",
+    "check:browser": "node tests/browser-flow.mjs",
+    "check:all": "npm run check && npm run check:browser"
   }
 }

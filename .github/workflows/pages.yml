@@ -7,6 +7,8 @@ on:
       - "plugins/vibespec/skills/vibespec/src/**"
       - "plugins/vibespec/skills/vibespec/build.mjs"
       - "plugins/vibespec/skills/vibespec/assets/viewer.html"
+      - "plugins/vibespec/skills/vibespec/scripts/**"
+      - "demo/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -35,10 +37,16 @@ jobs:
       - name: Build viewer from src
         run: node build.mjs
         working-directory: plugins/vibespec/skills/vibespec
+      - name: Validate English demo SOT
+        run: node plugins/vibespec/skills/vibespec/scripts/validate-sot.mjs demo/meeting-room-booking.en.sot.json
       - name: Stage site
         run: |
-          mkdir -p _site
+          mkdir -p _site/en
           cp plugins/vibespec/skills/vibespec/assets/viewer.html _site/index.html
+          node plugins/vibespec/skills/vibespec/scripts/embed-sot.mjs \
+            plugins/vibespec/skills/vibespec/assets/viewer.html \
+            demo/meeting-room-booking.en.sot.json \
+            _site/en/index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

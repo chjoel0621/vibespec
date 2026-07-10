@@ -1,0 +1,229 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Meeting Room Booking",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "An app where employees find and book a free meeting room in three taps and see live availability.",
+    "goal": "Within 6 months of launch, move 80% of internal room bookings into the app and cut the no-show rate below 5%.",
+    "whyNow": "Hybrid work concentrates demand for meeting rooms, yet bookings still happen over chat or word of mouth — double bookings and no-shows are rising, and the need for space-utilization data keeps growing.",
+    "problem": "Booking status is scattered, so finding a free room is hard (the employee's job: grab an empty room right now), and double bookings and no-shows keep recurring.",
+    "solution": "Fast booking on top of live availability, confirmation and reminder notifications, and a usage-analytics dashboard for admins.",
+    "alternatives": "Today it's messenger announcements, paper sign-up sheets, and general-purpose calendars (Google Calendar) — none offer live availability or no-show management.",
+    "differentiator": "Combines company SSO accounts with room availability to support instant booking of free rooms and automatic no-show tracking.",
+    "targets": [
+      { "name": "Employee A", "role": "Booker", "needs": "Grab a free meeting room quickly, right now", "pain": "Status is scattered, so finding an empty room is a chore" },
+      { "name": "Team lead", "role": "Attendee management", "needs": "Share time and place with attendees in one step", "pain": "Verbal or chat announcements cause people to be missed" },
+      { "name": "Facilities admin", "role": "Room operations", "needs": "Manage utilization and no-shows with data", "pain": "No data to base operational decisions on" }
+    ],
+    "scenarios": [
+      { "text": "Employee A checks free rooms from Home for a 2 p.m. meeting, picks a 3rd-floor room, adds four attendees, and confirms the booking. A confirmation notification goes out to the attendees.", "start": "P6" },
+      { "text": "Admin B reviews per-room utilization and no-show rates on the weekly dashboard and adjusts the operating hours of under-used rooms.", "start": "" }
+    ],
+    "northStar": "Weekly Completed Bookings",
+    "kpis": [
+      { "name": "Average taps to complete a booking", "target": "≤ 3", "baseline": "6", "method": "Average taps to the completion event from logs", "refs": ["F3", "F6"] },
+      { "name": "Monthly no-show rate", "target": "≤ 5%", "baseline": "18%", "method": "Bookings without check-in / total bookings", "refs": ["F7"] },
+      { "name": "Weekly active booker ratio (WAU/employees)", "target": "≥ 40%", "baseline": "22%", "method": "Weekly bookers / all employees", "refs": ["F3"] }
+    ],
+    "inScope": ["Live room availability", "Create, change, and cancel bookings", "Confirmation and reminder notifications", "Admin usage-analytics dashboard"],
+    "nonGoals": ["External guest booking", "Payments and settlement", "Video-conferencing integration (excluded initially)", "Desk (seat) booking"],
+    "assumptions": ["Every employee has a company SSO account", "Facilities provides the room list and capacity data", "No-shows can be detected as booked-but-not-checked-in"],
+    "risks": ["Uncertain schedule for company SSO integration", "Accuracy of availability in rooms without sensors", "Low statistical confidence early on due to sparse data"],
+    "openQuestions": ["Check-in via QR or NFC?", "Should there be a no-show penalty policy?", "Booking slots of 15 or 30 minutes?"],
+    "constraints": ["Must work inside the corporate network (VPN)", "Personal data may not be stored externally per company policy", "iOS, Android, and web must be supported simultaneously"],
+    "category": "Internal booking management (B2B SaaS)",
+    "platforms": ["Web", "iOS", "Android"]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "Account management", "desc": "Members of the organization must be able to create an account and sign in securely.",
+      "status": "done", "priority": "mid", "acceptance": [],
+      "features": [
+        {
+          "id": "F1", "title": "Sign-up", "desc": "Sign up with email/password or a social account, and map the department via employee-ID verification.",
+          "status": "done", "priority": "mid",
+          "acceptance": [
+            { "text": "Email format and password rules must be validated.", "done": true },
+            { "text": "Sign-up must be blocked when employee-ID verification fails.", "done": false }
+          ],
+          "specs": [
+            { "title": "Email/password sign-up", "desc": "", "acceptance": [] },
+            { "title": "Social login (Kakao, Google)", "desc": "", "acceptance": [] },
+            { "title": "Employee-ID verification and department mapping", "desc": "", "acceptance": [] }
+          ]
+        },
+        {
+          "id": "F2", "title": "Login / logout", "desc": "",
+          "status": "done", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Auto login / logout handling", "desc": "", "acceptance": [] },
+            { "title": "Password recovery and reset", "desc": "", "acceptance": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2", "title": "Booking management", "desc": "Users must be able to pick a room and time slot, then create or change a booking.",
+      "status": "doing", "priority": "high",
+      "acceptance": [
+        { "text": "Users must be able to select a room and a time slot to book.", "done": true },
+        { "text": "Overlapping time-slot bookings must be blocked.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F3", "title": "Create booking", "desc": "The user picks a room and time slot and creates a booking. Double bookings are prevented, and attendees are notified on confirmation.",
+          "status": "doing", "priority": "high",
+          "acceptance": [
+            { "text": "A room must be selectable from the room list.", "done": true },
+            { "text": "Overlapping bookings must be blocked when picking start/end times.", "done": false },
+            { "text": "The booker must be notified when the booking is confirmed.", "done": false }
+          ],
+          "specs": [
+            { "title": "Pick room and time slot", "desc": "", "acceptance": [] },
+            { "title": "Add attendees and set capacity limits", "desc": "", "acceptance": [] },
+            { "title": "Review booking and send confirmation notification", "desc": "", "acceptance": [] }
+          ]
+        },
+        {
+          "id": "F4", "title": "View / change bookings", "desc": "",
+          "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "List my bookings", "desc": "", "acceptance": [] },
+            { "title": "Edit and cancel bookings", "desc": "", "acceptance": [] },
+            { "title": "Weekly calendar view", "desc": "", "acceptance": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3", "title": "Room management", "desc": "Admins must be able to register room information and see live status.",
+      "status": "todo", "priority": "mid", "acceptance": [],
+      "features": [
+        {
+          "id": "F5", "title": "Register rooms", "desc": "",
+          "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Register room details (location/photos)", "desc": "", "acceptance": [] },
+            { "title": "Set capacity and equipment", "desc": "", "acceptance": [] },
+            { "title": "Set available hours", "desc": "", "acceptance": [] }
+          ]
+        },
+        {
+          "id": "F6", "title": "Live status", "desc": "",
+          "status": "todo", "priority": "low", "acceptance": [],
+          "specs": [
+            { "title": "Per-room usage board", "desc": "", "acceptance": [] },
+            { "title": "Show remaining time and next booking", "desc": "", "acceptance": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4", "title": "Notifications and admin", "desc": "The product must send booking notifications and let admins manage operational metrics.",
+      "status": "todo", "priority": "mid", "acceptance": [],
+      "features": [
+        {
+          "id": "F7", "title": "Notifications", "desc": "",
+          "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Reminder before the booking starts", "desc": "", "acceptance": [] },
+            { "title": "Change/cancellation notifications", "desc": "", "acceptance": [] }
+          ]
+        },
+        {
+          "id": "F8", "title": "Operations dashboard", "desc": "",
+          "status": "todo", "priority": "low", "acceptance": [],
+          "specs": [
+            { "title": "Per-room utilization statistics", "desc": "", "acceptance": [] },
+            { "title": "No-show / cancellation report", "desc": "", "acceptance": [] }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1", "title": "Auth & onboarding",
+        "pages": [
+          {
+            "id": "P1", "title": "Landing page", "type": "top", "refs": [],
+            "children": [
+              {
+                "id": "P2", "title": "Sign-up", "type": "page", "refs": ["F1", "F1:0", "F1:2"],
+                "children": [ { "id": "P3", "title": "Social login", "type": "action", "refs": ["F1:1"], "children": [] } ]
+              },
+              {
+                "id": "P4", "title": "Login", "type": "page", "refs": ["F2", "F2:0"],
+                "children": [ { "id": "P5", "title": "Password reset", "type": "action", "refs": ["F2:1"], "children": [] } ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S2", "title": "Booking",
+        "pages": [
+          {
+            "id": "P6", "title": "Home / dashboard", "type": "top", "refs": [],
+            "children": [
+              {
+                "id": "P7", "title": "Book a room", "type": "page", "refs": ["F3", "F3:1"],
+                "children": [
+                  { "id": "P8", "title": "Pick room & time", "type": "action", "refs": ["F3:0"], "children": [] },
+                  { "id": "P9", "title": "Confirm booking", "type": "action", "refs": ["F3:2"], "children": [] }
+                ]
+              },
+              {
+                "id": "P10", "title": "My bookings", "type": "page", "refs": ["F4", "F4:0", "F4:2"],
+                "children": [ { "id": "P11", "title": "Cancel booking", "type": "action", "refs": ["F4:1"], "children": [] } ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S3", "title": "Room management",
+        "pages": [
+          {
+            "id": "P12", "title": "Admin home", "type": "top", "refs": [],
+            "children": [
+              { "id": "P13", "title": "Register rooms", "type": "page", "refs": ["F5", "F5:0", "F5:1", "F5:2"], "children": [] },
+              { "id": "P14", "title": "Live status", "type": "page", "refs": ["F6", "F6:0", "F6:1"], "children": [] }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S4", "title": "Notifications & settings",
+        "pages": [
+          {
+            "id": "P15", "title": "Settings", "type": "top", "refs": [],
+            "children": [
+              { "id": "P16", "title": "Notification settings", "type": "page", "refs": ["F7", "F7:0", "F7:1"], "children": [] },
+              { "id": "P17", "title": "Operations dashboard", "type": "page", "refs": ["F8", "F8:0", "F8:1"], "children": [] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F1" },
+      { "from": "P1", "to": "P4", "ref": "F2" },
+      { "from": "P2", "to": "P4", "label": "Sign-up complete" },
+      { "from": "P4", "to": "P6", "label": "Login success" },
+      { "from": "P6", "to": "P7", "ref": "F3" },
+      { "from": "P7", "to": "P8", "ref": "F3:0" },
+      { "from": "P8", "to": "P9", "label": "Review" },
+      { "from": "P9", "to": "P6", "label": "Booking complete" },
+      { "from": "P6", "to": "P10", "ref": "F4" },
+      { "from": "P10", "to": "P11", "ref": "F4:1" },
+      { "from": "P11", "to": "P10", "label": "Cancellation complete" },
+      { "from": "P6", "to": "P12", "label": "Admin" },
+      { "from": "P6", "to": "P15", "label": "Settings" }
+    ]
+  }
+}

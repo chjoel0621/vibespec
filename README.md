@@ -7,7 +7,7 @@
 
 VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code and OpenAI Codex. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
-**🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable, and Save exports the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.
+**🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — ask "turn my product idea into a planning tool" or attach a business plan, and the skill produces an HTML just like this demo. Try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable, and Save exports the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.
 
 ## Core idea
 

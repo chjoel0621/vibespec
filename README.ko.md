@@ -8,7 +8,7 @@
 
 VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있는 듀얼 포맷 **플러그인 마켓플레이스**입니다. 아이디어를 설명하거나 사업계획서·PRD 초안 같은 문서를 첨부하면, AI가 스키마에 맞는 SOT JSON을 생성하고 전용 HTML 뷰어로 열어 바로 편집할 수 있습니다.
 
-**🕹️ [라이브 데모](https://chjoel0621.github.io/vibespec/)** — 설치 없이 브라우저에서 바로 뷰어를 체험해 보세요. 샘플 제품(회의실 예약 앱)이 열리고, 모든 항목을 편집할 수 있으며 저장을 누르면 SOT JSON이 내보내집니다. [영어 데모](https://chjoel0621.github.io/vibespec/en/)도 있습니다.
+**🕹️ [라이브 데모](https://chjoel0621.github.io/vibespec/)** — "내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면 데모와 같은 HTML을 산출합니다. 설치 없이 브라우저에서 바로 뷰어를 체험해 보세요. 샘플 제품(회의실 예약 앱)이 열리고, 모든 항목을 편집할 수 있으며 저장을 누르면 SOT JSON이 내보내집니다. [영어 데모](https://chjoel0621.github.io/vibespec/en/)도 있습니다.
 
 ## 핵심 개념
 

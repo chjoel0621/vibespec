@@ -1,0 +1,31 @@
+<div class="app">
+  <div class="topbar">
+    <div class="logo">VS</div>
+    <div class="title" id="prodTitle" contenteditable="true" spellcheck="false">회의실 예약 앱
+      <small data-i18n="VibeSpec · 기획 뷰어|VibeSpec · Planning Viewer">VibeSpec · 기획 뷰어</small>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-view="prd" aria-selected="true">PRD</button>
+      <button class="tab" role="tab" data-view="spec" data-i18n="기능명세서|Feature Spec">기능명세서</button>
+      <button class="tab" role="tab" data-view="tree" data-i18n="트리|Tree">트리</button>
+      <button class="tab" role="tab" data-view="ia">IA</button>
+      <button class="tab" role="tab" data-view="flow" data-i18n="유저플로우|User Flow">유저플로우</button>
+    </div>
+    <button class="topbtn" id="langBtn" title="Language">EN</button>
+    <button class="topbtn" id="undoBtn" data-i18n-title="실행 취소 (Ctrl+Z)|Undo (Ctrl+Z)" title="실행 취소 (Ctrl+Z)">↩</button>
+    <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
+    <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
+    <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
+    <button class="topbtn" id="loadBtn" data-i18n="불러오기|Load" data-i18n-title="JSON 파일 불러오기|Load JSON" title="JSON 파일 불러오기">불러오기</button>
+    <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
+    <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
+    <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>
+  </div>
+  <div class="view"><div class="wrap" id="stage"></div></div>
+</div>
+<div class="hist-drawer" id="histDrawer">
+  <div class="hist-head"><span data-i18n="변경 히스토리|Change history">변경 히스토리</span> <button class="topbtn" id="histClose" data-i18n="닫기|Close">닫기</button></div>
+  <div class="hist-sub" data-i18n="항목을 클릭하면 그 시점으로 되돌립니다.|Click an entry to restore that point.">항목을 클릭하면 그 시점으로 되돌립니다.</div>
+  <div class="hist-list" id="histList"></div>
+</div>
+<div class="sot-flash" id="flash"><b>SOT 갱신됨</b> · 모든 뷰 동기화 완료</div>

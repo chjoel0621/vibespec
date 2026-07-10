@@ -1,2 +1,7 @@
 # Cowork 자동 생성 파일
 AGENTS.md
+
+# 뷰어 빌드 산출물 (소스는 src/, 배포본은 assets/viewer.html)
+build/
+.build/
+node_modules/

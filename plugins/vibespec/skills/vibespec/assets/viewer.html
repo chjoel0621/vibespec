@@ -1,6 +1,5 @@
 <!doctype html>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VibeSpec</title>
 <style>
   :root{
@@ -366,8 +365,8 @@
   .tcol-label{position:absolute;top:18px;background:var(--accent);color:#fff;font-size:12px;font-weight:650;padding:5px 12px;border-radius:7px;z-index:2}
   .tree-hint{color:var(--muted);font-size:12px;position:absolute;top:22px;right:24px}
   .empty{color:var(--muted);font-style:italic;padding:8px 0}
-</style>
 
+</style>
 <div class="app">
   <div class="topbar">
     <div class="logo">VS</div>
@@ -399,9 +398,33 @@
   <div class="hist-list" id="histList"></div>
 </div>
 <div class="sot-flash" id="flash"><b>SOT 갱신됨</b> · 모든 뷰 동기화 완료</div>
-<script type="application/json" id="embedded-sot"></script>
 
+<script type="application/json" id="embedded-sot"></script>
 <script>
+/* ==== 00-config.js ==== */
+const PRIO = {high:{c:"high",t:"높음",e:"High"}, mid:{c:"mid",t:"보통",e:"Mid"}, low:{c:"low",t:"낮음",e:"Low"}};
+const STAT = {todo:{c:"st-todo",t:"시작전",e:"To do"}, doing:{c:"st-doing",t:"진행중",e:"In progress"}, done:{c:"st-done",t:"완료",e:"Done"}};
+const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+const LS_KEY="sot-proto-v3-flow";
+const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
+const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
+const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
+const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
+const SCHEMA_VERSION="1.0";
+
+
+/* ==== 10-i18n.js ==== */
+let LANG = "ko"; const LANG_KEY = "vibespec-lang";
+function t(ko,en){ return LANG==="en" ? en : ko; }
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ const p=el.dataset.i18n.split("|"); el.textContent = LANG==="en"?(p[1]||p[0]):p[0]; });
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ const p=el.dataset.i18nTitle.split("|"); el.title = LANG==="en"?(p[1]||p[0]):p[0]; });
+  const lb=document.getElementById("langBtn"); if(lb) lb.textContent = LANG==="en"?"한글":"EN";
+}
+function ptype(k){ return t(PTYPE[k]||k, PTYPE_EN[k]||k); }
+
+
+/* ==== 20-state.js ==== */
 /* ========================================================================
    SINGLE SOURCE OF TRUTH
    PRD · 기능명세서 · IA · 유저플로우 · 트리 뷰가 전부 이 하나의 객체만 읽고 씁니다.
@@ -516,7 +539,6 @@ const SEED = {
     {from:"P6",to:"P15",label:"설정"}
   ] }
 };
-
 /* enrich seed with detail-level fields (설명 / 수용 기준 / 상태 / 중요도) */
 (function seedDetail(){
   const R=id=>SEED.requirements.find(r=>r.id===id);
@@ -529,7 +551,6 @@ const SEED = {
   F("F1").desc="이메일/비밀번호 또는 소셜 계정으로 회원가입하고, 사번 인증으로 부서를 매핑한다.";
   F("F1").acceptance=[{text:"이메일 형식과 비밀번호 규칙을 검증해야 한다.",done:true},{text:"사번 인증 실패 시 가입이 제한되어야 한다.",done:false}];
 })();
-
 function normalize(s){
   s.requirements.forEach(r=>{
     if(r.status==null) r.status="todo";
@@ -575,35 +596,23 @@ function deriveFlow(s){
   for(let i=0;i<tops.length-1;i++) trans.push({from:tops[i],to:tops[i+1],label:""});
   return {start:tops[0]||null, transitions:trans};
 }
-
 let SOT = normalize(structuredClone(SEED));
 let VIEW = "prd";
-let LANG = "ko"; const LANG_KEY = "vibespec-lang";
-function t(ko,en){ return LANG==="en" ? en : ko; }
-function applyStaticI18n(){
-  document.querySelectorAll("[data-i18n]").forEach(el=>{ const p=el.dataset.i18n.split("|"); el.textContent = LANG==="en"?(p[1]||p[0]):p[0]; });
-  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ const p=el.dataset.i18nTitle.split("|"); el.title = LANG==="en"?(p[1]||p[0]):p[0]; });
-  const lb=document.getElementById("langBtn"); if(lb) lb.textContent = LANG==="en"?"한글":"EN";
-}
 let selReq, selFeat, selNode;
 let colReqCol = false, colFeatCol = false;
 let selSec, selPage;
 let idc = 100;
 const nid = p => p + (++idc);
-
-const PRIO = {high:{c:"high",t:"높음",e:"High"}, mid:{c:"mid",t:"보통",e:"Mid"}, low:{c:"low",t:"낮음",e:"Low"}};
-const STAT = {todo:{c:"st-todo",t:"시작전",e:"To do"}, doing:{c:"st-doing",t:"진행중",e:"In progress"}, done:{c:"st-done",t:"완료",e:"Done"}};
-const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
-
 /* ---- mutation helpers: every edit funnels through here, then render() ---- */
 function commit(){ normalize(SOT); render(); flash(); pushHistory(); }
 function flash(){ const f=document.getElementById("flash"); f.classList.add("show"); clearTimeout(flash._t); flash._t=setTimeout(()=>f.classList.remove("show"),1200); }
+function find(id){ return SOT.requirements.find(r=>r.id===id); }
+function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x=>x.id===fid); if(f) return {r,f}; } return {}; }
 
+
+/* ==== 30-history.js ==== */
 /* ---- persistence + history ---- */
-const LS_KEY="sot-proto-v3-flow";
 let HISTORY=[], HPTR=-1, restoring=false;
-const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
-const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
 function snapshot(){ return JSON.stringify(SOT); }
 function saveLocal(){ try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
 function pushHistory(label){
@@ -637,6 +646,18 @@ function renderHistory(){
 }
 function snapshotIfChanged(label){ const s=snapshot(); if(!(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===s)) pushHistory(label); }
 
+
+/* ==== 40-io.js ==== */
+function stableStringify(obj){
+  const PRI=["schemaVersion","title","lang","id","name","type","status","priority","desc","acceptance","refs","from","to","ref","label","start"];
+  const rank=k=>{ const i=PRI.indexOf(k); return i<0?999:i; };
+  const ser=v=>{ if(Array.isArray(v)) return v.map(ser); if(v&&typeof v==="object"){ const o={}; Object.keys(v).sort((a,b)=>(rank(a)-rank(b))||(a<b?-1:a>b?1:0)).forEach(k=>{o[k]=ser(v[k]);}); return o; } return v; };
+  return JSON.stringify(ser(obj),null,2);
+}
+function canonicalSOT(){ const c=JSON.parse(JSON.stringify(SOT)); c.schemaVersion=SCHEMA_VERSION; return stableStringify(c); }
+
+
+/* ==== 50-render.js ==== */
 /* ============================ RENDER DISPATCH ============================ */
 function render(){
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
@@ -648,7 +669,32 @@ function render(){
   else if(VIEW==="ia") el.innerHTML = renderIA();
   else { try{ el.innerHTML = renderFlow(); layoutFlow(); }catch(err){ el.innerHTML='<div style="padding:40px;color:#c0392b;font-weight:600">유저플로우 렌더 오류: '+esc(String(err&&err.stack||err))+'</div>'; } }
 }
+/* --------------------- 기능명세서 (3분할 디렉터리 + 상세) --------------------- */
+function nodeInfo(id){
+  if(!id) return null;
+  if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); const ff=findF(fid); if(!ff.f||!ff.f.specs[+si]) return null; return {kind:"spec",id,ref:id,obj:ff.f.specs[+si]}; }
+  const r=find(id); if(r) return {kind:"req",id,obj:r};
+  const ff=findF(id); if(ff.f) return {kind:"feat",id,obj:ff.f};
+  return null;
+}
+function ownerOf(id){ if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); return findF(fid).f.specs[+si]; } return id[0]==="R"?find(id):findF(id).f; }
+function specTitle(sp){ return typeof sp==="string"?sp:(sp&&sp.title||""); }
+function iaWalk(arr,sec,parent,id){ for(const p of arr){ if(p.id===id) return {page:p,arr,sec,parent}; const r=iaWalk(p.children||[],sec,p,id); if(r) return r; } return null; }
+function iaFindPage(id){ if(!id) return null; for(const sec of SOT.ia.sections){ const r=iaWalk(sec.pages,sec,null,id); if(r) return r; } return null; }
+function countPages(arr){ let n=arr.length; arr.forEach(p=>n+=countPages(p.children||[])); return n; }
+function specCatalog(){ const out=[]; SOT.requirements.forEach(r=>r.features.forEach(f=>{ out.push({id:f.id,label:r.title+" › "+f.title}); f.specs.forEach((sp,si)=>out.push({id:f.id+":"+si,label:f.title+" › "+specTitle(sp)})); })); return out; }
+function refLabel(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label:id; }
+function pagesRefTo(fid){ const out=[]; const walk=arr=>arr.forEach(p=>{ if((p.refs||[]).includes(fid)) out.push(p); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return out; }
+function allPages(){ const out=[]; const walk=(arr,st)=>arr.forEach(p=>{ out.push({id:p.id,label:st+" › "+p.title}); walk(p.children||[],st); }); SOT.ia.sections.forEach(s=>walk(s.pages,s.title)); return out; }
+function pageLabel(id){ const a=allPages().find(x=>x.id===id); return a?a.label:id; }
+function findPageByRef(id){ let res=null; const walk=arr=>arr.forEach(p=>{ if(!res&&(p.refs||[]).includes(id)) res=p; walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return res; }
+function coverage(){ const mapped=new Set(); const walk=arr=>arr.forEach(p=>{ (p.refs||[]).forEach(x=>mapped.add(x)); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); const unmapped=specCatalog().filter(c=>!mapped.has(c.id)); return {mapped,unmapped}; }
+function flowMeta(id){ const r=iaFindPage(id); return r?{title:r.page.title,type:r.page.type}:{title:id,type:"page"}; }
+function refTitle(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label.split("›").pop().trim():id; }
+function transLabel(t){ return t.ref? refTitle(t.ref) : (t.label||""); }
 
+
+/* ==== 55-prd.js ==== */
 /* -------------------------------- PRD -------------------------------- */
 function prdField(k, ph){ return `<div class="prd-field field" contenteditable data-prd-field="${k}">${esc(SOT.prd[k]||"")}</div>`; }
 function prdList(k, ordered){
@@ -719,17 +765,8 @@ function renderPRD(){
   </div>`;
 }
 
-/* --------------------- 기능명세서 (3분할 디렉터리 + 상세) --------------------- */
-function nodeInfo(id){
-  if(!id) return null;
-  if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); const ff=findF(fid); if(!ff.f||!ff.f.specs[+si]) return null; return {kind:"spec",id,ref:id,obj:ff.f.specs[+si]}; }
-  const r=find(id); if(r) return {kind:"req",id,obj:r};
-  const ff=findF(id); if(ff.f) return {kind:"feat",id,obj:ff.f};
-  return null;
-}
-function ownerOf(id){ if(id.indexOf(":")>-1){ const[fid,si]=id.split(":"); return findF(fid).f.specs[+si]; } return id[0]==="R"?find(id):findF(id).f; }
-function specTitle(sp){ return typeof sp==="string"?sp:(sp&&sp.title||""); }
 
+/* ==== 60-spec.js ==== */
 function renderSpec(){
   if(!find(selReq)) selReq = SOT.requirements[0] ? SOT.requirements[0].id : null;
   const req = find(selReq);
@@ -777,6 +814,8 @@ function renderSpec(){
   return `<div class="dir">${colReqHtml}${colFeatHtml}${colSpecHtml}${colDetailHtml}</div>`;
 }
 
+
+/* ==== 65-detail.js ==== */
 function childIds(node){ if(node.kind==="req"){ const ids=[]; node.obj.features.forEach(f=>{ ids.push(f.id); f.specs.forEach((sp,i)=>ids.push(f.id+":"+i)); }); return ids; } if(node.kind==="feat"){ const ids=[node.id]; node.obj.specs.forEach((sp,i)=>ids.push(node.id+":"+i)); return ids; } return [node.id]; }
 function traceFor(node){ const ids=new Set(childIds(node)); const pgMap={}; ids.forEach(id=>pagesRefTo(id).forEach(p=>pgMap[p.id]=p)); const trans=((SOT.flow&&SOT.flow.transitions)||[]).filter(t=>t.ref&&ids.has(t.ref)); const kpis=((SOT.prd&&SOT.prd.kpis)||[]).filter(k=>(k.refs||[]).some(r=>ids.has(r))); return {pages:Object.values(pgMap),trans,kpis}; }
 function renderTrace(node,includeIA){
@@ -859,20 +898,9 @@ function renderDetail(){
   </div>`;
 }
 
+
+/* ==== 70-ia.js ==== */
 /* ------------------------------ IA (정보구조) ------------------------------ */
-const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
-const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
-function ptype(k){ return t(PTYPE[k]||k, PTYPE_EN[k]||k); }
-function iaWalk(arr,sec,parent,id){ for(const p of arr){ if(p.id===id) return {page:p,arr,sec,parent}; const r=iaWalk(p.children||[],sec,p,id); if(r) return r; } return null; }
-function iaFindPage(id){ if(!id) return null; for(const sec of SOT.ia.sections){ const r=iaWalk(sec.pages,sec,null,id); if(r) return r; } return null; }
-function countPages(arr){ let n=arr.length; arr.forEach(p=>n+=countPages(p.children||[])); return n; }
-function specCatalog(){ const out=[]; SOT.requirements.forEach(r=>r.features.forEach(f=>{ out.push({id:f.id,label:r.title+" › "+f.title}); f.specs.forEach((sp,si)=>out.push({id:f.id+":"+si,label:f.title+" › "+specTitle(sp)})); })); return out; }
-function refLabel(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label:id; }
-function pagesRefTo(fid){ const out=[]; const walk=arr=>arr.forEach(p=>{ if((p.refs||[]).includes(fid)) out.push(p); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return out; }
-function allPages(){ const out=[]; const walk=(arr,st)=>arr.forEach(p=>{ out.push({id:p.id,label:st+" › "+p.title}); walk(p.children||[],st); }); SOT.ia.sections.forEach(s=>walk(s.pages,s.title)); return out; }
-function pageLabel(id){ const a=allPages().find(x=>x.id===id); return a?a.label:id; }
-function findPageByRef(id){ let res=null; const walk=arr=>arr.forEach(p=>{ if(!res&&(p.refs||[]).includes(id)) res=p; walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); return res; }
-function coverage(){ const mapped=new Set(); const walk=arr=>arr.forEach(p=>{ (p.refs||[]).forEach(x=>mapped.add(x)); walk(p.children||[]); }); SOT.ia.sections.forEach(s=>walk(s.pages)); const unmapped=specCatalog().filter(c=>!mapped.has(c.id)); return {mapped,unmapped}; }
 function iaFillMissing(){
   SOT.requirements.forEach(r=>{
     r.features.forEach(f=>{
@@ -896,7 +924,6 @@ function buildIAFromSpec(){
     }))
   }));
 }
-
 function iaPageLi(p){
   const kids = (p.children&&p.children.length)?`<ul>${p.children.map(iaPageLi).join("")}</ul>`:"";
   const cls = p.type==="top"?"top":(p.type==="action"?"action":"page");
@@ -975,163 +1002,8 @@ function renderIADetail(){
   </div>`;
 }
 
-/* --------------------- 유저플로우 (전환 그래프) --------------------- */
-function flowMeta(id){ const r=iaFindPage(id); return r?{title:r.page.title,type:r.page.type}:{title:id,type:"page"}; }
-function computeFlow(){
-  const f=SOT.flow||{}; const trans=(f.transitions||[]).filter(t=>t&&t.from&&t.to);
-  const ids=new Set(); trans.forEach(t=>{ids.add(t.from);ids.add(t.to);}); if(f.start) ids.add(f.start);
-  const nodes=[...ids]; if(!nodes.length) return null;
-  const incoming={}; nodes.forEach(n=>incoming[n]=0); trans.forEach(t=>{ if(t.from!==t.to) incoming[t.to]++; });
-  const start=(f.start&&ids.has(f.start))?f.start:(nodes.find(n=>incoming[n]===0)||nodes[0]);
-  const adj={}; nodes.forEach(n=>adj[n]=[]); trans.forEach(t=>{ if(adj[t.from]) adj[t.from].push(t.to); });
-  const layer={}; layer[start]=0; const q=[start];
-  while(q.length){ const n=q.shift(); adj[n].forEach(m=>{ if(layer[m]===undefined){ layer[m]=layer[n]+1; q.push(m); } }); }
-  let mx=0; nodes.forEach(n=>{ if(layer[n]!==undefined&&layer[n]>mx) mx=layer[n]; });
-  nodes.forEach(n=>{ if(layer[n]===undefined) layer[n]=mx+1; });
-  const byL={}; nodes.forEach(n=>{ (byL[layer[n]]=byL[layer[n]]||[]).push(n); });
-  const order={};
-  Object.keys(byL).map(Number).sort((a,b)=>a-b).forEach(L=>{
-    if(L===0){ byL[L].forEach((n,i)=>order[n]=i); return; }
-    byL[L].sort((a,b)=>{
-      const pa=trans.filter(t=>t.to===a&&layer[t.from]!==undefined).map(t=>order[t.from]).filter(x=>x!==undefined);
-      const pb=trans.filter(t=>t.to===b&&layer[t.from]!==undefined).map(t=>order[t.from]).filter(x=>x!==undefined);
-      const ma=pa.length?pa.reduce((s,x)=>s+x,0)/pa.length:999;
-      const mb=pb.length?pb.reduce((s,x)=>s+x,0)/pb.length:999;
-      return ma-mb || a.localeCompare(b,undefined,{numeric:true});
-    });
-    byL[L].forEach((n,i)=>order[n]=i);
-  });
-  return {trans,nodes,layer,byL,start};
-}
-let flowZ=1, flowX=0, flowY=0, flowW=0, flowH=0, flowSel=null, flowLabels=false, flowEdit=false;
-function refTitle(id){ const c=specCatalog().find(x=>x.id===id); return c?c.label.split("›").pop().trim():id; }
-function transLabel(t){ return t.ref? refTitle(t.ref) : (t.label||""); }
-function flowCoverage(){
-  const pages=allPages(); const known=new Set(pages.map(p=>p.id));
-  const trans=(SOT.flow&&SOT.flow.transitions)||[];
-  const used=new Set(); trans.forEach(t=>{used.add(t.from);used.add(t.to);}); if(SOT.flow&&SOT.flow.start) used.add(SOT.flow.start);
-  const orphans=pages.filter(p=>!used.has(p.id));
-  const dangling=trans.filter(t=>!known.has(t.from)||!known.has(t.to));
-  let banner;
-  if(orphans.length||dangling.length){
-    const chips=orphans.slice(0,12).map(o=>`<span class="warn-chip">${esc(o.label.split("›").pop().trim())}</span>`).join("");
-    banner=`<div class="flow-warn">⚠ ${t('흐름에 연결 안 된 화면','Screens not connected in the flow')} <b>${orphans.length}</b>${t('개','')}${dangling.length?` · ${t('없는 화면 참조','dangling refs')} <b>${dangling.length}</b>${t('개','')}`:''}<span class="iw-btns">${orphans.length?`<button class="addbtn sm" data-fcov="orphans">${t('시작에 연결','Connect to start')}</button>`:''}${dangling.length?`<button class="addbtn sm ghost" data-fcov="clean">${t('참조 정리','Clean refs')}</button>`:''}</span> ${chips}</div>`;
-  } else banner=`<div class="flow-warn ok">✓ ${t('모든 화면이 흐름에 연결되어 있습니다.','All screens are connected in the flow.')}</div>`;
-  return {orphans,dangling,banner};
-}
-function triggerSelect(tr,i){
-  const cat=specCatalog();
-  const isCustom=(!tr.ref&&tr.label);
-  const opts=cat.map(c=>`<option value="${c.id}" ${tr.ref===c.id?'selected':''}>${esc(c.label)}</option>`).join("");
-  return `<select data-tref="${i}"><option value="" ${(!tr.ref&&!tr.label)?'selected':''}>${t('— 자동/없음 —','— Auto/None —')}</option>${opts}<option value="__custom" ${isCustom?'selected':''}>${t('직접 입력…','Custom…')}</option></select>${isCustom?`<input data-tlabel="${i}" value="${esc(tr.label)}" placeholder="${t('라벨 직접 입력','Enter label')}" style="margin-top:5px">`:''}`;
-}
-function renderFlowEditPanel(){
-  const pages=allPages();
-  const opts=pages.map(p=>`<option value="${p.id}">${esc(p.label)}</option>`).join("");
-  const startOpts=pages.map(p=>`<option value="${p.id}" ${(SOT.flow&&SOT.flow.start)===p.id?'selected':''}>${esc(p.label)}</option>`).join("");
-  const cat=specCatalog();
-  const trans=(SOT.flow&&SOT.flow.transitions)||[];
-  const rows=trans.map((tr,i)=>`<div class="tr-row"><div class="tr-head"><span class="tr-fromto">${esc(flowMeta(tr.from).title)} → ${esc(flowMeta(tr.to).title)}</span><button class="mini" data-tdel="${i}" title="${t('삭제','Delete')}">×</button></div>${triggerSelect(tr,i)}</div>`).join("") || `<div class="fep-empty">${t('전환이 없습니다.','No transitions.')}</div>`;
-  return `<div class="flow-editpanel"><div class="fep-sec">${t('시작 화면','Start screen')}</div><select data-flowstart>${startOpts}</select><div class="fep-sec">${t('전환 추가','Add transition')}</div><div class="fep-add"><select data-addfrom><option value="">${t('출발 화면…','From screen…')}</option>${opts}</select><select data-addto><option value="">${t('도착 화면…','To screen…')}</option>${opts}</select><select data-addref><option value="">${t('트리거 기능 (선택)','Trigger feature (optional)')}</option>${cat.map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("")}<option value="__custom">${t('직접 입력…','Custom…')}</option></select><input data-addlabel placeholder="${t('직접 입력 라벨(트리거 미선택 시)','Custom label (if no trigger)')}"><button class="addbtn" data-addtrans>${t('＋ 전환 추가','＋ Add transition')}</button></div><div class="fep-sec">${t('전환 목록','Transitions')} (${trans.length}) · ${t('트리거=기능이면 라벨 자동','feature trigger = auto label')}</div><div class="fep-list">${rows}</div></div>`;
-}
-function applyFlowFocus(){
-  const vp=document.getElementById("flowVP"); if(!vp) return;
-  const groups=vp.querySelectorAll(".fedgeg"), nodes=vp.querySelectorAll("[data-fn]");
-  if(flowSel && ![...nodes].some(n=>n.dataset.fn===flowSel)) flowSel=null;
-  if(!flowSel){ groups.forEach(g=>g.classList.remove("hot","dim")); nodes.forEach(n=>n.classList.remove("dim","sel")); return; }
-  const conn=new Set([flowSel]);
-  groups.forEach(g=>{ const on=(g.dataset.from===flowSel||g.dataset.to===flowSel); g.classList.toggle("hot",on); g.classList.toggle("dim",!on); if(on){conn.add(g.dataset.from);conn.add(g.dataset.to);} });
-  nodes.forEach(n=>{ const id=n.dataset.fn; n.classList.toggle("sel",id===flowSel); n.classList.toggle("dim",!conn.has(id)); });
-}
-function renderFlow(){
-  const g=computeFlow();
-  const legend=`<div class="flow-legend">
-      <span class="lg"><span class="sw start"></span>${t('시작','Start')}</span>
-      <span class="lg"><span class="sw top"></span>${t('섹션 최상위','Section top')}</span>
-      <span class="lg"><span class="sw page"></span>${t('페이지','Page')}</span>
-      <span class="lg"><span class="sw action"></span>${t('행동','Action')}</span>
-      <span class="lg">${t('→ 화면 이동(전환)','→ Navigation (transition)')}</span>
-    </div>`;
-  const zoom=`<div class="flow-zoom"><button class="zbtn" data-zoom="out">−</button><button class="zbtn" data-zoom="fit">${t('맞춤','Fit')}</button><button class="zbtn" data-zoom="in">＋</button></div>`;
-  if(!g) return `<div class="flowg" id="flowVP">${legend}<div class="empty" style="padding:48px">${t('전환(유저플로우) 데이터가 없습니다.','No user-flow transition data.')}</div></div>`;
-  const COLW=390, ROWH=124, padX=46, padY=58, NW=206, NH=52;
-  const pos={};
-  Object.keys(g.byL).map(Number).sort((a,b)=>a-b).forEach(L=>{ g.byL[L].forEach((n,i)=>{ pos[n]={x:padX+L*COLW, y:padY+i*ROWH}; }); });
-  const maxL=Math.max(...Object.keys(g.byL).map(Number));
-  const maxRows=Math.max(...Object.values(g.byL).map(a=>a.length));
-  flowW=padX+(maxL+1)*COLW+140; flowH=padY+maxRows*ROWH+120;
-  let paths="";
-  const outRank={}, inRank={}, outCount={}, inCount={};
-  g.trans.forEach(t=>{ outCount[t.from]=(outCount[t.from]||0)+1; inCount[t.to]=(inCount[t.to]||0)+1; });
-  const nextOut={}, nextIn={};
-  g.trans.forEach(t=>{ outRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
-  g.trans.forEach((t,ei)=>{
-    const a=pos[t.from], b=pos[t.to]; if(!a||!b) return;
-    const key=t.from+"~"+t.to+"~"+(t.label||"");
-    const so=(outRank[key]-(outCount[t.from]-1)/2)*7;
-    const ti=(inRank[key]-(inCount[t.to]-1)/2)*7;
-    let d, lx, ly;
-    if(b.x>a.x){
-      const x1=a.x+NW, y1=a.y+NH/2+so, x2=b.x, y2=b.y+NH/2+ti;
-      const gap=x2-x1, lane=((ei%5)-2)*18;
-      const mx=x1+Math.max(90,gap*.46);
-      d=`M${x1},${y1} C${mx},${y1+lane} ${x2-Math.max(90,gap*.32)},${y2-lane} ${x2},${y2}`;
-      lx=x1+Math.min(150,Math.max(92,gap*.34));
-      ly=y1+lane-10;
-    } else {
-      const sx=a.x+NW/2+so, sy=a.y+NH, tx=b.x+NW/2+ti, ty=b.y+NH;
-      const dip=Math.max(sy,ty)+ROWH*(.82+(ei%4)*.18);
-      d=`M${sx},${sy} C${sx},${dip} ${tx},${dip} ${tx},${ty}`;
-      lx=(sx+tx)/2; ly=dip-16;
-    }
-    paths+=`<g class="fedgeg" data-from="${t.from}" data-to="${t.to}"><path class="fedge-hit" d="${d}"/><path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
-    const lab=transLabel(t);
-    if(lab) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`;
-    paths+=`</g>`;
-  });
-  let nds="";
-  g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
-    nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fn="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;
-  });
-  const cov=flowCoverage();
-  return `<div class="flowwrap">
-    ${cov.banner}
-    <div class="flow-stage">
-      <div class="flow-main">
-        <div class="flowg ${flowLabels?'labels':''}" id="flowVP">
-          <div class="flowg-inner" id="flowInner" style="width:${flowW}px;height:${flowH}px">
-            <svg width="${flowW}" height="${flowH}" style="position:absolute;left:0;top:0;overflow:visible">
-              <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
-              ${paths}
-            </svg>
-            ${nds}
-          </div>
-        </div>
-        <div class="flow-tools">
-          <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">${t('라벨','Labels')}</button>
-          <button class="ztg ${flowEdit?'on':''}" data-ftool="edit">${t('편집','Edit')}</button>
-          <button class="ztg" data-ftool="clear">${t('선택 해제','Clear')}</button>
-          <span class="ft-hint">${flowEdit?t('오른쪽 패널에서 전환 추가·삭제 · 트리거=기능이면 라벨 자동','Add/remove transitions in the right panel · feature trigger = auto label'):t('노드 클릭 = 연결된 흐름만 강조','Click a node to highlight its flow')}</span>
-        </div>
-        ${legend}
-        ${zoom}
-      </div>
-      ${flowEdit?renderFlowEditPanel():''}
-    </div>
-  </div>`;
-}
-function applyFlowTransform(){ const el=document.getElementById("flowInner"); if(el) el.style.transform="scale("+flowZ+")"; }
-function flowFit(){ const vp=document.getElementById("flowVP"); if(!vp||!flowW) return; const z=Math.min((vp.clientWidth||900)/flowW,(vp.clientHeight||600)/flowH,1); flowZ=Math.max(0.2,z||1); applyFlowTransform(); vp.scrollTo(0,0); }
-function layoutFlow(){
-  const vp=document.getElementById("flowVP"); if(!vp) return;
-  if(!flowZ) flowZ=1; applyFlowTransform();
-  vp.classList.toggle("labels", flowLabels); applyFlowFocus();
-  let dg=false,sx,sy,sl,st;
-  vp.onpointerdown=(e)=>{ if(e.target.closest("[data-fn]")||e.target.closest(".flow-tools")||e.target.closest(".flow-zoom")) return; dg=true; sx=e.clientX; sy=e.clientY; sl=vp.scrollLeft; st=vp.scrollTop; vp.style.cursor="grabbing"; };
-  vp.onpointermove=(e)=>{ if(!dg) return; vp.scrollLeft=sl-(e.clientX-sx); vp.scrollTop=st-(e.clientY-sy); };
-  vp.onpointerup=vp.onpointercancel=()=>{ dg=false; vp.style.cursor="grab"; };
-}
 
+/* ==== 75-tree.js ==== */
 /* ----------------------------- 트리 / 노드 캔버스 ----------------------------- */
 let EDGES = [];
 function renderTree(){
@@ -1234,6 +1106,167 @@ function goToSpec(id){
   VIEW="spec"; render();
 }
 
+
+/* ==== 80-flow.js ==== */
+/* --------------------- 유저플로우 (전환 그래프) --------------------- */
+function computeFlow(){
+  const f=SOT.flow||{}; const trans=(f.transitions||[]).filter(t=>t&&t.from&&t.to);
+  const ids=new Set(); trans.forEach(t=>{ids.add(t.from);ids.add(t.to);}); if(f.start) ids.add(f.start);
+  const nodes=[...ids]; if(!nodes.length) return null;
+  const incoming={}; nodes.forEach(n=>incoming[n]=0); trans.forEach(t=>{ if(t.from!==t.to) incoming[t.to]++; });
+  const start=(f.start&&ids.has(f.start))?f.start:(nodes.find(n=>incoming[n]===0)||nodes[0]);
+  const adj={}; nodes.forEach(n=>adj[n]=[]); trans.forEach(t=>{ if(adj[t.from]) adj[t.from].push(t.to); });
+  const layer={}; layer[start]=0; const q=[start];
+  while(q.length){ const n=q.shift(); adj[n].forEach(m=>{ if(layer[m]===undefined){ layer[m]=layer[n]+1; q.push(m); } }); }
+  let mx=0; nodes.forEach(n=>{ if(layer[n]!==undefined&&layer[n]>mx) mx=layer[n]; });
+  nodes.forEach(n=>{ if(layer[n]===undefined) layer[n]=mx+1; });
+  const byL={}; nodes.forEach(n=>{ (byL[layer[n]]=byL[layer[n]]||[]).push(n); });
+  const order={};
+  Object.keys(byL).map(Number).sort((a,b)=>a-b).forEach(L=>{
+    if(L===0){ byL[L].forEach((n,i)=>order[n]=i); return; }
+    byL[L].sort((a,b)=>{
+      const pa=trans.filter(t=>t.to===a&&layer[t.from]!==undefined).map(t=>order[t.from]).filter(x=>x!==undefined);
+      const pb=trans.filter(t=>t.to===b&&layer[t.from]!==undefined).map(t=>order[t.from]).filter(x=>x!==undefined);
+      const ma=pa.length?pa.reduce((s,x)=>s+x,0)/pa.length:999;
+      const mb=pb.length?pb.reduce((s,x)=>s+x,0)/pb.length:999;
+      return ma-mb || a.localeCompare(b,undefined,{numeric:true});
+    });
+    byL[L].forEach((n,i)=>order[n]=i);
+  });
+  return {trans,nodes,layer,byL,start};
+}
+let flowZ=1, flowX=0, flowY=0, flowW=0, flowH=0, flowSel=null, flowLabels=false, flowEdit=false;
+function applyFlowFocus(){
+  const vp=document.getElementById("flowVP"); if(!vp) return;
+  const groups=vp.querySelectorAll(".fedgeg"), nodes=vp.querySelectorAll("[data-fn]");
+  if(flowSel && ![...nodes].some(n=>n.dataset.fn===flowSel)) flowSel=null;
+  if(!flowSel){ groups.forEach(g=>g.classList.remove("hot","dim")); nodes.forEach(n=>n.classList.remove("dim","sel")); return; }
+  const conn=new Set([flowSel]);
+  groups.forEach(g=>{ const on=(g.dataset.from===flowSel||g.dataset.to===flowSel); g.classList.toggle("hot",on); g.classList.toggle("dim",!on); if(on){conn.add(g.dataset.from);conn.add(g.dataset.to);} });
+  nodes.forEach(n=>{ const id=n.dataset.fn; n.classList.toggle("sel",id===flowSel); n.classList.toggle("dim",!conn.has(id)); });
+}
+function renderFlow(){
+  const g=computeFlow();
+  const legend=`<div class="flow-legend">
+      <span class="lg"><span class="sw start"></span>${t('시작','Start')}</span>
+      <span class="lg"><span class="sw top"></span>${t('섹션 최상위','Section top')}</span>
+      <span class="lg"><span class="sw page"></span>${t('페이지','Page')}</span>
+      <span class="lg"><span class="sw action"></span>${t('행동','Action')}</span>
+      <span class="lg">${t('→ 화면 이동(전환)','→ Navigation (transition)')}</span>
+    </div>`;
+  const zoom=`<div class="flow-zoom"><button class="zbtn" data-zoom="out">−</button><button class="zbtn" data-zoom="fit">${t('맞춤','Fit')}</button><button class="zbtn" data-zoom="in">＋</button></div>`;
+  if(!g) return `<div class="flowg" id="flowVP">${legend}<div class="empty" style="padding:48px">${t('전환(유저플로우) 데이터가 없습니다.','No user-flow transition data.')}</div></div>`;
+  const COLW=390, ROWH=124, padX=46, padY=58, NW=206, NH=52;
+  const pos={};
+  Object.keys(g.byL).map(Number).sort((a,b)=>a-b).forEach(L=>{ g.byL[L].forEach((n,i)=>{ pos[n]={x:padX+L*COLW, y:padY+i*ROWH}; }); });
+  const maxL=Math.max(...Object.keys(g.byL).map(Number));
+  const maxRows=Math.max(...Object.values(g.byL).map(a=>a.length));
+  flowW=padX+(maxL+1)*COLW+140; flowH=padY+maxRows*ROWH+120;
+  let paths="";
+  const outRank={}, inRank={}, outCount={}, inCount={};
+  g.trans.forEach(t=>{ outCount[t.from]=(outCount[t.from]||0)+1; inCount[t.to]=(inCount[t.to]||0)+1; });
+  const nextOut={}, nextIn={};
+  g.trans.forEach(t=>{ outRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextOut[t.from]||0; nextOut[t.from]=(nextOut[t.from]||0)+1; inRank[t.from+"~"+t.to+"~"+(t.label||"")]=nextIn[t.to]||0; nextIn[t.to]=(nextIn[t.to]||0)+1; });
+  g.trans.forEach((t,ei)=>{
+    const a=pos[t.from], b=pos[t.to]; if(!a||!b) return;
+    const key=t.from+"~"+t.to+"~"+(t.label||"");
+    const so=(outRank[key]-(outCount[t.from]-1)/2)*7;
+    const ti=(inRank[key]-(inCount[t.to]-1)/2)*7;
+    let d, lx, ly;
+    if(b.x>a.x){
+      const x1=a.x+NW, y1=a.y+NH/2+so, x2=b.x, y2=b.y+NH/2+ti;
+      const gap=x2-x1, lane=((ei%5)-2)*18;
+      const mx=x1+Math.max(90,gap*.46);
+      d=`M${x1},${y1} C${mx},${y1+lane} ${x2-Math.max(90,gap*.32)},${y2-lane} ${x2},${y2}`;
+      lx=x1+Math.min(150,Math.max(92,gap*.34));
+      ly=y1+lane-10;
+    } else {
+      const sx=a.x+NW/2+so, sy=a.y+NH, tx=b.x+NW/2+ti, ty=b.y+NH;
+      const dip=Math.max(sy,ty)+ROWH*(.82+(ei%4)*.18);
+      d=`M${sx},${sy} C${sx},${dip} ${tx},${dip} ${tx},${ty}`;
+      lx=(sx+tx)/2; ly=dip-16;
+    }
+    paths+=`<g class="fedgeg" data-from="${t.from}" data-to="${t.to}"><path class="fedge-hit" d="${d}"/><path class="fedge" d="${d}" marker-end="url(#fa)"/>`;
+    const lab=transLabel(t);
+    if(lab) paths+=`<foreignObject x="${lx-78}" y="${ly}" width="156" height="22"><div class="elabel ${t.ref?'reff':''}" xmlns="http://www.w3.org/1999/xhtml" title="${esc(lab)}">${esc(lab)}</div></foreignObject>`;
+    paths+=`</g>`;
+  });
+  let nds="";
+  g.nodes.forEach(n=>{ const m=flowMeta(n); const cls=m.type==="top"?"top":(m.type==="action"?"action":"page");
+    nds+=`<div class="fnode ${cls} ${n===g.start?'is-start':''}" style="left:${pos[n].x}px;top:${pos[n].y}px;width:${NW}px;height:${NH}px" data-fn="${n}" title="${esc(m.title)}"><span class="ftitle">${esc(m.title)}</span></div>`;
+  });
+  const cov=flowCoverage();
+  return `<div class="flowwrap">
+    ${cov.banner}
+    <div class="flow-stage">
+      <div class="flow-main">
+        <div class="flowg ${flowLabels?'labels':''}" id="flowVP">
+          <div class="flowg-inner" id="flowInner" style="width:${flowW}px;height:${flowH}px">
+            <svg width="${flowW}" height="${flowH}" style="position:absolute;left:0;top:0;overflow:visible">
+              <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b3a8e0"/></marker></defs>
+              ${paths}
+            </svg>
+            ${nds}
+          </div>
+        </div>
+        <div class="flow-tools">
+          <button class="ztg ${flowLabels?'on':''}" data-ftool="labels">${t('라벨','Labels')}</button>
+          <button class="ztg ${flowEdit?'on':''}" data-ftool="edit">${t('편집','Edit')}</button>
+          <button class="ztg" data-ftool="clear">${t('선택 해제','Clear')}</button>
+          <span class="ft-hint">${flowEdit?t('오른쪽 패널에서 전환 추가·삭제 · 트리거=기능이면 라벨 자동','Add/remove transitions in the right panel · feature trigger = auto label'):t('노드 클릭 = 연결된 흐름만 강조','Click a node to highlight its flow')}</span>
+        </div>
+        ${legend}
+        ${zoom}
+      </div>
+      ${flowEdit?renderFlowEditPanel():''}
+    </div>
+  </div>`;
+}
+function applyFlowTransform(){ const el=document.getElementById("flowInner"); if(el) el.style.transform="scale("+flowZ+")"; }
+function flowFit(){ const vp=document.getElementById("flowVP"); if(!vp||!flowW) return; const z=Math.min((vp.clientWidth||900)/flowW,(vp.clientHeight||600)/flowH,1); flowZ=Math.max(0.2,z||1); applyFlowTransform(); vp.scrollTo(0,0); }
+function layoutFlow(){
+  const vp=document.getElementById("flowVP"); if(!vp) return;
+  if(!flowZ) flowZ=1; applyFlowTransform();
+  vp.classList.toggle("labels", flowLabels); applyFlowFocus();
+  let dg=false,sx,sy,sl,st;
+  vp.onpointerdown=(e)=>{ if(e.target.closest("[data-fn]")||e.target.closest(".flow-tools")||e.target.closest(".flow-zoom")) return; dg=true; sx=e.clientX; sy=e.clientY; sl=vp.scrollLeft; st=vp.scrollTop; vp.style.cursor="grabbing"; };
+  vp.onpointermove=(e)=>{ if(!dg) return; vp.scrollLeft=sl-(e.clientX-sx); vp.scrollTop=st-(e.clientY-sy); };
+  vp.onpointerup=vp.onpointercancel=()=>{ dg=false; vp.style.cursor="grab"; };
+}
+
+
+/* ==== 85-flow-edit.js ==== */
+function flowCoverage(){
+  const pages=allPages(); const known=new Set(pages.map(p=>p.id));
+  const trans=(SOT.flow&&SOT.flow.transitions)||[];
+  const used=new Set(); trans.forEach(t=>{used.add(t.from);used.add(t.to);}); if(SOT.flow&&SOT.flow.start) used.add(SOT.flow.start);
+  const orphans=pages.filter(p=>!used.has(p.id));
+  const dangling=trans.filter(t=>!known.has(t.from)||!known.has(t.to));
+  let banner;
+  if(orphans.length||dangling.length){
+    const chips=orphans.slice(0,12).map(o=>`<span class="warn-chip">${esc(o.label.split("›").pop().trim())}</span>`).join("");
+    banner=`<div class="flow-warn">⚠ ${t('흐름에 연결 안 된 화면','Screens not connected in the flow')} <b>${orphans.length}</b>${t('개','')}${dangling.length?` · ${t('없는 화면 참조','dangling refs')} <b>${dangling.length}</b>${t('개','')}`:''}<span class="iw-btns">${orphans.length?`<button class="addbtn sm" data-fcov="orphans">${t('시작에 연결','Connect to start')}</button>`:''}${dangling.length?`<button class="addbtn sm ghost" data-fcov="clean">${t('참조 정리','Clean refs')}</button>`:''}</span> ${chips}</div>`;
+  } else banner=`<div class="flow-warn ok">✓ ${t('모든 화면이 흐름에 연결되어 있습니다.','All screens are connected in the flow.')}</div>`;
+  return {orphans,dangling,banner};
+}
+function triggerSelect(tr,i){
+  const cat=specCatalog();
+  const isCustom=(!tr.ref&&tr.label);
+  const opts=cat.map(c=>`<option value="${c.id}" ${tr.ref===c.id?'selected':''}>${esc(c.label)}</option>`).join("");
+  return `<select data-tref="${i}"><option value="" ${(!tr.ref&&!tr.label)?'selected':''}>${t('— 자동/없음 —','— Auto/None —')}</option>${opts}<option value="__custom" ${isCustom?'selected':''}>${t('직접 입력…','Custom…')}</option></select>${isCustom?`<input data-tlabel="${i}" value="${esc(tr.label)}" placeholder="${t('라벨 직접 입력','Enter label')}" style="margin-top:5px">`:''}`;
+}
+function renderFlowEditPanel(){
+  const pages=allPages();
+  const opts=pages.map(p=>`<option value="${p.id}">${esc(p.label)}</option>`).join("");
+  const startOpts=pages.map(p=>`<option value="${p.id}" ${(SOT.flow&&SOT.flow.start)===p.id?'selected':''}>${esc(p.label)}</option>`).join("");
+  const cat=specCatalog();
+  const trans=(SOT.flow&&SOT.flow.transitions)||[];
+  const rows=trans.map((tr,i)=>`<div class="tr-row"><div class="tr-head"><span class="tr-fromto">${esc(flowMeta(tr.from).title)} → ${esc(flowMeta(tr.to).title)}</span><button class="mini" data-tdel="${i}" title="${t('삭제','Delete')}">×</button></div>${triggerSelect(tr,i)}</div>`).join("") || `<div class="fep-empty">${t('전환이 없습니다.','No transitions.')}</div>`;
+  return `<div class="flow-editpanel"><div class="fep-sec">${t('시작 화면','Start screen')}</div><select data-flowstart>${startOpts}</select><div class="fep-sec">${t('전환 추가','Add transition')}</div><div class="fep-add"><select data-addfrom><option value="">${t('출발 화면…','From screen…')}</option>${opts}</select><select data-addto><option value="">${t('도착 화면…','To screen…')}</option>${opts}</select><select data-addref><option value="">${t('트리거 기능 (선택)','Trigger feature (optional)')}</option>${cat.map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("")}<option value="__custom">${t('직접 입력…','Custom…')}</option></select><input data-addlabel placeholder="${t('직접 입력 라벨(트리거 미선택 시)','Custom label (if no trigger)')}"><button class="addbtn" data-addtrans>${t('＋ 전환 추가','＋ Add transition')}</button></div><div class="fep-sec">${t('전환 목록','Transitions')} (${trans.length}) · ${t('트리거=기능이면 라벨 자동','feature trigger = auto label')}</div><div class="fep-list">${rows}</div></div>`;
+}
+
+
+/* ==== 90-init.js ==== */
 /* ============================ EVENT WIRING ============================ */
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;render();}));
 document.getElementById("resetBtn").addEventListener("click",()=>{ if(!HISTORY.length) return; restoreTo(0); const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title||"제품"; });
@@ -1352,14 +1385,6 @@ document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
 document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
 document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
-const SCHEMA_VERSION="1.0";
-function stableStringify(obj){
-  const PRI=["schemaVersion","title","lang","id","name","type","status","priority","desc","acceptance","refs","from","to","ref","label","start"];
-  const rank=k=>{ const i=PRI.indexOf(k); return i<0?999:i; };
-  const ser=v=>{ if(Array.isArray(v)) return v.map(ser); if(v&&typeof v==="object"){ const o={}; Object.keys(v).sort((a,b)=>(rank(a)-rank(b))||(a<b?-1:a>b?1:0)).forEach(k=>{o[k]=ser(v[k]);}); return o; } return v; };
-  return JSON.stringify(ser(obj),null,2);
-}
-function canonicalSOT(){ const c=JSON.parse(JSON.stringify(SOT)); c.schemaVersion=SCHEMA_VERSION; return stableStringify(c); }
 document.getElementById("saveBtn").addEventListener("click",()=>{
   const blob=new Blob([canonicalSOT()],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
@@ -1373,10 +1398,6 @@ document.getElementById("fileInput").addEventListener("change",e=>{
   rd.readAsText(f);
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
-
-function find(id){ return SOT.requirements.find(r=>r.id===id); }
-function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x=>x.id===fid); if(f) return {r,f}; } return {}; }
-
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ SOT=normalize(JSON.parse(emb.textContent)); _loaded=true; } }catch(e){}
 if(!_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
@@ -1390,4 +1411,5 @@ try{ LANG = localStorage.getItem(LANG_KEY) || (SOT&&SOT.lang) || "ko"; }catch(e)
 document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); render(); });
 applyStaticI18n();
 render();
+
 </script>

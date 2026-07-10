@@ -1,0 +1,11 @@
+{
+  "name": "vibespec-viewer",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Modular source for the VibeSpec viewer. Build inlines src/ into a single self-contained assets/viewer.html.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs && node --check .build/app.js"
+  }
+}

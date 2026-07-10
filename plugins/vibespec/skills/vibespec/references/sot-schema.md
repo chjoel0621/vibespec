@@ -17,8 +17,10 @@
   "oneLiner": "한 문장 정의", "goal": "비즈니스 성과 목표(수치·기한)", "whyNow": "왜 지금(시장·타이밍)",
   "category": "카테고리", "platforms": ["웹","iOS"],
   "problem": "사용자 Job/문제", "solution": "해결 방식", "alternatives": "현재 대안·경쟁", "differentiator": "차별점",
-  "targets": ["타겟·페르소나"], "scenarios": ["유저 스토리·시나리오"],
-  "northStar": "북극성 지표(하나)", "kpis": ["KPI (목표치 포함)"],
+  "targets": [ {"name":"페르소나 이름", "role":"역할", "needs":"니즈", "pain":"페인포인트"} ],
+  "scenarios": [ {"text":"유저 스토리·시나리오", "start":"P1"} ],
+  "northStar": "북극성 지표(하나)",
+  "kpis": [ {"name":"지표명", "target":"목표치", "baseline":"기준값", "method":"측정방법", "refs":["F1"]} ],
   "inScope": ["포함 범위·MVP"], "nonGoals": ["비목표(범위 밖)"],
   "assumptions": ["가정"], "risks": ["리스크"], "openQuestions": ["미해결 질문"], "constraints": ["제약·의존성"]
 }
@@ -26,6 +28,8 @@
 
 - 섹션: ①개요(oneLiner·goal·whyNow·category·platforms) ②문제·가치(problem·solution·alternatives·differentiator) ③사용자(targets·scenarios) ④성공지표(northStar·kpis) ⑤범위(inScope·nonGoals) ⑥리스크·가정(assumptions·risks·openQuestions·constraints).
 - `goal`은 성과(왜)와 `solution`(어떻게)을 구분한다. `nonGoals`로 범위를 명확히 하고, `assumptions`/`openQuestions`로 불확실성을 남긴다.
+- **`targets`(페르소나)** 는 `{name, role, needs, pain}` 객체 배열. **`scenarios`** 는 `{text, start}` 객체 배열이고 `start`는 이 시나리오가 시작되는 ia 페이지 id(`P#`, 선택) — 뷰어에서 클릭하면 유저플로우로 이동한다. **`kpis`** 는 `{name, target, baseline, method, refs}` 객체 배열이고 `refs`는 이 지표를 움직이는 기능/상세기능 id(`F#`/`F#:인덱스`) — 기능명을 바꾸면 KPI의 연결 라벨도 자동 갱신된다.
+- (구버전에서 이들이 문자열 배열이면 뷰어가 자동으로 객체로 이관한다. 새로 생성할 땐 객체 형태로 쓴다.)
 - (구버전 `background`→`whyNow`, `roles`→`targets`로 자동 이관됨. 새로 생성할 땐 새 필드명만 쓴다.)
 
 ## requirements (요구사항 → 기능 → 상세기능)

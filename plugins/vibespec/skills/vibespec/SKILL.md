@@ -17,7 +17,8 @@ description: VibeSpec — 제품 아이디어나 기획 문서(사업계획서, 
 2. **SOT JSON 생성** — `references/sot-schema.md`의 스키마를 정확히 따른다.
    - `title`, `prd`, `requirements`, `ia`, `flow` 를 채운다.
    - `prd`는 6개 섹션을 모두 채운다: ①개요(oneLiner·goal·whyNow·category·platforms) ②문제·가치(problem·solution·alternatives·differentiator) ③사용자(targets·scenarios) ④성공지표(northStar·kpis) ⑤범위(inScope·nonGoals) ⑥리스크·가정(assumptions·risks·openQuestions·constraints).
-     - `goal`은 비즈니스 성과 목표(가능하면 수치·기한), `whyNow`는 "왜 지금"(시장·타이밍), `problem`은 사용자 Job/문제, `alternatives`는 현재 대안·경쟁, `northStar`는 핵심 하나의 북극성 지표, `kpis`는 목표치를 포함, `nonGoals`는 명시적 범위 밖, `assumptions`/`openQuestions`/`constraints`로 불확실성·제약을 남긴다.
+     - `goal`은 비즈니스 성과 목표(가능하면 수치·기한), `whyNow`는 "왜 지금"(시장·타이밍), `problem`은 사용자 Job/문제, `alternatives`는 현재 대안·경쟁, `nonGoals`는 명시적 범위 밖, `assumptions`/`openQuestions`/`constraints`로 불확실성·제약을 남긴다.
+     - **구조화 필드**: `targets`는 `{name,role,needs,pain}` 페르소나 객체 배열, `scenarios`는 `{text,start}` 객체 배열(`start`는 그 시나리오가 시작되는 ia 페이지 `P#`, 선택), `kpis`는 `{name,target,baseline,method,refs}` 객체 배열(`refs`는 그 지표를 움직이는 기능 `F#`/`F#:인덱스`). `northStar`는 하나의 문자열. KPI의 `refs`와 시나리오의 `start`를 채우면 PRD가 기능·플로우와 연결된다.
    - `requirements`는 요구사항 → 기능 → 상세기능 3계층. id는 `R1..`, `F1..`(전체에서 유일하게 증가). 상세기능 참조는 `기능id:인덱스`(예 `F1:0`).
    - `ia.sections`를 만들고 모든 기능/상세기능을 페이지(top/page/action)의 `refs`로 매핑한다.
    - **커버리지**: 모든 `F#`와 모든 `F#:idx`가 IA의 어떤 페이지 `refs`에든 최소 1번 등장해야 한다(뷰어의 "누락 경고"가 뜨지 않도록).

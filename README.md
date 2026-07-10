@@ -103,11 +103,25 @@ vibespec/
 │   └── skills/vibespec/
 │       ├── SKILL.md                    # Skill: idea/document → SOT JSON
 │       ├── references/sot-schema.md    # JSON data contract (schema)
-│       └── assets/viewer.html          # HTML viewer (app)
+│       ├── assets/viewer.html          # HTML viewer (app) — BUILT OUTPUT
+│       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
+│       ├── build.mjs                   # Inlines src/ into the single-file viewer
+│       └── package.json                # npm run build · npm run check
 ├── LICENSE
 ├── README.md                           # English (default)
 └── README.ko.md                        # Korean
 ```
+
+### Working on the viewer
+
+`assets/viewer.html` is generated. Edit the modules under `src/`, then rebuild and commit both:
+
+```
+cd plugins/vibespec/skills/vibespec
+npm run check    # build + syntax-check the concatenated app
+```
+
+The build concatenates `src/js/*.js` in filename order into one shared scope, so `90-init.js` (event wiring and boot) must always sort last. No dependencies, no install step.
 
 ## License
 

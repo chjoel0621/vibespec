@@ -104,11 +104,25 @@ vibespec/
 │   └── skills/vibespec/
 │       ├── SKILL.md                    # 아이디어/문서 → SOT JSON 생성 스킬
 │       ├── references/sot-schema.md    # JSON 데이터 계약(스키마)
-│       └── assets/viewer.html          # HTML 뷰어(앱)
+│       ├── assets/viewer.html          # HTML 뷰어(앱) — 빌드 산출물
+│       ├── src/                        # 뷰어 소스 (styles.css, head.html, js/NN-*.js)
+│       ├── build.mjs                   # src/ 를 단일 파일 뷰어로 인라인
+│       └── package.json                # npm run build · npm run check
 ├── LICENSE
 ├── README.md                           # 영어(기본)
 └── README.ko.md                        # 한국어
 ```
+
+### 뷰어 수정하기
+
+`assets/viewer.html`은 생성되는 파일입니다. `src/` 아래 모듈을 편집한 뒤 다시 빌드하고, 둘을 함께 커밋하세요.
+
+```
+cd plugins/vibespec/skills/vibespec
+npm run check    # 빌드 + 연결된 앱의 구문 검증
+```
+
+빌드는 `src/js/*.js`를 파일명 순서대로 하나의 스코프에 이어붙이므로, `90-init.js`(이벤트 배선·부팅)는 항상 마지막에 정렬돼야 합니다. 의존성도 설치 과정도 없습니다.
 
 ## 라이선스
 

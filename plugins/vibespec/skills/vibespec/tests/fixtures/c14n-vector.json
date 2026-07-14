@@ -1,0 +1,26 @@
+{
+  "zeta": "unranked keys sort alphabetically · 한글 유니코드",
+  "title": "c14n 벡터 · <angle> \"quotes\" \\backslash 😀",
+  "schemaVersion": "1.0",
+  "initiative": {
+    "status": "proposed",
+    "parent": { "digest": "sha256:0000", "scopeId": "root", "canonicalization": "sot-c14n-v1" },
+    "path": "1-2",
+    "productId": "vector",
+    "id": "probe"
+  },
+  "alpha": [
+    { "label": "전환", "from": "P1", "to": "P2" },
+    { "ref": "F1:0", "to": "P3", "from": "P2" },
+    3,
+    "문자열",
+    null,
+    true,
+    []
+  ],
+  "boundary": { "pageId": "P10", "scopeId": "root" },
+  "desc": "",
+  "lang": "ko",
+  "acceptance": [ { "done": false, "text": "수용 기준" } ],
+  "beta": { "nested": { "start": "P1", "aardvark": 1 } }
+}

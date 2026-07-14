@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { validateSot } from "../scripts/validate-sot.mjs";
+import { SOT_C14N_V1, stableStringify, sotDigest } from "../scripts/lib/c14n.mjs";
 import { createDenseSot } from "./dense-fixture.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -39,8 +40,25 @@ for (const testCase of cases) {
   console.log(`[test] PASS ${testCase.name}`);
 }
 
+/* ==== sot-c14n-v1 freeze guard (known-answer test) ====
+   The pinned digest below IS the definition of sot-c14n-v1. If this test
+   fails, canonicalization output changed — that is a breaking change
+   requiring a new algorithm id and a digest migration, NOT a pin update.
+   Update the pin ONLY when deliberately shipping sot-c14n-v2. */
+const C14N_VECTOR_DIGEST = "sha256:3f1a99b8c255ab38f14d65ae327fe8f4a74fc876da8081dece73caa5826c2cec";
+const vectorInput = JSON.parse(readFileSync(join(here, "fixtures", "c14n-vector.json"), "utf8"));
+const vectorExpected = readFileSync(join(here, "fixtures", "c14n-vector.expected.txt"), "utf8");
+assert.equal(SOT_C14N_V1, "sot-c14n-v1");
+assert.equal(stableStringify(vectorInput), vectorExpected, "c14n canonical output drifted from the frozen vector");
+assert.equal(sotDigest(vectorInput), C14N_VECTOR_DIGEST, "c14n digest drifted from the frozen vector");
+assert.ok(!vectorExpected.endsWith("\n"), "canonical form must not carry a trailing newline");
+const vectorSnapshot = JSON.stringify(vectorInput);
+stableStringify(vectorInput);
+assert.equal(JSON.stringify(vectorInput), vectorSnapshot, "stableStringify must not mutate its input");
+console.log("[test] PASS sot-c14n-v1 frozen vector (canonical bytes + digest)");
+
 const sourceRoot = join(here, "..", "src", "js");
-const viewerContractSource = ["00-config.js", "20-state.js", "40-io.js"]
+const viewerContractSource = ["00-config.js", "05-c14n.js", "20-state.js", "40-io.js"]
   .map(file => readFileSync(join(sourceRoot, file), "utf8"))
   .join("\n") + "\nthis.canonical = canonicalSOT(); this.promote = input => { SOT=normalize(structuredClone(input)); return canonicalSOT(); }; this.makeTransition = flowTransition;";
 const viewerContext = { structuredClone };
@@ -49,6 +67,9 @@ const viewerExport = JSON.parse(viewerContext.canonical);
 const viewerResult = validateSot(viewerExport);
 assert.equal(viewerResult.valid, true, `viewer export: ${JSON.stringify(viewerResult.errors)}`);
 console.log("[test] PASS viewer default export matches SOT 1.0");
+
+assert.equal(viewerContext.stableStringify(vectorInput), vectorExpected, "viewer bundle c14n diverged from Node loader");
+console.log("[test] PASS viewer bundle and Node loader share one c14n source");
 
 const legacy = clone(valid);
 delete legacy.schemaVersion;
@@ -90,6 +111,36 @@ for (const path of ["connect to start", "manual transition"]) {
   assert.equal(result.valid, true, `${path}: ${JSON.stringify(result.errors)}`);
   console.log(`[test] PASS viewer ${path} triggerless transition validates after save`);
 }
+
+/* ==== diff + impact library (v0.5 contract, reused by v1 rebase) ==== */
+const { diffReport } = await import("../scripts/lib/diff.mjs");
+
+const identical = diffReport(clone(valid), clone(valid));
+assert.equal(identical.changes.length, 0);
+assert.equal(identical.digest.before, identical.digest.after);
+console.log("[test] PASS diff of identical SOTs is empty with equal digests");
+
+const edited = clone(valid);
+edited.requirements[0].features[0].title = "Renamed feature";
+edited.requirements[0].features[0].specs.push({ title: "New spec", desc: "", acceptance: [] });
+edited.prd.kpis[0].target = "changed-target";
+const report = diffReport(clone(valid), edited);
+const paths = report.changes.map(c => `${c.type} ${c.path}`);
+assert.ok(paths.includes("modified F1.title"), `missing F1.title: ${paths}`);
+assert.ok(paths.some(p => p.startsWith("added F1:")), `missing added spec: ${paths}`);
+assert.ok(paths.some(p => p.startsWith("modified prd.kpis[") && p.endsWith(".target")), `missing kpi field diff: ${paths}`);
+assert.ok(report.unchanged.includes("ia") && report.unchanged.includes("flow"), `ia/flow must be byte-identical: ${report.unchanged}`);
+assert.ok(report.impact.F1, "F1 impact missing");
+assert.ok(report.impact.F1.pages.length > 0, "F1 impact must list referencing pages");
+assert.notEqual(report.digest.before, report.digest.after);
+assert.equal(report.removedIds.length, 0);
+console.log("[test] PASS diff reports id-addressed changes, impact radius, and unchanged proof");
+
+const withRemoval = clone(valid);
+withRemoval.requirements[0].features = [];
+const removalReport = diffReport(clone(valid), withRemoval);
+assert.ok(removalReport.removedIds.includes("F1"), `removed ids must flag F1: ${removalReport.removedIds}`);
+console.log("[test] PASS diff flags removed ids for no-reissue enforcement");
 
 const dense = createDenseSot();
 const denseResult = validateSot(dense);

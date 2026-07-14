@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0",
+  "title": "c14n 벡터 · <angle> \"quotes\" \\backslash 😀",
+  "lang": "ko",
+  "initiative": {
+    "productId": "vector",
+    "id": "probe",
+    "path": "1-2",
+    "status": "proposed",
+    "parent": {
+      "scopeId": "root",
+      "canonicalization": "sot-c14n-v1",
+      "digest": "sha256:0000"
+    }
+  },
+  "desc": "",
+  "acceptance": [
+    {
+      "done": false,
+      "text": "수용 기준"
+    }
+  ],
+  "boundary": {
+    "pageId": "P10",
+    "scopeId": "root"
+  },
+  "alpha": [
+    {
+      "from": "P1",
+      "to": "P2",
+      "label": "전환"
+    },
+    {
+      "from": "P2",
+      "to": "P3",
+      "ref": "F1:0"
+    },
+    3,
+    "문자열",
+    null,
+    true,
+    []
+  ],
+  "beta": {
+    "nested": {
+      "start": "P1",
+      "aardvark": 1
+    }
+  },
+  "zeta": "unranked keys sort alphabetically · 한글 유니코드"
+}

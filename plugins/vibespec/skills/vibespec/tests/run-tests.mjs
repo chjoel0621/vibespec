@@ -171,6 +171,24 @@ assert.deepEqual(parallelChanges.map(c => c.type), ["added"], `parallel transiti
 assert.ok(parallelChanges[0].path.includes("ref:F1"), `parallel path must carry the trigger: ${parallelChanges[0].path}`);
 console.log("[test] PASS parallel transitions (same from→to) diff as add/remove, not modified");
 
+// Parallel group shrinking 2 → 1: the REMOVED transition must be reported,
+// never the surviving one (the old Map-collapse bug reported the survivor).
+const shrinkReport = diffReport(clone(parallelAfter), clone(valid));
+const shrinkChanges = shrinkReport.changes.filter(c => c.path.startsWith("flow."));
+assert.deepEqual(shrinkChanges.map(c => c.type), ["removed"], `parallel 2→1 must diff as one removal: ${JSON.stringify(shrinkChanges)}`);
+assert.ok(shrinkChanges[0].path.includes("ref:F1") && !shrinkChanges[0].path.includes("ref:F1:0"),
+  `the removed transition (ref:F1), not the survivor (ref:F1:0), must be reported: ${shrinkChanges[0].path}`);
+console.log("[test] PASS parallel 2→1 reports the removed transition, not the survivor");
+
+// Single group 1 → 1: a trigger change stays a friendly "modified".
+const retriggered = clone(valid);
+retriggered.flow.transitions[0] = { from: "P1", to: "P2", label: "달라진 라벨" };
+const retriggerReport = diffReport(clone(valid), retriggered);
+const retriggerChanges = retriggerReport.changes.filter(c => c.path.startsWith("flow."));
+assert.deepEqual(retriggerChanges.map(c => c.type), ["modified"], `single-group trigger change must stay modified: ${JSON.stringify(retriggerChanges)}`);
+assert.equal(retriggerChanges[0].path, "flow.P1→P2");
+console.log("[test] PASS single transition trigger change stays a modified record");
+
 const dense = createDenseSot();
 const denseResult = validateSot(dense);
 assert.equal(dense.flow.transitions.length, 53);

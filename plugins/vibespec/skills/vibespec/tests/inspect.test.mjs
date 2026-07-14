@@ -77,3 +77,23 @@ console.log("[inspect] PASS flags rebase and drops map when the main has drifted
 const empty = inspectDocs([]);
 assert.deepEqual(empty.suggestedModes, ["generate"]);
 console.log("[inspect] PASS empty input suggests generate");
+
+// An unrecognized SOT (unsupported schemaVersion) must NEVER route to generate —
+// that would mistake an existing document for a blank slate and overwrite it.
+const unknownSot = clone(main); unknownSot.schemaVersion = "9.9";
+const u = inspectDocs([doc("legacy.sot.json", unknownSot)], { fromFolder: true });
+assert.equal(u.files[0].kind, "unknown");
+assert.equal(u.unknownCount, 1);
+assert.ok(/unrecognized/.test(u.invalidReason), "an unknown SOT must expose an invalidReason");
+assert.deepEqual(u.suggestedModes, ["repair"], "an unknown SOT is blocked, never generate");
+console.log("[inspect] PASS an unrecognized SOT is blocked (repair), never generate");
+
+// Structural error + stale together: the structural problem wins. rebase would
+// refuse to write into a broken tree, so it must not be offered.
+const staleMain = clone(main); staleMain.title = "Changed";        // makes payment stale
+const brokenChild = clone(payment); brokenChild.ia.sections[0].pages[0].boundary.pageId = "P99"; // structural
+const both = inspectDocs([doc("m", staleMain), doc("p", brokenChild)], { fromFolder: true });
+assert.equal(both.needsRebase, true, "the tree is genuinely stale too");
+assert.ok(/structural/.test(both.invalidReason), "but the structural error is the blocking reason");
+assert.deepEqual(both.suggestedModes, ["repair"], "structural error outranks rebase");
+console.log("[inspect] PASS a structural error outranks stale (repair, not rebase)");

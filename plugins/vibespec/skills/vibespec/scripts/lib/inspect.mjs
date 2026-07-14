@@ -63,15 +63,21 @@ export function inspectDocs(docs, opts = {}) {
 
   const needsRebase = staleInitiatives.length > 0;
   const incompleteTree = inits.length > 0 && !hasMain;
+  const unknowns = files.filter(f => f.kind === "unknown");
   // A structural problem the skill cannot route around (only repair fixes it).
+  // Unknown SOT files must NEVER fall through to `generate`: an unrecognized
+  // existing document would be mistaken for a blank slate and overwritten.
   let invalidReason = null;
-  if (mainCount > 1) invalidReason = `multiple main documents (${mainCount})`;
+  if (unknowns.length) invalidReason = `unrecognized SOT file(s): ${unknowns.map(u => u.name).join(", ")} (unsupported schemaVersion — cannot route)`;
+  else if (mainCount > 1) invalidReason = `multiple main documents (${mainCount})`;
   else if (nonStaleErrors.length) invalidReason = `tree has ${nonStaleErrors.length} structural error(s): ${nonStaleErrors[0].message}`;
 
+  // Order matters: a structural problem blocks everything (rebase would refuse
+  // to write anyway), then a missing main, then the actionable modes.
   const modes = [];
   if (invalidReason) modes.push("repair");
   else if (incompleteTree) { /* need the main first — no actionable mode */ }
-  else if (!hasMain) modes.push("generate");
+  else if (!hasMain) modes.push("generate"); // no files at all → a fresh product
   else { // one main, no structural errors
     modes.push("edit", "initiative");
     if (needsRebase) modes.push("rebase");
@@ -79,7 +85,7 @@ export function inspectDocs(docs, opts = {}) {
   }
 
   return {
-    files, hasMain, mainCount, initiativeCount: inits.length, incompleteTree,
+    files, hasMain, mainCount, initiativeCount: inits.length, incompleteTree, unknownCount: unknowns.length,
     tree, invalidReason, nextPath, pathAuthority, staleInitiatives, needsRebase,
     suggestedModes: modes
   };

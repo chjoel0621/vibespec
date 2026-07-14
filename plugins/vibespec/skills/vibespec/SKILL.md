@@ -1,6 +1,7 @@
 ---
 name: vibespec
-description: 제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성, 사업계획서로 기획, make a planning tool, generate a PRD/spec, create IA and user flow. 기획 문서를 첨부하며 산출물을 요청할 때도 사용.
+description: >-
+  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성, 사업계획서로 기획, make a planning tool, generate a PRD/spec, create IA and user flow. 기획 문서를 첨부하며 산출물을 요청할 때도 사용.
 ---
 
 # SOT 기획 도구 생성

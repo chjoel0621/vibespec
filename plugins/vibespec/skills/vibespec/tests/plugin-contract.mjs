@@ -56,7 +56,9 @@ assert.equal(codexEntry.category, "Productivity");
 
 assert.equal(claudeMarketplace.name, "vibespec");
 assert.equal(claudeMarketplace.plugins.find(plugin => plugin.name === "vibespec")?.source, "./plugins/vibespec");
-assert.match(skillMd, /^---\r?\nname: vibespec\r?\ndescription:/);
+assert.match(skillMd, /^---\r?\nname: vibespec\r?\ndescription: >-\r?\n  \S/);
+const skillFrontmatter = skillMd.slice(4, skillMd.indexOf("\n---", 4));
+assert.doesNotMatch(skillFrontmatter, /^description:\s+[^"'|>].*:\s/m, "unquoted skill description contains a YAML mapping separator");
 assert.match(agentYaml, /display_name:\s*"VibeSpec"/);
 assert.match(agentYaml, /default_prompt:\s*"[^"]*\$vibespec/);
 assert.doesNotMatch(JSON.stringify({ codexPlugin, codexMarketplace }), /\[TODO:/);

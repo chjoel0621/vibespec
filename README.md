@@ -123,16 +123,22 @@ vibespec/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/vibespec/
 │       ├── agents/openai.yaml          # Codex skill UI metadata
-│       ├── SKILL.md                    # Skill: idea/document → SOT JSON
+│       ├── SKILL.md                    # Skill: idea/document → SOT JSON (+ targeted edits)
 │       ├── references/sot-schema.md    # JSON data contract (schema)
 │       ├── references/sot.schema.json  # Machine-readable JSON Schema
-│       ├── scripts/validate-sot.mjs    # Structure, reference, and coverage validator
-│       ├── tests/                      # Validator regression tests and fixture
+│       ├── scripts/
+│       │   ├── validate-sot.mjs        # Single-file validator (structure, refs, coverage)
+│       │   ├── diff-sot.mjs            # Change + impact-radius report between two SOTs
+│       │   ├── embed-sot.mjs           # Inline a SOT into the viewer's embedded-sot tag
+│       │   └── lib/                    # Shared: c14n (sot-c14n-v1), diff, tree, rebase
+│       ├── tests/                      # Validator, viewer round-trip, and headless-flow regressions
 │       ├── assets/viewer.html          # HTML viewer (app) — BUILT OUTPUT
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
-│       └── package.json                # npm run build · npm run check
+│       └── package.json                # npm run build · check · validate
+├── demo/meeting-room-booking.ko.sot.json  # Korean demo SOT (deployed to /)
 ├── demo/meeting-room-booking.en.sot.json  # English demo SOT (deployed to /en/)
+├── .github/workflows/                  # CI (build + tests) and Pages demo deploy
 ├── LICENSE
 ├── README.md                           # English (default)
 └── README.ko.md                        # Korean
@@ -148,10 +154,16 @@ npm run check       # build + syntax + schema/round-trip + Claude/Codex plugin c
 npm run check:all   # check + Chrome/Edge dense-flow layout regression
 ```
 
-Validate a generated or edited **SOT 1.0** file with the command below. It enforces the JSON Schema and checks duplicate IDs, IA feature coverage, and KPI, scenario, and user-flow references.
+Validate a generated or edited SOT file with the command below. It enforces the JSON Schema and checks duplicate IDs, IA feature coverage, and KPI, scenario, and user-flow references.
 
 ```
 npm run validate -- path/to/product.sot.json
+```
+
+To compare two versions of a SOT — what changed, what it touches (screens, transitions, KPIs), and what is byte-identical:
+
+```
+node scripts/diff-sot.mjs before.sot.json after.sot.json
 ```
 
 For an older SOT, load it in the viewer and save it once to promote it to the 1.0 format, then validate the newly saved file. Loading normalizes legacy KPI, scenario, and field shapes.

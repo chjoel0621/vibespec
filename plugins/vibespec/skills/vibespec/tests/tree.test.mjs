@@ -134,6 +134,23 @@ assert.ok(closure.warnings.some(w => w.file === "refund" && w.message.includes('
   "orphaned child must be warned to rebase the ancestor");
 console.log("[tree] PASS active set is ancestry-closed (stale parent excludes child, warns upstream)");
 
+// Merkle-chain property: rebasing a parent alone does NOT restore its subtree,
+// because parent.digest hashes the whole parent doc (including the parent's own
+// parent.digest), so rebasing payment changes payment's hash and immediately
+// stales refund. Restoration requires a top-down cascade. This guards the
+// future rebase implementation against the "one rebase heals the subtree" myth.
+const rebasedParent = clone(payment);
+rebasedParent.initiative.parent.digest = sotDigest(changedMain); // rebase payment to the new root
+const parentOnly = validateTree([doc("m", changedMain), doc("payment", rebasedParent), doc("refund", closureChild)]);
+assert.deepEqual(parentOnly.product.activeSet, ["payment"], "rebasing the parent alone reactivates only the parent");
+assert.ok(hasError(parentOnly, "digest stale") && parentOnly.errors.some(e => e.file === "refund"),
+  "the child is immediately staled by the parent's new hash");
+const cascadedChild = clone(closureChild);
+cascadedChild.initiative.parent.digest = sotDigest(rebasedParent); // then rebase refund onto the rebased payment
+const cascaded = validateTree([doc("m", changedMain), doc("payment", rebasedParent), doc("refund", cascadedChild)]);
+assert.deepEqual(cascaded.product.activeSet, ["payment", "refund"], "only a top-down cascade restores the whole subtree");
+console.log("[tree] PASS rebase does not propagate — subtree restore needs a top-down cascade");
+
 // Active initiatives may overlap in v1, but each owner needs a conflict
 // warning so a person can resolve it before product-map synthesis.
 const paymentConflict = clone(payment);

@@ -138,7 +138,12 @@ resetSelections();
 selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
 pushHistory(t("현재 상태","Current state"));
 updateUndoButtons();
-try{ LANG = localStorage.getItem(LANG_KEY) || (SOT&&SOT.lang) || "ko"; }catch(e){}
+// An embedded document is authoritative for its own language: the skill baked
+// in a product with an intended language, so honor SOT.lang over a leftover
+// localStorage preference (which is shared per-origin and would otherwise leak
+// between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
+// embedded SOT) falls back to the remembered preference.
+try{ LANG = _loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko"); }catch(e){}
 document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); render(); });
 applyStaticI18n();
 render();

@@ -1,0 +1,632 @@
+{
+  "schemaVersion": "1.0",
+  "title": "회의실 예약 관리",
+  "lang": "ko",
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "label": "회원가입"
+      },
+      {
+        "from": "P1",
+        "to": "P4",
+        "label": "로그인"
+      },
+      {
+        "from": "P2",
+        "to": "P4",
+        "label": "가입 완료"
+      },
+      {
+        "from": "P4",
+        "to": "P6",
+        "label": "로그인 성공"
+      },
+      {
+        "from": "P6",
+        "to": "P7",
+        "label": "예약하기"
+      },
+      {
+        "from": "P7",
+        "to": "P8",
+        "label": "회의실·시간 선택"
+      },
+      {
+        "from": "P8",
+        "to": "P9",
+        "label": "확인"
+      },
+      {
+        "from": "P9",
+        "to": "P6",
+        "label": "예약 완료"
+      },
+      {
+        "from": "P6",
+        "to": "P10",
+        "label": "내 예약"
+      },
+      {
+        "from": "P10",
+        "to": "P11",
+        "label": "취소하기"
+      },
+      {
+        "from": "P11",
+        "to": "P10",
+        "label": "취소 완료"
+      },
+      {
+        "from": "P6",
+        "to": "P12",
+        "label": "관리자"
+      },
+      {
+        "from": "P6",
+        "to": "P15",
+        "label": "설정"
+      }
+    ]
+  },
+  "ia": {
+    "sections": [
+      {
+        "title": "인증·온보딩",
+        "id": "S1",
+        "pages": [
+          {
+            "title": "랜딩 페이지",
+            "id": "P1",
+            "type": "top",
+            "refs": [],
+            "children": [
+              {
+                "title": "회원가입",
+                "id": "P2",
+                "type": "page",
+                "refs": [
+                  "F1",
+                  "F1:0",
+                  "F1:2"
+                ],
+                "children": [
+                  {
+                    "title": "소셜 로그인",
+                    "id": "P3",
+                    "type": "action",
+                    "refs": [
+                      "F1:1"
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "title": "로그인",
+                "id": "P4",
+                "type": "page",
+                "refs": [
+                  "F2",
+                  "F2:0"
+                ],
+                "children": [
+                  {
+                    "title": "비밀번호 재설정",
+                    "id": "P5",
+                    "type": "action",
+                    "refs": [
+                      "F2:1"
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "예약",
+        "id": "S2",
+        "pages": [
+          {
+            "title": "홈 / 대시보드",
+            "id": "P6",
+            "type": "top",
+            "refs": [],
+            "children": [
+              {
+                "title": "예약하기",
+                "id": "P7",
+                "type": "page",
+                "refs": [
+                  "F3",
+                  "F3:1"
+                ],
+                "children": [
+                  {
+                    "title": "회의실·시간 선택",
+                    "id": "P8",
+                    "type": "action",
+                    "refs": [
+                      "F3:0"
+                    ],
+                    "children": []
+                  },
+                  {
+                    "title": "예약 확정",
+                    "id": "P9",
+                    "type": "action",
+                    "refs": [
+                      "F3:2"
+                    ],
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "title": "내 예약",
+                "id": "P10",
+                "type": "page",
+                "refs": [
+                  "F4",
+                  "F4:0",
+                  "F4:2"
+                ],
+                "children": [
+                  {
+                    "title": "예약 취소",
+                    "id": "P11",
+                    "type": "action",
+                    "refs": [
+                      "F4:1"
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "회의실 관리",
+        "id": "S3",
+        "pages": [
+          {
+            "title": "관리자 홈",
+            "id": "P12",
+            "type": "top",
+            "refs": [],
+            "children": [
+              {
+                "title": "회의실 등록",
+                "id": "P13",
+                "type": "page",
+                "refs": [
+                  "F5",
+                  "F5:0",
+                  "F5:1",
+                  "F5:2"
+                ],
+                "children": []
+              },
+              {
+                "title": "실시간 현황",
+                "id": "P14",
+                "type": "page",
+                "refs": [
+                  "F6",
+                  "F6:0",
+                  "F6:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "알림·설정",
+        "id": "S4",
+        "pages": [
+          {
+            "title": "설정",
+            "id": "P15",
+            "type": "top",
+            "refs": [],
+            "children": [
+              {
+                "title": "알림 설정",
+                "id": "P16",
+                "type": "page",
+                "refs": [
+                  "F7",
+                  "F7:0",
+                  "F7:1"
+                ],
+                "children": []
+              },
+              {
+                "title": "운영 대시보드",
+                "id": "P17",
+                "type": "page",
+                "refs": [
+                  "F8",
+                  "F8:0",
+                  "F8:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "prd": {
+    "alternatives": "현재는 사내 메신저 공지·종이 예약표·범용 캘린더(구글 캘린더)로 대체 — 실시간 현황과 노쇼 관리가 안 된다.",
+    "assumptions": [
+      "전 직원이 사내 SSO 계정을 보유한다",
+      "회의실 목록·수용 인원 데이터를 총무팀이 제공한다",
+      "노쇼는 예약 후 미체크인으로 판별 가능하다"
+    ],
+    "category": "사내 업무용 예약 관리 (B2B SaaS)",
+    "constraints": [
+      "사내망(VPN) 환경에서 동작해야 함",
+      "개인정보는 사내 정책상 외부 저장 불가",
+      "iOS·Android·웹 동시 지원 필요"
+    ],
+    "differentiator": "사내 계정(SSO)과 회의실 현황을 결합해 '빈 방 즉시 예약'과 노쇼 자동 집계를 지원한다.",
+    "goal": "출시 6개월 내 사내 회의실 예약의 80%를 앱으로 전환하고 노쇼율을 5% 이하로 낮춘다.",
+    "inScope": [
+      "실시간 회의실 현황 조회",
+      "예약 생성·취소·변경",
+      "확정/리마인더 알림",
+      "관리자 이용 통계 대시보드"
+    ],
+    "kpis": [
+      {
+        "name": "예약 완료까지 평균 탭 수",
+        "refs": [
+          "F3",
+          "F6"
+        ],
+        "baseline": "6",
+        "method": "완료 이벤트까지의 탭 수 로그 평균",
+        "target": "≤ 3"
+      },
+      {
+        "name": "월간 노쇼율",
+        "refs": [
+          "F7"
+        ],
+        "baseline": "18%",
+        "method": "예약 후 미체크인 / 총예약",
+        "target": "≤ 5%"
+      },
+      {
+        "name": "주간 활성 예약자 비율(WAU/직원)",
+        "refs": [
+          "F3"
+        ],
+        "baseline": "22%",
+        "method": "주간 예약자 수 / 전체 직원",
+        "target": "≥ 40%"
+      }
+    ],
+    "nonGoals": [
+      "외부 게스트 예약",
+      "유료 결제·정산",
+      "화상회의 솔루션 연동(초기 제외)",
+      "좌석(데스크) 예약"
+    ],
+    "northStar": "주간 앱 예약 완료 건수 (Weekly Completed Bookings)",
+    "oneLiner": "사내 구성원이 3번의 탭으로 빈 회의실을 찾아 예약하고 실시간 현황을 확인하는 앱",
+    "openQuestions": [
+      "체크인은 QR·NFC 중 무엇으로 할까?",
+      "노쇼 패널티 정책을 둘 것인가?",
+      "예약 시간 단위는 15/30분?"
+    ],
+    "platforms": [
+      "웹",
+      "iOS",
+      "Android"
+    ],
+    "problem": "예약 현황이 흩어져 있어 빈 회의실을 찾기 어렵고(직원의 Job: 지금 당장 빈 방을 잡고 싶다), 중복 예약과 노쇼가 반복된다.",
+    "risks": [
+      "사내 계정(SSO) 연동 일정 불확실",
+      "센서 미설치 공간의 현황 정확도 이슈",
+      "초기 데이터 부족으로 통계 신뢰도 낮음"
+    ],
+    "scenarios": [
+      {
+        "start": "P6",
+        "text": "직원 A는 오후 2시 회의를 위해 홈에서 빈 회의실을 확인하고, 3층 회의실을 골라 참석자 4명을 추가한 뒤 예약을 확정한다. 확정 알림이 참석자에게 전송된다."
+      },
+      {
+        "start": "",
+        "text": "관리자 B는 주간 대시보드에서 회의실별 이용률과 노쇼율을 확인하고, 이용률이 낮은 회의실의 운영 시간을 조정한다."
+      }
+    ],
+    "solution": "실시간 현황 기반의 빠른 예약과 확정·리마인더 알림, 관리자용 이용 통계 대시보드를 제공한다.",
+    "targets": [
+      {
+        "name": "직원 A",
+        "needs": "지금 당장 빈 회의실을 빠르게 잡고 싶다",
+        "pain": "현황이 흩어져 있어 빈 방 찾기가 번거롭다",
+        "role": "예약자"
+      },
+      {
+        "name": "팀 리더",
+        "needs": "참석자에게 일정·장소를 한 번에 공유",
+        "pain": "구두·메신저 공지로 누락이 생긴다",
+        "role": "참석자 관리"
+      },
+      {
+        "name": "총무·관리자",
+        "needs": "이용률·노쇼를 데이터로 관리",
+        "pain": "운영 판단에 쓸 데이터가 없다",
+        "role": "회의실 운영"
+      }
+    ],
+    "whyNow": "하이브리드 근무로 회의실 수요가 몰리는데 예약이 메신저·구두로 이뤄져 중복·노쇼가 늘었고, 공간 운영 데이터의 필요가 커졌다."
+  },
+  "requirements": [
+    {
+      "title": "회원 관리",
+      "id": "R1",
+      "status": "done",
+      "priority": "mid",
+      "desc": "조직 구성원이 계정을 만들고 안전하게 로그인할 수 있어야 한다.",
+      "acceptance": [],
+      "features": [
+        {
+          "title": "회원가입",
+          "id": "F1",
+          "status": "done",
+          "priority": "mid",
+          "desc": "이메일/비밀번호 또는 소셜 계정으로 회원가입하고, 사번 인증으로 부서를 매핑한다.",
+          "acceptance": [
+            {
+              "done": true,
+              "text": "이메일 형식과 비밀번호 규칙을 검증해야 한다."
+            },
+            {
+              "done": false,
+              "text": "사번 인증 실패 시 가입이 제한되어야 한다."
+            }
+          ],
+          "specs": [
+            {
+              "title": "이메일/비밀번호 기반 회원가입",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "소셜 로그인 (카카오, 구글)",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "사번 인증 및 부서 매핑",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        },
+        {
+          "title": "로그인/로그아웃",
+          "id": "F2",
+          "status": "done",
+          "priority": "mid",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "자동 로그인 / 로그아웃 처리",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "비밀번호 찾기 및 재설정",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "예약 관리",
+      "id": "R2",
+      "status": "doing",
+      "priority": "high",
+      "desc": "원하는 회의실과 시간대를 골라 예약을 생성·변경할 수 있어야 한다.",
+      "acceptance": [
+        {
+          "done": true,
+          "text": "사용자는 회의실과 시간대를 선택해 예약할 수 있어야 한다."
+        },
+        {
+          "done": false,
+          "text": "중복된 시간대 예약은 차단되어야 한다."
+        }
+      ],
+      "features": [
+        {
+          "title": "예약 생성",
+          "id": "F3",
+          "status": "doing",
+          "priority": "high",
+          "desc": "사용자가 원하는 회의실과 시간대를 선택해 예약을 생성한다. 중복 예약을 방지하고, 확정 시 참석자에게 알림을 발송한다.",
+          "acceptance": [
+            {
+              "done": true,
+              "text": "회의실 목록에서 하나를 선택할 수 있어야 한다."
+            },
+            {
+              "done": false,
+              "text": "시작/종료 시간 선택 시 중복 예약이 차단되어야 한다."
+            },
+            {
+              "done": false,
+              "text": "예약 확정 시 예약자에게 알림이 발송되어야 한다."
+            }
+          ],
+          "specs": [
+            {
+              "title": "회의실 및 시간대 선택",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "참석자 추가 및 인원 제한 설정",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "예약 확인 및 확정 알림 발송",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        },
+        {
+          "title": "예약 조회/변경",
+          "id": "F4",
+          "status": "todo",
+          "priority": "high",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "내 예약 목록 조회",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "예약 수정 및 취소",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "주간 캘린더 뷰",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "회의실 관리",
+      "id": "R3",
+      "status": "todo",
+      "priority": "mid",
+      "desc": "관리자가 회의실 정보를 등록하고 실시간 현황을 파악할 수 있어야 한다.",
+      "acceptance": [],
+      "features": [
+        {
+          "title": "회의실 등록",
+          "id": "F5",
+          "status": "todo",
+          "priority": "mid",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "회의실 정보(위치/사진) 등록",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "수용 인원 및 장비 설정",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "사용 가능 시간대 설정",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        },
+        {
+          "title": "실시간 현황",
+          "id": "F6",
+          "status": "todo",
+          "priority": "low",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "회의실별 이용 현황 보드",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "잔여 시간 및 다음 예약 표시",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "알림 및 관리자",
+      "id": "R4",
+      "status": "todo",
+      "priority": "mid",
+      "desc": "예약 관련 알림을 보내고 운영 지표를 관리할 수 있어야 한다.",
+      "acceptance": [],
+      "features": [
+        {
+          "title": "알림",
+          "id": "F7",
+          "status": "todo",
+          "priority": "mid",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "예약 시작 전 리마인더",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "변경/취소 알림",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        },
+        {
+          "title": "운영 대시보드",
+          "id": "F8",
+          "status": "todo",
+          "priority": "low",
+          "desc": "",
+          "acceptance": [],
+          "specs": [
+            {
+              "title": "회의실별 이용률 통계",
+              "desc": "",
+              "acceptance": []
+            },
+            {
+              "title": "노쇼/취소율 리포트",
+              "desc": "",
+              "acceptance": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

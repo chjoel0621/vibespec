@@ -72,6 +72,8 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 **Adding an initiative (a scoped increment):** attach your main `*.sot.json` and ask "add a payment initiative on top." Instead of bloating the main plan, the skill creates a **separate initiative file** (`<product>.<path>.<id>.sot.json`) layered on it — with its own lean PRD (problem, solution, in-scope, non-goals) and a **boundary** marking where it attaches to a main screen. The main file is left untouched, so an initiative can be reviewed, approved, and shipped on its own. Each initiative records a digest of the main it was written against; if the main later changes, the skill can **rebase** the affected initiatives (parent-to-child) so nothing silently drifts.
 
+**Seeing the whole product:** ask "show the product map" and the skill composes the main with its **active** initiatives into one read-only view — each initiative's screens grafted under the main screen it attaches to, with composite ids (`root/P6`, `notif/P2`) showing provenance. Proposed and dropped initiatives are listed as excluded. Try the composed **[product map demo](https://chjoel0621.github.io/vibespec/map/)** (booking app + a notification initiative).
+
 ### If the skill doesn't auto-trigger (invoke it manually)
 
 The skill fires automatically on natural-language requests, but if it doesn't, you can call it directly.
@@ -138,8 +140,8 @@ vibespec/
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
 │       └── package.json                # npm run build · check · validate
-├── demo/meeting-room-booking.ko.sot.json  # Korean demo SOT (deployed to /)
-├── demo/meeting-room-booking.en.sot.json  # English demo SOT (deployed to /en/)
+├── demo/                               # Demo SOTs: main (ko/en → / , /en/) + a notif
+│                                       #   initiative, composed into the map (/map/, /en/map/)
 ├── .github/workflows/                  # CI (build + tests) and Pages demo deploy
 ├── LICENSE
 ├── README.md                           # English (default)

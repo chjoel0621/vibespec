@@ -6,10 +6,21 @@
 // first). Usage:
 //   node scripts/product-map.mjs <folder | file.sot.json ...>
 //   node scripts/product-map.mjs <...> --json
-import { readFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { dirname, join } from "node:path";
 import { collectFiles } from "./validate-tree.mjs";
 import { buildProductMap } from "./lib/product-map.mjs";
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+
+// Embed a built map into a copy of the viewer, which renders it read-only.
+function writeMapHtml(map, out) {
+  const viewer = readFileSync(join(scriptDir, "..", "assets", "viewer.html"), "utf8");
+  const tag = '<script type="application/json" id="embedded-sot"></script>';
+  const payload = JSON.stringify(map).replace(/</g, "\\u003c");
+  writeFileSync(out, viewer.replace(tag, tag.replace("></script>", `>${payload}</script>`)));
+}
 
 function printTree(pages, depth, out) {
   for (const p of pages) {
@@ -35,8 +46,10 @@ export function printMap(map) {
 
 async function main(argv) {
   const json = argv.includes("--json");
-  const paths = argv.filter(a => a !== "--json");
-  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--json]"); process.exitCode = 2; return; }
+  const htmlIdx = argv.indexOf("--html");
+  const htmlOut = htmlIdx >= 0 ? argv[htmlIdx + 1] : null;
+  const paths = argv.filter((a, i) => !a.startsWith("--") && !(htmlIdx >= 0 && i === htmlIdx + 1));
+  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--json] [--html <out.html>]"); process.exitCode = 2; return; }
   let files;
   try { files = collectFiles(paths); } catch (cause) { console.error(`[FAIL] ${cause.message}`); process.exitCode = 2; return; }
   const docs = [];
@@ -47,6 +60,7 @@ async function main(argv) {
   const map = buildProductMap(docs);
   if (json) console.log(JSON.stringify(map, null, 2));
   else printMap(map);
+  if (map.valid && htmlOut) { writeMapHtml(map, htmlOut); if (!json) console.log(`\n[map] 읽기전용 지도 HTML: ${htmlOut}`); }
   if (!map.valid) process.exitCode = 1;
 }
 

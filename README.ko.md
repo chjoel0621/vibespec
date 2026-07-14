@@ -73,6 +73,8 @@ codex plugin add vibespec@vibespec
 
 **이니셔티브 추가하기(범위 있는 증분):** 본편 `*.sot.json`을 첨부하고 "결제 기능 이니셔티브로 얹어줘"처럼 요청하세요. 본편을 비대하게 만드는 대신, 스킬이 그 위에 얹히는 **별도 이니셔티브 파일**(`<제품>.<경로>.<id>.sot.json`)을 만듭니다 — 자체 경량 PRD(문제·해결·포함범위·비목표)와, 본편 화면에 붙는 지점을 표시하는 **경계(boundary)**를 담아서요. 본편은 그대로 두므로 이니셔티브를 독립적으로 검토·승인·출시할 수 있습니다. 각 이니셔티브는 작성 기준이 된 본편의 digest를 기록하고, 나중에 본편이 바뀌면 스킬이 영향받은 이니셔티브들을 **재기준(rebase)**(부모→자식 순서)해 조용한 드리프트가 없게 합니다.
 
+**제품 전체 보기:** "제품 지도 보여줘"라고 하면 스킬이 본편과 **활성** 이니셔티브들을 하나의 읽기 전용 뷰로 합성합니다 — 각 이니셔티브의 화면이 붙는 본편 화면 아래에 접붙고, 복합 id(`root/P6`·`notif/P2`)로 출처를 보여줍니다. proposed·dropped 이니셔티브는 "제외"로 표시됩니다. 합성된 **[제품 지도 데모](https://chjoel0621.github.io/vibespec/map/)**(예약 앱 + 알림 이니셔티브)를 열어보세요.
+
 ### 스킬이 자동으로 안 뜰 때 (직접 호출)
 
 자연어로 요청하면 스킬이 자동 발동하지만, 안 걸릴 때는 직접 부를 수 있습니다.
@@ -139,8 +141,8 @@ vibespec/
 │       ├── src/                        # 뷰어 소스 (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # src/ 를 단일 파일 뷰어로 인라인
 │       └── package.json                # npm run build · check · validate
-├── demo/meeting-room-booking.ko.sot.json  # 한글 데모 SOT (/ 로 배포)
-├── demo/meeting-room-booking.en.sot.json  # 영어 데모 SOT (/en/ 으로 배포)
+├── demo/                               # 데모 SOT: 본편(ko/en → / , /en/) + 알림 이니셔티브,
+│                                       #   합성 지도(/map/, /en/map/)
 ├── .github/workflows/                  # CI(빌드+테스트)와 Pages 데모 배포
 ├── LICENSE
 ├── README.md                           # 영어(기본)

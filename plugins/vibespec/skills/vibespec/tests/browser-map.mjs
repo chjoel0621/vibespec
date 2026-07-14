@@ -32,6 +32,8 @@ const payment = JSON.parse(readFileSync(join(treeDir, "shop.1-2.payment.sot.json
 const map = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: payment }]);
 
 const harness = `<script>
+const initNode=document.querySelector(".snode.map-init");
+const ir=initNode?initNode.getBoundingClientRect():null;
 const pt=document.getElementById("prodTitle");
 const before=pt.firstChild?pt.firstChild.textContent:"";
 // Try to edit the (read-only) title: simulate typing + input event.
@@ -45,7 +47,11 @@ document.documentElement.setAttribute("data-probe",JSON.stringify({
   titleWriteIgnored: (typeof SOT==="undefined") || !SOT || SOT.title!=="HACKED",
   grafted: [...document.querySelectorAll(".snode.map-init .stitle")].some(e=>/Pay/.test(e.textContent)),
   compositeIds: [...document.querySelectorAll(".sitemap .stype")].map(e=>e.textContent).filter(x=>x.includes("/")),
-  scopes: [...document.querySelectorAll(".map-scope b")].map(e=>e.textContent)
+  scopes: [...document.querySelectorAll(".map-scope b")].map(e=>e.textContent),
+  // The increment must be on-screen when the map opens (a wide composite used to
+  // push it past the right edge, so the map showed only the main).
+  incrementOnScreen: !!ir && ir.x>=0 && ir.right<=window.innerWidth && ir.y>=0 && ir.bottom<=window.innerHeight,
+  attachLine: (document.querySelector(".map-attach")||{}).textContent||""
 }));
 </script>`;
 
@@ -71,7 +77,9 @@ try {
   assert.deepEqual(p.scopes, ["Shop", "Payment"], "legend lists the main and the active initiative");
   assert.equal(p.titleEditable, false, "map mode: the product title must not be contenteditable");
   assert.equal(p.titleWriteIgnored, true, "map mode: editing the title must not write to SOT (read-only)");
-  console.log("[browser] PASS product map is read-only (composite + non-editable title)");
+  assert.equal(p.incrementOnScreen, true, "the initiative's screen must be visible when the map opens");
+  assert.match(p.attachLine, /Payment|Cart|접점|Attaches/, "the map names where each initiative attaches");
+  console.log("[browser] PASS product map is read-only, shows the increment on open, and names its attach point");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

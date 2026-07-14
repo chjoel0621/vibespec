@@ -50,6 +50,11 @@
   .map-hint{padding:6px 18px 0;color:var(--muted);font-size:11.5px}
   .snode.map-init{border-color:var(--accent);background:var(--accent-soft)}
   .map-scopetag{font-size:10px;font-weight:700;color:var(--accent);background:#fff;border:1px solid var(--accent-line);border-radius:999px;padding:0 6px}
+  .map-attach{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 18px 0;color:var(--sub);font-size:12px}
+  .map-jump{border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);border-radius:7px;padding:3px 9px;font-size:12px;cursor:pointer}
+  .map-jump:hover{background:#fff}
+  .map-jump b{color:var(--accent)}
+  .snode.map-flash{box-shadow:0 0 0 3px var(--accent);transition:box-shadow .2s}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}

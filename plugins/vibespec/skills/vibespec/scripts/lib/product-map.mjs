@@ -95,7 +95,10 @@ export function buildProductMap(docs) {
   }
 
   return {
+    // `kind` lets the viewer detect a read-only map payload vs an editable SOT.
+    kind: "vibespec-product-map",
     valid: true,
+    lang: (root && root.sot.lang) || "ko",
     productId: tree.product.productId,
     scopes: scopeInfo,
     active: [...active],

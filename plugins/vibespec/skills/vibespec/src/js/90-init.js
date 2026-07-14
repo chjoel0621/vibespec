@@ -132,20 +132,22 @@ document.getElementById("fileInput").addEventListener("change",e=>{
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
-try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ SOT=normalize(JSON.parse(emb.textContent)); _loaded=true; } }catch(e){}
-if(!_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
-if(!SOT.title) SOT.title="제품";
-(function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
-resetSelections();
-selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
-pushHistory(t("현재 상태","Current state"));
-updateUndoButtons();
+try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map") MAP=payload; else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
+if(!MAP && !_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
+if(!MAP){
+  if(!SOT.title) SOT.title="제품";
+  (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
+  resetSelections();
+  selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
+  pushHistory(t("현재 상태","Current state"));
+  updateUndoButtons();
+}
 // An embedded document is authoritative for its own language: the skill baked
 // in a product with an intended language, so honor SOT.lang over a leftover
 // localStorage preference (which is shared per-origin and would otherwise leak
 // between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
 // embedded SOT) falls back to the remembered preference.
-try{ LANG = _loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko"); }catch(e){}
-document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); render(); });
+try{ LANG = MAP ? ((MAP.lang) || "ko") : (_loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko")); }catch(e){}
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); MAP?renderMap():render(); });
 applyStaticI18n();
-render();
+MAP?renderMap():render();

@@ -44,6 +44,16 @@
   .ib-dot.approved{background:var(--accent)}
   .ib-dot.implemented{background:var(--ok)}
   .ib-dot.dropped{background:#c0392b}
+  .ib-dot.main{background:#1e1e22}
+  /* read-only product map */
+  .map-head{padding:14px 18px 4px;font-weight:650;font-size:14px}
+  .map-legend{display:flex;flex-wrap:wrap;gap:8px 18px;padding:8px 18px 4px}
+  .map-scope{display:flex;align-items:center;gap:6px;font-size:12.5px}
+  .map-scope-id{color:var(--muted);font-size:11.5px}
+  .map-excluded{padding:4px 18px;color:var(--sub);font-size:12px}
+  .map-hint{padding:6px 18px 0;color:var(--muted);font-size:11.5px}
+  .snode.map-init{border-color:var(--accent);background:var(--accent-soft)}
+  .map-scopetag{font-size:10px;font-weight:700;color:var(--accent);background:#fff;border:1px solid var(--accent-line);border-radius:999px;padding:0 6px}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}
@@ -1393,6 +1403,48 @@ function renderFlowEditPanel(){
 }
 
 
+/* ==== 87-map.js ==== */
+/* ---- read-only product map (v2): renders a composed main + active initiatives
+   payload (kind: "vibespec-product-map"). Dormant for normal SOT documents. ---- */
+let MAP = null;
+function mapStatusLabel(s){ const m=INIT_STATUS[s]; return m?t(m.t,m.e):s; }
+function renderMapNode(p){
+  const kids = (p.children&&p.children.length)?`<ul>${p.children.map(renderMapNode).join("")}</ul>`:"";
+  const cls = p.scope==="root" ? (p.type==="top"?"top":(p.type==="action"?"action":"page")) : "map-init";
+  const tag = p.scope!=="root" ? ` <span class="map-scopetag">+${esc(p.scope)}</span>` : "";
+  return `<li><div class="snode ${cls}">
+      <span class="stype">${esc(p.compositeId)}</span>
+      <span class="stitle">${esc(p.title)}${tag}</span>
+    </div>${kids}</li>`;
+}
+function renderMap(){
+  const M=MAP; if(!M) return;
+  // Hide the editing chrome — a map is a read-only overview, not an editor.
+  ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
+  document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
+  const band=document.getElementById("initBand"); if(band) band.hidden=true;
+  const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=M.productId||"Product";
+  const legend = (M.scopes||[]).map(s=>{
+    const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
+    return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span><b>${esc(s.title||s.id)}</b> <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;
+  }).join("");
+  const excluded = (M.excluded&&M.excluded.length) ? `<div class="map-excluded">${t("제외","Excluded")}: ${M.excluded.map(e=>`${esc(e.id)} (${esc(e.reason)})`).join(", ")}</div>` : "";
+  const tree = `<div class="sitemap"><ul>${(M.ia||[]).map(sec=>`<li>
+      <div class="snode sec"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}</span></div>
+      ${sec.pages.length?`<ul>${sec.pages.map(renderMapNode).join("")}</ul>`:""}
+    </li>`).join("")}</ul></div>`;
+  const el=document.getElementById("stage");
+  el.className="wrap ia";
+  el.innerHTML = `<div class="ia-canvas">
+    <div class="map-head">${t("제품 지도 (읽기 전용)","Product map (read-only)")} · ${t("본편 + 활성 이니셔티브","main + active initiatives")} ${M.active?M.active.length:0}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
+    <div class="map-legend">${legend}</div>
+    ${excluded}
+    <div class="map-hint">${t("복합 id(scope/로컬id)로 출처를 표시합니다. +표시 노드는 이니셔티브가 본편 화면 아래에 더한 화면입니다.","Composite ids (scope/local-id) show provenance. +marked nodes are screens an initiative adds under a main screen.")}</div>
+    ${tree}
+  </div>`;
+}
+
+
 /* ==== 90-init.js ==== */
 /* ============================ EVENT WIRING ============================ */
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;render();}));
@@ -1528,22 +1580,24 @@ document.getElementById("fileInput").addEventListener("change",e=>{
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
-try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ SOT=normalize(JSON.parse(emb.textContent)); _loaded=true; } }catch(e){}
-if(!_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
-if(!SOT.title) SOT.title="제품";
-(function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
-resetSelections();
-selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
-pushHistory(t("현재 상태","Current state"));
-updateUndoButtons();
+try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map") MAP=payload; else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
+if(!MAP && !_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
+if(!MAP){
+  if(!SOT.title) SOT.title="제품";
+  (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
+  resetSelections();
+  selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
+  pushHistory(t("현재 상태","Current state"));
+  updateUndoButtons();
+}
 // An embedded document is authoritative for its own language: the skill baked
 // in a product with an intended language, so honor SOT.lang over a leftover
 // localStorage preference (which is shared per-origin and would otherwise leak
 // between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
 // embedded SOT) falls back to the remembered preference.
-try{ LANG = _loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko"); }catch(e){}
-document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); render(); });
+try{ LANG = MAP ? ((MAP.lang) || "ko") : (_loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko")); }catch(e){}
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); MAP?renderMap():render(); });
 applyStaticI18n();
-render();
+MAP?renderMap():render();
 
 </script>

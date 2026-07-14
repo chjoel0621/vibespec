@@ -1,7 +1,7 @@
 ---
 name: vibespec
 description: >-
-  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성, 사업계획서로 기획, make a planning tool, generate a PRD/spec, create IA and user flow. 기획 문서를 첨부하며 산출물을 요청할 때도 사용.
+  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성하고, 기존 SOT 파일의 국소 수정도 처리한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; also applies targeted edits to an existing SOT. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
 ---
 
 # SOT 기획 도구 생성
@@ -13,7 +13,8 @@ description: >-
 
 ## 절차
 
-1. **입력 수집**
+1. **입력 수집 및 모드 판별**
+   - **라우팅**: 사용자가 기존 `.sot.json`을 첨부(또는 경로 제시)하며 변경을 요청하면 신규 생성이 아니라 아래 **수정 모드**로 진행한다. 그 외(아이디어·기획 문서)는 신규 생성이다.
    - 사용자가 제품을 설명했거나 문서를 첨부했으면 그것을 근거로 삼는다. 첨부 문서는 현재 플랫폼에서 제공하는 파일 읽기 도구로 읽는다.
    - 정보가 부족할 때만(제품 목적·핵심 사용자·주요 기능이 불명확) 2~3개 핵심 질문을 한다. 충분하면 묻지 말고 진행한다.
 
@@ -42,7 +43,19 @@ description: >-
    - `<제품명>.html`을 브라우저로 열면 사용자 제품이 바로 표시된다(불러오기 불필요).
    - 편집은 뷰어에서, 저장은 저장(JSON 내보내기)으로. 되돌리기·히스토리도 지원한다.
 
+## 수정 모드 (기존 SOT 국소 수정)
+
+기존 `.sot.json`에 변경을 적용할 때는 재생성이 아니라 **최소 편집**이다. 원본 파일은 그대로 두고, 수정본을 outputs 폴더에 쓴 뒤 아래를 지킨다.
+
+1. **id는 절대 재발급하지 않는다.** 기존 `R#`·`F#`·`S#`·`P#`와 상세기능 인덱스(`F#:i`)를 바꾸거나 번호를 당기지 않는다. 새 항목의 id는 파일 전체에서 해당 접두사의 최대 번호 + 1. 상세기능·시나리오는 배열 끝에만 추가한다(중간 삽입은 `F#:i` 참조를 어긋나게 한다).
+2. **요청 범위 밖은 건드리지 않는다.** 부탁받지 않은 문장을 다듬거나 재서술하지 않는다 — 목표는 diff에 요청한 변경만 남는 것.
+3. **삭제 시 참조를 정리한다.** 기능을 지우면 IA 페이지 `refs`, flow의 `ref`, KPI `refs`에서도 제거한다. 삭제된 id는 재사용 금지.
+4. **검증**: 신규 생성과 동일하게 `validate-sot.mjs`를 PASS까지 돌린다.
+5. **변경 리포트**: `node "<VIBESPEC_SKILL_DIR>/scripts/diff-sot.mjs" "<원본 경로>" "<수정본 경로>"`를 실행해 그 출력(변경 목록·영향 반경·바이트 동일 섹션)을 사용자에게 요약 전달한다. 영향 반경에 뜬 화면·전환·KPI는 함께 검토가 필요하다는 신호다. diff에 요청 범위 밖 변경이 보이면 되돌리고 다시 diff한다.
+6. **산출물**: 수정된 `<제품명>.sot.json`과 embedded-sot를 갱신한 `<제품명>.html`을 신규 생성과 같은 방식으로 전달한다.
+
 ## 참고
 - 상세 스키마와 예시는 `references/sot-schema.md`.
 - 표준 JSON Schema는 `references/sot.schema.json`, 교차 참조·커버리지 검증기는 `scripts/validate-sot.mjs`.
+- 두 SOT의 변경·영향 비교는 `scripts/diff-sot.mjs` (`--json` 지원).
 - IA와 기능명세서는 refs로 연결된 별개 축이다. flow는 실제 이동 경로로 채운다.

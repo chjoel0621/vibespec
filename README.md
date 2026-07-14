@@ -68,6 +68,8 @@ Start a new Codex task after installing or updating so the plugin skills are loa
 
 Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. Open it and all five views appear immediately — edit, save, and load right there.
 
+**Updating an existing plan:** attach your `*.sot.json` with a request like "rename F3 and add an acceptance criterion." The skill applies a minimal edit — every existing id stays stable — then validates the result and reports exactly what changed, what it touches (screens, transitions, KPIs), and which sections are untouched byte-for-byte.
+
 ### If the skill doesn't auto-trigger (invoke it manually)
 
 The skill fires automatically on natural-language requests, but if it doesn't, you can call it directly.

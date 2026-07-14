@@ -71,6 +71,17 @@ function flattenPages(sot) {
 }
 
 const transitionKey = t => `${t.from}→${t.to}`;
+const transitionTrigger = t => (t.ref !== undefined ? `ref:${t.ref}` : t.label !== undefined ? `label:${t.label}` : "무트리거");
+const groupTransitions = (list = []) => {
+  const map = new Map();
+  for (const t of list) {
+    if (!t || typeof t !== "object") continue;
+    const key = transitionKey(t);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(t);
+  }
+  return map;
+};
 
 export function diffSot(before, after) {
   const changes = [];
@@ -149,11 +160,25 @@ export function diffSot(before, after) {
   if (!same(scalar(before.flow?.start), scalar(after.flow?.start))) {
     record(changes, "flow.start", "modified", before.flow?.start, after.flow?.start);
   }
-  const trB = byKey(before.flow?.transitions, transitionKey), trA = byKey(after.flow?.transitions, transitionKey);
-  for (const [key, t] of trA) if (!trB.has(key)) record(changes, `flow.${key}`, "added", undefined, t);
-  for (const [key, t] of trB) {
-    if (!trA.has(key)) record(changes, `flow.${key}`, "removed", t, undefined);
-    else if (!same(t, trA.get(key))) record(changes, `flow.${key}`, "modified", t, trA.get(key));
+  // Parallel transitions (same from→to, different trigger) are legal per the
+  // contract, so from→to alone is NOT an identity. Diff as a multiset per
+  // from→to group: the 1-vs-1 case stays a friendly "modified"; anything else
+  // matches exact-equal pairs and reports the rest as added/removed,
+  // disambiguated by trigger in the path.
+  const grpB = groupTransitions(before.flow?.transitions), grpA = groupTransitions(after.flow?.transitions);
+  for (const key of new Set([...grpB.keys(), ...grpA.keys()])) {
+    const b = grpB.get(key) ?? [], a = grpA.get(key) ?? [];
+    if (b.length === 1 && a.length === 1) {
+      if (!same(b[0], a[0])) record(changes, `flow.${key}`, "modified", b[0], a[0]);
+      continue;
+    }
+    const remaining = [...a];
+    for (const t of b) {
+      const match = remaining.findIndex(x => same(x, t));
+      if (match >= 0) remaining.splice(match, 1);
+      else record(changes, `flow.${key}[${transitionTrigger(t)}]`, "removed", t, undefined);
+    }
+    for (const t of remaining) record(changes, `flow.${key}[${transitionTrigger(t)}]`, "added", undefined, t);
   }
 
   const removedIds = changes.filter(c => c.type === "removed" && /^[RFSP][0-9]/.test(c.path)).map(c => c.path);
@@ -203,6 +228,17 @@ export function impactFor(entityIds, sot) {
   return report;
 }
 
+function mergeImpact(primary, secondary) {
+  const merged = {};
+  for (const id of new Set([...Object.keys(primary), ...Object.keys(secondary)])) {
+    merged[id] = Object.fromEntries(["pages", "transitions", "kpis", "scenarios"].map(key => [
+      key,
+      [...new Set([...(primary[id]?.[key] ?? []), ...(secondary[id]?.[key] ?? [])])]
+    ]));
+  }
+  return merged;
+}
+
 export function diffReport(before, after) {
   const { changes, removedIds } = diffSot(before, after);
   const changedEntities = [...new Set(changes.map(c => c.path.split(".")[0].split(":")[0]).filter(p => /^[RFP][0-9]/.test(p)))];
@@ -210,7 +246,10 @@ export function diffReport(before, after) {
     changes,
     removedIds,
     unchanged: unchangedSections(before, after),
-    impact: impactFor(changedEntities, after),
+    // Impact must consider BOTH documents: a deleted feature's connections
+    // exist only in `before` (the update contract says to clean its refs),
+    // while an added feature's connections exist only in `after`.
+    impact: mergeImpact(impactFor(changedEntities, before), impactFor(changedEntities, after)),
     digest: { before: sotDigest(before), after: sotDigest(after) }
   };
 }

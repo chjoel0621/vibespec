@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Minimal VibeSpec",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "A minimal valid VibeSpec fixture",
+    "goal": "Validate generated SOT files before delivery",
+    "whyNow": "Broken references are expensive to diagnose after rendering",
+    "category": "Developer tool",
+    "platforms": ["Web"],
+    "problem": "Invalid generated data can produce incomplete views",
+    "solution": "Validate structure and cross-references deterministically",
+    "alternatives": "Manual inspection",
+    "differentiator": "Checks VibeSpec-specific semantic integrity",
+    "targets": [{ "name": "Planner", "role": "Author", "needs": "Reliable output", "pain": "Silent rendering failures" }],
+    "scenarios": [{ "text": "The author opens the start page and completes the action", "start": "P1" }],
+    "northStar": "Valid SOT delivery rate",
+    "kpis": [{ "name": "Validation pass rate", "target": "100%", "baseline": "0%", "method": "CLI result", "refs": ["F1"] }],
+    "inScope": ["SOT validation"],
+    "nonGoals": ["Runtime collaboration"],
+    "assumptions": ["Node.js is available"],
+    "risks": ["Schema and viewer may drift"],
+    "openQuestions": [],
+    "constraints": ["No external dependencies"]
+  },
+  "requirements": [{
+    "id": "R1", "title": "Validate SOT", "desc": "Reject invalid data", "status": "done", "priority": "high",
+    "acceptance": [{ "text": "Invalid references are rejected", "done": true }],
+    "features": [{
+      "id": "F1", "title": "Run validation", "desc": "Validate a SOT JSON file", "status": "done", "priority": "high",
+      "acceptance": [{ "text": "The valid fixture passes", "done": true }],
+      "specs": [{ "title": "Check references", "desc": "Resolve feature and page refs", "acceptance": [] }]
+    }]
+  }],
+  "ia": { "sections": [{
+    "id": "S1", "title": "Validation", "pages": [{
+      "id": "P1", "title": "Validator", "type": "top", "refs": ["F1"],
+      "children": [{ "id": "P2", "title": "Result", "type": "action", "refs": ["F1:0"], "children": [] }]
+    }]
+  }]},
+  "flow": { "start": "P1", "transitions": [{ "from": "P1", "to": "P2", "ref": "F1:0" }] }
+}

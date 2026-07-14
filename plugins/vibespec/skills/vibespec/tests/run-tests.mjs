@@ -57,6 +57,15 @@ stableStringify(vectorInput);
 assert.equal(JSON.stringify(vectorInput), vectorSnapshot, "stableStringify must not mutate its input");
 console.log("[test] PASS sot-c14n-v1 frozen vector (canonical bytes + digest)");
 
+/* Frozen 1.0 sample: canonical digest measured with the PRE-refactor viewer
+   stableStringify (commit 31059d3 baseline). Proves plain-1.0 documents
+   canonicalize byte-identically under sot-c14n-v1. The sample file is frozen —
+   never edit it; evolving test data belongs in valid-minimal.sot.json. */
+const sample10 = JSON.parse(readFileSync(join(here, "fixtures", "c14n-sample-1.0.sot.json"), "utf8"));
+assert.equal(sotDigest(sample10), "sha256:376e087cc26cb25088c25429a8863ac8ed066308c49c8c08ab5b8e047329d29f",
+  "1.0 sample canonical bytes drifted from the pre-refactor viewer baseline");
+console.log("[test] PASS frozen 1.0 sample matches pre-refactor canonical baseline");
+
 const sourceRoot = join(here, "..", "src", "js");
 const viewerContractSource = ["00-config.js", "05-c14n.js", "20-state.js", "40-io.js"]
   .map(file => readFileSync(join(sourceRoot, file), "utf8"))
@@ -141,6 +150,26 @@ withRemoval.requirements[0].features = [];
 const removalReport = diffReport(clone(valid), withRemoval);
 assert.ok(removalReport.removedIds.includes("F1"), `removed ids must flag F1: ${removalReport.removedIds}`);
 console.log("[test] PASS diff flags removed ids for no-reissue enforcement");
+
+const cleanedRemoval = clone(valid);
+cleanedRemoval.requirements[0].features = [];
+const stripRefs = page => { page.refs = (page.refs ?? []).filter(ref => !ref.startsWith("F1")); (page.children ?? []).forEach(stripRefs); };
+cleanedRemoval.ia.sections.forEach(section => section.pages.forEach(stripRefs));
+cleanedRemoval.flow.transitions = cleanedRemoval.flow.transitions.filter(t => !(t.ref ?? "").startsWith("F1"));
+if (!cleanedRemoval.flow.transitions.length) cleanedRemoval.flow.transitions.push({ from: "P1", to: "P2" });
+cleanedRemoval.prd.kpis.forEach(kpi => { kpi.refs = (kpi.refs ?? []).filter(ref => !ref.startsWith("F1")); });
+const cleanedReport = diffReport(clone(valid), cleanedRemoval);
+assert.ok(cleanedReport.impact.F1, "deleting F1 and cleaning its refs must still report F1 impact (from before)");
+assert.ok(cleanedReport.impact.F1.pages.length > 0, `deleted F1 impact must list formerly-linked pages: ${JSON.stringify(cleanedReport.impact.F1)}`);
+console.log("[test] PASS deletion impact survives reference cleanup (before-side radius)");
+
+const parallelAfter = clone(valid);
+parallelAfter.flow.transitions.push({ from: "P1", to: "P2", ref: "F1" });
+const parallelReport = diffReport(clone(valid), parallelAfter);
+const parallelChanges = parallelReport.changes.filter(c => c.path.startsWith("flow."));
+assert.deepEqual(parallelChanges.map(c => c.type), ["added"], `parallel transition must diff as added, got: ${JSON.stringify(parallelChanges)}`);
+assert.ok(parallelChanges[0].path.includes("ref:F1"), `parallel path must carry the trigger: ${parallelChanges[0].path}`);
+console.log("[test] PASS parallel transitions (same from→to) diff as add/remove, not modified");
 
 const dense = createDenseSot();
 const denseResult = validateSot(dense);

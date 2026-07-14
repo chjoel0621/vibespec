@@ -1,8 +1,12 @@
 /* ---- persistence + history ---- */
 let HISTORY=[], HPTR=-1, restoring=false;
 function snapshot(){ return JSON.stringify(SOT); }
-function saveLocal(){ try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
+// RO guards live here, at the persistence boundary: whatever slips past the UI,
+// a read-only document can neither be stored nor become an undo step — and it
+// can never overwrite the user's own working SOT in localStorage.
+function saveLocal(){ if(RO) return; try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
 function pushHistory(label){
+  if(RO) return;
   const snap=snapshot();
   if(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===snap) return; // no change
   HISTORY = HISTORY.slice(0, HPTR+1);

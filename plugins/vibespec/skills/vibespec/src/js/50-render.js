@@ -24,6 +24,7 @@ function render(){
   else if(VIEW==="tree"){ el.innerHTML = renderTree(); layoutTree(); }
   else if(VIEW==="ia") el.innerHTML = renderIA();
   else { try{ el.innerHTML = renderFlow(); layoutFlow(); }catch(err){ el.innerHTML='<div style="padding:40px;color:#c0392b;font-weight:600">유저플로우 렌더 오류: '+esc(String(err&&err.stack||err))+'</div>'; } }
+  if(RO) roHarden();
 }
 /* --------------------- 기능명세서 (3분할 디렉터리 + 상세) --------------------- */
 function nodeInfo(id){

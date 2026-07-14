@@ -26,7 +26,11 @@ function compositePage(page, scope, refScope) {
   return node;
 }
 
-export function buildProductMap(docs) {
+// opts.embedDocs: carry each scope's source SOT in the payload, so the rendered
+// map can open the document that defines a node. Without it a map shows an
+// increment you have no way to read — a dead end. The HTML map embeds by default;
+// the JSON map does not, so a data consumer is not handed duplicated documents.
+export function buildProductMap(docs, opts = {}) {
   const tree = validateTree(docs);
   if (!tree.valid) return { valid: false, errors: tree.errors, warnings: tree.warnings };
 
@@ -49,7 +53,8 @@ export function buildProductMap(docs) {
   // 1) Seed the composite with the main IA. Index every composite page by
   //    "scope/localId" so graft targets resolve.
   const index = new Map();
-  const scopeInfo = [{ id: "root", title: (root && root.sot.title) || "Main", status: "main" }];
+  const embed = sot => (opts.embedDocs ? { sot: JSON.parse(JSON.stringify(sot)) } : {});
+  const scopeInfo = [{ id: "root", title: (root && root.sot.title) || "Main", status: "main", ...(root ? embed(root.sot) : {}) }];
   const cloneInto = (pages, scope) => (pages || []).map(p => {
     const node = compositePage(p, scope);
     index.set(node.compositeId, node);
@@ -69,7 +74,7 @@ export function buildProductMap(docs) {
 
   for (const d of activeDocs) {
     const meta = d.sot.initiative;
-    scopeInfo.push({ id: meta.id, title: d.sot.title, status: meta.status, path: meta.path });
+    scopeInfo.push({ id: meta.id, title: d.sot.title, status: meta.status, path: meta.path, ...embed(d.sot) });
     // Walk the initiative IA at ANY depth (validate-tree allows a boundary at
     // any depth). A boundary stub is a reference, not a real node: it is not
     // materialized; its children graft under the boundary target. A non-boundary

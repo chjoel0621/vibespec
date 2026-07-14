@@ -60,10 +60,14 @@ document.documentElement.setAttribute("data-probe",JSON.stringify({
 </script>`;
 
 const workspace = mkdtempSync(join(tmpdir(), "vibespec-map-"));
-function probe(payload, name) {
+// body: optional JS returning the probe object; defaults to the map-mode harness.
+function probe(payload, name, body) {
+  const script = body
+    ? `<script>document.documentElement.setAttribute("data-probe",JSON.stringify((()=>{${body}})()));</script>`
+    : harness;
   const embedded = JSON.stringify(payload).replace(/</g, "\\u003c");
   const page = join(workspace, `${name}.html`);
-  writeFileSync(page, viewerHtml.replace(EMPTY_TAG, EMPTY_TAG.replace("></script>", `>${embedded}</script>`)) + harness);
+  writeFileSync(page, viewerHtml.replace(EMPTY_TAG, EMPTY_TAG.replace("></script>", `>${embedded}</script>`)) + script);
   const result = spawnSync(browserPath, [
     "--headless=new", "--allow-file-access-from-files", "--no-sandbox", "--disable-gpu",
     "--no-first-run", "--no-default-browser-check", `--user-data-dir=${join(workspace, "profile")}`,
@@ -100,6 +104,41 @@ try {
   assert.deepEqual(q.legendLinks, ["../main/", "../payment/"], "the legend links to each scope's document");
   assert.deepEqual(q.scopes, ["Shop", "Payment"], "linked legend still names the scopes");
   console.log("[browser] PASS a linked map opens each scope's own document (nodes + legend)");
+
+  // With embedded docs the map is navigable on its own (one self-contained file):
+  // clicking a node opens that scope's document, READ-ONLY — no editable field, no
+  // enabled control, and nothing may reach localStorage (shared with the user's
+  // own working SOT) or the undo history.
+  const withDocs = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: payment }], { embedDocs: true });
+  assert.ok(withDocs.scopes.every(s => s.sot), "embedDocs must carry every scope's SOT");
+  const d = probe(withDocs, "map-docs", `
+    localStorage.setItem(LS_KEY, "SENTINEL");
+    document.querySelector('[data-open="payment"]').click();
+    const stage = document.getElementById("stage");
+    const editable = [...stage.querySelectorAll('[contenteditable="true"]')].length;
+    const enabled = [...stage.querySelectorAll("button,input,select,textarea")]
+      .filter(e => !e.disabled && !e.matches(RO_ALLOW) && !e.closest("[data-ro-ok]")).length;
+    SOT.title = "HACKED"; pushHistory("hack"); saveLocal();
+    return {
+      openedTitle: SOT.title === "HACKED" ? "(in-memory only)" : SOT.title,
+      docView: !!stage.querySelector(".map-back"),
+      docPrd: stage.className.includes("prd"),
+      editableFields: editable,
+      enabledControls: enabled,
+      historyLen: HISTORY.length,
+      localStorageIntact: localStorage.getItem(LS_KEY) === "SENTINEL",
+      backToMap: (() => { stage.querySelector("[data-back-to-map]").click();
+        return !!document.querySelector(".map-head"); })()
+    };
+  `);
+  assert.equal(d.docView, true, "clicking a node must open that scope's document");
+  assert.equal(d.docPrd, true, "the opened document renders its PRD view");
+  assert.equal(d.editableFields, 0, "an opened document must have no editable field");
+  assert.equal(d.enabledControls, 0, "an opened document must have no enabled editing control");
+  assert.equal(d.historyLen, 0, "a read-only document must not create undo history");
+  assert.equal(d.localStorageIntact, true, "a map must never write over the user's own working SOT");
+  assert.equal(d.backToMap, true, "the back control must return to the map");
+  console.log("[browser] PASS an embedded map opens its documents read-only and never persists");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

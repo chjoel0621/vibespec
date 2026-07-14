@@ -68,11 +68,18 @@ async function main(argv) {
     try { docs.push({ name: file, sot: JSON.parse(readFileSync(file, "utf8")) }); }
     catch (cause) { console.error(`[FAIL] ${file}: ${cause.message}`); process.exitCode = 1; return; }
   }
-  const map = buildProductMap(docs);
+  // The HTML map embeds each scope's document so a node can be opened from the
+  // map itself (one self-contained file). --link points at separate pages instead
+  // (a deployed site); --embed-docs forces embedding into --json output too.
+  const embedDocs = argv.includes("--embed-docs") || (!!htmlOut && !Object.keys(links).length);
+  const map = buildProductMap(docs, { embedDocs });
   if (map.valid && map.scopes) map.scopes.forEach(s => { if (links[s.id]) s.href = links[s.id]; });
   if (json) console.log(JSON.stringify(map, null, 2));
   else printMap(map);
-  if (map.valid && htmlOut) { writeMapHtml(map, htmlOut); if (!json) console.log(`\n[map] 읽기전용 지도 HTML: ${htmlOut}`); }
+  if (map.valid && htmlOut) {
+    writeMapHtml(map, htmlOut);
+    if (!json) console.log(`\n[map] 읽기전용 지도 HTML: ${htmlOut}${embedDocs ? ` (${map.scopes.length}개 문서 내장 — 노드를 눌러 원문 열람)` : ""}`);
+  }
   if (!map.valid) process.exitCode = 1;
 }
 

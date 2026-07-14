@@ -55,10 +55,13 @@
   .map-jump:hover{background:#fff}
   .map-jump b{color:var(--accent)}
   .snode.map-flash{box-shadow:0 0 0 3px var(--accent);transition:box-shadow .2s}
-  a.snode.map-linked{text-decoration:none;color:inherit;cursor:pointer}
-  a.snode.map-linked:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-line)}
-  .map-scope-link{font-weight:700;color:var(--accent);text-decoration:none}
+  .snode.map-linked{text-decoration:none;color:inherit;cursor:pointer}
+  .snode.map-linked:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-line)}
+  .snode.map-linked:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .map-scope-link{font-weight:700;color:var(--accent);text-decoration:none;cursor:pointer}
   .map-scope-link:hover{text-decoration:underline}
+  .map-back{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--sub)}
+  .map-back .topbtn{flex:0 0 auto}
   /* demo-only nav (injected by the Pages deploy, not part of the product) */
   .demo-nav{position:fixed;right:14px;bottom:14px;z-index:80;display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:var(--shadow);font-size:12.5px}
   .demo-nav a{color:var(--sub);text-decoration:none;padding:3px 9px;border-radius:999px;font-weight:600}

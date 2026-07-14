@@ -101,3 +101,25 @@ const plain = run([treeDir, "--json"]);
 assert.equal(plain.status, 0, `plain run must succeed: ${plain.stderr}`);
 assert.ok(JSON.parse(plain.stdout).scopes.every(s => !("href" in s)), "without --link no scope carries an href");
 console.log("[map] PASS --link gives each scope a link without being read as an input path");
+
+// embedDocs carries each scope's source SOT so the rendered map can open the
+// document behind a node. Off by default: a --json consumer must not be handed
+// duplicated documents.
+const bare = buildProductMap([doc("main", main), doc("pay", payment)]);
+assert.ok(bare.scopes.every(s => !("sot" in s)), "buildProductMap must not embed documents unless asked");
+const embedded = buildProductMap([doc("main", main), doc("pay", payment)], { embedDocs: true });
+assert.deepEqual(embedded.scopes.map(s => s.sot.title), [main.title, payment.title], "each scope carries its own document");
+assert.equal(embedded.scopes[1].sot.initiative.id, "payment", "the embedded initiative is the source doc, not the composite");
+embedded.scopes[0].sot.title = "MUTATED";
+assert.notEqual(main.title, "MUTATED", "embedding must deep-copy, never alias the caller's doc");
+console.log("[map] PASS embedDocs carries each scope's source document (opt-in, deep-copied)");
+
+// The HTML map embeds by default (so it is navigable standalone); --link means the
+// scopes live at their own URLs, so embedding would be dead weight.
+const htmlOut = join(here, "..", ".build", "map-embed-probe.html");
+assert.equal(run([treeDir, "--html", htmlOut]).status, 0, "--html run must succeed");
+assert.ok(readFileSync(htmlOut, "utf8").includes('"kind":"vibespec-product-map"'), "the html map carries its payload");
+assert.ok(/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "the html map embeds its scopes' documents by default");
+assert.equal(run([treeDir, "--html", htmlOut, "--link", "root=/"]).status, 0, "--link run must succeed");
+assert.ok(!/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "--link points at real pages, so the html map does not embed docs");
+console.log("[map] PASS the html map embeds documents by default and defers to --link when given");

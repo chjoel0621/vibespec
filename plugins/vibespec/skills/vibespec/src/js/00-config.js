@@ -10,3 +10,11 @@ const INIT_STATUS = {proposed:{t:"제안됨",e:"Proposed"}, approved:{t:"승인�
 // Schema version is derived from the document (initiative meta ⇒ 1.1),
 // never hardcoded — saving must not downgrade a 1.1 initiative to 1.0.
 function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }
+// Read-only mode (product map and the documents opened from it). A map is a
+// snapshot: edits belong in the source files, and a map must never write to
+// localStorage, which is shared with the user's own working document.
+let RO = false;
+// Deny-by-default: in RO every control is disabled unless it is navigation.
+// A new editing control added later is therefore read-only until someone
+// deliberately lists it here.
+const RO_ALLOW = ".tab,#langBtn,[data-zoom],[data-expand],[data-collapse],[data-ro-ok]";

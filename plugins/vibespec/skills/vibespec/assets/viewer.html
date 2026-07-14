@@ -59,10 +59,13 @@
   .map-jump:hover{background:#fff}
   .map-jump b{color:var(--accent)}
   .snode.map-flash{box-shadow:0 0 0 3px var(--accent);transition:box-shadow .2s}
-  a.snode.map-linked{text-decoration:none;color:inherit;cursor:pointer}
-  a.snode.map-linked:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-line)}
-  .map-scope-link{font-weight:700;color:var(--accent);text-decoration:none}
+  .snode.map-linked{text-decoration:none;color:inherit;cursor:pointer}
+  .snode.map-linked:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-line)}
+  .snode.map-linked:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .map-scope-link{font-weight:700;color:var(--accent);text-decoration:none;cursor:pointer}
   .map-scope-link:hover{text-decoration:underline}
+  .map-back{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--sub)}
+  .map-back .topbtn{flex:0 0 auto}
   /* demo-only nav (injected by the Pages deploy, not part of the product) */
   .demo-nav{position:fixed;right:14px;bottom:14px;z-index:80;display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:var(--shadow);font-size:12.5px}
   .demo-nav a{color:var(--sub);text-decoration:none;padding:3px 9px;border-radius:999px;font-weight:600}
@@ -466,6 +469,14 @@ const INIT_STATUS = {proposed:{t:"제안됨",e:"Proposed"}, approved:{t:"승인�
 // Schema version is derived from the document (initiative meta ⇒ 1.1),
 // never hardcoded — saving must not downgrade a 1.1 initiative to 1.0.
 function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }
+// Read-only mode (product map and the documents opened from it). A map is a
+// snapshot: edits belong in the source files, and a map must never write to
+// localStorage, which is shared with the user's own working document.
+let RO = false;
+// Deny-by-default: in RO every control is disabled unless it is navigation.
+// A new editing control added later is therefore read-only until someone
+// deliberately lists it here.
+const RO_ALLOW = ".tab,#langBtn,[data-zoom],[data-expand],[data-collapse],[data-ro-ok]";
 
 
 /* ==== 05-c14n.js ==== */
@@ -703,8 +714,12 @@ function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x
 /* ---- persistence + history ---- */
 let HISTORY=[], HPTR=-1, restoring=false;
 function snapshot(){ return JSON.stringify(SOT); }
-function saveLocal(){ try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
+// RO guards live here, at the persistence boundary: whatever slips past the UI,
+// a read-only document can neither be stored nor become an undo step — and it
+// can never overwrite the user's own working SOT in localStorage.
+function saveLocal(){ if(RO) return; try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
 function pushHistory(label){
+  if(RO) return;
   const snap=snapshot();
   if(HPTR>=0 && HISTORY[HPTR] && HISTORY[HPTR].sot===snap) return; // no change
   HISTORY = HISTORY.slice(0, HPTR+1);
@@ -768,6 +783,7 @@ function render(){
   else if(VIEW==="tree"){ el.innerHTML = renderTree(); layoutTree(); }
   else if(VIEW==="ia") el.innerHTML = renderIA();
   else { try{ el.innerHTML = renderFlow(); layoutFlow(); }catch(err){ el.innerHTML='<div style="padding:40px;color:#c0392b;font-weight:600">유저플로우 렌더 오류: '+esc(String(err&&err.stack||err))+'</div>'; } }
+  if(RO) roHarden();
 }
 /* --------------------- 기능명세서 (3분할 디렉터리 + 상세) --------------------- */
 function nodeInfo(id){
@@ -1420,26 +1436,34 @@ function renderFlowEditPanel(){
 /* ==== 87-map.js ==== */
 /* ---- read-only product map (v2): renders a composed main + active initiatives
    payload (kind: "vibespec-product-map"). Dormant for normal SOT documents. ---- */
-let MAP = null;
+let MAP = null;      // the composed map payload
+let MAPDOC = null;   // scope id of the source document currently open from the map
 function mapStatusLabel(s){ const m=INIT_STATUS[s]; return m?t(m.t,m.e):s; }
-// A scope may carry an href to its own document; when it does, the map lets you
-// open it (otherwise the map is a dead end — you can see the increment but not
-// reach the document that defines it).
-function mapScopeHref(id){ const s=((MAP&&MAP.scopes)||[]).find(x=>x.id===id); return s&&s.href ? s.href : null; }
+function mapScope(id){ return ((MAP&&MAP.scopes)||[]).find(x=>x.id===id) || null; }
+// A map that only shows an increment is a dead end. Every node offers a way into
+// the document that defines it: an embedded copy of that scope's SOT (the normal
+// case — the map is one self-contained file), or an href when the map was built
+// for a site where each scope is its own page (--link).
+function mapScopeHref(id){ const s=mapScope(id); return s&&s.href ? s.href : null; }
+function mapScopeDoc(id){ const s=mapScope(id); return s&&s.sot ? s.sot : null; }
 function renderMapNode(p){
   const kids = (p.children&&p.children.length)?`<ul>${p.children.map(renderMapNode).join("")}</ul>`:"";
   const cls = p.scope==="root" ? (p.type==="top"?"top":(p.type==="action"?"action":"page")) : "map-init";
   const tag = p.scope!=="root" ? ` <span class="map-scopetag">+${esc(p.scope)}</span>` : "";
   const href = mapScopeHref(p.scope);
+  const open = t("이 화면을 정의한 문서 열기","Open the document that defines this screen");
   const body = `<span class="stype">${esc(p.compositeId)}</span>
       <span class="stitle">${esc(p.title)}${tag}</span>`;
   const node = href
-    ? `<a class="snode ${cls} map-linked" href="${esc(href)}" title="${t("이 문서 열기","Open this document")}">${body}</a>`
-    : `<div class="snode ${cls}">${body}</div>`;
+    ? `<a class="snode ${cls} map-linked" href="${esc(href)}" title="${open}">${body}</a>`
+    : mapScopeDoc(p.scope)
+      ? `<div class="snode ${cls} map-linked" role="button" tabindex="0" data-open="${esc(p.scope)}" title="${open}">${body}</div>`
+      : `<div class="snode ${cls}">${body}</div>`;
   return `<li>${node}${kids}</li>`;
 }
 function renderMap(){
   const M=MAP; if(!M) return;
+  MAPDOC=null;
   // Hide the editing chrome — a map is a read-only overview, not an editor.
   ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
   document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
@@ -1448,7 +1472,11 @@ function renderMap(){
   const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
     const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
-    const name = s.href ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>` : `<b>${esc(s.title||s.id)}</b>`;
+    const name = s.href
+      ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>`
+      : s.sot
+        ? `<span class="map-scope-link" role="button" tabindex="0" data-open="${esc(s.id)}">${esc(s.title||s.id)}</span>`
+        : `<b>${esc(s.title||s.id)}</b>`;
     return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span>${name} <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;
   }).join("");
   const excluded = (M.excluded&&M.excluded.length) ? `<div class="map-excluded">${t("제외","Excluded")}: ${M.excluded.map(e=>`${esc(e.id)} (${esc(e.reason)})`).join(", ")}</div>` : "";
@@ -1476,9 +1504,53 @@ function renderMap(){
   // The map exists to show what initiatives add — it must not open scrolled away
   // from them (a wide composite pushes the increment off-screen).
   el.querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>mapJumpTo(b.dataset.jump)));
+  el.querySelectorAll("[data-open]").forEach(n=>{
+    n.addEventListener("click",()=>openMapDoc(n.dataset.open));
+    n.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openMapDoc(n.dataset.open); } });
+  });
   const first=el.querySelector(".snode.map-init");
   if(first&&first.scrollIntoView) try{ first.scrollIntoView({block:"center",inline:"center"}); }catch(e){}
 }
+/* ---- opening a source document from the map (read-only) ---- */
+function openMapDoc(scopeId){
+  const s=mapScope(scopeId); if(!s||!s.sot) return;
+  MAPDOC=scopeId;
+  SOT=normalize(JSON.parse(JSON.stringify(s.sot)));
+  VIEW="prd";
+  document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="");
+  const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title||scopeId;
+  render();
+  window.scrollTo(0,0);
+}
+// Deny-by-default read-only pass. Runs after every render in RO mode (and on any
+// later DOM change, e.g. the detail panel), so an editing control that nobody
+// remembered to disable is disabled anyway.
+function roHarden(){
+  const back=document.getElementById("stage");
+  if(!back) return;
+  if(MAPDOC && !back.querySelector(".map-back")){
+    const s=mapScope(MAPDOC)||{};
+    const bar=document.createElement("div");
+    bar.className="map-back";
+    bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("제품 지도","Product map")}</button>
+      <span>${esc(s.title||MAPDOC)} · ${t("읽기 전용 스냅샷 — 편집은 원본 파일에서","read-only snapshot — edit the source file")}</span>`;
+    back.insertBefore(bar, back.firstChild);
+    bar.querySelector("[data-back-to-map]").addEventListener("click",renderMap);
+  }
+  document.querySelectorAll('#stage [contenteditable="true"], #stage [contenteditable=""]')
+    .forEach(e=>e.setAttribute("contenteditable","false"));
+  document.querySelectorAll("#stage button, #stage input, #stage select, #stage textarea")
+    .forEach(e=>{ if(!e.matches(RO_ALLOW) && !e.closest("[data-ro-ok]")) e.disabled=true; });
+}
+// The stage is re-rendered by many paths (detail panel, flow editor), so watch it
+// rather than trusting every call site to re-harden.
+function roWatch(){
+  const stage=document.getElementById("stage");
+  if(!stage || !window.MutationObserver) return;
+  new MutationObserver(()=>{ if(RO) roHarden(); }).observe(stage,{childList:true,subtree:true});
+}
+// Language toggle and other re-renders must keep you where you are.
+function rerender(){ if(MAP && !MAPDOC) renderMap(); else render(); }
 function mapJumpTo(scopeId){
   const nodes=[...document.querySelectorAll(".snode.map-init")];
   const target=nodes.find(n=>((n.querySelector(".map-scopetag")||{}).textContent||"")===`+${scopeId}`)||nodes[0];
@@ -1624,7 +1696,7 @@ document.getElementById("fileInput").addEventListener("change",e=>{
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
-try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map") MAP=payload; else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
+try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
 if(!MAP && !_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
 if(!MAP){
   if(!SOT.title) SOT.title="제품";
@@ -1640,8 +1712,9 @@ if(!MAP){
 // between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
 // embedded SOT) falls back to the remembered preference.
 try{ LANG = MAP ? ((MAP.lang) || "ko") : (_loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko")); }catch(e){}
-document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); MAP?renderMap():render(); });
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); rerender(); });
 applyStaticI18n();
 MAP?renderMap():render();
+roWatch();
 
 </script>

@@ -5,3 +5,6 @@ AGENTS.md
 build/
 .build/
 node_modules/
+
+# 로컬 기획·작업 문서 (git 비연동 — 로드맵 논의, 초안, 내부 메모)
+planning/

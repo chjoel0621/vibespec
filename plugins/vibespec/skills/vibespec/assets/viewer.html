@@ -790,46 +790,45 @@ function renderKpis(){
   return `<div class="kgrid">${rows}</div><button class="addbtn sm" data-kpi-add>${t('＋ KPI','＋ KPI')}</button>`;
 }
 function renderPRD(){
-  return `<div class="prd-doc">
-    <h1><span class="field" contenteditable data-prod>${esc(SOT.title||"제품")}</span></h1>
-    <div class="kv">Product Requirements Document</div>
-
-    <section><h2>${t('1. 개요','1. Overview')}</h2>
-      <div class="prd-row"><span class="prd-k">${t('한 줄 정의','One-liner')}</span>${prdField("oneLiner")}</div>
+  // Role-gated (§7). An initiative hides product-identity fields (category,
+  // platforms, alternatives, differentiator, northStar — the parent owns them)
+  // and reorders to foreground Scope + Problem. Sections are numbered by their
+  // position in the chosen order.
+  const init = !!(SOT && SOT.initiative);
+  const sec = {};
+  sec.overview = `<div class="prd-row"><span class="prd-k">${t('한 줄 정의','One-liner')}</span>${prdField("oneLiner")}</div>
       <div class="prd-row"><span class="prd-k">${t('성과 목표','Goal (outcome)')}</span>${prdField("goal")}</div>
-      <div class="prd-row"><span class="prd-k">${t('왜 지금','Why now')}</span>${prdField("whyNow")}</div>
+      <div class="prd-row"><span class="prd-k">${t('왜 지금','Why now')}</span>${prdField("whyNow")}</div>${init?'':`
       <div class="prd-row"><span class="prd-k">${t('카테고리','Category')}</span>${prdField("category")}</div>
-      <div class="prd-row"><span class="prd-k">${t('사용 환경','Platforms')}</span>${prdChips("platforms")}</div>
-    </section>
-
-    <section><h2>${t('2. 문제 · 가치','2. Problem · Value')}</h2>
-      <div class="prd-row"><span class="prd-k">${t('사용자 문제','User problem')}</span>${prdField("problem")}</div>
-      <div class="prd-row"><span class="prd-k">${t('해결 방식','Solution')}</span>${prdField("solution")}</div>
+      <div class="prd-row"><span class="prd-k">${t('사용 환경','Platforms')}</span>${prdChips("platforms")}</div>`}`;
+  sec.problem = `<div class="prd-row"><span class="prd-k">${t('사용자 문제','User problem')}</span>${prdField("problem")}</div>
+      <div class="prd-row"><span class="prd-k">${t('해결 방식','Solution')}</span>${prdField("solution")}</div>${init?'':`
       <div class="prd-row"><span class="prd-k">${t('대안 · 경쟁','Alternatives')}</span>${prdField("alternatives")}</div>
-      <div class="prd-row"><span class="prd-k">${t('차별점','Differentiator')}</span>${prdField("differentiator")}</div>
-    </section>
-
-    <section><h2>${t('3. 사용자','3. Users')}</h2>
-      <h3 class="prd-sub">${t('타겟 · 페르소나','Targets · Personas')}</h3>${renderPersonas()}
-      <h3 class="prd-sub">${t('유저 스토리 · 시나리오','User stories · Scenarios')} <span class="prd-hint">${t('(시작화면을 연결하면 유저플로우로 이동)','(link a start screen to jump to the user flow)')}</span></h3>${renderScenarios()}
-    </section>
-
-    <section><h2>${t('4. 성공 지표','4. Success Metrics')}</h2>
-      <div class="prd-row"><span class="prd-k">North Star</span>${prdField("northStar")}</div>
-      <h3 class="prd-sub">${t('핵심 KPI','Key KPIs')} <span class="prd-hint">${t('(지표·목표치·기준·측정 + 관련 기능 연결)','(metric · target · baseline · measure + feature links)')}</span></h3>${renderKpis()}
-    </section>
-
-    <section><h2>${t('5. 범위','5. Scope')}</h2>
-      <h3 class="prd-sub">${t('포함 범위 · MVP','In scope · MVP')}</h3>${prdList("inScope")}
-      <h3 class="prd-sub">${t('비목표 (범위 밖)','Non-goals (out of scope)')}</h3>${prdList("nonGoals")}
-    </section>
-
-    <section><h2>${t('6. 리스크 · 가정','6. Risks · Assumptions')}</h2>
-      <h3 class="prd-sub">${t('가정','Assumptions')}</h3>${prdList("assumptions")}
+      <div class="prd-row"><span class="prd-k">${t('차별점','Differentiator')}</span>${prdField("differentiator")}</div>`}`;
+  sec.users = `<h3 class="prd-sub">${t('타겟 · 페르소나','Targets · Personas')}</h3>${renderPersonas()}
+      <h3 class="prd-sub">${t('유저 스토리 · 시나리오','User stories · Scenarios')} <span class="prd-hint">${t('(시작화면을 연결하면 유저플로우로 이동)','(link a start screen to jump to the user flow)')}</span></h3>${renderScenarios()}`;
+  sec.metrics = `${init?'':`<div class="prd-row"><span class="prd-k">North Star</span>${prdField("northStar")}</div>
+      `}<h3 class="prd-sub">${t('핵심 KPI','Key KPIs')} <span class="prd-hint">${t('(지표·목표치·기준·측정 + 관련 기능 연결)','(metric · target · baseline · measure + feature links)')}</span></h3>${renderKpis()}`;
+  sec.scope = `<h3 class="prd-sub">${t('포함 범위 · MVP','In scope · MVP')}</h3>${prdList("inScope")}
+      <h3 class="prd-sub">${t('비목표 (범위 밖)','Non-goals (out of scope)')}</h3>${prdList("nonGoals")}`;
+  sec.risks = `<h3 class="prd-sub">${t('가정','Assumptions')}</h3>${prdList("assumptions")}
       <h3 class="prd-sub">${t('리스크','Risks')}</h3>${prdList("risks")}
       <h3 class="prd-sub">${t('미해결 질문','Open questions')}</h3>${prdList("openQuestions")}
-      <h3 class="prd-sub">${t('제약 · 의존성','Constraints · Dependencies')}</h3>${prdList("constraints")}
-    </section>
+      <h3 class="prd-sub">${t('제약 · 의존성','Constraints · Dependencies')}</h3>${prdList("constraints")}`;
+  const title = {
+    overview:t('개요','Overview'), problem:t('문제 · 가치','Problem · Value'), users:t('사용자','Users'),
+    metrics:t('성공 지표','Success Metrics'), scope:t('범위','Scope'), risks:t('리스크 · 가정','Risks · Assumptions')
+  };
+  const order = init
+    ? ["scope","problem","overview","users","metrics","risks"]
+    : ["overview","problem","users","metrics","scope","risks"];
+  const doctype = init ? t('이니셔티브 명세 (증분)','Initiative specification (increment)') : "Product Requirements Document";
+  const body = order.map((k,i)=>`<section><h2>${i+1}. ${title[k]}</h2>\n      ${sec[k]}\n    </section>`).join("\n\n    ");
+  return `<div class="prd-doc">
+    <h1><span class="field" contenteditable data-prod>${esc(SOT.title||"제품")}</span></h1>
+    <div class="kv">${doctype}</div>
+
+    ${body}
   </div>`;
 }
 

@@ -88,3 +88,25 @@ const [bandScroll, bandClient, statusRight, innerW] = probe(longSlugs, OVERFLOW_
 assert.ok(bandScroll <= bandClient, `long slugs must truncate, not overflow the band: scrollWidth ${bandScroll} > clientWidth ${bandClient}`);
 assert.ok(statusRight <= innerW, `status must stay on-screen at 430px: right ${statusRight} > innerWidth ${innerW}`);
 console.log("[browser] PASS initiative band truncates long slugs without overflow at 430px");
+
+// PRD role gating (§7): an initiative hides product-identity fields and
+// foregrounds Scope; a plain document keeps the full profile and order.
+const PRD_HARNESS = `<script>
+const keys=[...document.querySelectorAll(".prd-k")].map(e=>e.textContent);
+const has=re=>keys.some(k=>re.test(k))?"1":"0";
+document.documentElement.setAttribute("data-probe",[
+  (document.querySelectorAll(".prd-doc h2")[0]||{}).textContent||"",
+  has(/카테고리|Category/),has(/사용 환경|Platforms/),has(/대안|Alternatives/),has(/차별점|Differentiator/),has(/North Star/),
+  document.querySelector(".kv").textContent
+].join("~"));
+</script>`;
+const [initFirst, iCat, iPlat, iAlt, iDiff, iNorth, initDoctype] = probe(initiative, PRD_HARNESS).split("~");
+assert.match(initFirst, /1\. (Scope|범위)/, "initiative PRD must lead with Scope");
+assert.equal([iCat, iPlat, iAlt, iDiff, iNorth].join(""), "00000", "initiative must hide every product-identity field");
+assert.match(initDoctype, /Initiative|이니셔티브/, "initiative doctype label");
+console.log("[browser] PASS initiative PRD hides product-identity fields and leads with Scope");
+
+const [plainFirst, pCat, pPlat, pAlt, pDiff, pNorth] = probe(plain, PRD_HARNESS).split("~");
+assert.match(plainFirst, /1\. (Overview|개요)/, "1.0 PRD keeps Overview first");
+assert.equal([pCat, pPlat, pAlt, pDiff, pNorth].join(""), "11111", "1.0 must keep every product-identity field");
+console.log("[browser] PASS plain 1.0 PRD keeps the full profile and order");

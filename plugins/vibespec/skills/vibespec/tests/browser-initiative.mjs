@@ -30,8 +30,9 @@ const viewerHtml = readFileSync(viewer, "utf8");
 const EMPTY_TAG = '<script type="application/json" id="embedded-sot"></script>';
 
 // Reads document state after boot via a probe appended to the page. Returns the
-// parsed `data-probe` payload the harness stamps on <html>.
-function probe(sot, harness) {
+// parsed `data-probe` payload the harness stamps on <html>. `windowSize` sets
+// the headless viewport (e.g. "430,844") for responsive checks.
+function probe(sot, harness, windowSize) {
   const workspace = mkdtempSync(join(tmpdir(), "vibespec-init-"));
   try {
     const embedded = JSON.stringify(sot).replace(/</g, "\\u003c");
@@ -40,6 +41,7 @@ function probe(sot, harness) {
     const result = spawnSync(browserPath, [
       "--headless=new", "--allow-file-access-from-files", "--no-sandbox", "--disable-gpu",
       "--no-first-run", "--no-default-browser-check", `--user-data-dir=${join(workspace, "profile")}`,
+      ...(windowSize ? [`--window-size=${windowSize}`] : []),
       "--virtual-time-budget=1500", "--dump-dom", pathToFileURL(page).href
     ], { encoding: "utf8", timeout: 20000, maxBuffer: 8 * 1024 * 1024 });
     assert.equal(result.status, 0, `headless browser failed: ${result.stderr || result.error || "unknown"}`);
@@ -71,3 +73,18 @@ console.log("[browser] PASS initiative band shows id, parent, and status for a 1
 const plainState = probe(plain, BAND_HARNESS).split("|")[0];
 assert.equal(plainState, "hidden", "a plain 1.0 document must hide the initiative band");
 console.log("[browser] PASS initiative band is hidden for a plain 1.0 document");
+
+// Unbounded slugs must not overflow the band at mobile width: name/parent
+// truncate (band scrollWidth == clientWidth) and the status stays on-screen.
+const longSlugs = JSON.parse(JSON.stringify(initiative));
+longSlugs.initiative.productId = "acme-shopping-platform-north-america-region";
+longSlugs.initiative.id = "payment-gateway-with-multi-currency-and-fraud-checks";
+const OVERFLOW_HARNESS = `<script>
+const b=document.getElementById("initBand");
+const st=document.getElementById("ibStatus").getBoundingClientRect();
+document.documentElement.setAttribute("data-probe",[b.scrollWidth,b.clientWidth,Math.round(st.right),window.innerWidth].join("|"));
+</script>`;
+const [bandScroll, bandClient, statusRight, innerW] = probe(longSlugs, OVERFLOW_HARNESS, "430,844").split("|").map(Number);
+assert.ok(bandScroll <= bandClient, `long slugs must truncate, not overflow the band: scrollWidth ${bandScroll} > clientWidth ${bandClient}`);
+assert.ok(statusRight <= innerW, `status must stay on-screen at 430px: right ${statusRight} > innerWidth ${innerW}`);
+console.log("[browser] PASS initiative band truncates long slugs without overflow at 430px");

@@ -27,12 +27,14 @@
   .topbtn.danger{color:#c0392b;border-color:#f0d4d0}
   .topbtn.danger:hover{background:#fdeeec}
   /* initiative band (shown only for SOT 1.1 initiative documents) */
-  .init-band{display:flex;align-items:center;gap:10px;padding:7px 18px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line);font-size:12.5px;flex:0 0 auto}
+  .init-band{display:flex;align-items:center;gap:10px;padding:7px 18px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line);font-size:12.5px;flex:0 0 auto;overflow:hidden}
   .init-band[hidden]{display:none}
-  .ib-badge{background:var(--accent);color:#fff;font-weight:700;font-size:11px;letter-spacing:.3px;border-radius:999px;padding:2px 9px}
-  .ib-name{font-weight:700;color:var(--text)}
-  .ib-parent{color:var(--sub)}
-  .ib-status{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--sub);font-weight:600}
+  /* Slugs are unbounded, so name/parent truncate (parent first) while the badge
+     and status stay fully visible. Keeps the band a single non-overflowing row. */
+  .ib-badge{flex:0 0 auto;background:var(--accent);color:#fff;font-weight:700;font-size:11px;letter-spacing:.3px;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .ib-name{font-weight:700;color:var(--text);min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ib-parent{color:var(--sub);min-width:0;flex:3 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ib-status{margin-left:auto;flex:0 0 auto;display:flex;align-items:center;gap:6px;color:var(--sub);font-weight:600;white-space:nowrap}
   .ib-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--muted)}
   .ib-dot.proposed{background:var(--warn)}
   .ib-dot.approved{background:var(--accent)}

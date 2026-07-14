@@ -8,9 +8,10 @@
     "build": "node build.mjs",
     "validate": "node scripts/validate-sot.mjs",
     "validate:tree": "node scripts/validate-tree.mjs",
-    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs",
+    "rebase": "node scripts/rebase.mjs",
+    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs",
     "test:browser": "npm run check:browser",
-    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/plugin-contract.mjs",
+    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/plugin-contract.mjs",
     "check:browser": "node tests/browser-flow.mjs",
     "check:all": "npm run check && npm run check:browser"
   }

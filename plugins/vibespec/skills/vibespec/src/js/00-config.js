@@ -6,4 +6,6 @@ const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유
 const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
 const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
-const SCHEMA_VERSION="1.0";
+// Schema version is derived from the document (initiative meta ⇒ 1.1),
+// never hardcoded — saving must not downgrade a 1.1 initiative to 1.0.
+function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }

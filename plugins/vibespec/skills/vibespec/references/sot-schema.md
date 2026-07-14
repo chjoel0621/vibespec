@@ -2,7 +2,9 @@
 
 뷰어(`viewer.html`)가 읽고 쓰는 단일 데이터 객체(SOT)의 구조다. 생성하는 JSON은 반드시 이 스키마를 따라야 뷰어에서 정상 표시되고 "누락 경고" 없이 열린다.
 
-기계 판독용 JSON Schema는 `sot.schema.json`에 있다. `../scripts/validate-sot.mjs`가 이 스키마를 직접 실행하고, 동적 참조와 IA 커버리지를 추가 검증한다. 검증 대상은 SOT 1.0이며, 구버전 파일은 뷰어에서 불러온 뒤 다시 저장해 1.0으로 승격한다.
+기계 판독용 JSON Schema는 `sot.schema.json`에 있다. `../scripts/validate-sot.mjs`가 이 스키마를 직접 실행하고, 동적 참조와 IA 커버리지를 추가 검증한다. 검증기는 **SOT 1.0과 1.1을 모두** 지원한다(구버전 파일은 뷰어에서 불러온 뒤 다시 저장해 정규화된다).
+
+**버전.** 일반 제품 SOT는 `1.0`이다. 특정 본편 위에 얹히는 **이니셔티브 SOT**는 `1.1`이며, 최상위 `initiative` 메타와 페이지 `boundary`(본편 접점 표시)를 쓸 수 있다. 이 둘은 1.1에서만 허용된다 — 1.0 파일에 넣으면 검증 실패. 뷰어는 1.0·1.1을 모두 열고, **1.1을 저장할 때 1.0으로 낮추지 않는다**(schemaVersion은 `initiative` 존재 여부에서 도출). 이니셔티브 생성 절차는 아직 스킬에 활성화되지 않았다(로드맵 v1).
 
 ## 최상위 구조
 
@@ -10,9 +12,39 @@
 { "schemaVersion": "1.0", "title": "제품 이름", "lang": "ko", "prd": { }, "requirements": [ ], "ia": { "sections": [ ] }, "flow": { } }
 ```
 
-- `schemaVersion`: 필수 스키마 버전(현재 `"1.0"`). 레거시 입력에는 없을 수 있지만, 뷰어가 저장하거나 스킬이 생성하는 SOT 1.0에는 반드시 포함한다.
+- `schemaVersion`: 필수. 일반 SOT는 `"1.0"`, 이니셔티브 SOT는 `"1.1"`. 레거시 입력에는 없을 수 있지만, 뷰어가 저장하거나 스킬이 생성하는 SOT에는 반드시 포함한다.
 - `lang`: 뷰어 기본 표시 언어(`"ko"`/`"en"`, 선택). 영어로 생성하면 `"en"`.
 - 파일은 Git 형상관리를 위해 **키 정렬 고정 + pretty-print**된 `<제품명>.sot.json`으로 저장한다(뷰어의 저장 기능이 이 표준형을 출력한다).
+
+## 이니셔티브 (SOT 1.1, 미활성)
+
+> 로드맵 v1에서 스킬에 활성화 예정. 아래는 계약 정의이며, 현재 검증기가 이미 강제한다.
+
+이니셔티브는 본편 SOT를 그대로 두고 그 위에 얹히는 증분 문서다. 구조적으로는 완전한 SOT이고, 여기에 두 가지가 더해진다.
+
+```json
+"initiative": {
+  "productId": "acme-shop",
+  "id": "payment",
+  "path": "1-2",
+  "status": "proposed",
+  "parent": { "scopeId": "root", "canonicalization": "sot-c14n-v1", "digest": "sha256:…" }
+}
+```
+
+- `productId`·`id`: 소문자 slug(`^[a-z0-9][a-z0-9-]*$`). `id`는 같은 제품 안에서 유일하며 생성 후 불변. `"root"`는 본편 예약어라 `id`로 못 쓴다.
+- `path`: 표시·파일명용 경로(`1-2`, `1-2-1`). 참조 식별자가 아니다.
+- `status`: `proposed | approved | implemented | dropped`.
+- `parent.scopeId`: 부모 scope(`"root"` 또는 부모 이니셔티브의 `id`). 자기 자신은 못 가리킨다.
+- `parent.canonicalization`: 항상 `"sot-c14n-v1"`. `parent.digest`: 부모 SOT를 그 규칙으로 표준화한 SHA-256(`sha256:` + 64 hex).
+
+**경계 스텁(boundary).** 이니셔티브가 본편의 화면에서 시작·연결될 때, 그 접점을 페이지에 `boundary`로 표시한다. 스텁 페이지는 본편 페이지를 가리키는 참조일 뿐이므로 자체 기능 `refs`를 담지 않는다(담으면 경고).
+
+```json
+{ "id": "P1", "title": "장바구니", "type": "top", "refs": [], "boundary": { "scopeId": "root", "pageId": "P10" }, "children": [ … ] }
+```
+
+교차 파일 검사(`scopeId`가 실제 조상에 존재하는지, `path`가 부모 접두와 맞는지, digest가 현재 부모와 일치하는지)는 단일 파일 검증기 범위 밖이며 `validate-tree`(로드맵 v1)가 담당한다.
 
 ## prd (제품 정의)
 

@@ -230,6 +230,16 @@ assert.equal(stubResult.valid, true, `boundary stub with refs should still be va
 assert.ok(stubResult.warnings.some(w => w.message.includes("boundary stub")), "boundary stub with refs should warn");
 console.log("[test] PASS boundary stub with own refs warns but stays valid");
 
+// Viewer load → save must NOT downgrade a 1.1 initiative to 1.0 (which would
+// strand its initiative/boundary fields as forbidden 1.0 content).
+const savedInitiative = JSON.parse(viewerContext.promote(cloneInit()));
+assert.equal(savedInitiative.schemaVersion, "1.1", "viewer save must preserve schemaVersion 1.1");
+assert.ok(savedInitiative.initiative && savedInitiative.ia.sections[0].pages[0].boundary, "1.1 fields must survive save");
+assert.equal(validateSot(savedInitiative).valid, true, `1.1 survives viewer roundtrip: ${JSON.stringify(validateSot(savedInitiative).errors)}`);
+const savedPlain = JSON.parse(viewerContext.promote(clone(valid)));
+assert.equal(savedPlain.schemaVersion, "1.0", "a plain SOT must still save as 1.0");
+console.log("[test] PASS viewer save preserves 1.1 and keeps plain SOT at 1.0");
+
 const dense = createDenseSot();
 const denseResult = validateSot(dense);
 assert.equal(dense.flow.transitions.length, 53);

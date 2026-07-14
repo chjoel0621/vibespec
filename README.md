@@ -170,11 +170,13 @@ To compare two versions of a SOT — what changed, what it touches (screens, tra
 node scripts/diff-sot.mjs before.sot.json after.sot.json
 ```
 
-For a product tree (a main SOT plus its initiatives), validate cross-file rules, and rebase initiatives after the main changes:
+For a product tree (a main SOT plus its initiatives), inspect/validate cross-file rules, rebase after the main changes, and compose the read-only product map:
 
 ```
-node scripts/validate-tree.mjs path/to/product-folder   # scope, digest, boundary, path checks
+node scripts/inspect.mjs path/to/product-folder          # classify inputs, next path, suggested mode
+node scripts/validate-tree.mjs path/to/product-folder    # scope, digest, boundary, path checks
 node scripts/rebase.mjs path/to/product-folder           # dry-run cascade; add --apply to write
+node scripts/product-map.mjs path/to/product-folder --html map.html   # read-only composite
 ```
 
 For an older SOT, load it in the viewer and save it once to promote it to the 1.0 format, then validate the newly saved file. Loading normalizes legacy KPI, scenario, and field shapes.

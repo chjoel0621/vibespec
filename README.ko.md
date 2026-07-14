@@ -171,11 +171,13 @@ npm run validate -- path/to/product.sot.json
 node scripts/diff-sot.mjs before.sot.json after.sot.json
 ```
 
-제품 트리(본편 + 이니셔티브들)의 교차 파일 규칙을 검증하고, 본편이 바뀐 뒤 이니셔티브를 재기준하려면:
+제품 트리(본편 + 이니셔티브들)를 사전판별·검증하고, 본편이 바뀐 뒤 재기준하고, 읽기전용 제품 지도를 합성하려면:
 
 ```
-node scripts/validate-tree.mjs path/to/product-folder   # scope·digest·boundary·path 검사
+node scripts/inspect.mjs path/to/product-folder          # 입력 분류·다음 path·추천 모드
+node scripts/validate-tree.mjs path/to/product-folder    # scope·digest·boundary·path 검사
 node scripts/rebase.mjs path/to/product-folder           # 드라이런 연쇄; --apply로 기록
+node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 지도
 ```
 
 구버전 SOT는 먼저 뷰어에서 불러온 뒤 저장하여 1.0 형식으로 승격하고, 새로 저장된 파일을 검증하세요. 뷰어의 불러오기가 구형 KPI·시나리오·필드명을 현재 구조로 정규화합니다.

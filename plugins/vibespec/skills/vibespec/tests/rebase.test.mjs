@@ -113,6 +113,20 @@ try {
   assert.equal(validateTree(afterDocs).valid, true, "CLI --apply must produce a valid tree");
   console.log("[rebase] PASS CLI dry-run then --apply rewrites files into a valid tree");
 
+  // CLI --apply --only <id>: parse the selection, write only that node, leave
+  // the sibling untouched, and report it as still stale. Two same-depth
+  // siblings so the selection is what distinguishes them, not the cascade.
+  const search = clone(payment); search.initiative.id = "search"; search.initiative.path = "1-3";
+  writeFileSync(join(workDir, "search.sot.json"), stableStringify(search) + "\n");
+  const paymentBefore = readFileSync(join(workDir, "payment.sot.json"), "utf8"); // already rebased above
+  const searchBefore = readFileSync(join(workDir, "search.sot.json"), "utf8");
+  const only = run([workDir, "--apply", "--only", "search"], workDir);
+  assert.equal(only.status, 0, `--only exit: ${only.stderr}`);
+  assert.match(only.stdout, /갱신 완료/);
+  assert.notEqual(readFileSync(join(workDir, "search.sot.json"), "utf8"), searchBefore, "--only search must rewrite search");
+  assert.equal(readFileSync(join(workDir, "payment.sot.json"), "utf8"), paymentBefore, "--only search must not touch payment");
+  console.log("[rebase] PASS CLI --apply --only writes just the selected initiative");
+
   // Apply on a tree with a non-stale error (duplicate id) is refused, exit 1,
   // and nothing is written.
   writeFileSync(join(workDir, "dupe.sot.json"), stableStringify({ ...clone(payment), initiative: { ...clone(payment).initiative, path: "1-9" } }) + "\n");

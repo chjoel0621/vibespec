@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -65,25 +66,62 @@ const brokenPlan = planRebase(broken);
 assert.ok(brokenPlan.unrebasable.some(u => u.id === "payment"), "cyclic node must be flagged unrebasable, not hang");
 console.log("[rebase] PASS cyclic ancestry is reported unrebasable");
 
-// End-to-end via the file-writing CLI path: --apply actually rewrites files and
-// the on-disk result validates clean.
+// Depth-3 partial apply: "refuse a child whose parent stays stale" must hold at
+// EVERY depth. Selecting a grandchild while skipping the middle node writes
+// nothing, and remainingStale reports the whole chain.
+function tree3() {
+  const [m, p, r] = tree("Changed");
+  const cb = clone(r.sot);
+  cb.name = undefined;
+  cb.initiative.id = "chargeback";
+  cb.initiative.path = "1-2-1-1";
+  cb.initiative.parent = { scopeId: "refund", canonicalization: "sot-c14n-v1", digest: sotDigest(r.sot) };
+  cb.ia.sections[0].pages[0].boundary = { scopeId: "refund", pageId: "P2" };
+  return [m, p, r, { name: "chargeback", sot: cb }];
+}
+const d3 = tree3();
+const p3 = planRebase(d3).plan;
+assert.deepEqual(p3.map(s => s.id), ["payment", "refund", "chargeback"], "depth-3 plan is root→leaf");
+assert.equal(applyRebase(d3, p3, ["refund", "chargeback"]).length, 0, "skipping the root of the chain writes nothing, even for the grandchild");
+assert.deepEqual(remainingStale(p3, ["refund", "chargeback"]), ["payment", "refund", "chargeback"], "the whole chain stays stale");
+assert.deepEqual(applyRebase(d3, p3, ["payment", "chargeback"]).map(w => w.id), ["payment"], "skipping the middle node strands the grandchild");
+assert.deepEqual(remainingStale(p3, ["payment", "chargeback"]), ["refund", "chargeback"], "grandchild stranded when middle is skipped");
+console.log("[rebase] PASS depth-3 partial apply refuses stranded descendants at every level");
+
+// End-to-end through the REAL CLI (spawn, arg parsing, exit codes, file writes).
+const cliPath = join(here, "..", "scripts", "rebase.mjs");
+const run = (args, cwd) => spawnSync(process.execPath, [cliPath, ...args], { cwd, encoding: "utf8" });
 const workDir = mkdtempSync(join(tmpdir(), "vibespec-rebase-"));
 try {
   const changedMain = clone(main); changedMain.title = "Changed on disk";
   writeFileSync(join(workDir, "main.sot.json"), stableStringify(changedMain) + "\n");
   writeFileSync(join(workDir, "payment.sot.json"), stableStringify(clone(payment)) + "\n");
-  const child = tree()[2].sot;
-  writeFileSync(join(workDir, "refund.sot.json"), stableStringify(child) + "\n");
 
-  const disk = ["main", "payment", "refund"].map(n => ({ name: join(workDir, `${n}.sot.json`), sot: JSON.parse(readFileSync(join(workDir, `${n}.sot.json`), "utf8")) }));
-  const diskPlan = planRebase(disk);
-  const diskWrites = applyRebase(disk, diskPlan.plan, diskPlan.plan.map(p => p.id));
-  for (const w of diskWrites) writeFileSync(w.file, w.content);
+  // Dry-run: plans without writing, exit 0.
+  const dry = run([workDir], workDir);
+  assert.equal(dry.status, 0, `dry-run exit: ${dry.stderr}`);
+  assert.match(dry.stdout, /연쇄 계획/);
+  assert.match(dry.stdout, /드라이런/);
+  const beforeBytes = readFileSync(join(workDir, "payment.sot.json"), "utf8");
+  assert.match(beforeBytes, /"schemaVersion": "1.1"/); // untouched by dry-run
 
-  const after = disk.map(d => ({ name: d.name, sot: JSON.parse(readFileSync(d.name, "utf8")) }));
-  assert.equal(validateTree(after).valid, true, "on-disk rebased tree must validate");
-  assert.deepEqual(validateTree(after).product.activeSet, ["payment", "refund"]);
-  console.log("[rebase] PASS on-disk apply rewrites files into a valid tree");
+  // Apply: rewrites files, exit 0, result validates clean.
+  const applied = run([workDir, "--apply"], workDir);
+  assert.equal(applied.status, 0, `apply exit: ${applied.stderr}`);
+  assert.match(applied.stdout, /갱신 완료/);
+  const afterDocs = ["main", "payment"].map(n => ({ name: n, sot: JSON.parse(readFileSync(join(workDir, `${n}.sot.json`), "utf8")) }));
+  assert.equal(validateTree(afterDocs).valid, true, "CLI --apply must produce a valid tree");
+  console.log("[rebase] PASS CLI dry-run then --apply rewrites files into a valid tree");
+
+  // Apply on a tree with a non-stale error (duplicate id) is refused, exit 1,
+  // and nothing is written.
+  writeFileSync(join(workDir, "dupe.sot.json"), stableStringify({ ...clone(payment), initiative: { ...clone(payment).initiative, path: "1-9" } }) + "\n");
+  const beforeDupe = readFileSync(join(workDir, "payment.sot.json"), "utf8");
+  const refused = run([workDir, "--apply"], workDir);
+  assert.equal(refused.status, 1, "apply on an invalid tree must exit 1");
+  assert.match(refused.stderr, /거부|duplicate/);
+  assert.equal(readFileSync(join(workDir, "payment.sot.json"), "utf8"), beforeDupe, "refused apply must not write any file");
+  console.log("[rebase] PASS CLI --apply is refused (exit 1, no writes) on a non-stale error");
 } finally {
   rmSync(workDir, { recursive: true, force: true });
 }

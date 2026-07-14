@@ -80,33 +80,39 @@ export function planRebase(docs) {
   return { plan, unrebasable, alreadyFresh: plan.length === 0 && unrebasable.length === 0 };
 }
 
-// Given a plan and the set of ids the user chose to apply, returns which planned
-// nodes remain stale (either not selected, or selected but their parent was
-// not — a child cannot be fresh unless its parent is rebased first).
-export function remainingStale(plan, appliedIds) {
-  const applied = new Set(appliedIds);
+// The set of nodes that will ACTUALLY be written, computed root→leaf: a node is
+// effectively applied only if it is selected AND its parent is either already
+// fresh (not in the plan) or itself effectively applied. This makes "refuse a
+// child whose parent stays stale" hold at every depth, not just one level —
+// selecting a grandchild while skipping the middle node writes nothing.
+export function effectiveApplied(plan, selectedIds) {
+  const selected = new Set(selectedIds);
   const planned = new Set(plan.map(p => p.id));
-  const remaining = [];
-  for (const step of plan) {
-    const parentInPlanUnapplied = planned.has(step.parentId) && !applied.has(step.parentId);
-    if (!applied.has(step.id) || parentInPlanUnapplied) remaining.push(step.id);
+  const ok = new Set();
+  for (const step of plan) { // plan is root→leaf ordered, so a parent is resolved before its child
+    if (!selected.has(step.id)) continue;
+    const parentReady = !planned.has(step.parentId) || ok.has(step.parentId);
+    if (parentReady) ok.add(step.id);
   }
-  return remaining;
+  return ok;
 }
 
-// Produce the rewritten file contents for the selected ids. Only ids whose
-// parent is either fresh or also being applied are written (a child is refused
-// if its parent stays stale — no incoherent partial). Returns [{ file, content, id }].
-export function applyRebase(docs, plan, appliedIds) {
-  const applied = new Set(appliedIds);
-  const planned = new Map(plan.map(p => [p.id, p]));
+// Planned nodes that remain stale after applying `selectedIds` — those not
+// effectively applied (skipped, or stranded because an ancestor was skipped).
+export function remainingStale(plan, selectedIds) {
+  const ok = effectiveApplied(plan, selectedIds);
+  return plan.filter(step => !ok.has(step.id)).map(step => step.id);
+}
+
+// Rewritten file contents for exactly the effectively-applied nodes — never an
+// incoherent partial. Returns [{ file, content, id }].
+export function applyRebase(docs, plan, selectedIds) {
+  const ok = effectiveApplied(plan, selectedIds);
   const byName = new Map(docs.map(d => [d.name, d]));
   const writes = [];
   for (const step of plan) {
-    if (!applied.has(step.id)) continue;
-    if (planned.has(step.parentId) && !applied.has(step.parentId)) continue; // parent stays stale → refuse child
-    const doc = byName.get(step.file);
-    const next = JSON.parse(JSON.stringify(doc.sot));
+    if (!ok.has(step.id)) continue;
+    const next = JSON.parse(JSON.stringify(byName.get(step.file).sot));
     next.initiative.parent.digest = step.to;
     writes.push({ file: step.file, id: step.id, content: stableStringify(next) + "\n" });
   }

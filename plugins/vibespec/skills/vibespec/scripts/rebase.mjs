@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { collectFiles } from "./validate-tree.mjs";
+import { validateTree } from "./lib/tree.mjs";
 import { planRebase, applyRebase, remainingStale } from "./lib/rebase.mjs";
 
 function shortHash(d) { return typeof d === "string" ? d.slice(0, 19) + "…" : "?"; }
@@ -55,10 +56,28 @@ async function main(argv) {
   const result = planRebase(docs);
   const applied = apply ? (onlyIds ?? result.plan.map(p => p.id)) : null;
 
-  if (json) { console.log(JSON.stringify({ ...result, applied }, null, 2)); }
-  else printPlan(result, applied);
+  // --apply must never write into a tree that isn't otherwise valid: a stale
+  // digest is the ONLY finding rebase is allowed to fix. Any other error
+  // (duplicate id, structural, cycle, missing parent) means the tree is not a
+  // safe rebase target — refuse to write. Dry-run still shows the plan.
+  let blocked = null;
+  if (apply) {
+    const tree = validateTree(docs);
+    const nonStale = tree.errors.filter(e => !e.message.includes("digest stale"));
+    if (nonStale.length) blocked = nonStale;
+    else if (result.unrebasable.length) blocked = result.unrebasable.map(u => ({ file: u.file, path: "$.initiative", message: u.reason }));
+  }
+
+  if (json) { console.log(JSON.stringify({ ...result, applied, blocked }, null, 2)); }
+  else printPlan(result, blocked ? null : applied);
 
   if (apply) {
+    if (blocked) {
+      console.error("\n[rebase] --apply 거부: rebase는 stale digest만 고칩니다. 먼저 validate-tree 오류를 해결하세요:");
+      blocked.forEach(e => console.error(`  error ${e.file} ${e.path}: ${e.message}`));
+      process.exitCode = 1;
+      return;
+    }
     const writes = applyRebase(docs, result.plan, applied);
     for (const w of writes) writeFileSync(w.file, w.content);
     if (!json) console.log(`\n[rebase] ${writes.length}개 파일 갱신 완료.`);

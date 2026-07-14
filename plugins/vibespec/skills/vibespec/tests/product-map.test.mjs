@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -86,3 +87,17 @@ assert.ok(nodeById(m6, "root/P2").children.some(c => c.compositeId === "payment/
 assert.ok(nodeById(m6, "payment/P3"), "the wrapper becomes the initiative's own node");
 assert.equal(nodeById(m6, "payment/P1"), null, "the boundary stub itself is not materialized");
 console.log("[map] PASS a boundary nested under a wrapper still grafts at its target");
+
+// CLI: --link <scopeId>=<url> attaches a link to each scope so the rendered map
+// can open the document that defines it. The link value must not be mistaken for
+// an input path (that used to make the CLI try to read "notif=/notif/" as a SOT).
+const cli = join(here, "..", "scripts", "product-map.mjs");
+const run = args => spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
+const linked = run([treeDir, "--link", "root=/", "--link", "payment=/pay/", "--json"]);
+assert.equal(linked.status, 0, `--link run must succeed: ${linked.stderr}`);
+const linkedMap = JSON.parse(linked.stdout);
+assert.deepEqual(linkedMap.scopes.map(s => [s.id, s.href]), [["root", "/"], ["payment", "/pay/"]], "--link sets each scope's href");
+const plain = run([treeDir, "--json"]);
+assert.equal(plain.status, 0, `plain run must succeed: ${plain.stderr}`);
+assert.ok(JSON.parse(plain.stdout).scopes.every(s => !("href" in s)), "without --link no scope carries an href");
+console.log("[map] PASS --link gives each scope a link without being read as an input path");

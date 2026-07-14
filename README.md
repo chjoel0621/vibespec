@@ -9,6 +9,8 @@ VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code
 
 **🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — ask "turn my product idea into a planning tool" or attach a business plan, and the skill produces an HTML just like this demo. Try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable, and Save exports the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.
 
+The demo has three linked pages — use the strip in the bottom-right corner to move between them: the **[main plan](https://chjoel0621.github.io/vibespec/en/)**, an **[initiative](https://chjoel0621.github.io/vibespec/en/notif/)** layered on it (a notification increment), and the **[product map](https://chjoel0621.github.io/vibespec/en/map/)** that composes the two. In the map, click any node to open the document that defines it.
+
 ## Core idea
 
 - **HTML = the app (viewer/editor)** · **JSON = the data (SOT)** — the two are kept separate.
@@ -72,7 +74,7 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 **Adding an initiative (a scoped increment):** attach your main `*.sot.json` and ask "add a payment initiative on top." Instead of bloating the main plan, the skill creates a **separate initiative file** (`<product>.<path>.<id>.sot.json`) layered on it — with its own lean PRD (problem, solution, in-scope, non-goals) and a **boundary** marking where it attaches to a main screen. The main file is left untouched, so an initiative can be reviewed, approved, and shipped on its own. Each initiative records a digest of the main it was written against; if the main later changes, the skill can **rebase** the affected initiatives (parent-to-child) so nothing silently drifts.
 
-**Seeing the whole product:** ask "show the product map" and the skill composes the main with its **active** initiatives into one read-only view — each initiative's screens grafted under the main screen it attaches to, with composite ids (`root/P6`, `notif/P2`) showing provenance. Proposed and dropped initiatives are listed as excluded. Try the composed **[product map demo](https://chjoel0621.github.io/vibespec/en/map/)** (booking app + a notification initiative); a [Korean map](https://chjoel0621.github.io/vibespec/map/) is also deployed.
+**Seeing the whole product:** ask "show the product map" and the skill composes the main with its **active** initiatives into one read-only view — each initiative's screens grafted under the main screen it attaches to, with composite ids (`root/P6`, `notif/P2`) showing provenance. Proposed and dropped initiatives are listed as excluded. Try the composed **[product map demo](https://chjoel0621.github.io/vibespec/en/map/)** (booking app + a notification initiative) — every node links back to the document it came from, so the map is a way in, not just a picture. A [Korean map](https://chjoel0621.github.io/vibespec/map/) is also deployed.
 
 ### If the skill doesn't auto-trigger (invoke it manually)
 
@@ -145,8 +147,9 @@ vibespec/
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
 │       └── package.json                # npm run build · check · validate
-├── demo/                               # Demo SOTs: main (ko/en → / , /en/) + a notif
-│                                       #   initiative, composed into the map (/map/, /en/map/)
+├── demo/                               # Demo SOTs: main (/ , /en/) + a notif initiative
+│                                       #   (/notif/, /en/notif/), composed into the product
+│                                       #   map (/map/, /en/map/). nav.mjs links the pages.
 ├── .github/workflows/                  # CI (build + tests) and Pages demo deploy
 ├── LICENSE
 ├── README.md                           # English (default)

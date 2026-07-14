@@ -47,7 +47,11 @@ document.documentElement.setAttribute("data-probe",JSON.stringify({
   titleWriteIgnored: (typeof SOT==="undefined") || !SOT || SOT.title!=="HACKED",
   grafted: [...document.querySelectorAll(".snode.map-init .stitle")].some(e=>/Pay/.test(e.textContent)),
   compositeIds: [...document.querySelectorAll(".sitemap .stype")].map(e=>e.textContent).filter(x=>x.includes("/")),
-  scopes: [...document.querySelectorAll(".map-scope b")].map(e=>e.textContent),
+  scopes: [...document.querySelectorAll(".map-scope b, .map-scope .map-scope-link")].map(e=>e.textContent),
+  // With a scope href the map must be navigable: its nodes and its legend entry
+  // link to the document that defines them (without one, they stay plain divs).
+  linkedNodes: [...document.querySelectorAll("a.snode.map-linked")].map(e=>e.getAttribute("href")),
+  legendLinks: [...document.querySelectorAll(".map-scope-link")].map(e=>e.getAttribute("href")),
   // The increment must be on-screen when the map opens (a wide composite used to
   // push it past the right edge, so the map showed only the main).
   incrementOnScreen: !!ir && ir.x>=0 && ir.right<=window.innerWidth && ir.y>=0 && ir.bottom<=window.innerHeight,
@@ -56,9 +60,9 @@ document.documentElement.setAttribute("data-probe",JSON.stringify({
 </script>`;
 
 const workspace = mkdtempSync(join(tmpdir(), "vibespec-map-"));
-try {
-  const embedded = JSON.stringify(map).replace(/</g, "\\u003c");
-  const page = join(workspace, "map.html");
+function probe(payload, name) {
+  const embedded = JSON.stringify(payload).replace(/</g, "\\u003c");
+  const page = join(workspace, `${name}.html`);
   writeFileSync(page, viewerHtml.replace(EMPTY_TAG, EMPTY_TAG.replace("></script>", `>${embedded}</script>`)) + harness);
   const result = spawnSync(browserPath, [
     "--headless=new", "--allow-file-access-from-files", "--no-sandbox", "--disable-gpu",
@@ -67,8 +71,12 @@ try {
   ], { encoding: "utf8", timeout: 20000, maxBuffer: 8 * 1024 * 1024 });
   assert.equal(result.status, 0, `headless browser failed: ${result.stderr || result.error || "unknown"}`);
   const match = result.stdout.match(/data-probe="([^"]*)"/);
-  assert.ok(match, "map probe did not emit data-probe");
-  const p = JSON.parse(match[1].replace(/&quot;/g, String.fromCharCode(34)));
+  assert.ok(match, `map probe (${name}) did not emit data-probe`);
+  return JSON.parse(match[1].replace(/&quot;/g, String.fromCharCode(34)));
+}
+
+try {
+  const p = probe(map, "map");
   assert.equal(p.mapHead, true, "map mode must render the map header");
   assert.equal(p.tabsHidden, true, "map mode must hide the editing tabs");
   assert.equal(p.saveHidden, true, "map mode must hide the Save button (read-only)");
@@ -79,7 +87,19 @@ try {
   assert.equal(p.titleWriteIgnored, true, "map mode: editing the title must not write to SOT (read-only)");
   assert.equal(p.incrementOnScreen, true, "the initiative's screen must be visible when the map opens");
   assert.match(p.attachLine, /Payment|Cart|접점|Attaches/, "the map names where each initiative attaches");
+  assert.deepEqual(p.linkedNodes, [], "without scope hrefs the map stays plain (no links)");
   console.log("[browser] PASS product map is read-only, shows the increment on open, and names its attach point");
+
+  // With hrefs the map must be navigable — seeing an increment you cannot open
+  // makes the map a dead end.
+  const linked = JSON.parse(JSON.stringify(map));
+  linked.scopes.forEach(s => { s.href = s.id === "root" ? "../main/" : `../${s.id}/`; });
+  const q = probe(linked, "map-linked");
+  assert.deepEqual(q.compositeIds, ["root/P1", "root/P2", "payment/P2"], "linking must not change the composite");
+  assert.deepEqual(q.linkedNodes, ["../main/", "../main/", "../payment/"], "every node links to the document that defines it");
+  assert.deepEqual(q.legendLinks, ["../main/", "../payment/"], "the legend links to each scope's document");
+  assert.deepEqual(q.scopes, ["Shop", "Payment"], "linked legend still names the scopes");
+  console.log("[browser] PASS a linked map opens each scope's own document (nodes + legend)");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

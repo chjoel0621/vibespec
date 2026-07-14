@@ -2,14 +2,21 @@
    payload (kind: "vibespec-product-map"). Dormant for normal SOT documents. ---- */
 let MAP = null;
 function mapStatusLabel(s){ const m=INIT_STATUS[s]; return m?t(m.t,m.e):s; }
+// A scope may carry an href to its own document; when it does, the map lets you
+// open it (otherwise the map is a dead end — you can see the increment but not
+// reach the document that defines it).
+function mapScopeHref(id){ const s=((MAP&&MAP.scopes)||[]).find(x=>x.id===id); return s&&s.href ? s.href : null; }
 function renderMapNode(p){
   const kids = (p.children&&p.children.length)?`<ul>${p.children.map(renderMapNode).join("")}</ul>`:"";
   const cls = p.scope==="root" ? (p.type==="top"?"top":(p.type==="action"?"action":"page")) : "map-init";
   const tag = p.scope!=="root" ? ` <span class="map-scopetag">+${esc(p.scope)}</span>` : "";
-  return `<li><div class="snode ${cls}">
-      <span class="stype">${esc(p.compositeId)}</span>
-      <span class="stitle">${esc(p.title)}${tag}</span>
-    </div>${kids}</li>`;
+  const href = mapScopeHref(p.scope);
+  const body = `<span class="stype">${esc(p.compositeId)}</span>
+      <span class="stitle">${esc(p.title)}${tag}</span>`;
+  const node = href
+    ? `<a class="snode ${cls} map-linked" href="${esc(href)}" title="${t("이 문서 열기","Open this document")}">${body}</a>`
+    : `<div class="snode ${cls}">${body}</div>`;
+  return `<li>${node}${kids}</li>`;
 }
 function renderMap(){
   const M=MAP; if(!M) return;
@@ -21,7 +28,8 @@ function renderMap(){
   const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
     const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
-    return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span><b>${esc(s.title||s.id)}</b> <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;
+    const name = s.href ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>` : `<b>${esc(s.title||s.id)}</b>`;
+    return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span>${name} <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;
   }).join("");
   const excluded = (M.excluded&&M.excluded.length) ? `<div class="map-excluded">${t("제외","Excluded")}: ${M.excluded.map(e=>`${esc(e.id)} (${esc(e.reason)})`).join(", ")}</div>` : "";
   // A composite tree can be far wider than the viewport, so name where each

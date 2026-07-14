@@ -48,8 +48,19 @@ async function main(argv) {
   const json = argv.includes("--json");
   const htmlIdx = argv.indexOf("--html");
   const htmlOut = htmlIdx >= 0 ? argv[htmlIdx + 1] : null;
-  const paths = argv.filter((a, i) => !a.startsWith("--") && !(htmlIdx >= 0 && i === htmlIdx + 1));
-  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--json] [--html <out.html>]"); process.exitCode = 2; return; }
+  // --link <scopeId>=<url> (repeatable): give a scope a link to its own document
+  // so the map is navigable (click an increment → open the initiative that defines it).
+  const links = {};
+  const linkValueIdx = new Set();
+  argv.forEach((a, i) => {
+    if (a === "--link" && argv[i + 1]) {
+      linkValueIdx.add(i + 1);
+      const eq = argv[i + 1].indexOf("=");
+      if (eq > 0) links[argv[i + 1].slice(0, eq)] = argv[i + 1].slice(eq + 1);
+    }
+  });
+  const paths = argv.filter((a, i) => !a.startsWith("--") && !(htmlIdx >= 0 && i === htmlIdx + 1) && !linkValueIdx.has(i));
+  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--json] [--html <out.html>] [--link <scopeId>=<url> ...]"); process.exitCode = 2; return; }
   let files;
   try { files = collectFiles(paths); } catch (cause) { console.error(`[FAIL] ${cause.message}`); process.exitCode = 2; return; }
   const docs = [];
@@ -58,6 +69,7 @@ async function main(argv) {
     catch (cause) { console.error(`[FAIL] ${file}: ${cause.message}`); process.exitCode = 1; return; }
   }
   const map = buildProductMap(docs);
+  if (map.valid && map.scopes) map.scopes.forEach(s => { if (links[s.id]) s.href = links[s.id]; });
   if (json) console.log(JSON.stringify(map, null, 2));
   else printMap(map);
   if (map.valid && htmlOut) { writeMapHtml(map, htmlOut); if (!json) console.log(`\n[map] 읽기전용 지도 HTML: ${htmlOut}`); }

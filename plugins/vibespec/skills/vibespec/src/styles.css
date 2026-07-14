@@ -55,6 +55,15 @@
   .map-jump:hover{background:#fff}
   .map-jump b{color:var(--accent)}
   .snode.map-flash{box-shadow:0 0 0 3px var(--accent);transition:box-shadow .2s}
+  a.snode.map-linked{text-decoration:none;color:inherit;cursor:pointer}
+  a.snode.map-linked:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-line)}
+  .map-scope-link{font-weight:700;color:var(--accent);text-decoration:none}
+  .map-scope-link:hover{text-decoration:underline}
+  /* demo-only nav (injected by the Pages deploy, not part of the product) */
+  .demo-nav{position:fixed;right:14px;bottom:14px;z-index:80;display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:var(--shadow);font-size:12.5px}
+  .demo-nav a{color:var(--sub);text-decoration:none;padding:3px 9px;border-radius:999px;font-weight:600}
+  .demo-nav a:hover{background:var(--panel);color:var(--text)}
+  .demo-nav a.on{background:var(--accent);color:#fff}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}

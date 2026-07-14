@@ -50,24 +50,39 @@ jobs:
             demo/meeting-room-booking.en.sot.json demo/meeting-room-booking.en.1-2.notif.sot.json
       - name: Stage site
         run: |
-          mkdir -p _site/en _site/map _site/en/map
-          # Both demos embed their SOT explicitly so neither depends on
+          B=/vibespec
+          S=plugins/vibespec/skills/vibespec
+          mkdir -p _site/en _site/map _site/en/map _site/notif _site/en/notif
+          # Main demos embed their SOT explicitly so neither depends on
           # localStorage (which is shared per-origin between / and /en).
-          node plugins/vibespec/skills/vibespec/scripts/embed-sot.mjs \
-            plugins/vibespec/skills/vibespec/assets/viewer.html \
-            demo/meeting-room-booking.ko.sot.json \
-            _site/index.html
-          node plugins/vibespec/skills/vibespec/scripts/embed-sot.mjs \
-            plugins/vibespec/skills/vibespec/assets/viewer.html \
-            demo/meeting-room-booking.en.sot.json \
-            _site/en/index.html
-          # Read-only product map = main + its active initiative, composed.
-          node plugins/vibespec/skills/vibespec/scripts/product-map.mjs \
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.ko.sot.json _site/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.en.sot.json _site/en/index.html
+          # The initiative's own document, so the map can link into it.
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.ko.1-2.notif.sot.json _site/notif/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.en.1-2.notif.sot.json _site/en/notif/index.html
+          # Read-only product map = main + its active initiative, composed. --link
+          # makes each scope's nodes open the document that defines it.
+          node $S/scripts/product-map.mjs \
             demo/meeting-room-booking.ko.sot.json demo/meeting-room-booking.ko.1-2.notif.sot.json \
-            --html _site/map/index.html
-          node plugins/vibespec/skills/vibespec/scripts/product-map.mjs \
+            --link root=$B/ --link notif=$B/notif/ --html _site/map/index.html
+          node $S/scripts/product-map.mjs \
             demo/meeting-room-booking.en.sot.json demo/meeting-room-booking.en.1-2.notif.sot.json \
-            --html _site/en/map/index.html
+            --link root=$B/en/ --link notif=$B/en/notif/ --html _site/en/map/index.html
+      # The three demo pages are separate documents; without this strip the map is
+      # unreachable from the demo and vice versa. Demo-only — not part of the plugin.
+      - name: Add demo navigation
+        run: node demo/nav.mjs /vibespec _site
+      # A silent no-op here would republish the old dead-end demo, so fail loudly.
+      - name: Verify demo is navigable
+        run: |
+          for f in "" en/ notif/ en/notif/ map/ en/map/; do
+            grep -q 'class="demo-nav"' "_site/${f}index.html" || { echo "no nav strip: _site/${f}index.html"; exit 1; }
+          done
+          # The map renders its links from the embedded payload, so assert the payload
+          # carries an href per scope (browser-map.mjs covers the rendering itself).
+          grep -q '"href":"/vibespec/notif/"' _site/map/index.html || { echo "ko map does not link into its initiative"; exit 1; }
+          grep -q '"href":"/vibespec/en/notif/"' _site/en/map/index.html || { echo "en map does not link into its initiative"; exit 1; }
+          echo "[verify] 6 pages carry the nav strip; both maps link into their initiative"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

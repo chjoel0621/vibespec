@@ -11,9 +11,10 @@
     "digest": "node scripts/sot-digest.mjs",
     "rebase": "node scripts/rebase.mjs",
     "map": "node scripts/product-map.mjs",
-    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs",
+    "inspect": "node scripts/inspect.mjs",
+    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/inspect.test.mjs",
     "test:browser": "npm run check:browser",
-    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/plugin-contract.mjs",
+    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/inspect.test.mjs && node tests/plugin-contract.mjs",
     "check:browser": "node tests/browser-flow.mjs && node tests/browser-initiative.mjs && node tests/browser-map.mjs",
     "check:all": "npm run check && npm run check:browser"
   }

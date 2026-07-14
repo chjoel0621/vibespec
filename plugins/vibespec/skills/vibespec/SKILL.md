@@ -1,7 +1,7 @@
 ---
 name: vibespec
 description: >-
-  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성하고, 기존 SOT 파일의 국소 수정도 처리한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; also applies targeted edits to an existing SOT. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
+  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성하고, 기존 SOT의 국소 수정, 그리고 본편 위에 얹는 증분 이니셔티브 생성까지 처리한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; also applies targeted edits to an existing SOT and creates incremental "initiatives" layered on a main SOT. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 기능 추가 이니셔티브, 결제/검색 기능 얹어줘, 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT, add a feature initiative on top of an existing product. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
 ---
 
 # SOT 기획 도구 생성
@@ -14,7 +14,12 @@ description: >-
 ## 절차
 
 1. **입력 수집 및 모드 판별**
-   - **라우팅**: 사용자가 기존 `.sot.json`을 첨부(또는 경로 제시)하며 변경을 요청하면 신규 생성이 아니라 아래 **수정 모드**로 진행한다. 그 외(아이디어·기획 문서)는 신규 생성이다.
+   - **라우팅** (기존 `.sot.json` 첨부·경로 제시가 있으면 4갈래로 판별):
+     - 새 제품 아이디어·기획 문서만 있으면 → **신규 생성**(아래 2~4단계, 본편 SOT 1.0).
+     - 기존 SOT에 작은 제자리 수정(오타·상태·수용 기준 보완, 기존 항목 문구 변경)이면 → **수정 모드**.
+     - 기존 **본편** SOT 위에 범위가 있는 증분(예: "쇼핑몰에 결제 기능 얹어줘", "검색 개선 이니셔티브")이면 → **이니셔티브 모드**(본편은 건드리지 않고 별도 1.1 파일 생성).
+     - 본편이 바뀌어 딸린 이니셔티브들의 기준을 갱신해야 하면 → **재기준(rebase)**.
+   - 애매하면 사용자에게 "본편을 직접 고칠까요, 아니면 별도 이니셔티브로 얹을까요?"를 한 번 확인한다. 판단 기준: 기존 화면·기능의 소규모 교정=수정, 독립적으로 검토·승인·구현할 새 기능 묶음=이니셔티브.
    - 사용자가 제품을 설명했거나 문서를 첨부했으면 그것을 근거로 삼는다. 첨부 문서는 현재 플랫폼에서 제공하는 파일 읽기 도구로 읽는다.
    - 정보가 부족할 때만(제품 목적·핵심 사용자·주요 기능이 불명확) 2~3개 핵심 질문을 한다. 충분하면 묻지 말고 진행한다.
 
@@ -54,8 +59,54 @@ description: >-
 5. **변경 리포트**: `node "<VIBESPEC_SKILL_DIR>/scripts/diff-sot.mjs" "<원본 경로>" "<수정본 경로>"`를 실행해 그 출력(변경 목록·영향 반경·바이트 동일 섹션)을 사용자에게 요약 전달한다. 영향 반경에 뜬 화면·전환·KPI는 함께 검토가 필요하다는 신호다. diff에 요청 범위 밖 변경이 보이면 되돌리고 다시 diff한다.
 6. **산출물**: 수정된 `<제품명>.sot.json`과 embedded-sot를 갱신한 `<제품명>.html`을 신규 생성과 같은 방식으로 전달한다.
 
+## 이니셔티브 모드 (본편 위에 얹는 증분, SOT 1.1)
+
+본편(1.0)을 **그대로 두고**, 그 위에 얹히는 증분을 **별도의 1.1 파일**로 만든다. 본편이 비대해지지 않고, 이니셔티브를 독립적으로 검토·승인·구현할 수 있다. 계약 상세는 `references/sot-schema.md`의 "이니셔티브(SOT 1.1)" 절.
+
+1. **본편을 읽는다.** 첨부·경로로 받은 본편 `.sot.json`을 읽어 접점(이 증분이 어느 화면·기능에서 시작·연결되는지)과 `productId`로 쓸 안정 slug를 파악한다. 본편은 절대 수정하지 않는다.
+
+2. **이니셔티브 SOT를 만든다** (schemaVersion `"1.1"`). 최상위 `initiative` 메타를 넣는다:
+   ```json
+   "initiative": { "productId": "<제품 slug>", "id": "<이니셔티브 slug>", "path": "<경로>", "status": "proposed",
+     "parent": { "scopeId": "root", "canonicalization": "sot-c14n-v1", "digest": "<본편 digest>" } }
+   ```
+   - `productId`·`id`: 소문자 slug(`^[a-z0-9][a-z0-9-]*$`). `id`는 같은 제품 안에서 유일·불변, `"root"` 금지.
+   - `parent.scopeId`: 본편에 붙으면 `"root"`, 다른 이니셔티브 위에 얹으면 그 이니셔티브의 `id`.
+   - `parent.digest`: **부모 파일로부터 계산**한다 — `node "<VIBESPEC_SKILL_DIR>/scripts/sot-digest.mjs" "<부모 sot.json 절대경로>"`의 출력(`sha256:...`)을 그대로 넣는다. 손으로 만들지 말 것.
+   - `path`: 부모가 `root`면 `1-<n>`(형제 중 최대 번호+1, 없으면 `1-1`), 부모가 이니셔티브면 `<부모 path>-<n>`(정확히 한 세그먼트 추가). validate-tree가 이 규칙을 강제한다.
+
+3. **경량 PRD** (§7). 이니셔티브 PRD는 본편과 다르다:
+   - **필수**: `problem`·`solution`(비어있지 않게), `inScope`·`nonGoals`(이 증분이 더하는 것 / 명시적으로 안 하는 것). 이게 이니셔티브의 핵심이다.
+   - 선택: `goal`·`oneLiner`·스코프된 `kpis`·`scenarios`·`targets`.
+   - **제품 정체성 필드 금지**: `category`·`platforms`·`northStar`·`differentiator`·`alternatives`는 넣지 않는다(본편 소관 — 넣으면 검증기가 경고하고 뷰어가 제거를 요구한다).
+
+4. **접점을 경계 스텁으로 표현한다.** 증분이 본편의 화면에서 시작·연결되면, 그 접점을 `boundary`가 있는 페이지로 IA에 넣는다:
+   ```json
+   { "id":"P1", "title":"<본편 페이지 제목 그대로>", "type":"<본편 페이지 타입 그대로>", "refs":[],
+     "boundary": { "scopeId":"root", "pageId":"<본편의 그 페이지 P#>" }, "children":[ …이 증분의 화면들… ] }
+   ```
+   - 스텁의 `title`·`type`은 **본편 페이지를 그대로 미러링**한다(다르면 validate-tree가 drift 경고). 스텁은 참조이므로 자체 `refs`를 두지 않는다. 이 증분의 새 화면들은 스텁의 `children`으로 매단다.
+
+5. **나머지는 신규 생성과 동일.** `requirements`(R1/F1..은 이 파일 안에서 새로 시작), `ia` 커버리지(이 파일의 모든 `F#`·`F#:idx`가 페이지 refs에 등장), `flow`(from/to는 이 파일의 페이지 id — 경계 스텁 포함). 트리거 `ref` 규칙 등 2단계의 flow 규칙을 그대로 지킨다.
+
+6. **검증(2단계)**:
+   - 파일 단독: `node "<VIBESPEC_SKILL_DIR>/scripts/validate-sot.mjs" "<이니셔티브 절대경로>"` → PASS.
+   - 트리(본편+이니셔티브가 든 폴더): `node "<VIBESPEC_SKILL_DIR>/scripts/validate-tree.mjs" "<폴더 절대경로>"` → 오류 0. digest·경계 대상 실존·path·순환을 교차 검사한다. 오류가 나면 고치고 다시 돌린다.
+
+7. **산출물**: `<제품명>.<path>.<id>.sot.json`(예 `shop.1-2.payment.sot.json`)으로 저장하고, 신규 생성과 같은 방식으로 embedded-sot를 심은 HTML을 함께 낸다. 뷰어는 이니셔티브 헤더 밴드·경량 PRD·경계 스텁 읽기전용을 자동으로 보여준다. 본편 파일은 그대로 두고, 사용자에게 "본편은 수정하지 않았고 결제 이니셔티브만 추가했다"처럼 명확히 안내한다.
+
+## 재기준(rebase) — 본편이 바뀐 뒤 이니셔티브 갱신
+
+본편을 수정(수정 모드)하면 본편의 digest가 바뀌어, 그 본편을 기준으로 기록해 둔 이니셔티브들이 **stale**이 된다. digest는 Merkle 체인이라 자동 전파되지 않는다 — 조상을 rebase하면 그 노드 해시가 바뀌어 자식이 다시 stale이 되므로 **root→leaf 순서로 연쇄**해야 한다.
+
+1. 본편+이니셔티브가 든 폴더에서 먼저 **드라이런**: `node "<VIBESPEC_SKILL_DIR>/scripts/rebase.mjs" "<폴더 절대경로>"`. 어떤 이니셔티브가 어떤 순서로 갱신되는지 계획이 출력된다.
+2. 적용: `... rebase.mjs "<폴더>" --apply`(전체 연쇄) 또는 `--apply --only <id,...>`(일부). 부모가 갱신되지 않은 자식은 기록을 거부하고 "stale로 남는다"고 리포트한다 — 조용한 부분 복구는 없다.
+3. rebase는 **stale digest만** 고친다. 트리에 다른 오류(중복 id·구조 등)가 있으면 `--apply`가 거부되므로 validate-tree로 먼저 정리한다.
+4. 갱신된 이니셔티브 파일들의 embedded-sot HTML도 다시 만들어 함께 전달하고, 무엇이 최신이 되었고 무엇이 남았는지 사용자에게 요약한다.
+
 ## 참고
-- 상세 스키마와 예시는 `references/sot-schema.md`.
-- 표준 JSON Schema는 `references/sot.schema.json`, 교차 참조·커버리지 검증기는 `scripts/validate-sot.mjs`.
-- 두 SOT의 변경·영향 비교는 `scripts/diff-sot.mjs` (`--json` 지원).
+- 상세 스키마와 예시는 `references/sot-schema.md`(이니셔티브 1.1·경량 PRD·경계 스텁 포함).
+- 표준 JSON Schema는 `references/sot.schema.json`. 단일 파일 검증기는 `scripts/validate-sot.mjs`, 교차 파일(트리) 검증기는 `scripts/validate-tree.mjs`.
+- 부모 digest 계산은 `scripts/sot-digest.mjs`, 본편 변경 후 연쇄 재기준은 `scripts/rebase.mjs`, 두 SOT 변경·영향 비교는 `scripts/diff-sot.mjs`(`--json` 지원).
 - IA와 기능명세서는 refs로 연결된 별개 축이다. flow는 실제 이동 경로로 채운다.
+- 이니셔티브 산출 파일은 항상 자기완결이다(본편 없이도 뷰어에서 열림). 본편 데이터를 이니셔티브에 복사하지 말고 경계 스텁으로만 접점을 표시한다.

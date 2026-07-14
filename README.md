@@ -70,6 +70,8 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 **Updating an existing plan:** attach your `*.sot.json` with a request like "rename F3 and add an acceptance criterion." The skill applies a minimal edit — every existing id stays stable — then validates the result and reports exactly what changed, what it touches (screens, transitions, KPIs), and which sections are untouched byte-for-byte.
 
+**Adding an initiative (a scoped increment):** attach your main `*.sot.json` and ask "add a payment initiative on top." Instead of bloating the main plan, the skill creates a **separate initiative file** (`<product>.<path>.<id>.sot.json`) layered on it — with its own lean PRD (problem, solution, in-scope, non-goals) and a **boundary** marking where it attaches to a main screen. The main file is left untouched, so an initiative can be reviewed, approved, and shipped on its own. Each initiative records a digest of the main it was written against; if the main later changes, the skill can **rebase** the affected initiatives (parent-to-child) so nothing silently drifts.
+
 ### If the skill doesn't auto-trigger (invoke it manually)
 
 The skill fires automatically on natural-language requests, but if it doesn't, you can call it directly.
@@ -164,6 +166,13 @@ To compare two versions of a SOT — what changed, what it touches (screens, tra
 
 ```
 node scripts/diff-sot.mjs before.sot.json after.sot.json
+```
+
+For a product tree (a main SOT plus its initiatives), validate cross-file rules, and rebase initiatives after the main changes:
+
+```
+node scripts/validate-tree.mjs path/to/product-folder   # scope, digest, boundary, path checks
+node scripts/rebase.mjs path/to/product-folder           # dry-run cascade; add --apply to write
 ```
 
 For an older SOT, load it in the viewer and save it once to promote it to the 1.0 format, then validate the newly saved file. Loading normalizes legacy KPI, scenario, and field shapes.

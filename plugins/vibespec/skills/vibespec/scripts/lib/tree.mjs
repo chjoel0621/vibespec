@@ -91,8 +91,9 @@ export function validateTree(docs) {
       const parentScope = scopes.get(meta.parent.scopeId);
       if (parentScope && !parentScope.isRoot) {
         const parentPath = parentScope.doc.sot.initiative.path;
-        if (!String(meta.path).startsWith(parentPath + "-")) {
-          err(d.name, "$.initiative.path", `path "${meta.path}" must extend parent path "${parentPath}" (e.g. "${parentPath}-1")`);
+        const escapedParentPath = parentPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        if (!new RegExp(`^${escapedParentPath}-[1-9]\\d*$`).test(String(meta.path))) {
+          err(d.name, "$.initiative.path", `path "${meta.path}" must extend parent path "${parentPath}" by exactly one numeric segment (e.g. "${parentPath}-1")`);
         }
       }
     }
@@ -112,7 +113,19 @@ export function validateTree(docs) {
 
   // 6) Boundary stubs: scopeId must be a real ancestor, pageId must exist there,
   //    and stored title/type must not have drifted from the target page.
-  const ancestorsOf = id => { const out = new Set(); let c = parentOf(id); while (c) { out.add(c); c = c === ROOT ? null : parentOf(c); } return out; };
+  const ancestorsOf = id => {
+    const out = new Set();
+    const seen = new Set([id]);
+    let c = parentOf(id);
+    while (c) {
+      if (seen.has(c)) break; // The cycle is already reported above; never hang while reporting it.
+      seen.add(c);
+      out.add(c);
+      if (c === ROOT) break;
+      c = parentOf(c);
+    }
+    return out;
+  };
   for (const d of initiatives) {
     const meta = d.sot.initiative;
     const ancestors = ancestorsOf(meta.id);
@@ -145,18 +158,72 @@ export function validateTree(docs) {
     }
   }
 
-  // 8) Active set for map/index: approved requires a clean digest; implemented
-  //    is always included (stale ones flagged above).
+  // 8) Active set for map/index, ANCESTRY-CLOSED: an initiative is active only
+  //    if it is self-active AND every ancestor up to root is active too. A
+  //    stale approved parent that drops out must take its subtree with it —
+  //    otherwise the map synthesizes an overlay onto a scope that isn't there.
+  const digestOf = new Map(); // memoize parent-doc hashes
+  const hashScope = id => { if (!digestOf.has(id)) digestOf.set(id, sotDigest(scopes.get(id).doc.sot)); return digestOf.get(id); };
+  const isStale = meta => { const p = scopes.get(meta.parent.scopeId); return !!p && hashScope(meta.parent.scopeId) !== meta.parent.digest; };
+  const selfActive = scope => {
+    if (scope.isRoot) return true;
+    const meta = scope.doc.sot.initiative;
+    if (!ACTIVE.has(meta.status)) return false;
+    if (meta.status === "approved" && isStale(meta)) return false; // excluded until rebased+reapproved
+    return true;
+  };
+  const activeMemo = new Map();
+  const isActive = id => {
+    if (activeMemo.has(id)) return activeMemo.get(id);
+    const scope = scopes.get(id);
+    if (!scope) return false;
+    activeMemo.set(id, false); // guard against cycles (already errored) while resolving
+    const parentActive = scope.isRoot ? true : (scopes.has(scope.doc.sot.initiative.parent.scopeId) && isActive(scope.doc.sot.initiative.parent.scopeId));
+    const result = selfActive(scope) && parentActive;
+    activeMemo.set(id, result);
+    return result;
+  };
   const activeSet = [];
   const staleSet = [];
   for (const d of initiatives) {
     const meta = d.sot.initiative;
-    if (!ACTIVE.has(meta.status)) continue;
-    const parentScope = scopes.get(meta.parent.scopeId);
-    const stale = parentScope && sotDigest(parentScope.doc.sot) !== meta.parent.digest;
-    if (meta.status === "approved" && stale) continue; // excluded until rebased+reapproved
-    activeSet.push(meta.id);
-    if (stale) staleSet.push(meta.id);
+    if (isActive(meta.id)) {
+      activeSet.push(meta.id);
+      if (isStale(meta)) staleSet.push(meta.id); // only implemented reaches here while stale
+    } else if (selfActive(scopes.get(meta.id))) {
+      // self-active but excluded by an ancestor — point the user upstream.
+      let cursor = meta.parent.scopeId, blocker = null;
+      while (cursor && cursor !== ROOT && scopes.has(cursor)) {
+        if (!selfActive(scopes.get(cursor))) { blocker = cursor; break; }
+        cursor = scopes.get(cursor).doc.sot.initiative.parent.scopeId;
+      }
+      if (blocker) warn(d.name, "$.initiative", `excluded from the active set: ancestor "${blocker}" is not active — rebase/approve "${blocker}", not this`);
+    }
+  }
+
+  // v1 only reports conflicts: active initiatives may still share a boundary,
+  // but the user must see every affected file before resolving the overlap.
+  const boundaryOwners = new Map();
+  for (const d of initiatives) {
+    if (!activeSet.includes(d.sot.initiative.id)) continue;
+    const meta = d.sot.initiative;
+    const walk = (pages, base) => (pages ?? []).forEach((page, i) => {
+      const path = `${base}[${i}]`;
+      if (isObject(page.boundary)) {
+        const target = `${page.boundary.scopeId}/${page.boundary.pageId}`;
+        if (!boundaryOwners.has(target)) boundaryOwners.set(target, new Map());
+        boundaryOwners.get(target).set(meta.id, { file: d.name, path: `${path}.boundary` });
+      }
+      walk(page.children, `${path}.children`);
+    });
+    d.sot.ia?.sections?.forEach((section, i) => walk(section.pages, `$.ia.sections[${i}].pages`));
+  }
+  for (const [target, owners] of boundaryOwners) {
+    if (owners.size < 2) continue;
+    const ids = [...owners.keys()].join(", ");
+    for (const { file, path } of owners.values()) {
+      warn(file, path, `boundary conflict: active initiatives ${ids} all reference "${target}"`);
+    }
   }
 
   return {

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateTree } from "../scripts/lib/tree.mjs";
+import { collectFiles } from "../scripts/validate-tree.mjs";
 import { sotDigest } from "../scripts/lib/c14n.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -78,6 +80,28 @@ assert.ok(hasError(validateTree([doc("m", main), doc("p", payment), doc("c", bad
   "child path must extend parent path");
 console.log("[tree] PASS rejects child path that does not extend the parent path");
 
+// A direct child gets exactly one new path segment; otherwise a missing
+// intermediate initiative could be implied by a valid-looking path.
+const skippedLevel = clone(activeChild);
+skippedLevel.initiative.status = "proposed";
+skippedLevel.initiative.path = "1-2-1-1";
+skippedLevel.initiative.parent = { scopeId: "payment", canonicalization: "sot-c14n-v1", digest: sotDigest(payment) };
+assert.ok(hasError(validateTree([doc("m", main), doc("p", payment), doc("c", skippedLevel)]), "exactly one numeric segment"),
+  "direct child path must add exactly one segment");
+console.log("[tree] PASS rejects a child path that skips an intermediate level");
+
+// A parent cycle must produce findings and return; boundary ancestry walks
+// cannot be allowed to loop after the cycle detector has identified it.
+const cycleA = clone(payment);
+cycleA.initiative.parent.scopeId = "refund";
+const cycleB = clone(payment);
+cycleB.initiative.id = "refund";
+cycleB.initiative.path = "1-2-1";
+cycleB.initiative.parent.scopeId = "payment";
+assert.ok(hasError(validateTree([doc("m", main), doc("a", cycleA), doc("b", cycleB)]), "cycle detected"),
+  "parent cycle must be reported without hanging");
+console.log("[tree] PASS reports a parent cycle without hanging");
+
 // implemented + stale digest = warning (not error), stays in the active set flagged stale.
 const changedMain = clone(main); changedMain.title = "Changed";
 const shipped = clone(payment); shipped.initiative.status = "implemented";
@@ -93,3 +117,43 @@ const staleApproved = validateTree([doc("m", changedMain), doc("p", payment)]);
 assert.equal(staleApproved.valid, false, "approved + stale = error");
 assert.deepEqual(staleApproved.product.activeSet, [], "stale approved is excluded from the active set");
 console.log("[tree] PASS stale approved initiative is excluded from the active set");
+
+// Ancestry closure: a stale approved parent takes its (otherwise-active) child
+// out of the active set too — no orphan overlay — and the child is warned to
+// rebase the ancestor, not itself.
+const closureChild = clone(payment);
+closureChild.initiative.id = "refund";
+closureChild.initiative.path = "1-2-1";
+closureChild.initiative.status = "approved";
+closureChild.initiative.parent = { scopeId: "payment", canonicalization: "sot-c14n-v1", digest: sotDigest(payment) };
+closureChild.ia.sections[0].pages[0].boundary = { scopeId: "payment", pageId: "P2" };
+closureChild.ia.sections[0].pages[0].title = "Pay"; // match target to avoid unrelated drift noise
+const closure = validateTree([doc("m", changedMain), doc("payment", payment), doc("refund", closureChild)]);
+assert.deepEqual(closure.product.activeSet, [], "stale approved parent must exclude its whole subtree (no orphan child)");
+assert.ok(closure.warnings.some(w => w.file === "refund" && w.message.includes('ancestor "payment"')),
+  "orphaned child must be warned to rebase the ancestor");
+console.log("[tree] PASS active set is ancestry-closed (stale parent excludes child, warns upstream)");
+
+// Active initiatives may overlap in v1, but each owner needs a conflict
+// warning so a person can resolve it before product-map synthesis.
+const paymentConflict = clone(payment);
+paymentConflict.initiative.id = "search";
+paymentConflict.initiative.path = "1-3";
+const conflictResult = validateTree([doc("m", main), doc("payment", payment), doc("search", paymentConflict)]);
+assert.equal(conflictResult.valid, true, "boundary overlap is a warning, not an error");
+assert.ok(hasWarn(conflictResult, "boundary conflict"), "active initiatives sharing a boundary must warn");
+console.log("[tree] PASS active initiatives sharing a boundary warn");
+
+// Folder mode is the normal user path, so archived dropped files must be found
+// recursively rather than silently disappearing from path-reuse protection.
+const scanDir = mkdtempSync(join(tmpdir(), "vibespec-tree-"));
+try {
+  mkdirSync(join(scanDir, "archive"));
+  copyFileSync(join(treeDir, "main.sot.json"), join(scanDir, "main.sot.json"));
+  copyFileSync(join(treeDir, "shop.1-2.payment.sot.json"), join(scanDir, "archive", "shop.1-2.payment.sot.json"));
+  const scanned = collectFiles([scanDir]).map(file => basename(file)).sort();
+  assert.deepEqual(scanned, ["main.sot.json", "shop.1-2.payment.sot.json"], "folder scan must include archived SOT files");
+} finally {
+  rmSync(scanDir, { recursive: true, force: true });
+}
+console.log("[tree] PASS folder scan includes archived SOT files recursively");

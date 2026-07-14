@@ -11,17 +11,33 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { validateTree } from "./lib/tree.mjs";
 
-function collectFiles(args) {
+function collectSotFiles(folder) {
+  const files = [];
+  const visit = dir => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== ".git" && entry.name !== "node_modules") visit(path);
+      } else if (entry.isFile() && entry.name.endsWith(".sot.json")) {
+        files.push(path);
+      }
+    }
+  };
+  visit(folder);
+  return files;
+}
+
+export function collectFiles(args) {
   const files = [];
   for (const arg of args) {
     const st = statSync(arg);
     if (st.isDirectory()) {
-      for (const name of readdirSync(arg)) if (name.endsWith(".sot.json")) files.push(join(arg, name));
+      files.push(...collectSotFiles(arg));
     } else {
       files.push(arg);
     }
   }
-  return files;
+  return [...new Set(files)];
 }
 
 export function printTreeResult(result, fileCount) {

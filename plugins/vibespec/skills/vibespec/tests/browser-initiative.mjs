@@ -165,3 +165,30 @@ console.log("[browser] PASS boundary stub is read-only for title/type/refs but a
 const [nTitle, nType, nLink] = iaProbe("P2"); // P2 is a normal initiative-owned page
 assert.equal([nTitle, nType, nLink].join(""), "truetruetrue", "a normal page keeps full editing");
 console.log("[browser] PASS a normal initiative page keeps full IA editing");
+
+// A boundary stub with its own feature refs (validator warns, linking UI hidden)
+// must not trap the value: it surfaces a clear action, and clicking empties refs.
+const stubWithStrayRefs = JSON.parse(JSON.stringify(initiative));
+stubWithStrayRefs.ia.sections[0].pages[0].refs = ["F1"]; // P1 is the boundary stub
+const STRAY_SHOW = `<script>
+VIEW="ia"; selPage="P1"; render();
+document.documentElement.setAttribute("data-probe",[!!document.querySelector("[data-clear-boundary-refs]"),(document.querySelector(".prd-idnotice b")||{}).textContent||""].join("~"));
+</script>`;
+const [strayShown, strayNames] = probe(stubWithStrayRefs, STRAY_SHOW).split("~");
+assert.equal(strayShown, "true", "a boundary stub carrying refs must surface a clear action");
+assert.ok(strayNames.length > 0, "the notice must name the stray refs");
+console.log("[browser] PASS boundary stub with feature refs surfaces a clear action");
+
+const noStray = probe(initiative, STRAY_SHOW).split("~")[0]; // fixture P1 has empty refs
+assert.equal(noStray, "false", "an empty boundary stub shows no clear action");
+console.log("[browser] PASS boundary stub without refs shows no clear action");
+
+const STRAY_CLEAR = `<script>
+VIEW="ia"; selPage="P1"; render();
+document.querySelector("[data-clear-boundary-refs]").click();
+document.documentElement.setAttribute("data-probe",[!!document.querySelector("[data-clear-boundary-refs]"),JSON.stringify(iaFindPage("P1").page.refs)].join("~"));
+</script>`;
+const [afterStrayNotice, afterStrayRefs] = probe(stubWithStrayRefs, STRAY_CLEAR).split("~");
+assert.equal(afterStrayNotice, "false", "clearing removes the boundary-refs notice");
+assert.equal(afterStrayRefs, "[]", "clearing empties the boundary stub's refs");
+console.log("[browser] PASS clear-boundary-refs empties the stub and dismisses the notice");

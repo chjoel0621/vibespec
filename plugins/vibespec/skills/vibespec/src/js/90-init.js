@@ -87,6 +87,7 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if(d.addToppage){ const s=SOT.ia.sections.find(x=>x.id===d.addToppage); const p={id:nid("P"),title:"새 페이지",type:"top",refs:[],children:[]}; s.pages.push(p); selPage=p.id; commit(); }
   else if(d.addPage){ const r=iaFindPage(d.addPage); const p={id:nid("P"),title:"새 페이지",type:"page",refs:[],children:[]}; r.page.children.push(p); selPage=p.id; commit(); }
   else if(d.delPage){ const r=iaFindPage(d.delPage); if(r){ const i=r.arr.indexOf(r.page); r.arr.splice(i,1); if(selPage===d.delPage) selPage=null; } commit(); }
+  else if(d.clearBoundaryRefs){ const r=iaFindPage(d.clearBoundaryRefs); if(r) r.page.refs=[]; commit(); }
   else if(d.iaUnlink){ const[pid,i]=d.iaUnlink.split("#"); const r=iaFindPage(pid); if(r) r.page.refs.splice(+i,1); commit(); }
   else if(d.mapUnlink){ const[pid,fid]=d.mapUnlink.split("~"); const r=iaFindPage(pid); if(r) r.page.refs=r.page.refs.filter(x=>x!==fid); commit(); }
   else if("iaFillmissing" in d){ iaFillMissing(); commit(); }

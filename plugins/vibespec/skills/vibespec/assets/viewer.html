@@ -1084,6 +1084,12 @@ function renderIADetail(){
   // Adding child screens and deleting the stub stay allowed (the initiative's
   // own structure hangs off this attach point).
   if(p.boundary){
+    // A stub referencing a parent page must not carry its own feature refs
+    // (validate-sot warns). If it does, the linking UI is hidden — so surface a
+    // notice with an explicit clear action rather than trapping the value.
+    const strayRefs = (p.refs||[]).length
+      ? `<div class="prd-idnotice">⚠ ${t('이 본편 접점에 이니셔티브 자체 기능 참조가 들어 있습니다','This boundary stub carries the initiative’s own feature refs')}: <b>${(p.refs||[]).map(rid=>esc(refLabel(rid))).join(", ")}</b>. ${t('접점은 본편 화면의 참조라 자체 참조를 두지 않습니다.','A boundary is a reference to a main-document screen and should not hold its own refs.')} <button class="addbtn" data-clear-boundary-refs="${p.id}">${t('기능 참조 비우기','Clear feature refs')}</button></div>`
+      : "";
     return `<div class="detail">
       <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('본편','Main')}</span></div>
       <div class="dt-goto"><button class="topbtn" data-add-page="${p.id}">${t('＋ 하위 화면','＋ Child screen')}</button>
@@ -1091,6 +1097,7 @@ function renderIADetail(){
       <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
       <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${ptype(p.type)}</span></div>
       <div class="dt-row"><span class="dt-k">${t('본편 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
+      ${strayRefs}
       <div class="ia-boundary-note">${t('본편 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
     </div>`;
   }
@@ -1476,6 +1483,7 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if(d.addToppage){ const s=SOT.ia.sections.find(x=>x.id===d.addToppage); const p={id:nid("P"),title:"새 페이지",type:"top",refs:[],children:[]}; s.pages.push(p); selPage=p.id; commit(); }
   else if(d.addPage){ const r=iaFindPage(d.addPage); const p={id:nid("P"),title:"새 페이지",type:"page",refs:[],children:[]}; r.page.children.push(p); selPage=p.id; commit(); }
   else if(d.delPage){ const r=iaFindPage(d.delPage); if(r){ const i=r.arr.indexOf(r.page); r.arr.splice(i,1); if(selPage===d.delPage) selPage=null; } commit(); }
+  else if(d.clearBoundaryRefs){ const r=iaFindPage(d.clearBoundaryRefs); if(r) r.page.refs=[]; commit(); }
   else if(d.iaUnlink){ const[pid,i]=d.iaUnlink.split("#"); const r=iaFindPage(pid); if(r) r.page.refs.splice(+i,1); commit(); }
   else if(d.mapUnlink){ const[pid,fid]=d.mapUnlink.split("~"); const r=iaFindPage(pid); if(r) r.page.refs=r.page.refs.filter(x=>x!==fid); commit(); }
   else if("iaFillmissing" in d){ iaFillMissing(); commit(); }

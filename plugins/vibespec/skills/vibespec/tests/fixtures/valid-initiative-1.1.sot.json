@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.1",
+  "title": "Payment initiative",
+  "lang": "en",
+  "initiative": {
+    "productId": "acme-shop",
+    "id": "payment",
+    "path": "1-2",
+    "status": "proposed",
+    "parent": {
+      "scopeId": "root",
+      "canonicalization": "sot-c14n-v1",
+      "digest": "sha256:376e087cc26cb25088c25429a8863ac8ed066308c49c8c08ab5b8e047329d29f"
+    }
+  },
+  "prd": {
+    "oneLiner": "Add a checkout flow to the shop",
+    "goal": "Ship payments so members can complete a purchase",
+    "whyNow": "",
+    "category": "",
+    "platforms": [],
+    "problem": "Members can fill a cart but cannot pay",
+    "solution": "Add a checkout flow that starts from the existing cart screen",
+    "alternatives": "",
+    "differentiator": "",
+    "targets": [],
+    "scenarios": [],
+    "northStar": "",
+    "kpis": [],
+    "inScope": [],
+    "nonGoals": [],
+    "assumptions": [],
+    "risks": [],
+    "openQuestions": [],
+    "constraints": []
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "Checkout", "desc": "", "status": "todo", "priority": "mid", "acceptance": [],
+      "features": [
+        { "id": "F1", "title": "Pay", "desc": "", "status": "todo", "priority": "mid", "acceptance": [], "specs": [] }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1", "title": "Checkout",
+        "pages": [
+          {
+            "id": "P1", "title": "Cart (main)", "type": "top", "refs": [],
+            "boundary": { "scopeId": "root", "pageId": "P10" },
+            "children": [
+              { "id": "P2", "title": "Pay", "type": "page", "refs": ["F1"], "children": [] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [ { "from": "P1", "to": "P2", "ref": "F1" } ]
+  }
+}

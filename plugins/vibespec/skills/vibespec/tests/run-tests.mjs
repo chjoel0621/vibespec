@@ -189,6 +189,47 @@ assert.deepEqual(retriggerChanges.map(c => c.type), ["modified"], `single-group 
 assert.equal(retriggerChanges[0].path, "flow.P1→P2");
 console.log("[test] PASS single transition trigger change stays a modified record");
 
+/* ==== SOT 1.1 initiative schema (inactive contract — nothing generates 1.1 yet) ==== */
+const initiative = JSON.parse(readFileSync(join(here, "fixtures", "valid-initiative-1.1.sot.json"), "utf8"));
+const cloneInit = () => JSON.parse(JSON.stringify(initiative));
+
+assert.equal(validateSot(cloneInit()).valid, true, `valid 1.1 initiative: ${JSON.stringify(validateSot(cloneInit()).errors)}`);
+console.log("[test] PASS valid 1.1 initiative passes validation");
+
+const initiativeCases = [
+  { name: "id reserved root", mutate: v => { v.initiative.id = "root"; }, message: '"root" is reserved' },
+  { name: "self parent", mutate: v => { v.initiative.parent.scopeId = v.initiative.id; }, message: "cannot be its own parent" },
+  { name: "wrong canonicalization", mutate: v => { v.initiative.parent.canonicalization = "sot-c14n-v2"; }, message: 'must equal "sot-c14n-v1"' },
+  { name: "malformed digest", mutate: v => { v.initiative.parent.digest = "notahash"; }, message: "must match" },
+  { name: "bad status", mutate: v => { v.initiative.status = "merged"; }, message: "must be one of proposed" },
+  { name: "missing initiative meta", mutate: v => { delete v.initiative; }, message: "must be an object" },
+  { name: "unknown initiative field", mutate: v => { v.initiative.kind = "feature"; }, message: "field is not allowed" }
+];
+for (const testCase of initiativeCases) {
+  const doc = cloneInit(); testCase.mutate(doc);
+  const r = validateSot(doc);
+  assert.equal(r.valid, false, `${testCase.name}: expected failure`);
+  assert.ok(r.errors.some(e => e.message.includes(testCase.message)), `${testCase.name}: missing "${testCase.message}" in ${JSON.stringify(r.errors)}`);
+  console.log(`[test] PASS 1.1 rejects: ${testCase.name}`);
+}
+
+// Version gating: 1.1-only fields must be rejected under 1.0.
+const oneOhPlusInitiative = clone(valid); oneOhPlusInitiative.initiative = cloneInit().initiative;
+assert.ok(validateSot(oneOhPlusInitiative).errors.some(e => e.message.includes("requires schemaVersion 1.1")),
+  "1.0 with initiative must be rejected");
+const oneOhPlusBoundary = clone(valid); oneOhPlusBoundary.ia.sections[0].pages[0].boundary = { scopeId: "root", pageId: "P1" };
+assert.ok(validateSot(oneOhPlusBoundary).errors.some(e => e.message.includes("requires schemaVersion 1.1")),
+  "1.0 with page boundary must be rejected");
+console.log("[test] PASS 1.0 forbids initiative meta and page boundary");
+
+// Boundary stub carrying its own refs is a warning, not an error.
+const stubWithRefs = cloneInit();
+stubWithRefs.ia.sections[0].pages[0].refs = ["F1"];
+const stubResult = validateSot(stubWithRefs);
+assert.equal(stubResult.valid, true, `boundary stub with refs should still be valid: ${JSON.stringify(stubResult.errors)}`);
+assert.ok(stubResult.warnings.some(w => w.message.includes("boundary stub")), "boundary stub with refs should warn");
+console.log("[test] PASS boundary stub with own refs warns but stays valid");
+
 const dense = createDenseSot();
 const denseResult = validateSot(dense);
 assert.equal(dense.flow.transitions.length, 53);

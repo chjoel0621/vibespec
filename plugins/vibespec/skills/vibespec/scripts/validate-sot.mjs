@@ -94,7 +94,8 @@ export function validateSot(sot) {
     return { valid: uniqueErrors.length === 0, errors: uniqueErrors, warnings: uniqueWarnings };
   };
   if (!requireObject(sot, "$")) return result();
-  if (sot.schemaVersion !== "1.0") error("$.schemaVersion", 'must equal "1.0"');
+  if (!["1.0", "1.1"].includes(sot.schemaVersion)) error("$.schemaVersion", 'must equal "1.0" or "1.1"');
+  const isInitiative = sot.schemaVersion === "1.1";
   requireString(sot.title, "$.title", true);
   if (sot.lang !== undefined && !["ko", "en"].includes(sot.lang)) error("$.lang", 'must be "ko" or "en"');
 
@@ -152,6 +153,7 @@ export function validateSot(sot) {
   const pageIds = new Set();
   const iaRefs = new Set();
   const sectionIds = new Set();
+  const boundaryPages = [];
   const walkPage = (page, path) => {
     if (!requireObject(page, path)) return;
     if (!pageIdPattern.test(page.id || "")) error(`${path}.id`, "must match P1, P2, ...");
@@ -164,6 +166,7 @@ export function validateSot(sot) {
       else if (!featureRefs.has(ref)) error(`${path}.refs[${i}]`, `unknown feature ref ${ref}`);
       else iaRefs.add(ref);
     });
+    if (Object.hasOwn(page, "boundary")) boundaryPages.push({ page, path });
     if (requireArray(page.children, `${path}.children`)) page.children.forEach((child, i) => walkPage(child, `${path}.children[${i}]`));
   };
   if (requireObject(sot.ia, "$.ia") && requireArray(sot.ia.sections, "$.ia.sections")) {
@@ -179,6 +182,30 @@ export function validateSot(sot) {
     });
   }
   for (const ref of featureRefs) if (!iaRefs.has(ref)) error("$.ia", `missing IA coverage for ${ref}`);
+
+  // Version-conditional: initiative meta + page boundary are 1.1-only. The
+  // JSON Schema layer only accepts them structurally (superset); presence
+  // rules and self-reference checks live here. Cross-file existence of
+  // parent.scopeId / boundary.scopeId is validate-tree's job, not this file's.
+  if (isInitiative) {
+    // Single-file checks only. path↔parent-prefix consistency and cross-file
+    // existence of parent.scopeId are validate-tree invariants (and exact path
+    // issuance is still an open roadmap question), so they are NOT enforced here.
+    const meta = sot.initiative;
+    if (requireObject(meta, "$.initiative")) {
+      if (meta.id === "root") error("$.initiative.id", '"root" is reserved for the main document');
+      if (isObject(meta.parent) && meta.parent.scopeId === meta.id) error("$.initiative.parent.scopeId", "initiative cannot be its own parent");
+    }
+    for (const { page, path } of boundaryPages) {
+      if (isObject(page.boundary) && page.boundary.scopeId === (meta && meta.id)) {
+        error(`${path}.boundary.scopeId`, "boundary cannot reference the initiative's own scope");
+      }
+      if ((page.refs || []).length) warning(`${path}.refs`, "a boundary stub page should not carry its own feature refs");
+    }
+  } else {
+    if (Object.hasOwn(sot, "initiative")) error("$.initiative", "initiative meta requires schemaVersion 1.1");
+    for (const { path } of boundaryPages) error(`${path}.boundary`, "page boundary requires schemaVersion 1.1");
+  }
 
   if (isObject(prd)) {
     if (Array.isArray(prd.scenarios)) prd.scenarios.forEach((scenario, i) => {

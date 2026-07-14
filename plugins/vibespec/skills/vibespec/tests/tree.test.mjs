@@ -174,3 +174,13 @@ try {
   rmSync(scanDir, { recursive: true, force: true });
 }
 console.log("[tree] PASS folder scan includes archived SOT files recursively");
+
+// sot-digest.mjs prints exactly the digest an initiative records as
+// parent.digest — i.e. the value validate-tree recomputes for freshness.
+import { spawnSync } from "node:child_process";
+import { sotDigest as digestOf } from "../scripts/lib/c14n.mjs";
+const digestCli = spawnSync(process.execPath, [join(here, "..", "scripts", "sot-digest.mjs"), join(treeDir, "main.sot.json")], { encoding: "utf8" });
+assert.equal(digestCli.status, 0, `sot-digest exit: ${digestCli.stderr}`);
+assert.equal(digestCli.stdout.trim(), digestOf(main), "sot-digest CLI must match lib sotDigest");
+assert.equal(digestCli.stdout.trim(), payment.initiative.parent.digest, "and match the fixture initiative's recorded parent digest");
+console.log("[tree] PASS sot-digest CLI prints the canonical parent digest");

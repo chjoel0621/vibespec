@@ -8,6 +8,7 @@
     "build": "node build.mjs",
     "validate": "node scripts/validate-sot.mjs",
     "validate:tree": "node scripts/validate-tree.mjs",
+    "digest": "node scripts/sot-digest.mjs",
     "rebase": "node scripts/rebase.mjs",
     "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs",
     "test:browser": "npm run check:browser",

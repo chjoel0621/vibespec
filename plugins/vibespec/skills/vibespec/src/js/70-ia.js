@@ -25,8 +25,11 @@ function buildIAFromSpec(){
 function iaPageLi(p){
   const kids = (p.children&&p.children.length)?`<ul>${p.children.map(iaPageLi).join("")}</ul>`:"";
   const cls = p.type==="top"?"top":(p.type==="action"?"action":"page");
-  return `<li><div class="snode ${cls} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
-      <span class="stype">${ptype(p.type)}</span>
+  const bnd = p.boundary ? " boundary" : "";
+  // A boundary stub references a parent page — keep ＋add child (the initiative
+  // hangs its own screens here), keep ×delete (re-attach is the user's call).
+  return `<li><div class="snode ${cls}${bnd} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
+      <span class="stype">${p.boundary?t('본편 접점','Main boundary'):ptype(p.type)}</span>
       <span class="stitle">${esc(p.title)}</span>
       <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="${t('하위 추가','Add child')}">＋</button><button class="mini" data-del-page="${p.id}" title="${t('삭제','Delete')}">×</button></span>
     </div>${kids}</li>`;
@@ -83,6 +86,21 @@ function renderIADetail(){
   const r = iaFindPage(selPage);
   if(!r) return `<div class="detail"><p class="empty">${t('노드를 선택하세요.','Select a node.')}</p></div>`;
   const p=r.page;
+  // Boundary stub: a reference to a parent page. Title/type/feature-refs are the
+  // parent's to define (editing them here = drift), so they render read-only.
+  // Adding child screens and deleting the stub stay allowed (the initiative's
+  // own structure hangs off this attach point).
+  if(p.boundary){
+    return `<div class="detail">
+      <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('본편','Main')}</span></div>
+      <div class="dt-goto"><button class="topbtn" data-add-page="${p.id}">${t('＋ 하위 화면','＋ Child screen')}</button>
+        <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
+      <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
+      <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${ptype(p.type)}</span></div>
+      <div class="dt-row"><span class="dt-k">${t('본편 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
+      <div class="ia-boundary-note">${t('본편 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
+    </div>`;
+  }
   const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${ptype(k)}</option>`).join("");
   const cat = specCatalog();
   const linked = (p.refs||[]).map((rid,i)=>`<div class="ia-link"><span class="ill">${esc(refLabel(rid))}</span><button class="ac-del" data-ia-unlink="${p.id}#${i}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">${t('연결된 기능이 없습니다.','No linked features.')}</div>`;

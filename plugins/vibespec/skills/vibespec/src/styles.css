@@ -71,6 +71,11 @@
   .snode.sec{background:var(--accent-soft);font-weight:700}
   .snode.top{border-color:var(--accent);font-weight:700}
   .snode.action{border-radius:999px}
+  /* boundary stub: a reference to a parent page (read-only title/type/refs) */
+  .snode.boundary{border-style:dashed;background:repeating-linear-gradient(135deg,#fff,#fff 6px,var(--panel) 6px,var(--panel) 12px)}
+  .snode.boundary .stype{color:var(--accent);opacity:1}
+  .boundary-tag{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:1px 7px;vertical-align:middle}
+  .ia-boundary-note{margin-top:14px;padding:10px 12px;background:var(--panel);border:1px dashed var(--accent-line);border-radius:9px;color:var(--sub);font-size:12px;line-height:1.6}
   .snode .stitle{font-size:12.5px;font-weight:600;white-space:nowrap}
   .snode .stype{font-size:10px;font-weight:700;letter-spacing:.3px;opacity:.7}
   .snode .srowbtns{position:absolute;top:-11px;right:-9px;display:flex;gap:3px;opacity:0;transition:opacity .15s}

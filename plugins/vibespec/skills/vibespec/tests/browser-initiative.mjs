@@ -139,3 +139,29 @@ assert.equal(afterNotice, "false", "clicking clear must remove the notice");
 assert.equal(afterCat, "", "clear must empty string product-identity fields");
 assert.equal(afterPlat, "[]", "clear must empty array product-identity fields");
 console.log("[browser] PASS clear-identity button empties the fields and dismisses the notice");
+
+// Boundary stub (§7): a reference to a parent page. Title/type/feature-linking
+// are read-only (the parent owns them); adding child screens and deleting the
+// stub stay allowed. A normal page keeps full editing.
+const iaProbe = pageId => {
+  const harness = `<script>
+  VIEW="ia"; selPage="${pageId}"; render();
+  const d=document.querySelector(".ia-side");
+  document.documentElement.setAttribute("data-probe",[
+    !!d.querySelector("[data-ia-title]"), !!d.querySelector("[data-ia-type]"), !!d.querySelector("[data-ia-link]"),
+    !!d.querySelector("[data-add-page]"), !!d.querySelector("[data-del-page]"),
+    !!document.querySelector(".snode.boundary"), !!d.querySelector(".ia-boundary-note")
+  ].join("|"));
+  </script>`;
+  return probe(initiative, harness).split("|");
+};
+const [bTitle, bType, bLink, bAdd, bDel, bNode, bNote] = iaProbe("P1"); // P1 is the boundary stub in the fixture
+assert.equal([bTitle, bType, bLink].join(""), "falsefalsefalse", "boundary stub must not expose title/type/feature-link editing");
+assert.equal([bAdd, bDel].join(""), "truetrue", "boundary stub must still allow add-child and delete");
+assert.equal(bNode, "true", "the boundary node must be visually marked in the sitemap");
+assert.equal(bNote, "true", "the boundary detail must show the read-only explanation");
+console.log("[browser] PASS boundary stub is read-only for title/type/refs but allows structure edits");
+
+const [nTitle, nType, nLink] = iaProbe("P2"); // P2 is a normal initiative-owned page
+assert.equal([nTitle, nType, nLink].join(""), "truetruetrue", "a normal page keeps full editing");
+console.log("[browser] PASS a normal initiative page keeps full IA editing");

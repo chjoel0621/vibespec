@@ -131,11 +131,16 @@ vibespec/
 │       ├── references/sot-schema.md    # JSON data contract (schema)
 │       ├── references/sot.schema.json  # Machine-readable JSON Schema
 │       ├── scripts/
+│       │   ├── inspect.mjs             # Routing pre-flight (classify, next path, suggested mode)
 │       │   ├── validate-sot.mjs        # Single-file validator (structure, refs, coverage)
+│       │   ├── validate-tree.mjs       # Cross-file checks (scope, digest, boundary, path)
+│       │   ├── sot-digest.mjs          # Parent digest an initiative records
+│       │   ├── rebase.mjs              # Root-to-leaf cascade after the main changes
+│       │   ├── product-map.mjs         # Compose main + active initiatives (--html/--json)
 │       │   ├── diff-sot.mjs            # Change + impact-radius report between two SOTs
 │       │   ├── embed-sot.mjs           # Inline a SOT into the viewer's embedded-sot tag
-│       │   └── lib/                    # Shared: c14n (sot-c14n-v1), diff, tree, rebase
-│       ├── tests/                      # Validator, viewer round-trip, and headless-flow regressions
+│       │   └── lib/                    # Shared: c14n (sot-c14n-v1), diff, tree, rebase, product-map, inspect
+│       ├── tests/                      # Validator, tree, rebase, map, inspect + headless viewer regressions
 │       ├── assets/viewer.html          # HTML viewer (app) — BUILT OUTPUT
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer

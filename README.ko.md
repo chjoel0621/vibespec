@@ -132,11 +132,16 @@ vibespec/
 │       ├── references/sot-schema.md    # JSON 데이터 계약(스키마)
 │       ├── references/sot.schema.json  # 기계 판독용 JSON Schema
 │       ├── scripts/
+│       │   ├── inspect.mjs             # 라우팅 사전판별(분류·다음 path·추천 모드)
 │       │   ├── validate-sot.mjs        # 단일 파일 검증기(구조·참조·커버리지)
+│       │   ├── validate-tree.mjs       # 교차 파일 검증(scope·digest·boundary·path)
+│       │   ├── sot-digest.mjs          # 부모 digest 계산(이니셔티브가 기록할 값)
+│       │   ├── rebase.mjs              # 본편 변경 후 root→leaf 연쇄 재기준
+│       │   ├── product-map.mjs         # 본편+활성 이니셔티브 합성 지도(--html/--json)
 │       │   ├── diff-sot.mjs            # 두 SOT의 변경·영향 반경 리포트
 │       │   ├── embed-sot.mjs           # SOT를 뷰어 embedded-sot 태그에 주입
-│       │   └── lib/                    # 공용: c14n(sot-c14n-v1)·diff·tree·rebase
-│       ├── tests/                      # 검증기·뷰어 왕복·헤드리스 플로우 회귀
+│       │   └── lib/                    # 공용: c14n(sot-c14n-v1)·diff·tree·rebase·product-map·inspect
+│       ├── tests/                      # 검증기·트리·재기준·지도·inspect + 헤드리스 뷰어 회귀
 │       ├── assets/viewer.html          # HTML 뷰어(앱) — 빌드 산출물
 │       ├── src/                        # 뷰어 소스 (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # src/ 를 단일 파일 뷰어로 인라인

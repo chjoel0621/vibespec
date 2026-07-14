@@ -1,5 +1,21 @@
+/* ---- initiative band: shown only for SOT 1.1 initiative documents ---- */
+function renderInitiativeBand(){
+  const band=document.getElementById("initBand"); if(!band) return;
+  const meta=SOT&&SOT.initiative;
+  if(!meta){ band.hidden=true; return; }
+  band.hidden=false;
+  document.getElementById("ibBadge").textContent=t("이니셔티브","Initiative");
+  document.getElementById("ibName").textContent=meta.id||"";
+  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("본편","the main document") : (meta.parent&&meta.parent.scopeId)||"";
+  document.getElementById("ibParent").textContent=t(`${parent} 기준 · ${meta.productId||""}`,`over ${parent} · ${meta.productId||""}`);
+  const st=INIT_STATUS[meta.status]||{t:meta.status,e:meta.status};
+  const dot=document.getElementById("ibDot"); dot.className="ib-dot "+(meta.status||"");
+  document.getElementById("ibStatusLabel").textContent=t(st.t,st.e);
+}
+
 /* ============================ RENDER DISPATCH ============================ */
 function render(){
+  renderInitiativeBand();
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
   const el = document.getElementById("stage");
   el.className = "wrap " + VIEW;

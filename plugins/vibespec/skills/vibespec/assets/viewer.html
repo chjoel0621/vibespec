@@ -30,6 +30,18 @@
   .topbtn.primary{background:#151519;color:#fff;border-color:#151519}
   .topbtn.danger{color:#c0392b;border-color:#f0d4d0}
   .topbtn.danger:hover{background:#fdeeec}
+  /* initiative band (shown only for SOT 1.1 initiative documents) */
+  .init-band{display:flex;align-items:center;gap:10px;padding:7px 18px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line);font-size:12.5px;flex:0 0 auto}
+  .init-band[hidden]{display:none}
+  .ib-badge{background:var(--accent);color:#fff;font-weight:700;font-size:11px;letter-spacing:.3px;border-radius:999px;padding:2px 9px}
+  .ib-name{font-weight:700;color:var(--text)}
+  .ib-parent{color:var(--sub)}
+  .ib-status{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--sub);font-weight:600}
+  .ib-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--muted)}
+  .ib-dot.proposed{background:var(--warn)}
+  .ib-dot.approved{background:var(--accent)}
+  .ib-dot.implemented{background:var(--ok)}
+  .ib-dot.dropped{background:#c0392b}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}
@@ -390,6 +402,12 @@
     <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
     <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>
   </div>
+  <div class="init-band" id="initBand" hidden>
+    <span class="ib-badge" id="ibBadge">이니셔티브</span>
+    <span class="ib-name" id="ibName"></span>
+    <span class="ib-parent" id="ibParent"></span>
+    <span class="ib-status" id="ibStatus"><span class="ib-dot" id="ibDot"></span><span id="ibStatusLabel"></span></span>
+  </div>
   <div class="view"><div class="wrap" id="stage"></div></div>
 </div>
 <div class="hist-drawer" id="histDrawer">
@@ -410,6 +428,7 @@ const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유
 const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
 const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
+const INIT_STATUS = {proposed:{t:"제안됨",e:"Proposed"}, approved:{t:"승인됨",e:"Approved"}, implemented:{t:"구현됨",e:"Implemented"}, dropped:{t:"폐기됨",e:"Dropped"}};
 // Schema version is derived from the document (initiative meta ⇒ 1.1),
 // never hardcoded — saving must not downgrade a 1.1 initiative to 1.0.
 function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }
@@ -689,8 +708,24 @@ function canonicalSOT(){ const c=normalize(JSON.parse(JSON.stringify(SOT))); c.s
 
 
 /* ==== 50-render.js ==== */
+/* ---- initiative band: shown only for SOT 1.1 initiative documents ---- */
+function renderInitiativeBand(){
+  const band=document.getElementById("initBand"); if(!band) return;
+  const meta=SOT&&SOT.initiative;
+  if(!meta){ band.hidden=true; return; }
+  band.hidden=false;
+  document.getElementById("ibBadge").textContent=t("이니셔티브","Initiative");
+  document.getElementById("ibName").textContent=meta.id||"";
+  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("본편","the main document") : (meta.parent&&meta.parent.scopeId)||"";
+  document.getElementById("ibParent").textContent=t(`${parent} 기준 · ${meta.productId||""}`,`over ${parent} · ${meta.productId||""}`);
+  const st=INIT_STATUS[meta.status]||{t:meta.status,e:meta.status};
+  const dot=document.getElementById("ibDot"); dot.className="ib-dot "+(meta.status||"");
+  document.getElementById("ibStatusLabel").textContent=t(st.t,st.e);
+}
+
 /* ============================ RENDER DISPATCH ============================ */
 function render(){
+  renderInitiativeBand();
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
   const el = document.getElementById("stage");
   el.className = "wrap " + VIEW;

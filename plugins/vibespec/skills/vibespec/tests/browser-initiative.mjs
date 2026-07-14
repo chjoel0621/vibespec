@@ -1,0 +1,73 @@
+// Headless regression for the adaptive viewer: an initiative (SOT 1.1) document
+// renders the initiative band; a plain (1.0) document hides it. Grows as the
+// activation adds PRD section gating and read-only boundary stubs.
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const viewer = join(here, "..", "assets", "viewer.html");
+
+function findBrowser() {
+  const roots = [process.env.PROGRAMFILES, process.env["PROGRAMFILES(X86)"], process.env.LOCALAPPDATA].filter(Boolean);
+  const candidates = [
+    ...roots.flatMap(root => [join(root, "Google", "Chrome", "Application", "chrome.exe"), join(root, "Microsoft", "Edge", "Application", "msedge.exe")]),
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable", "/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/microsoft-edge"
+  ];
+  return candidates.find(existsSync);
+}
+
+const browserPath = findBrowser();
+assert.ok(browserPath, "Chrome or Edge is required for the initiative browser regression test");
+assert.ok(existsSync(viewer), "built viewer.html is missing; run npm run build first");
+
+const viewerHtml = readFileSync(viewer, "utf8");
+const EMPTY_TAG = '<script type="application/json" id="embedded-sot"></script>';
+
+// Reads document state after boot via a probe appended to the page. Returns the
+// parsed `data-probe` payload the harness stamps on <html>.
+function probe(sot, harness) {
+  const workspace = mkdtempSync(join(tmpdir(), "vibespec-init-"));
+  try {
+    const embedded = JSON.stringify(sot).replace(/</g, "\\u003c");
+    const page = join(workspace, "probe.html");
+    writeFileSync(page, viewerHtml.replace(EMPTY_TAG, EMPTY_TAG.replace("></script>", `>${embedded}</script>`)) + harness);
+    const result = spawnSync(browserPath, [
+      "--headless=new", "--allow-file-access-from-files", "--no-sandbox", "--disable-gpu",
+      "--no-first-run", "--no-default-browser-check", `--user-data-dir=${join(workspace, "profile")}`,
+      "--virtual-time-budget=1500", "--dump-dom", pathToFileURL(page).href
+    ], { encoding: "utf8", timeout: 20000, maxBuffer: 8 * 1024 * 1024 });
+    assert.equal(result.status, 0, `headless browser failed: ${result.stderr || result.error || "unknown"}`);
+    const match = result.stdout.match(/data-probe="([^"]*)"/);
+    assert.ok(match, "probe did not emit data-probe");
+    return match[1];
+  } finally {
+    try { rmSync(workspace, { recursive: true, force: true }); } catch {}
+  }
+}
+
+const BAND_HARNESS = `<script>
+const b=document.getElementById("initBand");
+const g=id=>(document.getElementById(id)||{}).textContent||"";
+document.documentElement.setAttribute("data-probe",[b&&b.hidden?"hidden":"shown",g("ibName"),g("ibParent"),g("ibStatusLabel"),(document.getElementById("ibDot")||{}).className||""].join("|"));
+</script>`;
+
+const initiative = JSON.parse(readFileSync(join(here, "fixtures", "valid-initiative-1.1.sot.json"), "utf8"));
+const plain = JSON.parse(readFileSync(join(here, "fixtures", "valid-minimal.sot.json"), "utf8"));
+
+const [state, name, parent, status, dotClass] = probe(initiative, BAND_HARNESS).split("|");
+assert.equal(state, "shown", "initiative document must show the band");
+assert.equal(name, "payment", "band must show the initiative id");
+assert.match(parent, /main document|본편/, "band must name the parent scope");
+assert.match(status, /Proposed|제안/, "band must show the status");
+assert.ok(dotClass.includes("proposed"), "status dot must reflect the status");
+console.log("[browser] PASS initiative band shows id, parent, and status for a 1.1 document");
+
+const plainState = probe(plain, BAND_HARNESS).split("|")[0];
+assert.equal(plainState, "hidden", "a plain 1.0 document must hide the initiative band");
+console.log("[browser] PASS initiative band is hidden for a plain 1.0 document");

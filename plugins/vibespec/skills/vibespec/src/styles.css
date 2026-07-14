@@ -26,6 +26,18 @@
   .topbtn.primary{background:#151519;color:#fff;border-color:#151519}
   .topbtn.danger{color:#c0392b;border-color:#f0d4d0}
   .topbtn.danger:hover{background:#fdeeec}
+  /* initiative band (shown only for SOT 1.1 initiative documents) */
+  .init-band{display:flex;align-items:center;gap:10px;padding:7px 18px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line);font-size:12.5px;flex:0 0 auto}
+  .init-band[hidden]{display:none}
+  .ib-badge{background:var(--accent);color:#fff;font-weight:700;font-size:11px;letter-spacing:.3px;border-radius:999px;padding:2px 9px}
+  .ib-name{font-weight:700;color:var(--text)}
+  .ib-parent{color:var(--sub)}
+  .ib-status{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--sub);font-weight:600}
+  .ib-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--muted)}
+  .ib-dot.proposed{background:var(--warn)}
+  .ib-dot.approved{background:var(--accent)}
+  .ib-dot.implemented{background:var(--ok)}
+  .ib-dot.dropped{background:#c0392b}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}

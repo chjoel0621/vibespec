@@ -12,7 +12,7 @@
     "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs",
     "test:browser": "npm run check:browser",
     "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/plugin-contract.mjs",
-    "check:browser": "node tests/browser-flow.mjs",
+    "check:browser": "node tests/browser-flow.mjs && node tests/browser-initiative.mjs",
     "check:all": "npm run check && npm run check:browser"
   }
 }

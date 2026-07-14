@@ -50,7 +50,8 @@ document.getElementById("stage").addEventListener("click",e=>{
     return;
   }
   const d=b.dataset;
-  if(d.prdAdd){ (SOT.prd[d.prdAdd]=SOT.prd[d.prdAdd]||[]).push("새 항목"); commit(); }
+  if("clearIdentity" in d){ ["category","northStar","differentiator","alternatives"].forEach(k=>SOT.prd[k]=""); SOT.prd.platforms=[]; commit(); }
+  else if(d.prdAdd){ (SOT.prd[d.prdAdd]=SOT.prd[d.prdAdd]||[]).push("새 항목"); commit(); }
   else if(d.prdDel){ const[k,i]=d.prdDel.split("#"); SOT.prd[k].splice(+i,1); commit(); }
   else if("personaAdd" in d){ SOT.prd.targets.push({name:"새 페르소나",role:"",needs:"",pain:""}); commit(); }
   else if(d.personaDel!==undefined){ SOT.prd.targets.splice(+d.personaDel,1); commit(); }

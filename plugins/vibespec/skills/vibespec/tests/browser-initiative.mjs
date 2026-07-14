@@ -110,3 +110,32 @@ const [plainFirst, pCat, pPlat, pAlt, pDiff, pNorth] = probe(plain, PRD_HARNESS)
 assert.match(plainFirst, /1\. (Overview|개요)/, "1.0 PRD keeps Overview first");
 assert.equal([pCat, pPlat, pAlt, pDiff, pNorth].join(""), "11111", "1.0 must keep every product-identity field");
 console.log("[browser] PASS plain 1.0 PRD keeps the full profile and order");
+
+// Hidden product-identity content is not a trap: an initiative carrying it
+// shows a notice with a clear action; empty fields show nothing; the clear
+// button empties the fields and the notice goes away.
+const withIdentity = JSON.parse(JSON.stringify(initiative));
+withIdentity.prd.category = "B2B SaaS";
+withIdentity.prd.platforms = ["Web", "iOS"];
+const NOTICE_HARNESS = `<script>
+document.documentElement.setAttribute("data-probe",[!!document.querySelector(".prd-idnotice"),(document.querySelector(".prd-idnotice b")||{}).textContent||""].join("~"));
+</script>`;
+const [noticeShown, noticeNames] = probe(withIdentity, NOTICE_HARNESS).split("~");
+assert.equal(noticeShown, "true", "stray product-identity content must surface a notice");
+assert.match(noticeNames, /Category|카테고리/, "notice names the stray fields");
+console.log("[browser] PASS stray product-identity surfaces a clear-notice");
+
+const noNotice = probe(initiative, NOTICE_HARNESS).split("~")[0];
+assert.equal(noNotice, "false", "empty product-identity fields must not show the notice");
+console.log("[browser] PASS empty product-identity shows no notice");
+
+// SOT is a top-level `let`, reachable by bare name from an appended classic script.
+const CLEAR_HARNESS = `<script>
+document.querySelector("[data-clear-identity]").click();
+document.documentElement.setAttribute("data-probe",[!!document.querySelector(".prd-idnotice"),SOT.prd.category,JSON.stringify(SOT.prd.platforms)].join("~"));
+</script>`;
+const [afterNotice, afterCat, afterPlat] = probe(withIdentity, CLEAR_HARNESS).split("~");
+assert.equal(afterNotice, "false", "clicking clear must remove the notice");
+assert.equal(afterCat, "", "clear must empty string product-identity fields");
+assert.equal(afterPlat, "[]", "clear must empty array product-identity fields");
+console.log("[browser] PASS clear-identity button empties the fields and dismisses the notice");

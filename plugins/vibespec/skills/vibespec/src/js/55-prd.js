@@ -24,6 +24,14 @@ function renderKpis(){
   const rows=arr.map((k,i)=>{ const chips=(k.refs||[]).map((rid,j)=>`<span class="kpi-ref">${esc(refTitle(rid))}<button class="ac-del" data-kpi-refdel="${i}#${j}" title="${t('연결 해제','Unlink')}">×</button></span>`).join(""); const avail=cat.filter(c=>!(k.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join(""); return `<div class="kcard"><div class="kcard-h"><span class="field k-name" contenteditable data-kpi="${i}#name">${esc(k.name)}</span><button class="mini" data-kpi-del="${i}" title="${t('삭제','Delete')}">×</button></div><div class="kcard-grid"><label>${t('목표치','Target')}<span class="field" contenteditable data-kpi="${i}#target">${esc(k.target)}</span></label><label>${t('기준값','Baseline')}<span class="field" contenteditable data-kpi="${i}#baseline">${esc(k.baseline)}</span></label><label>${t('측정','Measure')}<span class="field" contenteditable data-kpi="${i}#method">${esc(k.method)}</span></label></div><div class="kcard-refs"><span class="kpi-reflabel">${t('관련 기능','Related features')}</span>${chips}<select data-kpi-refadd="${i}"><option value="">${t('＋ 기능 연결','＋ Link feature')}</option>${avail}</select></div></div>`; }).join("") || `<div class="empty">${t('KPI가 없습니다.','No KPIs yet.')}</div>`;
   return `<div class="kgrid">${rows}</div><button class="addbtn sm" data-kpi-add>${t('＋ KPI','＋ KPI')}</button>`;
 }
+// Product-identity fields belong to the parent; an initiative hides them, so if
+// one arrives with content the user can't see or clear it inline. Surface it.
+const PRD_IDENTITY = [["category","카테고리","Category"],["platforms","사용 환경","Platforms"],["northStar","North Star","North Star"],["differentiator","차별점","Differentiator"],["alternatives","대안 · 경쟁","Alternatives"]];
+function strayIdentityFields(){
+  const pd=(SOT&&SOT.prd)||{};
+  const has=v=>(typeof v==="string"&&v.trim())||(Array.isArray(v)&&v.length);
+  return PRD_IDENTITY.filter(([k])=>has(pd[k]));
+}
 function renderPRD(){
   // Role-gated (§7). An initiative hides product-identity fields (category,
   // platforms, alternatives, differentiator, northStar — the parent owns them)
@@ -59,10 +67,18 @@ function renderPRD(){
     : ["overview","problem","users","metrics","scope","risks"];
   const doctype = init ? t('이니셔티브 명세 (증분)','Initiative specification (increment)') : "Product Requirements Document";
   const body = order.map((k,i)=>`<section><h2>${i+1}. ${title[k]}</h2>\n      ${sec[k]}\n    </section>`).join("\n\n    ");
+  let notice = "";
+  if(init){
+    const stray = strayIdentityFields();
+    if(stray.length){
+      const names = stray.map(([,ko,en])=>t(ko,en)).join(", ");
+      notice = `<div class="prd-idnotice">⚠ ${t('이 이니셔티브에 본편 소관 필드가 들어 있습니다','This initiative carries fields owned by the main document')}: <b>${esc(names)}</b>. ${t('이니셔티브는 이를 두지 않습니다.','An initiative should not restate them.')} <button class="addbtn" data-clear-identity>${t('제품 정체성 필드 비우기','Clear product-identity fields')}</button></div>`;
+    }
+  }
   return `<div class="prd-doc">
     <h1><span class="field" contenteditable data-prod>${esc(SOT.title||"제품")}</span></h1>
     <div class="kv">${doctype}</div>
-
+    ${notice}
     ${body}
   </div>`;
 }

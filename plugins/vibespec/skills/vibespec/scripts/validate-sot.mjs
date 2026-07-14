@@ -101,11 +101,28 @@ export function validateSot(sot) {
 
   const prd = sot.prd;
   if (requireObject(prd, "$.prd")) {
-    const strings = ["oneLiner", "goal", "whyNow", "category", "problem", "solution", "alternatives", "differentiator", "northStar"];
-    const nonEmpty = new Set(["oneLiner", "goal", "problem", "solution"]);
-    strings.forEach(key => requireString(prd[key], `$.prd.${key}`, nonEmpty.has(key)));
-    ["platforms", "targets", "scenarios", "kpis", "inScope", "nonGoals", "assumptions", "risks", "openQuestions", "constraints"]
-      .forEach(key => requireArray(prd[key], `$.prd.${key}`));
+    const stringFields = ["oneLiner", "goal", "whyNow", "category", "problem", "solution", "alternatives", "differentiator", "northStar"];
+    const arrayFields = ["platforms", "targets", "scenarios", "kpis", "inScope", "nonGoals", "assumptions", "risks", "openQuestions", "constraints"];
+    // Product-identity fields belong to the PARENT; an initiative inherits them
+    // and must not restate them (silent drift). Role gated by initiative meta.
+    const productIdentity = ["category", "platforms", "northStar", "differentiator", "alternatives"];
+    const hasContent = v => (typeof v === "string" && v.trim()) || (Array.isArray(v) && v.length);
+    if (isInitiative) {
+      // Lean profile: require the scoping core; product-identity is discouraged;
+      // every other field is optional but type-checked when present.
+      requireString(prd.problem, "$.prd.problem", true);
+      requireString(prd.solution, "$.prd.solution", true);
+      requireArray(prd.inScope, "$.prd.inScope");
+      requireArray(prd.nonGoals, "$.prd.nonGoals");
+      for (const key of productIdentity) if (hasContent(prd[key])) warning(`$.prd.${key}`, "product-identity field belongs to the main document; an initiative should not restate it (drift risk)");
+      stringFields.forEach(key => { if (prd[key] !== undefined) requireString(prd[key], `$.prd.${key}`); });
+      arrayFields.forEach(key => { if (prd[key] !== undefined) requireArray(prd[key], `$.prd.${key}`); });
+    } else {
+      // Full profile: the parent product defines everything.
+      const nonEmpty = new Set(["oneLiner", "goal", "problem", "solution"]);
+      stringFields.forEach(key => requireString(prd[key], `$.prd.${key}`, nonEmpty.has(key)));
+      arrayFields.forEach(key => requireArray(prd[key], `$.prd.${key}`));
+    }
   }
 
   const requirementIds = new Set();

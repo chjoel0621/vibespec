@@ -64,10 +64,10 @@
     "prd": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["oneLiner", "goal", "whyNow", "category", "platforms", "problem", "solution", "alternatives", "differentiator", "targets", "scenarios", "northStar", "kpis", "inScope", "nonGoals", "assumptions", "risks", "openQuestions", "constraints"],
+      "description-note": "Required set is role-conditional (parent 1.0 = full, initiative 1.1 = lean) and enforced in validate-sot.mjs. oneLiner/goal are plain strings here so a lean initiative may leave them empty; non-emptiness is required only for the parent role in code.",
       "properties": {
-        "oneLiner": { "$ref": "#/$defs/nonEmptyString" },
-        "goal": { "$ref": "#/$defs/nonEmptyString" },
+        "oneLiner": { "type": "string" },
+        "goal": { "type": "string" },
         "whyNow": { "type": "string" },
         "category": { "type": "string" },
         "platforms": { "$ref": "#/$defs/stringArray" },

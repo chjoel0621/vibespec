@@ -22,6 +22,8 @@
 
 이니셔티브는 본편 SOT를 그대로 두고 그 위에 얹히는 증분 문서다. 구조적으로는 완전한 SOT이고, 여기에 두 가지가 더해진다.
 
+**PRD는 역할별로 다르다(경량 프로파일).** 제품 정체성 필드(`category`·`platforms`·`northStar`·`differentiator`·`alternatives`)는 **본편 소관**이라 이니셔티브에는 두지 않는다(내용이 있으면 검증기가 경고 — 드리프트 위험). 이니셔티브 PRD의 필수 최소 집합은 `problem`·`solution`·`inScope`·`nonGoals`(오버레이의 핵심 = "X를 더하고 Y는 안 한다")이며, 나머지 스코프 필드(`goal`·`kpis`·`scenarios` 등)는 선택이다. 본편(1.0)은 여전히 전체 6섹션을 요구한다.
+
 ```json
 "initiative": {
   "productId": "acme-shop",

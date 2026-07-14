@@ -230,6 +230,49 @@ assert.equal(stubResult.valid, true, `boundary stub with refs should still be va
 assert.ok(stubResult.warnings.some(w => w.message.includes("boundary stub")), "boundary stub with refs should warn");
 console.log("[test] PASS boundary stub with own refs warns but stays valid");
 
+/* ==== Role-gated PRD (§7): initiative = lean profile, parent = full ==== */
+// The lean fixture omits product-identity fields entirely and still validates.
+assert.equal(validateSot(cloneInit()).valid, true, "lean initiative PRD must validate");
+assert.equal(cloneInit().prd.platforms, undefined, "the lean fixture must not carry product-identity fields");
+
+const leanRequired = [
+  ["problem", v => { delete v.prd.problem; }],
+  ["solution", v => { v.prd.solution = ""; }],
+  ["inScope", v => { delete v.prd.inScope; }],
+  ["nonGoals", v => { delete v.prd.nonGoals; }]
+];
+for (const [field, mutate] of leanRequired) {
+  const doc = cloneInit(); mutate(doc);
+  assert.equal(validateSot(doc).valid, false, `initiative must require ${field}`);
+  console.log(`[test] PASS initiative PRD requires ${field}`);
+}
+
+// Product-identity fields belong to the parent — an initiative carrying them
+// (with content) warns but stays valid; empty ones (viewer-normalized) do not.
+const identityInInitiative = cloneInit();
+identityInInitiative.prd.platforms = ["Web"];
+identityInInitiative.prd.northStar = "Weekly bookings";
+const identityResult = validateSot(identityInInitiative);
+assert.equal(identityResult.valid, true, "product-identity in an initiative is a warning, not an error");
+assert.equal(identityResult.warnings.filter(w => w.message.includes("main document")).length, 2, "each restated product-identity field must warn");
+const emptyIdentity = cloneInit();
+emptyIdentity.prd.category = ""; emptyIdentity.prd.platforms = [];
+assert.equal(validateSot(emptyIdentity).warnings.filter(w => w.message.includes("main document")).length, 0, "empty product-identity must not warn (viewer normalize fills these)");
+console.log("[test] PASS product-identity in an initiative warns only when it has content");
+
+// The parent (1.0) still demands the full profile.
+const leanParent = clone(valid); delete leanParent.prd.category;
+assert.ok(validateSot(leanParent).errors.some(e => e.path === "$.prd.category"), "a 1.0 parent must still require product-identity fields");
+console.log("[test] PASS parent (1.0) still requires the full PRD profile");
+
+// A lean initiative survives the viewer round-trip (normalize fills empties,
+// which must not trip the product-identity warning or invalidate the doc).
+const roundtripped = JSON.parse(viewerContext.promote(cloneInit()));
+assert.equal(roundtripped.schemaVersion, "1.1");
+assert.equal(validateSot(roundtripped).valid, true, `lean initiative must survive viewer save: ${JSON.stringify(validateSot(roundtripped).errors)}`);
+assert.equal(validateSot(roundtripped).warnings.filter(w => w.message.includes("main document")).length, 0, "normalized empties must not warn");
+console.log("[test] PASS lean initiative survives the viewer round-trip");
+
 // Viewer load → save must NOT downgrade a 1.1 initiative to 1.0 (which would
 // strand its initiative/boundary fields as forbidden 1.0 content).
 const savedInitiative = JSON.parse(viewerContext.promote(cloneInit()));

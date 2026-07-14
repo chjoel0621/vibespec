@@ -16,23 +16,10 @@
   "prd": {
     "oneLiner": "Add a checkout flow to the shop",
     "goal": "Ship payments so members can complete a purchase",
-    "whyNow": "",
-    "category": "",
-    "platforms": [],
     "problem": "Members can fill a cart but cannot pay",
     "solution": "Add a checkout flow that starts from the existing cart screen",
-    "alternatives": "",
-    "differentiator": "",
-    "targets": [],
-    "scenarios": [],
-    "northStar": "",
-    "kpis": [],
-    "inScope": [],
-    "nonGoals": [],
-    "assumptions": [],
-    "risks": [],
-    "openQuestions": [],
-    "constraints": []
+    "inScope": ["Card payment from the cart", "Order confirmation"],
+    "nonGoals": ["Refunds (a separate initiative)", "Subscriptions"]
   },
   "requirements": [
     {

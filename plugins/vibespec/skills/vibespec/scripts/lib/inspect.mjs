@@ -30,23 +30,28 @@ function nextPathUnder(scopePath, childPaths) {
   return `${scopePath}-${(nums.length ? Math.max(...nums) : 0) + 1}`;
 }
 
-export function inspectDocs(docs) {
+export function inspectDocs(docs, opts = {}) {
   const files = docs.map(classify);
   const mains = files.filter(f => f.kind === "main");
   const inits = files.filter(f => f.kind === "initiative");
-  const hasMain = mains.length === 1;
+  const mainCount = mains.length;
+  const hasMain = mainCount === 1;
 
-  // Path issuance per scope. Root's conceptual path prefix is "1".
+  // Path issuance per scope. Root's conceptual path prefix is "1". Authority is
+  // only "complete" when the caller scanned a product FOLDER — an explicit file
+  // list may omit sibling initiatives and re-issue an already-used number.
   const allChildPaths = inits.map(i => i.path).filter(Boolean);
   const nextPath = {};
   if (hasMain) nextPath.root = nextPathUnder("1", allChildPaths);
   for (const i of inits) if (i.path) nextPath[i.id] = nextPathUnder(i.path, allChildPaths);
+  const pathAuthority = opts.fromFolder ? "complete" : "incomplete";
 
-  // Tree facts (only meaningful with a root).
-  let tree = null, staleInitiatives = [];
+  // Tree facts + validity. Separate stale-digest errors (fixable by rebase)
+  // from structural errors (need a repair).
+  let tree = null, staleInitiatives = [], nonStaleErrors = [];
   if (hasMain) {
     const r = validateTree(docs);
-    // An initiative is stale when its recorded parent.digest != the parent's current hash.
+    nonStaleErrors = r.errors.filter(e => !e.message.includes("digest stale"));
     const scopeDoc = id => id === "root" ? docs.find(d => d.sot.schemaVersion === "1.0") : docs.find(d => d.sot.schemaVersion === "1.1" && d.sot.initiative && d.sot.initiative.id === id);
     for (const i of inits) {
       const d = docs.find(x => x.sot.initiative && x.sot.initiative.id === i.id);
@@ -57,17 +62,25 @@ export function inspectDocs(docs) {
   }
 
   const needsRebase = staleInitiatives.length > 0;
-  // Initiatives present but no main = incomplete: the skill should ask for the
-  // main SOT before it can route to a tree operation.
   const incompleteTree = inits.length > 0 && !hasMain;
+  // A structural problem the skill cannot route around (only repair fixes it).
+  let invalidReason = null;
+  if (mainCount > 1) invalidReason = `multiple main documents (${mainCount})`;
+  else if (nonStaleErrors.length) invalidReason = `tree has ${nonStaleErrors.length} structural error(s): ${nonStaleErrors[0].message}`;
+
   const modes = [];
-  if (!hasMain && !inits.length) modes.push("generate");
-  if (hasMain) { modes.push("edit", "initiative"); if (tree && tree.activeSet.length && !needsRebase) modes.push("map"); }
-  if (needsRebase) modes.push("rebase");
+  if (invalidReason) modes.push("repair");
+  else if (incompleteTree) { /* need the main first — no actionable mode */ }
+  else if (!hasMain) modes.push("generate");
+  else { // one main, no structural errors
+    modes.push("edit", "initiative");
+    if (needsRebase) modes.push("rebase");
+    else if (tree.activeSet.length) modes.push("map");
+  }
 
   return {
-    files, hasMain, initiativeCount: inits.length, incompleteTree,
-    tree, nextPath, staleInitiatives, needsRebase,
+    files, hasMain, mainCount, initiativeCount: inits.length, incompleteTree,
+    tree, invalidReason, nextPath, pathAuthority, staleInitiatives, needsRebase,
     suggestedModes: modes
   };
 }

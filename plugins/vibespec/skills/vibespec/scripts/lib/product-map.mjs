@@ -70,28 +70,26 @@ export function buildProductMap(docs) {
   for (const d of activeDocs) {
     const meta = d.sot.initiative;
     scopeInfo.push({ id: meta.id, title: d.sot.title, status: meta.status, path: meta.path });
-    const graft = (pages) => (pages || []).forEach(p => {
+    // Walk the initiative IA at ANY depth (validate-tree allows a boundary at
+    // any depth). A boundary stub is a reference, not a real node: it is not
+    // materialized; its children graft under the boundary target. A non-boundary
+    // page is a screen the initiative introduces and becomes a composite node.
+    // `host` is the composite node (or section-pages holder) new nodes attach to.
+    const graftPage = (p, host) => {
       if (isObject(p.boundary)) {
         const targetKey = `${p.boundary.scopeId}/${p.boundary.pageId}`;
         const target = index.get(targetKey);
-        // The stub's own children are the increment's screens; graft them.
-        const grafted = (p.children || []).map(child => {
-          const node = compositePage(child, meta.id);
-          index.set(node.compositeId, node);
-          node.children = cloneChildren(child.children, meta.id, index);
-          return node;
-        });
-        if (target) { target.children.push(...grafted); attachments.push({ initiative: meta.id, at: targetKey }); }
-        else grafted.forEach(g => orphanSection(iaSections, meta).pages.push(g)); // target missing (shouldn't happen post-validate)
+        if (target) attachments.push({ initiative: meta.id, at: targetKey });
+        const stubHost = target || { children: orphanSection(iaSections, meta).pages }; // missing target: defensive
+        (p.children || []).forEach(child => graftPage(child, stubHost));
       } else {
-        // A brand-new top page the initiative introduces (not an attach point).
         const node = compositePage(p, meta.id);
         index.set(node.compositeId, node);
-        node.children = cloneChildren(p.children, meta.id, index);
-        orphanSection(iaSections, meta).pages.push(node);
+        (host ? host.children : orphanSection(iaSections, meta).pages).push(node);
+        (p.children || []).forEach(child => graftPage(child, node));
       }
-    });
-    (d.sot.ia.sections || []).forEach(sec => graft(sec.pages));
+    };
+    (d.sot.ia.sections || []).forEach(sec => (sec.pages || []).forEach(p => graftPage(p, null)));
   }
 
   return {
@@ -107,15 +105,6 @@ export function buildProductMap(docs) {
     attachments,
     ia: iaSections
   };
-}
-
-function cloneChildren(pages, scope, index) {
-  return (pages || []).map(p => {
-    const node = compositePage(p, scope);
-    index.set(node.compositeId, node);
-    node.children = cloneChildren(p.children, scope, index);
-    return node;
-  });
 }
 
 // A place to hang an initiative's non-boundary top pages: one composite section

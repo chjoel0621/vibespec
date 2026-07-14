@@ -17,7 +17,8 @@ function renderMap(){
   ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
   document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
   const band=document.getElementById("initBand"); if(band) band.hidden=true;
-  const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=M.productId||"Product";
+  // A map is read-only — the title must not be editable (no history/SOT writes).
+  const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
     const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
     return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span><b>${esc(s.title||s.id)}</b> <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;

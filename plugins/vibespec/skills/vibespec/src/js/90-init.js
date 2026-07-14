@@ -5,7 +5,7 @@ document.getElementById("sotBtn").addEventListener("click",()=>{
   const w=window.open("","_blank","width=520,height=640");
   w.document.write("<title>SOT (Single Source of Truth)</title><pre style='font:12px/1.5 ui-monospace,Menlo,monospace;padding:16px;white-space:pre-wrap'>"+esc(JSON.stringify(SOT,null,2))+"</pre>");
 });
-document.getElementById("prodTitle").addEventListener("input",e=>{SOT.title=e.currentTarget.firstChild.textContent.trim();});
+document.getElementById("prodTitle").addEventListener("input",e=>{ if(MAP) return; SOT.title=e.currentTarget.firstChild.textContent.trim(); });
 
 /* delegated edits (contenteditable) */
 document.getElementById("stage").addEventListener("input",e=>{

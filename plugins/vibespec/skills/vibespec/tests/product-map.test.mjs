@@ -71,3 +71,18 @@ assert.equal(m5.valid, true, `nested tree must build: ${JSON.stringify(m5.errors
 const payNode = nodeById(m5, "payment/P2");
 assert.ok(payNode.children.some(c => c.compositeId === "refund/P2"), "a grandchild initiative grafts under its parent's grafted node");
 console.log("[map] PASS nested initiatives graft onto their parent's composite node");
+
+// A boundary stub nested below a non-boundary wrapper page (validate-tree allows
+// a boundary at any depth) must still graft at its target — the stub is not
+// materialized, and the wrapper becomes the initiative's own composite node.
+const nestedStub = clone(payment);
+nestedStub.ia.sections[0].pages = [{
+  id: "P3", title: "Wrapper", type: "top", refs: [], children: [
+    { id: "P1", title: "Cart", type: "page", refs: [], boundary: { scopeId: "root", pageId: "P2" }, children: [
+      { id: "P2", title: "Pay", type: "page", refs: ["F1"], children: [] }] }] }];
+const m6 = buildProductMap([doc("main", main), doc("pay", nestedStub)]);
+assert.deepEqual(m6.attachments, [{ initiative: "payment", at: "root/P2" }], "a deep boundary still attaches");
+assert.ok(nodeById(m6, "root/P2").children.some(c => c.compositeId === "payment/P2"), "the increment screen grafts under the main target");
+assert.ok(nodeById(m6, "payment/P3"), "the wrapper becomes the initiative's own node");
+assert.equal(nodeById(m6, "payment/P1"), null, "the boundary stub itself is not materialized");
+console.log("[map] PASS a boundary nested under a wrapper still grafts at its target");

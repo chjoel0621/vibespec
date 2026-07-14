@@ -26,12 +26,33 @@ assert.equal(t.needsRebase, false);
 console.log("[inspect] PASS classifies a tree, issues next paths, suggests modes");
 
 // A lone main: no initiatives, first path is 1-1, no map/rebase.
-const m = inspectDocs([doc("main.sot.json", main)]);
+const m = inspectDocs([doc("main.sot.json", main)], { fromFolder: true });
 assert.equal(m.hasMain, true);
 assert.equal(m.initiativeCount, 0);
 assert.equal(m.nextPath.root, "1-1", "first initiative under a fresh main is 1-1");
 assert.deepEqual(m.suggestedModes, ["edit", "initiative"]);
 console.log("[inspect] PASS a lone main suggests edit/initiative and issues 1-1");
+
+// Path authority: a folder scan is authoritative; an explicit file list is not
+// (sibling initiatives may be missing → a number could be re-issued).
+assert.equal(inspectDocs([doc("main", main)], { fromFolder: true }).pathAuthority, "complete");
+assert.equal(inspectDocs([doc("main", main)]).pathAuthority, "incomplete", "an explicit file list must flag path issuance incomplete");
+console.log("[inspect] PASS path authority is complete only for a folder scan");
+
+// A structurally invalid tree (missing boundary target) offers only repair —
+// never edit/initiative/map (which would act on a broken tree).
+const badTarget = clone(payment); badTarget.ia.sections[0].pages[0].boundary.pageId = "P99";
+const bad = inspectDocs([doc("main", main), doc("pay", badTarget)], { fromFolder: true });
+assert.ok(bad.invalidReason && /structural/.test(bad.invalidReason), "invalid tree must expose a reason");
+assert.deepEqual(bad.suggestedModes, ["repair"], "an invalid tree offers only repair");
+console.log("[inspect] PASS structurally invalid tree offers only repair");
+
+// Two mains in one folder is invalid → repair, with mainCount exposed.
+const twoMains = inspectDocs([doc("a", main), doc("b", clone(main))], { fromFolder: true });
+assert.equal(twoMains.mainCount, 2);
+assert.ok(/multiple main/.test(twoMains.invalidReason), "two mains must be flagged");
+assert.deepEqual(twoMains.suggestedModes, ["repair"], "two mains offers only repair (not generate)");
+console.log("[inspect] PASS two mains in a folder offers only repair");
 
 // A lone initiative (no main): incomplete — the skill must ask for the main
 // before any tree operation. No actionable mode, and generate is NOT offered.

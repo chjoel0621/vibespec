@@ -32,10 +32,17 @@ const payment = JSON.parse(readFileSync(join(treeDir, "shop.1-2.payment.sot.json
 const map = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: payment }]);
 
 const harness = `<script>
+const pt=document.getElementById("prodTitle");
+const before=pt.firstChild?pt.firstChild.textContent:"";
+// Try to edit the (read-only) title: simulate typing + input event.
+if(pt.firstChild) pt.firstChild.textContent="HACKED";
+pt.dispatchEvent(new Event("input",{bubbles:true}));
 document.documentElement.setAttribute("data-probe",JSON.stringify({
   mapHead: !!document.querySelector(".map-head"),
   tabsHidden: !!document.querySelector(".tabs") && getComputedStyle(document.querySelector(".tabs")).display==="none",
   saveHidden: getComputedStyle(document.getElementById("saveBtn")).display==="none",
+  titleEditable: pt.isContentEditable,
+  titleWriteIgnored: (typeof SOT==="undefined") || !SOT || SOT.title!=="HACKED",
   grafted: [...document.querySelectorAll(".snode.map-init .stitle")].some(e=>/Pay/.test(e.textContent)),
   compositeIds: [...document.querySelectorAll(".sitemap .stype")].map(e=>e.textContent).filter(x=>x.includes("/")),
   scopes: [...document.querySelectorAll(".map-scope b")].map(e=>e.textContent)
@@ -62,7 +69,9 @@ try {
   assert.equal(p.grafted, true, "the active initiative's screen must be grafted into the composite");
   assert.deepEqual(p.compositeIds, ["root/P1", "root/P2", "payment/P2"], "composite ids carry provenance");
   assert.deepEqual(p.scopes, ["Shop", "Payment"], "legend lists the main and the active initiative");
-  console.log("[browser] PASS product map renders a read-only composite with provenance");
+  assert.equal(p.titleEditable, false, "map mode: the product title must not be contenteditable");
+  assert.equal(p.titleWriteIgnored, true, "map mode: editing the title must not write to SOT (read-only)");
+  console.log("[browser] PASS product map is read-only (composite + non-editable title)");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

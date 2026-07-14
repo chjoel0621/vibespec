@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Shop",
+  "lang": "en",
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      }
+    ]
+  },
+  "ia": {
+    "sections": [
+      {
+        "title": "Shop",
+        "id": "S1",
+        "pages": [
+          {
+            "title": "Home",
+            "id": "P1",
+            "type": "top",
+            "refs": [],
+            "children": [
+              {
+                "title": "Cart",
+                "id": "P2",
+                "type": "page",
+                "refs": [
+                  "F1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "prd": {
+    "alternatives": "",
+    "assumptions": [],
+    "category": "",
+    "constraints": [],
+    "differentiator": "",
+    "goal": "Sell things",
+    "inScope": [],
+    "kpis": [],
+    "nonGoals": [],
+    "northStar": "",
+    "oneLiner": "A shop",
+    "openQuestions": [],
+    "platforms": [],
+    "problem": "People want to buy",
+    "risks": [],
+    "scenarios": [],
+    "solution": "Provide a catalog and cart",
+    "targets": [],
+    "whyNow": ""
+  },
+  "requirements": [
+    {
+      "title": "Catalog",
+      "id": "R1",
+      "status": "todo",
+      "priority": "mid",
+      "desc": "",
+      "acceptance": [],
+      "features": [
+        {
+          "title": "Browse",
+          "id": "F1",
+          "status": "todo",
+          "priority": "mid",
+          "desc": "",
+          "acceptance": [],
+          "specs": []
+        }
+      ]
+    }
+  ]
+}

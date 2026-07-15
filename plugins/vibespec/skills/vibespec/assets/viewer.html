@@ -477,8 +477,9 @@ function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }
 let RO = false;
 // Deny-by-default: in RO every control is disabled unless it is navigation.
 // A new editing control added later is therefore read-only until someone
-// deliberately lists it here.
-const RO_ALLOW = ".tab,#langBtn,[data-zoom],[data-expand],[data-collapse],[data-ro-ok]";
+// deliberately lists it here. data-jump/data-zoom/data-expand/data-collapse are
+// view navigation (scroll, pan, fold) — no document mutation — so they stay live.
+const RO_ALLOW = ".tab,#langBtn,[data-jump],[data-zoom],[data-expand],[data-collapse],[data-ro-ok]";
 
 
 /* ==== 05-c14n.js ==== */

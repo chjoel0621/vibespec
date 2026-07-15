@@ -139,6 +139,25 @@ try {
   assert.equal(d.localStorageIntact, true, "a map must never write over the user's own working SOT");
   assert.equal(d.backToMap, true, "the back control must return to the map");
   console.log("[browser] PASS an embedded map opens its documents read-only and never persists");
+
+  // The attach-point jump buttons ([data-jump]) are view navigation, not editing.
+  // A re-render (language toggle) or returning from an opened doc re-runs the RO
+  // hardening; the jump buttons must survive it and still jump. (Regression: the
+  // hardening once disabled every non-allowlisted button, killing these.)
+  const j = probe(withDocs, "map-jump", `
+    const before = [...document.querySelectorAll("[data-jump]")].length;
+    rerender();            // what a language toggle does: MAP && !MAPDOC -> renderMap()
+    roHarden();            // what the RO MutationObserver does on that re-render
+    const jumps = [...document.querySelectorAll("[data-jump]")];
+    let flashed = false;
+    if (jumps.length) { jumps[0].click(); flashed = !!document.querySelector(".snode.map-flash"); }
+    return { before, after: jumps.length, anyDisabled: jumps.some(b => b.disabled), flashed };
+  `);
+  assert.ok(j.before > 0, "the fixture must have at least one attach-point jump button");
+  assert.equal(j.after, j.before, "jump buttons must survive a re-render");
+  assert.equal(j.anyDisabled, false, "attach jump buttons must stay enabled after RO re-hardening");
+  assert.equal(j.flashed, true, "an enabled jump button must still jump to its increment");
+  console.log("[browser] PASS attach-point jump buttons stay live across re-render + RO hardening");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

@@ -54,24 +54,22 @@ jobs:
           validate_product demo/flea-market 1-1.escrow
       - name: Stage site
         run: |
-          B=/vibespec
           S=plugins/vibespec/skills/vibespec
-          # Stage one product's 6 pages (main·initiative·map × ko·en). The map
-          # uses --link so each node opens the document that defines it. Demos
-          # embed their SOT explicitly so neither depends on localStorage (shared
-          # per-origin across the whole site).
+          # Stage one product's 6 pages (main·initiative·map × ko·en). The map is
+          # built WITHOUT --link, so it embeds each scope's document: clicking a map
+          # node opens that plan read-only, in the same file, with a back link —
+          # exactly the self-contained map a real user gets. Demos embed their SOT
+          # explicitly so none depends on localStorage (shared per-origin site-wide).
           stage_product() { # $1=demo/<prefix>  $2=url-sub("" or "flea")  $3=<path>.<slug>  $4=<slug>
             local pre=$1 sub=$2 infix=$3 slug=$4
-            local url=$B${sub:+/$sub} dir=_site${sub:+/$sub}
+            local dir=_site${sub:+/$sub}
             mkdir -p "$dir/en" "$dir/map" "$dir/en/map" "$dir/$slug" "$dir/en/$slug"
             node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.ko.sot.json "$dir/index.html"
             node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.en.sot.json "$dir/en/index.html"
             node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.ko.$infix.sot.json "$dir/$slug/index.html"
             node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.en.$infix.sot.json "$dir/en/$slug/index.html"
-            node $S/scripts/product-map.mjs $pre.ko.sot.json $pre.ko.$infix.sot.json \
-              --link root=$url/ --link $slug=$url/$slug/ --html "$dir/map/index.html"
-            node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json \
-              --link root=$url/en/ --link $slug=$url/en/$slug/ --html "$dir/en/map/index.html"
+            node $S/scripts/product-map.mjs $pre.ko.sot.json $pre.ko.$infix.sot.json --html "$dir/map/index.html"
+            node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json --html "$dir/en/map/index.html"
           }
           stage_product demo/meeting-room-booking "" 1-2.notif notif
           stage_product demo/flea-market flea 1-1.escrow escrow
@@ -83,21 +81,21 @@ jobs:
       - name: Verify demo is navigable
         run: |
           verify_product() { # $1=url-sub("" or "flea")  $2=<slug>
-            local dir=_site${1:+/$1} url=/vibespec${1:+/$1}
+            local dir=_site${1:+/$1}
             for f in "" en/ $2/ en/$2/ map/ en/map/; do
               grep -q 'class="demo-nav"' "$dir/${f}index.html" || { echo "no nav strip: $dir/${f}index.html"; exit 1; }
             done
-            # The map renders its links from the embedded payload; assert the payload
-            # carries the initiative href (browser-map.mjs covers the rendering).
-            grep -q "\"href\":\"$url/$2/\"" "$dir/map/index.html" || { echo "ko map ($1) does not link into its initiative"; exit 1; }
-            grep -q "\"href\":\"$url/en/$2/\"" "$dir/en/map/index.html" || { echo "en map ($1) does not link into its initiative"; exit 1; }
+            # The map opens documents from its embedded payload; assert it carries
+            # each scope's SOT (browser-map.mjs covers the read-only open + back link).
+            grep -q '"sot":{' "$dir/map/index.html" || { echo "ko map ($1) does not embed its documents"; exit 1; }
+            grep -q '"sot":{' "$dir/en/map/index.html" || { echo "en map ($1) does not embed its documents"; exit 1; }
           }
           verify_product "" notif
           verify_product flea escrow
           # Cross-product link present on both mains.
           grep -q 'demo-nav-alt' _site/index.html || { echo "root demo missing cross-product link"; exit 1; }
           grep -q 'demo-nav-alt' _site/flea/index.html || { echo "flea demo missing cross-product link"; exit 1; }
-          echo "[verify] 12 pages carry the nav strip; both maps link into their initiative; products cross-link"
+          echo "[verify] 12 pages carry the nav strip; both maps embed their documents; products cross-link"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

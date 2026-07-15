@@ -28,9 +28,12 @@ export function printPlan(r) {
   if (rep.addedRequirements.length) console.log(`  요구사항: ${rep.addedRequirements.join(", ")}`);
   if (rep.addedFeatures.length) console.log(`  기능: ${rep.addedFeatures.join(", ")}`);
   if (rep.attachedAt.length) console.log(`  접점: ${rep.attachedAt.map(a => a.at).join(", ")}`);
-  const pv = rep.prdReview;
-  if (pv.problem || pv.solution || pv.goal || (pv.nonGoals || []).length) {
-    console.log(`  PRD 검토 필요(본편 서사에 수동 반영): ${[pv.problem && `problem="${pv.problem}"`, pv.solution && `solution="${pv.solution}"`, pv.goal && `goal="${pv.goal}"`, (pv.nonGoals || []).length && `nonGoals=${JSON.stringify(pv.nonGoals)}`].filter(Boolean).join(" ")}`);
+  if (rep.mergedInScope.length) console.log(`  본편 inScope에 추가됨: ${rep.mergedInScope.map(s => JSON.stringify(s)).join(", ")}`);
+  const keys = Object.keys(rep.manualPrdReview);
+  if (keys.length) {
+    console.log(`  ⚠ PRD 수동 검토 필요(자동 병합 안 됨 — 본편에 사람이 반영): ${keys.join(", ")}`);
+    console.log(`    ${JSON.stringify(rep.manualPrdReview)}`);
+    if (rep.manualPrdReview.kpis || rep.manualPrdReview.scenarios) console.log("    (kpi refs·scenario start는 본편 id로 재번호되어 있음)");
   }
   if (r.staleSiblings.length) console.log(`\n⚠ 머지 후 stale이 되는 본편 이니셔티브: ${r.staleSiblings.join(", ")} — rebase로 갱신하세요.`);
 }

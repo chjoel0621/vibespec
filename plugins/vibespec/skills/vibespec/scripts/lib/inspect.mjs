@@ -62,6 +62,18 @@ export function inspectDocs(docs, opts = {}) {
   }
 
   const needsRebase = staleInitiatives.length > 0;
+  // Merge (land) candidates: an implemented, main-attached initiative with no
+  // active children, in a valid tree. Computed here so routing trusts the tool
+  // (suggestedModes) instead of re-deriving eligibility from prose.
+  let mergeCandidates = [];
+  if (hasMain && tree && tree.valid) {
+    const parentsWithActiveChild = new Set(inits
+      .filter(i => i.parentScopeId && i.parentScopeId !== "root" && !["dropped", "landed"].includes(i.status))
+      .map(i => i.parentScopeId));
+    mergeCandidates = inits
+      .filter(i => i.status === "implemented" && i.parentScopeId === "root" && !parentsWithActiveChild.has(i.id))
+      .map(i => i.id);
+  }
   const incompleteTree = inits.length > 0 && !hasMain;
   const unknowns = files.filter(f => f.kind === "unknown");
   // A structural problem the skill cannot route around (only repair fixes it).
@@ -82,11 +94,12 @@ export function inspectDocs(docs, opts = {}) {
     modes.push("edit", "initiative");
     if (needsRebase) modes.push("rebase");
     else if (tree.activeSet.length) modes.push("map");
+    if (mergeCandidates.length) modes.push("merge"); // available; SKILL.md lands it only on an explicit request
   }
 
   return {
     files, hasMain, mainCount, initiativeCount: inits.length, incompleteTree, unknownCount: unknowns.length,
-    tree, invalidReason, nextPath, pathAuthority, staleInitiatives, needsRebase,
+    tree, invalidReason, nextPath, pathAuthority, staleInitiatives, needsRebase, mergeCandidates,
     suggestedModes: modes
   };
 }

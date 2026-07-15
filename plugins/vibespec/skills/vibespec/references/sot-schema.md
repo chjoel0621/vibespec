@@ -36,7 +36,7 @@
 
 - `productId`·`id`: 소문자 slug(`^[a-z0-9][a-z0-9-]*$`). `id`는 같은 제품 안에서 유일하며 생성 후 불변. `"root"`는 본편 예약어라 `id`로 못 쓴다.
 - `path`: 표시·파일명용 경로(`1-2`, `1-2-1`). 참조 식별자가 아니다.
-- `status`: `proposed | approved | implemented | dropped`.
+- `status`: `proposed | approved | implemented | dropped | landed`. `landed`는 구현된 이니셔티브를 본편에 접어 넣은(merge) 뒤 남는 종료 상태 — 그 내용은 이미 본편 baseline에 있으므로 합성·활성집합에서 제외되고 digest 신선도도 따지지 않는다(이력 보존용 tombstone). `merge.mjs`가 부여하며, 손으로 지정하지 않는다.
 - `parent.scopeId`: 부모 scope(`"root"` 또는 부모 이니셔티브의 `id`). 자기 자신은 못 가리킨다.
 - `parent.canonicalization`: 항상 `"sot-c14n-v1"`. `parent.digest`: 부모 SOT를 그 규칙으로 표준화한 SHA-256(`sha256:` + 64 hex).
 

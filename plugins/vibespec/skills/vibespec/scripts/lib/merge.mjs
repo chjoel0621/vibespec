@@ -104,10 +104,21 @@ export function planMerge(docs, initiativeId) {
     M.flow.transitions.push(nt);
   }
 
-  // PRD: the increment is now in scope. The rest of the lean PRD is semantic —
-  // surface it for human review rather than mixing it into the main narrative.
-  if (Array.isArray(I.prd?.inScope) && I.prd.inScope.length) { M.prd.inScope = M.prd.inScope || []; M.prd.inScope.push(...I.prd.inScope); }
+  // PRD: only `inScope` auto-merges (the increment is now in scope). Every OTHER
+  // lean-PRD field the initiative carries is semantic — folding it into the main's
+  // narrative/metrics blind would corrupt them — so surface ALL of it for human
+  // review. Nothing the initiative planned is silently lost: it stays in the
+  // landed file AND appears here, with kpi refs / scenario starts renumbered into
+  // the main's id space so a reviewer can wire them straight in.
+  const P = I.prd || {};
+  if (Array.isArray(P.inScope) && P.inScope.length) { M.prd.inScope = M.prd.inScope || []; M.prd.inScope.push(...P.inScope); }
   M.schemaVersion = "1.0";
+
+  const manualPrdReview = {};
+  for (const f of ["problem", "solution", "goal", "oneLiner"]) if (P[f]) manualPrdReview[f] = P[f];
+  for (const f of ["nonGoals", "targets", "assumptions", "risks", "openQuestions", "constraints"]) if ((P[f] || []).length) manualPrdReview[f] = P[f];
+  if ((P.kpis || []).length) manualPrdReview.kpis = P.kpis.map(k => ({ ...k, refs: (k.refs || []).map(mapRef) }));      // refs → new main F#/F#:idx
+  if ((P.scenarios || []).length) manualPrdReview.scenarios = P.scenarios.map(s => (s.start ? { ...s, start: mapPage(s.start) } : { ...s })); // start → new main P#
 
   const landed = clone(I); landed.initiative.status = "landed";
 
@@ -123,7 +134,8 @@ export function planMerge(docs, initiativeId) {
     addedPages: Object.entries(pageMap).map(([o, n]) => `${o}→${n}`),
     addedSections: Object.entries(secMap).map(([o, n]) => `${o}→${n}`),
     attachedAt,
-    prdReview: { problem: I.prd?.problem || "", solution: I.prd?.solution || "", nonGoals: I.prd?.nonGoals || [], goal: I.prd?.goal || "" },
+    mergedInScope: (P.inScope || []).slice(),          // what auto-merged into the main
+    manualPrdReview,                                    // everything else the reviewer must fold in by hand
     staleSiblings
   };
   return { ok: true, main: M, mainName: mainDoc.name, landed, landedName: initDoc.name, report, staleSiblings };

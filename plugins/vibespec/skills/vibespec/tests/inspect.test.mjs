@@ -97,3 +97,17 @@ assert.equal(both.needsRebase, true, "the tree is genuinely stale too");
 assert.ok(/structural/.test(both.invalidReason), "but the structural error is the blocking reason");
 assert.deepEqual(both.suggestedModes, ["repair"], "structural error outranks rebase");
 console.log("[inspect] PASS a structural error outranks stale (repair, not rebase)");
+
+// An implemented, main-attached initiative is offered as a merge candidate, and
+// "merge" appears in suggestedModes — routing trusts the tool, not prose.
+const impl = clone(payment); impl.initiative.status = "implemented";
+const mi = inspectDocs([doc("main.sot.json", main), doc("shop.1-2.payment.sot.json", impl)]);
+assert.deepEqual(mi.mergeCandidates, ["payment"], "an implemented main-attached initiative is a merge candidate");
+assert.ok(mi.suggestedModes.includes("merge"), "suggestedModes must offer merge when a candidate exists");
+console.log("[inspect] PASS an implemented initiative surfaces as a merge candidate");
+
+// An approved (not implemented) initiative is NOT a merge candidate.
+const appr = inspectDocs([doc("main.sot.json", main), doc("shop.1-2.payment.sot.json", payment)]);
+assert.deepEqual(appr.mergeCandidates, [], "only implemented initiatives are merge candidates");
+assert.ok(!appr.suggestedModes.includes("merge"), "merge must not be offered without an implemented candidate");
+console.log("[inspect] PASS a non-implemented initiative is not a merge candidate");

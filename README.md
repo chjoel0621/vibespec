@@ -142,6 +142,7 @@ vibespec/
 │       │   ├── validate-tree.mjs       # Cross-file checks (scope, digest, boundary, path)
 │       │   ├── sot-digest.mjs          # Parent digest an initiative records
 │       │   ├── rebase.mjs              # Root-to-leaf cascade after the main changes
+│       │   ├── merge.mjs               # Land an implemented initiative into the main
 │       │   ├── product-map.mjs         # Compose main + active initiatives (--html/--json)
 │       │   ├── diff-sot.mjs            # Change + impact-radius report between two SOTs
 │       │   ├── embed-sot.mjs           # Inline a SOT into the viewer's embedded-sot tag
@@ -189,6 +190,7 @@ For a product tree (a main SOT plus its initiatives), inspect/validate cross-fil
 node scripts/inspect.mjs path/to/product-folder          # classify inputs, next path, suggested mode
 node scripts/validate-tree.mjs path/to/product-folder    # scope, digest, boundary, path checks
 node scripts/rebase.mjs path/to/product-folder           # dry-run cascade; add --apply to write
+node scripts/merge.mjs path/to/product-folder --only <id> # land an implemented initiative into the main (--apply)
 node scripts/product-map.mjs path/to/product-folder --html map.html   # read-only composite
 ```
 

@@ -142,6 +142,7 @@ vibespec/
 │       │   ├── validate-tree.mjs       # 교차 파일 검증(scope·digest·boundary·path)
 │       │   ├── sot-digest.mjs          # 부모 digest 계산(이니셔티브가 기록할 값)
 │       │   ├── rebase.mjs              # 본편 변경 후 root→leaf 연쇄 재기준
+│       │   ├── merge.mjs               # 구현된 이니셔티브를 본편에 접어 넣기(land)
 │       │   ├── product-map.mjs         # 본편+활성 이니셔티브 합성 지도(--html/--json)
 │       │   ├── diff-sot.mjs            # 두 SOT의 변경·영향 반경 리포트
 │       │   ├── embed-sot.mjs           # SOT를 뷰어 embedded-sot 태그에 주입
@@ -188,6 +189,7 @@ node scripts/diff-sot.mjs before.sot.json after.sot.json
 node scripts/inspect.mjs path/to/product-folder          # 입력 분류·다음 path·추천 모드
 node scripts/validate-tree.mjs path/to/product-folder    # scope·digest·boundary·path 검사
 node scripts/rebase.mjs path/to/product-folder           # 드라이런 연쇄; --apply로 기록
+node scripts/merge.mjs path/to/product-folder --only <id> # 구현된 이니셔티브를 본편에 접어 넣기(--apply)
 node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 지도
 ```
 

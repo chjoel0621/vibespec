@@ -31,7 +31,7 @@
         "productId": { "$ref": "#/$defs/slug" },
         "id": { "$ref": "#/$defs/slug" },
         "path": { "type": "string", "pattern": "^[1-9][0-9]*(-[1-9][0-9]*)*$" },
-        "status": { "enum": ["proposed", "approved", "implemented", "dropped"] },
+        "status": { "enum": ["proposed", "approved", "implemented", "dropped", "landed"] },
         "parent": {
           "type": "object",
           "additionalProperties": false,

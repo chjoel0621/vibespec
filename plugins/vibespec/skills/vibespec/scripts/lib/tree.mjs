@@ -39,6 +39,7 @@ function digestSeverity(status) {
   if (status === "approved") return "error";
   if (status === "implemented") return "warning"; // shipped reality — flagged "stale", still synthesized
   if (status === "dropped") return "info";
+  if (status === "landed") return "info"; // merged into the main — its digest no longer matters
   return "warning"; // proposed
 }
 

@@ -46,6 +46,7 @@ export function buildProductMap(docs, opts = {}) {
       const s = d.sot.initiative.status;
       const reason = s === "proposed" ? "proposed (not yet approved)"
         : s === "dropped" ? "dropped"
+        : s === "landed" ? "landed (merged into the main)"
         : "excluded by an inactive ancestor";
       return { id: d.sot.initiative.id, status: s, reason };
     });

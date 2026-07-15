@@ -26,8 +26,12 @@
   "ia": {
     "sections": [
       {
-        "title": "Checkout",
+        "title": "Shop",
         "id": "S1",
+        "boundary": {
+          "scopeId": "root",
+          "sectionId": "S1"
+        },
         "pages": [
           {
             "title": "Cart",

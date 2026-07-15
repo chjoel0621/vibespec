@@ -61,10 +61,13 @@ export function buildProductMap(docs, opts = {}) {
     node.children = cloneInto(p.children, scope);
     return node;
   });
-  const iaSections = root ? root.sot.ia.sections.map(sec => ({
-    id: `root/${sec.id}`, scope: "root", title: sec.title, pages: cloneInto(sec.pages, "root")
-  })) : [];
-
+  // Index composed sections by "scope/sectionId" so a section boundary resolves.
+  const sectionIndex = new Map();
+  const iaSections = root ? root.sot.ia.sections.map(sec => {
+    const s = { id: `root/${sec.id}`, scope: "root", title: sec.title, pages: cloneInto(sec.pages, "root") };
+    sectionIndex.set(`root/${sec.id}`, s);
+    return s;
+  }) : [];
   // 2) Graft each ACTIVE initiative, shallowest first, so an ancestor scope is
   //    already in the index before its descendants attach.
   const activeDocs = initiatives.filter(d => active.has(d.sot.initiative.id))
@@ -75,26 +78,38 @@ export function buildProductMap(docs, opts = {}) {
   for (const d of activeDocs) {
     const meta = d.sot.initiative;
     scopeInfo.push({ id: meta.id, title: d.sot.title, status: meta.status, path: meta.path, ...embed(d.sot) });
-    // Walk the initiative IA at ANY depth (validate-tree allows a boundary at
-    // any depth). A boundary stub is a reference, not a real node: it is not
-    // materialized; its children graft under the boundary target. A non-boundary
-    // page is a screen the initiative introduces and becomes a composite node.
-    // `host` is the composite node (or section-pages holder) new nodes attach to.
-    const graftPage = (p, host) => {
+    // Walk the initiative IA at ANY depth. A page boundary stub is a reference,
+    // not a real node: it is not materialized; its children graft under the
+    // boundary target. A non-boundary page is a new screen and becomes a
+    // composite node. `host` is the composite node it attaches to; `secHost` is
+    // the composed section it lands in when it has no page host.
+    const graftPage = (p, host, secHost) => {
       if (isObject(p.boundary)) {
         const targetKey = `${p.boundary.scopeId}/${p.boundary.pageId}`;
         const target = index.get(targetKey);
         if (target) attachments.push({ initiative: meta.id, at: targetKey });
-        const stubHost = target || { children: orphanSection(iaSections, meta).pages }; // missing target: defensive
-        (p.children || []).forEach(child => graftPage(child, stubHost));
+        const stubHost = target || secHost; // missing target: keep children in the section
+        (p.children || []).forEach(child => graftPage(child, stubHost, secHost));
       } else {
         const node = compositePage(p, meta.id);
         index.set(node.compositeId, node);
-        (host ? host.children : orphanSection(iaSections, meta).pages).push(node);
-        (p.children || []).forEach(child => graftPage(child, node));
+        (host ? host.children : secHost.pages).push(node);
+        (p.children || []).forEach(child => graftPage(child, node, secHost));
       }
     };
-    (d.sot.ia.sections || []).forEach(sec => (sec.pages || []).forEach(p => graftPage(p, null)));
+    // A section boundary mirrors a main section: the initiative's new pages land
+    // in that main section (page stubs still graft under their page targets). A
+    // section WITHOUT a boundary is a new section of the initiative, kept with the
+    // author's title and tagged by scope. Either way nothing is silently dropped —
+    // but a new section is surfaced only if a page actually lands in it, so a
+    // pure wrapper (only page-boundary stubs that graft elsewhere) adds no phantom.
+    (d.sot.ia.sections || []).forEach(sec => {
+      const bkey = isObject(sec.boundary) ? `${sec.boundary.scopeId}/${sec.boundary.sectionId}` : null;
+      const existing = bkey ? sectionIndex.get(bkey) : null;
+      const secHost = existing || { id: `${meta.id}/${sec.id}`, scope: meta.id, title: sec.title, pages: [] };
+      (sec.pages || []).forEach(p => graftPage(p, null, secHost));
+      if (!existing && secHost.pages.length) { iaSections.push(secHost); sectionIndex.set(secHost.id, secHost); }
+    });
   }
 
   return {
@@ -110,13 +125,4 @@ export function buildProductMap(docs, opts = {}) {
     attachments,
     ia: iaSections
   };
-}
-
-// A place to hang an initiative's non-boundary top pages: one composite section
-// per initiative, created lazily.
-function orphanSection(iaSections, meta) {
-  const id = `${meta.id}/__added`;
-  let sec = iaSections.find(s => s.id === id);
-  if (!sec) { sec = { id, scope: meta.id, title: `＋ ${meta.title}`, pages: [] }; iaSections.push(sec); }
-  return sec;
 }

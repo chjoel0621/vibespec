@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateTree } from "../scripts/lib/tree.mjs";
+import { validateSot } from "../scripts/validate-sot.mjs";
 import { collectFiles } from "../scripts/validate-tree.mjs";
 import { sotDigest } from "../scripts/lib/c14n.mjs";
 
@@ -184,3 +185,52 @@ assert.equal(digestCli.status, 0, `sot-digest exit: ${digestCli.stderr}`);
 assert.equal(digestCli.stdout.trim(), digestOf(main), "sot-digest CLI must match lib sotDigest");
 assert.equal(digestCli.stdout.trim(), payment.initiative.parent.digest, "and match the fixture initiative's recorded parent digest");
 console.log("[tree] PASS sot-digest CLI prints the canonical parent digest");
+
+/* ==== section boundary (declare the wrapper: reference or new) ==== */
+// The clean payment fixture now mirrors main section S1 ("Shop") with a section
+// boundary, so its page boundary sits in a declared reference — no phantom.
+const sbBase = validateTree([doc("main.sot.json", main), doc("shop.1-2.payment.sot.json", payment)]);
+assert.equal(sbBase.warnings.length, 0, `section-boundary fixture must be clean: ${JSON.stringify(sbBase.warnings)}`);
+assert.equal(payment.ia.sections[0].boundary.sectionId, "S1", "fixture must exercise a section boundary");
+console.log("[tree] PASS a mirrored section boundary is clean (no phantom warning)");
+
+// Missing target section → error.
+const sbMissing = clone(payment); sbMissing.ia.sections[0].boundary.sectionId = "S9";
+assert.ok(hasError(validateTree([doc("m", main), doc("p", sbMissing)]), 'section "S9" does not exist'),
+  "a section boundary to a non-existent section must error");
+console.log("[tree] PASS section boundary to a missing section errors");
+
+// scopeId not an ancestor → error.
+const sbScope = clone(payment); sbScope.ia.sections[0].boundary.scopeId = "ghost";
+assert.ok(hasError(validateTree([doc("m", main), doc("p", sbScope)]), 'is not an ancestor scope'),
+  "a section boundary to a non-ancestor scope must error");
+console.log("[tree] PASS section boundary to a non-ancestor scope errors");
+
+// Title drift (stub title ≠ main section title) → warning.
+const sbDrift = clone(payment); sbDrift.ia.sections[0].title = "Renamed";
+assert.ok(hasWarn(validateTree([doc("m", main), doc("p", sbDrift)]), "section boundary title drift"),
+  "a drifted section-boundary title must warn");
+console.log("[tree] PASS section boundary title drift warns");
+
+// A section boundary that points at a DIFFERENT section than where its page
+// boundary attaches → warning. (Needs a main with a second section.)
+const mainTwoSec = clone(main);
+mainTwoSec.ia.sections.push({ id: "S2", title: "Account", pages: [{ id: "P9", title: "Profile", type: "page", refs: [], children: [] }] });
+const sbMismatch = clone(payment);
+sbMismatch.ia.sections[0].boundary.sectionId = "S2"; sbMismatch.ia.sections[0].title = "Account"; // mirrors S2...
+sbMismatch.initiative.parent.digest = sotDigest(mainTwoSec);                                       // ...but its page boundary still attaches in S1
+assert.ok(hasWarn(validateTree([doc("m", mainTwoSec), doc("p", sbMismatch)]), "does not match where its page boundary attaches"),
+  "a section boundary that doesn't match its page boundary's home section must warn");
+console.log("[tree] PASS mismatched section vs page boundary warns");
+
+// Dropping the section boundary reproduces the phantom-wrapper advisory.
+const sbNone = clone(payment); delete sbNone.ia.sections[0].boundary;
+assert.ok(hasWarn(validateTree([doc("m", main), doc("p", sbNone)]), "section with no boundary"),
+  "a page boundary under an undeclared section must advise declaring it");
+console.log("[tree] PASS an undeclared wrapper section is flagged (reference or new, never phantom)");
+
+// Section boundary is 1.1-only (single-file rule).
+const sbOnMain = clone(main); sbOnMain.ia.sections[0].boundary = { scopeId: "root", sectionId: "S1" };
+assert.ok(validateSot(sbOnMain).errors.some(e => e.message.includes("section boundary requires schemaVersion 1.1")),
+  "a section boundary on a 1.0 doc must be rejected");
+console.log("[tree] PASS section boundary is 1.1-only");

@@ -171,6 +171,7 @@ export function validateSot(sot) {
   const iaRefs = new Set();
   const sectionIds = new Set();
   const boundaryPages = [];
+  const boundarySections = [];
   const walkPage = (page, path) => {
     if (!requireObject(page, path)) return;
     if (!pageIdPattern.test(page.id || "")) error(`${path}.id`, "must match P1, P2, ...");
@@ -195,6 +196,7 @@ export function validateSot(sot) {
       else if (sectionIds.has(section.id)) error(`${sp}.id`, `duplicate section id ${section.id}`);
       else sectionIds.add(section.id);
       requireString(section.title, `${sp}.title`, true);
+      if (Object.hasOwn(section, "boundary")) boundarySections.push({ section, path: sp });
       if (requireArray(section.pages, `${sp}.pages`)) section.pages.forEach((page, pi) => walkPage(page, `${sp}.pages[${pi}]`));
     });
   }
@@ -219,9 +221,15 @@ export function validateSot(sot) {
       }
       if ((page.refs || []).length) warning(`${path}.refs`, "a boundary stub page should not carry its own feature refs");
     }
+    for (const { section, path } of boundarySections) {
+      if (isObject(section.boundary) && section.boundary.scopeId === (meta && meta.id)) {
+        error(`${path}.boundary.scopeId`, "section boundary cannot reference the initiative's own scope");
+      }
+    }
   } else {
     if (Object.hasOwn(sot, "initiative")) error("$.initiative", "initiative meta requires schemaVersion 1.1");
     for (const { path } of boundaryPages) error(`${path}.boundary`, "page boundary requires schemaVersion 1.1");
+    for (const { path } of boundarySections) error(`${path}.boundary`, "section boundary requires schemaVersion 1.1");
   }
 
   if (isObject(prd)) {

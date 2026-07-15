@@ -123,3 +123,31 @@ assert.ok(/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "the html map embeds i
 assert.equal(run([treeDir, "--html", htmlOut, "--link", "root=/"]).status, 0, "--link run must succeed");
 assert.ok(!/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "--link points at real pages, so the html map does not embed docs");
 console.log("[map] PASS the html map embeds documents by default and defers to --link when given");
+
+// Section boundary: the wrapper mirrors a main section, so it composes with NO
+// phantom section — the fixture's screens land under the main section as before.
+const sbMap = buildProductMap([doc("main", main), doc("pay", payment)]);
+assert.deepEqual(sbMap.ia.map(s => s.id), ["root/S1"], "a mirrored section boundary must not add a section");
+assert.ok(nodeById(sbMap, "payment/P2"), "the increment screen still composes under the main target");
+console.log("[map] PASS a section boundary mirrors a main section without a phantom");
+
+// A genuinely-new section (no boundary) with a real new page appears in the map
+// under the initiative's scope, keeping the AUTHOR'S title (not a machine label).
+const withNewSec = clone(payment);
+withNewSec.ia.sections.push({ id: "S2", title: "Wallet", pages: [
+  { id: "P3", title: "Balance", type: "page", refs: [], children: [] }
+] });
+const nsMap = buildProductMap([doc("main", main), doc("pay", withNewSec)]);
+const newSec = nsMap.ia.find(s => s.id === "payment/S2");
+assert.ok(newSec, "a non-boundary initiative section with new pages must surface");
+assert.equal(newSec.title, "Wallet", "the new section keeps the author's title");
+assert.equal(newSec.scope, "payment", "the new section is tagged with the initiative scope");
+assert.ok(newSec.pages.some(p => p.compositeId === "payment/P3"), "the new page composes into the new section");
+console.log("[map] PASS a genuinely-new initiative section surfaces tagged, with its own title");
+
+// A pure wrapper (only a page-boundary stub, nothing lands in it) adds NO section.
+const wrapperOnly = clone(payment); delete wrapperOnly.ia.sections[0].boundary; // undeclared wrapper
+const woMap = buildProductMap([doc("main", main), doc("pay", wrapperOnly)]);
+assert.deepEqual(woMap.ia.map(s => s.id), ["root/S1"], "a pure wrapper must not add an empty phantom section");
+assert.ok(nodeById(woMap, "payment/P2"), "its stub's children still graft under the main target");
+console.log("[map] PASS a pure wrapper adds no phantom section (children graft at the target)");

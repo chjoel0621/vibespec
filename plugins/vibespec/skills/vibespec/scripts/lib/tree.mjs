@@ -19,6 +19,20 @@ function pageById(sot, id) {
   (sot.ia?.sections ?? []).forEach(section => walk(section.pages));
   return found;
 }
+function sectionById(sot, id) {
+  return (sot.ia?.sections ?? []).find(s => s.id === id) || null;
+}
+// Which main section contains a given page (at any depth). Used to check that a
+// page-boundary stub's enclosing initiative section mirrors that main section.
+function sectionOfPage(sot, pageId) {
+  for (const section of sot.ia?.sections ?? []) {
+    let hit = false;
+    const walk = pages => { for (const p of pages ?? []) { if (hit) return; if (p.id === pageId) { hit = true; return; } walk(p.children); } };
+    walk(section.pages);
+    if (hit) return section;
+  }
+  return null;
+}
 
 // digest-mismatch severity by initiative status (roadmap §2).
 function digestSeverity(status) {
@@ -129,23 +143,51 @@ export function validateTree(docs) {
   for (const d of initiatives) {
     const meta = d.sot.initiative;
     const ancestors = ancestorsOf(meta.id);
-    const walk = (pages, base) => (pages ?? []).forEach((p, i) => {
+    // enc = the top-level initiative section wrapping the page (with its path), so
+    // a page boundary can be checked against its enclosing section's boundary.
+    const walk = (pages, base, enc) => (pages ?? []).forEach((p, i) => {
       const path = `${base}[${i}]`;
       if (isObject(p.boundary)) {
         const b = p.boundary;
         if (!ancestors.has(b.scopeId)) err(d.name, `${path}.boundary.scopeId`, `"${b.scopeId}" is not an ancestor scope of "${meta.id}"`);
         else if (scopes.has(b.scopeId)) { // if the ancestor scope's doc is missing, inv3 already flagged it
-          const target = pageById(scopes.get(b.scopeId).doc.sot, b.pageId);
+          const targetDoc = scopes.get(b.scopeId).doc.sot;
+          const target = pageById(targetDoc, b.pageId);
           if (!target) err(d.name, `${path}.boundary.pageId`, `page "${b.pageId}" does not exist in scope "${b.scopeId}"`);
           else {
             if (target.title !== p.title) warn(d.name, `${path}.boundary`, `boundary title drift: stub "${p.title}" vs "${b.scopeId}/${b.pageId}" "${target.title}"`);
             if (target.type !== p.type) warn(d.name, `${path}.boundary`, `boundary type drift: stub "${p.type}" vs target "${target.type}"`);
+            // Consistency: the enclosing initiative section should be a boundary
+            // onto the main section that holds this target page — otherwise the
+            // wrapper has no counterpart in the main and composes as a new section
+            // (or silently vanishes). This is what keeps every level explicit:
+            // a reference (mirror) or a declared new section, never a phantom.
+            const mainSec = sectionOfPage(targetDoc, b.pageId);
+            if (mainSec && enc) {
+              const sb = enc.section.boundary;
+              if (!isObject(sb)) warn(d.name, `${enc.path}.boundary`, `page boundary "${b.scopeId}/${b.pageId}" is under a section with no boundary — declare that section as a boundary onto "${b.scopeId}/${mainSec.id}" ("${mainSec.title}"), or it composes as a separate new section`);
+              else if (!(sb.scopeId === b.scopeId && sb.sectionId === mainSec.id)) warn(d.name, `${enc.path}.boundary`, `section boundary "${sb.scopeId}/${sb.sectionId}" does not match where its page boundary attaches ("${b.scopeId}/${mainSec.id}")`);
+            }
           }
         }
       }
-      walk(p.children, `${path}.children`);
+      walk(p.children, `${path}.children`, enc);
     });
-    d.sot.ia?.sections?.forEach((s, si) => walk(s.pages, `$.ia.sections[${si}].pages`));
+    d.sot.ia?.sections?.forEach((s, si) => {
+      const sp = `$.ia.sections[${si}]`;
+      // Section-level boundary: scopeId must be an ancestor, sectionId must exist
+      // there, and the stored title must mirror the target section (drift warns).
+      if (isObject(s.boundary)) {
+        const b = s.boundary;
+        if (!ancestors.has(b.scopeId)) err(d.name, `${sp}.boundary.scopeId`, `"${b.scopeId}" is not an ancestor scope of "${meta.id}"`);
+        else if (scopes.has(b.scopeId)) {
+          const targetSec = sectionById(scopes.get(b.scopeId).doc.sot, b.sectionId);
+          if (!targetSec) err(d.name, `${sp}.boundary.sectionId`, `section "${b.sectionId}" does not exist in scope "${b.scopeId}"`);
+          else if (targetSec.title !== s.title) warn(d.name, `${sp}.boundary`, `section boundary title drift: stub "${s.title}" vs "${b.scopeId}/${b.sectionId}" "${targetSec.title}"`);
+        }
+      }
+      walk(s.pages, `${sp}.pages`, { section: s, path: sp });
+    });
   }
 
   // 7) dropped parent → active child = error, proposed child = warning.

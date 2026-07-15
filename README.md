@@ -11,6 +11,8 @@ VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code
 
 The demo has three linked pages — use the strip in the bottom-right corner to move between them: the **[main plan](https://chjoel0621.github.io/vibespec/en/)**, an **[initiative](https://chjoel0621.github.io/vibespec/en/notif/)** layered on it (a notification increment), and the **[product map](https://chjoel0621.github.io/vibespec/en/map/)** that composes the two. In the map, click any node to open the document that defines it.
 
+A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)**, a location-based secondhand marketplace with a safe-payment (escrow) initiative, was produced end-to-end by the plugin itself (generate → initiative → map). Use the same corner strip to hop between the two demos.
+
 ## Core idea
 
 - **HTML = the app (viewer/editor)** · **JSON = the data (SOT)** — the two are kept separate.
@@ -149,9 +151,10 @@ vibespec/
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
 │       └── package.json                # npm run build · check · validate
-├── demo/                               # Demo SOTs: main (/ , /en/) + a notif initiative
-│                                       #   (/notif/, /en/notif/), composed into the product
-│                                       #   map (/map/, /en/map/). nav.mjs links the pages.
+├── demo/                               # Two demo products (ko/en), each a main + an
+│                                       #   approved initiative composed into a product map:
+│                                       #   meeting-room-booking (/) and flea-market (/flea/).
+│                                       #   nav.mjs links the pages and cross-links the two.
 ├── .github/workflows/                  # CI (build + tests) and Pages demo deploy
 ├── LICENSE
 ├── README.md                           # English (default)

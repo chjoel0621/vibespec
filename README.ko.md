@@ -12,6 +12,8 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 
 데모는 서로 연결된 세 페이지로 되어 있습니다. 오른쪽 아래 이동 바로 옮겨 다닐 수 있습니다 — **[본편](https://chjoel0621.github.io/vibespec/)**, 그 위에 얹은 **[이니셔티브](https://chjoel0621.github.io/vibespec/notif/)**(알림 증분), 둘을 합성한 **[제품 지도](https://chjoel0621.github.io/vibespec/map/)**. 지도에서는 아무 노드나 누르면 그 노드를 정의한 문서가 열립니다.
 
+**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래 + 안전결제(에스크로) 이니셔티브)는 플러그인으로 처음부터 끝까지(생성 → 이니셔티브 → 지도) 직접 만든 결과물입니다. 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
+
 ## 핵심 개념
 
 - **HTML = 앱(뷰어/편집기)** · **JSON = 데이터(SOT)** — 둘을 분리했습니다.
@@ -149,9 +151,9 @@ vibespec/
 │       ├── src/                        # 뷰어 소스 (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # src/ 를 단일 파일 뷰어로 인라인
 │       └── package.json                # npm run build · check · validate
-├── demo/                               # 데모 SOT: 본편(/ , /en/) + 알림 이니셔티브(/notif/,
-│                                       #   /en/notif/), 합성 지도(/map/, /en/map/).
-│                                       #   nav.mjs가 세 페이지를 서로 연결
+├── demo/                               # 데모 제품 둘(ko/en), 각각 본편 + 승인된 이니셔티브를
+│                                       #   합성 지도로: meeting-room-booking(/), flea-market(/flea/).
+│                                       #   nav.mjs가 페이지를 잇고 두 제품을 상호 연결
 ├── .github/workflows/                  # CI(빌드+테스트)와 Pages 데모 배포
 ├── LICENSE
 ├── README.md                           # 영어(기본)

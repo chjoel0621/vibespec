@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Neighborly",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "A location-based secondhand marketplace for buying and selling with neighbors you can meet on foot",
+    "goal": "Reach 300K monthly active users and 40% weekly retention within 12 months of launch",
+    "whyNow": "Inflation has made secondhand a daily habit, and fatigue with shipping fraud is driving fast-growing demand for nearby, meet-in-person deals",
+    "category": "Location-based C2C secondhand marketplace",
+    "platforms": ["iOS", "Android"],
+    "problem": "Shipping-based resale is prone to fraud and return disputes, and sellers find packing and mailing a chore. People want to meet neighbors, inspect the item, and deal in person, but there is no good channel for it",
+    "solution": "Verify the user's neighborhood by GPS and show only listings within the same living area. Arrange meetups over in-app chat, deal face to face, and build trust with a manner score",
+    "alternatives": "Nationwide resale platforms (shipping-centric), local community forums and open chats (unmoderated), offline flea markets (time and place constrained)",
+    "differentiator": "Neighborhood verification keeps only real neighbors, and a cumulative manner-score reputation eases the anxiety of anonymous deals",
+    "targets": [
+      { "name": "Budget-minded Jiyoung", "role": "Buyer", "needs": "wants to buy household goods cheaply, quickly, and from someone trustworthy", "pain": "can't trust an item's condition in shipping deals, and delivery takes too long" },
+      { "name": "Declutterer Hyunwoo", "role": "Seller", "needs": "wants to offload unused items in the neighborhood without hassle", "pain": "packing and shipping is tedious, and dealing with strangers feels unsafe" }
+    ],
+    "scenarios": [
+      { "text": "Jiyoung verifies her new neighborhood, spots a nearby desk in the home feed, and arranges a meetup with the seller over chat", "start": "P2" },
+      { "text": "Hyunwoo lists an unused stroller with 5 photos, marks the chatting buyer as reserved, and completes the deal in person", "start": "P8" }
+    ],
+    "northStar": "Weekly completed deals",
+    "kpis": [
+      { "name": "Deal completion rate", "target": "45%", "baseline": "-", "method": "share of started chats that reach 'sold'", "refs": ["F7", "F7:0"] },
+      { "name": "Neighborhood verification rate", "target": "80%", "baseline": "-", "method": "share of signups that complete location verification", "refs": ["F1"] },
+      { "name": "Retention (WAU/MAU)", "target": "40%", "baseline": "-", "method": "share of monthly actives returning weekly", "refs": ["F4", "F6"] }
+    ],
+    "inScope": [
+      "GPS-based neighborhood verification and living-area listing exposure",
+      "Listing creation with photos, price, and category",
+      "In-app 1:1 chat and deal-status management (reserved/sold)",
+      "Reputation via manner score and post-deal reviews"
+    ],
+    "nonGoals": [
+      "Shipping and in-app payment/settlement (out of initial scope; deferred to in-person cash/transfer)",
+      "Nationwide search (listings outside the living area are not shown)",
+      "Bulk-selling tools for businesses and pro sellers"
+    ],
+    "assumptions": [
+      "Most users grant location permission",
+      "Listing and demand density within a living area is high enough to complete deals"
+    ],
+    "risks": [
+      "Low listing density in an early neighborhood means deals don't complete and users churn",
+      "In-person deals are hard for the app to fully protect against fraud and disputes"
+    ],
+    "openQuestions": [
+      "Fix the neighborhood radius or let users adjust it",
+      "Which behaviors should feed the manner score"
+    ],
+    "constraints": [
+      "Comply with iOS/Android location-permission policies",
+      "Surface a safe-deal guide recommending public meetup spots"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "Onboarding & neighborhood verification", "desc": "After signup, verify the neighborhood and set up a profile", "status": "todo", "priority": "high",
+      "acceptance": [{ "text": "Only users who complete location verification can see listings", "done": false }],
+      "features": [
+        { "id": "F1", "title": "Neighborhood verification", "desc": "Verify the current living area by GPS", "status": "todo", "priority": "high", "acceptance": [{ "text": "Listings are filtered by the verified neighborhood", "done": false }],
+          "specs": [
+            { "title": "GPS-based neighborhood set", "desc": "Auto-detect and confirm the neighborhood from the current location", "acceptance": [] },
+            { "title": "Adjust neighborhood range", "desc": "Adjust the exposure radius between near and far", "acceptance": [] }
+          ] },
+        { "id": "F2", "title": "Profile", "desc": "Represent identity with a nickname and photo", "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Nickname & photo", "desc": "Register a display name and profile photo", "acceptance": [] }
+          ] }
+      ]
+    },
+    {
+      "id": "R2", "title": "Listing creation", "desc": "Sellers post items with ease", "status": "todo", "priority": "high",
+      "acceptance": [{ "text": "At least one photo and a price are required to post", "done": false }],
+      "features": [
+        { "id": "F3", "title": "Listing creation", "desc": "Post an item with photos, price, and category", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "Photo upload", "desc": "Attach up to 10 photos", "acceptance": [{ "text": "At least 1 is required", "done": false }] },
+            { "title": "Price & condition", "desc": "Enter the asking price and item condition (new/used)", "acceptance": [] },
+            { "title": "Category select", "desc": "Assign a category such as furniture, digital, or clothing", "acceptance": [] }
+          ] }
+      ]
+    },
+    {
+      "id": "R3", "title": "Browse & search", "desc": "Explore and find neighborhood listings", "status": "todo", "priority": "high",
+      "acceptance": [],
+      "features": [
+        { "id": "F4", "title": "Home feed", "desc": "Show the latest listings by neighborhood", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "Neighborhood-based sorting", "desc": "Sort listings by distance and recency", "acceptance": [] }
+          ] },
+        { "id": "F5", "title": "Search & filter", "desc": "Narrow listings by keyword and conditions", "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Keyword search", "desc": "Search titles and descriptions by keyword", "acceptance": [] },
+            { "title": "Price & category filter", "desc": "Filter results by price range and category", "acceptance": [] }
+          ] }
+      ]
+    },
+    {
+      "id": "R4", "title": "Chat & dealing", "desc": "Arrange meetups over chat and manage deal status", "status": "todo", "priority": "high",
+      "acceptance": [{ "text": "On completion, the status changes to 'sold'", "done": false }],
+      "features": [
+        { "id": "F6", "title": "Chat", "desc": "Buyer and seller talk 1:1", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "Real-time messages", "desc": "Exchange messages in real time", "acceptance": [] },
+            { "title": "Photo sending", "desc": "Send photos within the chat", "acceptance": [] }
+          ] },
+        { "id": "F7", "title": "Deal-status management", "desc": "Switch a listing between reserved and sold", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "Status switch", "desc": "Switch selling → reserved → sold", "acceptance": [] },
+            { "title": "Assign buyer", "desc": "Designate the actual buyer among chat partners", "acceptance": [] }
+          ] }
+      ]
+    },
+    {
+      "id": "R5", "title": "Trust & reputation", "desc": "Build trust with post-deal reviews and a manner score", "status": "todo", "priority": "mid",
+      "acceptance": [],
+      "features": [
+        { "id": "F8", "title": "Manner score & reviews", "desc": "Manage reputation with reviews and reports", "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "Post-deal review", "desc": "Leave a manner rating for the deal partner", "acceptance": [] },
+            { "title": "Report", "desc": "Report fraud and bad-manner users", "acceptance": [] }
+          ] }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      { "id": "S1", "title": "Start", "pages": [
+        { "id": "P1", "title": "Splash", "type": "top", "refs": [], "children": [] },
+        { "id": "P2", "title": "Neighborhood verification", "type": "page", "refs": ["F1", "F1:0", "F1:1"], "children": [] },
+        { "id": "P3", "title": "Profile setup", "type": "page", "refs": ["F2", "F2:0"], "children": [] }
+      ] },
+      { "id": "S2", "title": "Home & browse", "pages": [
+        { "id": "P4", "title": "Home feed", "type": "top", "refs": ["F4", "F4:0"], "children": [] },
+        { "id": "P5", "title": "Search", "type": "page", "refs": ["F5", "F5:0", "F5:1"], "children": [
+          { "id": "P6", "title": "Filter", "type": "action", "refs": ["F5:1"], "children": [] }
+        ] }
+      ] },
+      { "id": "S3", "title": "Listing", "pages": [
+        { "id": "P7", "title": "Listing detail", "type": "page", "refs": [], "children": [] },
+        { "id": "P8", "title": "Create listing", "type": "page", "refs": ["F3", "F3:1", "F3:2"], "children": [
+          { "id": "P9", "title": "Photo upload", "type": "action", "refs": ["F3:0"], "children": [] }
+        ] }
+      ] },
+      { "id": "S4", "title": "Chat & deal", "pages": [
+        { "id": "P10", "title": "Chat list", "type": "top", "refs": ["F6"], "children": [] },
+        { "id": "P11", "title": "Chat room", "type": "page", "refs": ["F6:0", "F6:1"], "children": [] },
+        { "id": "P12", "title": "Deal-status management", "type": "page", "refs": ["F7", "F7:0", "F7:1"], "children": [] }
+      ] },
+      { "id": "S5", "title": "My", "pages": [
+        { "id": "P13", "title": "My page", "type": "top", "refs": ["F2"], "children": [] },
+        { "id": "P14", "title": "Manner score & reviews", "type": "page", "refs": ["F8", "F8:0", "F8:1"], "children": [] }
+      ] }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F1" },
+      { "from": "P2", "to": "P3", "ref": "F2" },
+      { "from": "P3", "to": "P4", "label": "setup done" },
+      { "from": "P4", "to": "P5", "ref": "F5" },
+      { "from": "P5", "to": "P6", "ref": "F5:1" },
+      { "from": "P4", "to": "P7", "label": "pick a listing" },
+      { "from": "P7", "to": "P11", "ref": "F6" },
+      { "from": "P4", "to": "P8", "ref": "F3" },
+      { "from": "P8", "to": "P9", "ref": "F3:0" },
+      { "from": "P9", "to": "P8", "label": "upload done" },
+      { "from": "P8", "to": "P7", "label": "posted" },
+      { "from": "P4", "to": "P10", "label": "chat tab" },
+      { "from": "P10", "to": "P11", "label": "open chat room" },
+      { "from": "P11", "to": "P12", "ref": "F7" },
+      { "from": "P12", "to": "P14", "ref": "F8" },
+      { "from": "P4", "to": "P13", "label": "my tab" },
+      { "from": "P13", "to": "P14", "label": "view manner score" }
+    ]
+  }
+}

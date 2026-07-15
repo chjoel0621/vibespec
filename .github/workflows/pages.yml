@@ -37,52 +37,67 @@ jobs:
       - name: Build viewer from src
         run: node build.mjs
         working-directory: plugins/vibespec/skills/vibespec
-      - name: Validate demo SOTs
+      # Two demo products, each: main + an approved initiative, in ko and en.
+      # <prefix> <init-infix> per product; both languages validate independently
+      # (same folder mixes ko/en, so pass explicit file lists, not the folder).
+      - name: Validate demo SOTs and trees
         run: |
-          node plugins/vibespec/skills/vibespec/scripts/validate-sot.mjs \
-            demo/meeting-room-booking.ko.sot.json \
-            demo/meeting-room-booking.en.sot.json
-      - name: Validate demo trees
-        run: |
-          node plugins/vibespec/skills/vibespec/scripts/validate-tree.mjs \
-            demo/meeting-room-booking.ko.sot.json demo/meeting-room-booking.ko.1-2.notif.sot.json
-          node plugins/vibespec/skills/vibespec/scripts/validate-tree.mjs \
-            demo/meeting-room-booking.en.sot.json demo/meeting-room-booking.en.1-2.notif.sot.json
+          S=plugins/vibespec/skills/vibespec
+          validate_product() { # $1=demo/<prefix>  $2=<path>.<slug>
+            for f in $1.ko.sot.json $1.en.sot.json $1.ko.$2.sot.json $1.en.$2.sot.json; do
+              node $S/scripts/validate-sot.mjs "$f"
+            done
+            node $S/scripts/validate-tree.mjs $1.ko.sot.json $1.ko.$2.sot.json
+            node $S/scripts/validate-tree.mjs $1.en.sot.json $1.en.$2.sot.json
+          }
+          validate_product demo/meeting-room-booking 1-2.notif
+          validate_product demo/flea-market 1-1.escrow
       - name: Stage site
         run: |
           B=/vibespec
           S=plugins/vibespec/skills/vibespec
-          mkdir -p _site/en _site/map _site/en/map _site/notif _site/en/notif
-          # Main demos embed their SOT explicitly so neither depends on
-          # localStorage (which is shared per-origin between / and /en).
-          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.ko.sot.json _site/index.html
-          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.en.sot.json _site/en/index.html
-          # The initiative's own document, so the map can link into it.
-          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.ko.1-2.notif.sot.json _site/notif/index.html
-          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/meeting-room-booking.en.1-2.notif.sot.json _site/en/notif/index.html
-          # Read-only product map = main + its active initiative, composed. --link
-          # makes each scope's nodes open the document that defines it.
-          node $S/scripts/product-map.mjs \
-            demo/meeting-room-booking.ko.sot.json demo/meeting-room-booking.ko.1-2.notif.sot.json \
-            --link root=$B/ --link notif=$B/notif/ --html _site/map/index.html
-          node $S/scripts/product-map.mjs \
-            demo/meeting-room-booking.en.sot.json demo/meeting-room-booking.en.1-2.notif.sot.json \
-            --link root=$B/en/ --link notif=$B/en/notif/ --html _site/en/map/index.html
-      # The three demo pages are separate documents; without this strip the map is
-      # unreachable from the demo and vice versa. Demo-only — not part of the plugin.
+          # Stage one product's 6 pages (main·initiative·map × ko·en). The map
+          # uses --link so each node opens the document that defines it. Demos
+          # embed their SOT explicitly so neither depends on localStorage (shared
+          # per-origin across the whole site).
+          stage_product() { # $1=demo/<prefix>  $2=url-sub("" or "flea")  $3=<path>.<slug>  $4=<slug>
+            local pre=$1 sub=$2 infix=$3 slug=$4
+            local url=$B${sub:+/$sub} dir=_site${sub:+/$sub}
+            mkdir -p "$dir/en" "$dir/map" "$dir/en/map" "$dir/$slug" "$dir/en/$slug"
+            node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.ko.sot.json "$dir/index.html"
+            node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.en.sot.json "$dir/en/index.html"
+            node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.ko.$infix.sot.json "$dir/$slug/index.html"
+            node $S/scripts/embed-sot.mjs $S/assets/viewer.html $pre.en.$infix.sot.json "$dir/en/$slug/index.html"
+            node $S/scripts/product-map.mjs $pre.ko.sot.json $pre.ko.$infix.sot.json \
+              --link root=$url/ --link $slug=$url/$slug/ --html "$dir/map/index.html"
+            node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json \
+              --link root=$url/en/ --link $slug=$url/en/$slug/ --html "$dir/en/map/index.html"
+          }
+          stage_product demo/meeting-room-booking "" 1-2.notif notif
+          stage_product demo/flea-market flea 1-1.escrow escrow
+      # Each product's pages are separate documents; without this strip a map is
+      # unreachable from its demo and the two products don't cross-link. Demo-only.
       - name: Add demo navigation
         run: node demo/nav.mjs /vibespec _site
-      # A silent no-op here would republish the old dead-end demo, so fail loudly.
+      # A silent no-op here would republish a dead-end demo, so fail loudly.
       - name: Verify demo is navigable
         run: |
-          for f in "" en/ notif/ en/notif/ map/ en/map/; do
-            grep -q 'class="demo-nav"' "_site/${f}index.html" || { echo "no nav strip: _site/${f}index.html"; exit 1; }
-          done
-          # The map renders its links from the embedded payload, so assert the payload
-          # carries an href per scope (browser-map.mjs covers the rendering itself).
-          grep -q '"href":"/vibespec/notif/"' _site/map/index.html || { echo "ko map does not link into its initiative"; exit 1; }
-          grep -q '"href":"/vibespec/en/notif/"' _site/en/map/index.html || { echo "en map does not link into its initiative"; exit 1; }
-          echo "[verify] 6 pages carry the nav strip; both maps link into their initiative"
+          verify_product() { # $1=url-sub("" or "flea")  $2=<slug>
+            local dir=_site${1:+/$1} url=/vibespec${1:+/$1}
+            for f in "" en/ $2/ en/$2/ map/ en/map/; do
+              grep -q 'class="demo-nav"' "$dir/${f}index.html" || { echo "no nav strip: $dir/${f}index.html"; exit 1; }
+            done
+            # The map renders its links from the embedded payload; assert the payload
+            # carries the initiative href (browser-map.mjs covers the rendering).
+            grep -q "\"href\":\"$url/$2/\"" "$dir/map/index.html" || { echo "ko map ($1) does not link into its initiative"; exit 1; }
+            grep -q "\"href\":\"$url/en/$2/\"" "$dir/en/map/index.html" || { echo "en map ($1) does not link into its initiative"; exit 1; }
+          }
+          verify_product "" notif
+          verify_product flea escrow
+          # Cross-product link present on both mains.
+          grep -q 'demo-nav-alt' _site/index.html || { echo "root demo missing cross-product link"; exit 1; }
+          grep -q 'demo-nav-alt' _site/flea/index.html || { echo "flea demo missing cross-product link"; exit 1; }
+          echo "[verify] 12 pages carry the nav strip; both maps link into their initiative; products cross-link"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

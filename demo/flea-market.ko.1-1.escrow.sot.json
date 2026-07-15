@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.1",
+  "title": "안전결제(에스크로)",
+  "lang": "ko",
+  "initiative": {
+    "productId": "flea-market",
+    "id": "escrow",
+    "path": "1-1",
+    "status": "approved",
+    "parent": { "scopeId": "root", "canonicalization": "sot-c14n-v1", "digest": "sha256:f485c4e1556232c0cfb7cd44e1c86d40391f822dde07a09f66ef996facf8f791" }
+  },
+  "prd": {
+    "problem": "직거래는 현금·계좌 이체로 결제해, 구매자는 물건을 받기 전에 송금해야 하는 순간 사기 위험에 노출된다. 고가 매물일수록 '먼저 보내기'가 불안해 거래가 무산된다",
+    "solution": "앱이 구매 대금을 에스크로로 예치하고, 구매자가 물건 수령을 확인하면 판매자에게 정산한다. 물건과 돈이 동시에 오가는 안전장치를 직거래에 더한다",
+    "inScope": [
+      "결제 대금 에스크로 예치",
+      "구매자 수령 확인 후 판매자 정산",
+      "채팅·거래 상태에서 진입하는 안전결제 안내"
+    ],
+    "nonGoals": [
+      "택배·배송 연동(여전히 직접 만나 거래)",
+      "환불·분쟁의 자동 중재(고객센터 수동 처리로 위임)"
+    ],
+    "goal": "고가 매물(10만원 이상) 거래의 성사율을 안전결제 도입 전 대비 20% 높인다",
+    "scenarios": [
+      { "text": "지영은 25만원짜리 자전거를 안전결제로 구매해 대금을 예치하고, 만나서 상태를 확인한 뒤 수령 확인을 눌러 판매자에게 정산되게 한다", "start": "P2" }
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "안전결제", "desc": "에스크로로 대금을 예치하고 수령 확인 후 정산한다", "status": "todo", "priority": "high",
+      "acceptance": [{ "text": "수령 확인 전에는 판매자에게 정산되지 않는다", "done": false }],
+      "features": [
+        { "id": "F1", "title": "에스크로 결제", "desc": "대금 예치·수령 확인·정산의 3단계로 안전하게 거래한다", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "대금 예치", "desc": "구매자가 결제하면 대금을 앱이 예치한다", "acceptance": [{ "text": "예치 완료 시 판매자에게 예치 사실이 통지된다", "done": false }] },
+            { "title": "수령 확인", "desc": "구매자가 물건 수령을 확인한다", "acceptance": [] },
+            { "title": "정산", "desc": "수령 확인 시 예치금을 판매자에게 정산한다", "acceptance": [] }
+          ] },
+        { "id": "F2", "title": "안전결제 안내", "desc": "거래 상태 화면에서 안전결제 사용을 안내한다", "status": "todo", "priority": "mid", "acceptance": [], "specs": [] }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      { "id": "S1", "title": "안전거래", "pages": [
+        { "id": "P1", "title": "거래 상태 관리", "type": "page", "refs": [], "boundary": { "scopeId": "root", "pageId": "P12" }, "children": [
+          { "id": "P2", "title": "안전결제 안내", "type": "page", "refs": ["F2"], "children": [] },
+          { "id": "P3", "title": "결제 진행", "type": "page", "refs": ["F1", "F1:0"], "children": [
+            { "id": "P4", "title": "수령 확인", "type": "action", "refs": ["F1:1"], "children": [] }
+          ] },
+          { "id": "P5", "title": "정산", "type": "page", "refs": ["F1:2"], "children": [] }
+        ] }
+      ] }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F2" },
+      { "from": "P2", "to": "P3", "ref": "F1" },
+      { "from": "P3", "to": "P4", "ref": "F1:1" },
+      { "from": "P4", "to": "P5", "ref": "F1:2" },
+      { "from": "P5", "to": "P1", "label": "거래 완료" }
+    ]
+  }
+}

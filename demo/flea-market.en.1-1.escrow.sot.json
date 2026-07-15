@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.1",
+  "title": "Safe payment (escrow)",
+  "lang": "en",
+  "initiative": {
+    "productId": "flea-market",
+    "id": "escrow",
+    "path": "1-1",
+    "status": "approved",
+    "parent": { "scopeId": "root", "canonicalization": "sot-c14n-v1", "digest": "sha256:4e054fc61ef5b0eb99f060d1918cc65e1c80f9871c125d438404b12e85982145" }
+  },
+  "prd": {
+    "problem": "In-person deals settle in cash or bank transfer, so the buyer must send money before receiving the item — a moment of fraud exposure. The pricier the item, the more 'pay first' anxiety kills the deal",
+    "solution": "The app holds the payment in escrow and settles it to the seller once the buyer confirms receipt. It adds a safeguard where goods and money move together to in-person dealing",
+    "inScope": [
+      "Escrow hold of the payment",
+      "Settlement to the seller after the buyer confirms receipt",
+      "Safe-payment guidance entered from chat and deal status"
+    ],
+    "nonGoals": [
+      "Shipping integration (still meet in person)",
+      "Automated arbitration of refunds and disputes (deferred to manual support)"
+    ],
+    "goal": "Raise the completion rate of high-value deals (over $80) by 20% versus before safe payment",
+    "scenarios": [
+      { "text": "Jiyoung buys a $200 bike with safe payment, holds the amount in escrow, inspects it in person, then taps confirm receipt so it settles to the seller", "start": "P2" }
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "Safe payment", "desc": "Hold the payment in escrow and settle after receipt confirmation", "status": "todo", "priority": "high",
+      "acceptance": [{ "text": "Nothing settles to the seller before receipt is confirmed", "done": false }],
+      "features": [
+        { "id": "F1", "title": "Escrow payment", "desc": "Deal safely in three steps: hold, confirm receipt, settle", "status": "todo", "priority": "high", "acceptance": [],
+          "specs": [
+            { "title": "Hold payment", "desc": "When the buyer pays, the app holds the amount", "acceptance": [{ "text": "On hold, the seller is notified of the escrow", "done": false }] },
+            { "title": "Confirm receipt", "desc": "The buyer confirms receipt of the item", "acceptance": [] },
+            { "title": "Settle", "desc": "On receipt confirmation, settle the held amount to the seller", "acceptance": [] }
+          ] },
+        { "id": "F2", "title": "Safe-payment guidance", "desc": "Guide the use of safe payment from the deal-status screen", "status": "todo", "priority": "mid", "acceptance": [], "specs": [] }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      { "id": "S1", "title": "Safe dealing", "pages": [
+        { "id": "P1", "title": "Deal-status management", "type": "page", "refs": [], "boundary": { "scopeId": "root", "pageId": "P12" }, "children": [
+          { "id": "P2", "title": "Safe-payment guidance", "type": "page", "refs": ["F2"], "children": [] },
+          { "id": "P3", "title": "Payment", "type": "page", "refs": ["F1", "F1:0"], "children": [
+            { "id": "P4", "title": "Confirm receipt", "type": "action", "refs": ["F1:1"], "children": [] }
+          ] },
+          { "id": "P5", "title": "Settlement", "type": "page", "refs": ["F1:2"], "children": [] }
+        ] }
+      ] }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F2" },
+      { "from": "P2", "to": "P3", "ref": "F1" },
+      { "from": "P3", "to": "P4", "ref": "F1:1" },
+      { "from": "P4", "to": "P5", "ref": "F1:2" },
+      { "from": "P5", "to": "P1", "label": "deal complete" }
+    ]
+  }
+}

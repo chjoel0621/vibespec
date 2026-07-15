@@ -63,10 +63,12 @@
   .map-back{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--sub)}
   .map-back .topbtn{flex:0 0 auto}
   /* demo-only nav (injected by the Pages deploy, not part of the product) */
-  .demo-nav{position:fixed;right:14px;bottom:14px;z-index:80;display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:var(--shadow);font-size:12.5px}
-  .demo-nav a{color:var(--sub);text-decoration:none;padding:3px 9px;border-radius:999px;font-weight:600}
+  .demo-nav{position:fixed;right:14px;bottom:14px;z-index:80;display:flex;flex-wrap:wrap;align-items:center;gap:5px;max-width:calc(100vw - 28px);background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 8px;box-shadow:var(--shadow);font-size:12.5px}
+  .demo-nav a{color:var(--sub);text-decoration:none;padding:3px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
   .demo-nav a:hover{background:var(--panel);color:var(--text)}
   .demo-nav a.on{background:var(--accent);color:#fff}
+  .demo-nav-sep{width:1px;align-self:stretch;margin:2px 2px;background:var(--line)}
+  .demo-nav a.demo-nav-alt{color:var(--accent)}
   /* body */
   .view{flex:1 1 auto;overflow:auto}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}

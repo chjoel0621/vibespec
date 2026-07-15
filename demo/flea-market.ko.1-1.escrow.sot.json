@@ -43,7 +43,7 @@
   ],
   "ia": {
     "sections": [
-      { "id": "S1", "title": "안전거래", "pages": [
+      { "id": "S1", "title": "채팅·거래", "boundary": { "scopeId": "root", "sectionId": "S4" }, "pages": [
         { "id": "P1", "title": "거래 상태 관리", "type": "page", "refs": [], "boundary": { "scopeId": "root", "pageId": "P12" }, "children": [
           { "id": "P2", "title": "안전결제 안내", "type": "page", "refs": ["F2"], "children": [] },
           { "id": "P3", "title": "결제 진행", "type": "page", "refs": ["F1", "F1:0"], "children": [

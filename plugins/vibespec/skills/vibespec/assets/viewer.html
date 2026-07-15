@@ -1075,8 +1075,11 @@ function renderIA(){
   if(selPage && !iaFindPage(selPage)) selPage=null;
   const secLis = SOT.ia.sections.map(s=>{
     const pages = s.pages.length?`<ul>${s.pages.map(iaPageLi).join("")}</ul>`:"";
-    return `<li><div class="snode sec ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
-        <span class="stype">Depth 1</span>
+    // A section boundary mirrors a main section (like a page stub mirrors a main
+    // page): badge it 본편 접점, keep ＋add page (the initiative adds screens to it).
+    const bnd = s.boundary ? " boundary" : "";
+    return `<li><div class="snode sec${bnd} ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
+        <span class="stype">${s.boundary?t('본편 접점 · 섹션','Main boundary · section'):'Depth 1'}</span>
         <span class="stitle">${esc(s.title)}</span>
         <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="${t('페이지 추가','Add page')}">＋</button><button class="mini" data-del-sec="${s.id}" title="${t('섹션 삭제','Delete section')}">×</button></span>
       </div>${pages}</li>`;
@@ -1111,6 +1114,18 @@ function renderIADetail(){
   if(!selPage){
     const sec=SOT.ia.sections.find(s=>s.id===selSec);
     if(!sec) return `<div class="detail"><p class="empty">${t('노드를 선택하세요.','Select a node.')}</p></div>`;
+    // A section boundary is a reference to a main section — read-only title, shows
+    // the target, and adds the initiative's screens beneath it (like a page stub).
+    if(sec.boundary){
+      return `<div class="detail">
+        <div class="dt-title" style="color:var(--sub)">${esc(sec.title)} <span class="boundary-tag">${t('본편 섹션','Main section')}</span></div>
+        <div class="dt-row"><span class="dt-k">${t('본편 접점 · 섹션','Main boundary · section')}</span><span class="dt-v">${esc(sec.boundary.scopeId)}/${esc(sec.boundary.sectionId)}</span></div>
+        <div class="dt-row"><span class="dt-k">${t('페이지','Pages')}</span><span class="dt-v">${countPages(sec.pages)}${t('개','')}</span></div>
+        <div class="ia-boundary-note">${t('본편 섹션을 가리키는 참조입니다. 제목은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브가 이 섹션에 더하는 화면을 추가하세요.','A reference to a section in the main document. Its title is owned there and cannot be edited here. Add the screens this initiative contributes to that section beneath it.')}</div>
+        <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">${t('＋ 최상위 페이지 추가','＋ Add top page')}</button>
+          <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
+      </div>`;
+    }
     return `<div class="detail">
       <div class="dt-title field" contenteditable data-sec-title="${sec.id}">${esc(sec.title)}</div>
       <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${t('섹션 (Depth 1)','Section (Depth 1)')}</span></div>
@@ -1491,7 +1506,7 @@ function renderMap(){
     ? `<div class="map-attach">${t("접점","Attaches at")}: ${M.attachments.map(a=>`<button class="map-jump" data-jump="${esc(a.initiative)}"><b>${esc(scopeTitle(a.initiative))}</b> → ${esc(titleOf(a.at))}</button>`).join(" ")}</div>`
     : "";
   const tree = `<div class="sitemap"><ul>${(M.ia||[]).map(sec=>`<li>
-      <div class="snode sec"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}</span></div>
+      <div class="snode sec${sec.scope&&sec.scope!=="root"?" map-init":""}"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}${sec.scope&&sec.scope!=="root"?` <span class="map-scopetag">+${esc(sec.scope)}</span>`:""}</span></div>
       ${sec.pages.length?`<ul>${sec.pages.map(renderMapNode).join("")}</ul>`:""}
     </li>`).join("")}</ul></div>`;
   const el=document.getElementById("stage");

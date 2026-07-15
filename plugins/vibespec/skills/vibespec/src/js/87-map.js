@@ -52,7 +52,7 @@ function renderMap(){
     ? `<div class="map-attach">${t("접점","Attaches at")}: ${M.attachments.map(a=>`<button class="map-jump" data-jump="${esc(a.initiative)}"><b>${esc(scopeTitle(a.initiative))}</b> → ${esc(titleOf(a.at))}</button>`).join(" ")}</div>`
     : "";
   const tree = `<div class="sitemap"><ul>${(M.ia||[]).map(sec=>`<li>
-      <div class="snode sec"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}</span></div>
+      <div class="snode sec${sec.scope&&sec.scope!=="root"?" map-init":""}"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}${sec.scope&&sec.scope!=="root"?` <span class="map-scopetag">+${esc(sec.scope)}</span>`:""}</span></div>
       ${sec.pages.length?`<ul>${sec.pages.map(renderMapNode).join("")}</ul>`:""}
     </li>`).join("")}</ul></div>`;
   const el=document.getElementById("stage");

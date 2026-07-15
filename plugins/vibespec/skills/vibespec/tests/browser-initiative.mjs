@@ -192,3 +192,32 @@ const [afterStrayNotice, afterStrayRefs] = probe(stubWithStrayRefs, STRAY_CLEAR)
 assert.equal(afterStrayNotice, "false", "clearing removes the boundary-refs notice");
 assert.equal(afterStrayRefs, "[]", "clearing empties the boundary stub's refs");
 console.log("[browser] PASS clear-boundary-refs empties the stub and dismisses the notice");
+
+// Section boundary (§ section): a section that mirrors a main section is a
+// reference — its title is read-only (owned by the main), it shows the target and
+// the read-only note, and it is badged in the sitemap. Adding pages stays allowed.
+const withSectionBoundary = JSON.parse(JSON.stringify(initiative));
+withSectionBoundary.ia.sections[0].boundary = { scopeId: "root", sectionId: "S1" };
+const SEC_HARNESS = `<script>
+VIEW="ia"; selSec="${withSectionBoundary.ia.sections[0].id}"; selPage=null; render();
+const d=document.querySelector(".ia-side");
+document.documentElement.setAttribute("data-probe",[
+  !!d.querySelector("[data-sec-title]"), !!d.querySelector(".ia-boundary-note"), !!d.querySelector(".boundary-tag"),
+  !!d.querySelector("[data-add-toppage]"), !!document.querySelector(".snode.sec.boundary")
+].join("|"));
+</script>`;
+const [sTitle, sNote, sTag, sAdd, sBadge] = probe(withSectionBoundary, SEC_HARNESS).split("|");
+assert.equal(sTitle, "false", "a section boundary must not expose an editable title (the main owns it)");
+assert.equal(sNote, "true", "a section boundary must show the read-only reference note");
+assert.equal(sTag, "true", "a section boundary detail must carry the main-section tag");
+assert.equal(sAdd, "true", "a section boundary still allows adding the increment's pages");
+assert.equal(sBadge, "true", "the section boundary must be badged in the sitemap");
+console.log("[browser] PASS section boundary is a read-only reference, badged, still accepts pages");
+
+// A normal (non-boundary) section keeps its editable title.
+const NORMAL_SEC = `<script>
+VIEW="ia"; selSec="${initiative.ia.sections[0].id}"; selPage=null; render();
+document.documentElement.setAttribute("data-probe",[!!document.querySelector(".ia-side [data-sec-title]")].join("|"));
+</script>`;
+assert.equal(probe(initiative, NORMAL_SEC).split("|")[0], "true", "a normal section keeps an editable title");
+console.log("[browser] PASS a normal section keeps its editable title");

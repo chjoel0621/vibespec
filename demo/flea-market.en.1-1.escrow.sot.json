@@ -43,7 +43,7 @@
   ],
   "ia": {
     "sections": [
-      { "id": "S1", "title": "Safe dealing", "pages": [
+      { "id": "S1", "title": "Chat & deal", "boundary": { "scopeId": "root", "sectionId": "S4" }, "pages": [
         { "id": "P1", "title": "Deal-status management", "type": "page", "refs": [], "boundary": { "scopeId": "root", "pageId": "P12" }, "children": [
           { "id": "P2", "title": "Safe-payment guidance", "type": "page", "refs": ["F2"], "children": [] },
           { "id": "P3", "title": "Payment", "type": "page", "refs": ["F1", "F1:0"], "children": [

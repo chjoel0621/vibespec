@@ -3,5 +3,5 @@
     "parent":{"scopeId":"root","canonicalization":"sot-c14n-v1","digest":"sha256:c0b9332e626b0e3cd29d648592561213e0240b93392d22ccf65dc1aae4ffea08"}},
   "prd":{"problem":"Booking notifications are batch-only; users cannot pick their channel or timing.","solution":"Add a notification center on Home where users set channels (push/email) and reminder timing.","inScope":["Per-channel on/off","Reminder timing"],"nonGoals":["External messenger integration"]},
   "requirements":[{"id":"R1","title":"Notification settings","desc":"","status":"todo","priority":"mid","acceptance":[],"features":[{"id":"F1","title":"Channel & timing","desc":"","status":"todo","priority":"mid","acceptance":[],"specs":[]}]}],
-  "ia":{"sections":[{"id":"S1","title":"Notification settings","pages":[{"id":"P1","title":"Home / dashboard","type":"top","refs":[],"boundary":{"scopeId":"root","pageId":"P6"},"children":[{"id":"P2","title":"Notification center","type":"page","refs":["F1"],"children":[]}]}]}]},
+  "ia":{"sections":[{"id":"S1","title":"Booking","boundary":{"scopeId":"root","sectionId":"S2"},"pages":[{"id":"P1","title":"Home / dashboard","type":"top","refs":[],"boundary":{"scopeId":"root","pageId":"P6"},"children":[{"id":"P2","title":"Notification center","type":"page","refs":["F1"],"children":[]}]}]}]},
   "flow":{"start":"P1","transitions":[{"from":"P1","to":"P2","ref":"F1"}]} }

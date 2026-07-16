@@ -17,6 +17,7 @@ function classify(doc) {
     return { name: doc.name, kind: "initiative", productId: m.productId, id: m.id, path: m.path, status: m.status, parentScopeId: m.parent && m.parent.scopeId };
   }
   if (s.schemaVersion === "1.0") return { name: doc.name, kind: "main", title: s.title };
+  if (s.schemaVersion === undefined || s.schemaVersion === null) return { name: doc.name, kind: "legacy" };
   return { name: doc.name, kind: "unknown", schemaVersion: s.schemaVersion };
 }
 
@@ -34,6 +35,7 @@ export function inspectDocs(docs, opts = {}) {
   const files = docs.map(classify);
   const mains = files.filter(f => f.kind === "main");
   const inits = files.filter(f => f.kind === "initiative");
+  const legacy = files.filter(f => f.kind === "legacy");
   const mainCount = mains.length;
   const hasMain = mainCount === 1;
 
@@ -85,9 +87,10 @@ export function inspectDocs(docs, opts = {}) {
   else if (nonStaleErrors.length) invalidReason = `tree has ${nonStaleErrors.length} structural error(s): ${nonStaleErrors[0].message}`;
 
   // Order matters: a structural problem blocks everything (rebase would refuse
-  // to write anyway), then a missing main, then the actionable modes.
+  // to write anyway). Only an otherwise recognizable product can be migrated.
   const modes = [];
   if (invalidReason) modes.push("repair");
+  else if (legacy.length) modes.push("migrate");
   else if (incompleteTree) { /* need the main first — no actionable mode */ }
   else if (!hasMain) modes.push("generate"); // no files at all → a fresh product
   else { // one main, no structural errors
@@ -98,7 +101,7 @@ export function inspectDocs(docs, opts = {}) {
   }
 
   return {
-    files, hasMain, mainCount, initiativeCount: inits.length, incompleteTree, unknownCount: unknowns.length,
+    files, hasMain, mainCount, initiativeCount: inits.length, legacyCount: legacy.length, incompleteTree, unknownCount: unknowns.length,
     tree, invalidReason, nextPath, pathAuthority, staleInitiatives, needsRebase, mergeCandidates,
     suggestedModes: modes
   };

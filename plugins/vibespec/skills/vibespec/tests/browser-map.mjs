@@ -140,6 +140,24 @@ try {
   assert.equal(d.backToMap, true, "the back control must return to the map");
   console.log("[browser] PASS an embedded map opens its documents read-only and never persists");
 
+  // A workspace map deliberately includes proposed work for review, while the
+  // opened initiative exposes a direct route back to its main document.
+  const proposed = JSON.parse(JSON.stringify(payment));
+  proposed.initiative.status = "proposed";
+  const workspaceMap = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: proposed }], { mode: "workspace", embedDocs: true });
+  const w = probe(workspaceMap, "workspace-map",
+    'const heading=(document.querySelector(".map-head")||{}).textContent||"";' +
+    'document.querySelector("[data-open=payment]").click();' +
+    'const mainButton=document.querySelector("[data-map-open-scope=root]");' +
+    'const parentVisible=!!mainButton && !mainButton.disabled;' +
+    'if(mainButton) mainButton.click();' +
+    'return {heading,paymentVisible:!!document.querySelector("[data-open=payment]")||!!document.querySelector(".map-back"),parentVisible,openedMain:(document.getElementById("prodTitle")||{}).textContent||""};'
+  );
+  assert.match(w.heading, /Workspace|작업공간/, "workspace map must identify its review-only mode");
+  assert.equal(w.parentVisible, true, "an initiative document must offer a direct Main route");
+  assert.match(w.openedMain, /Shop/, "the direct Main route must open the parent document");
+  console.log("[browser] PASS workspace map shows proposed work and navigates initiative → main directly");
+
   // The attach-point jump buttons ([data-jump]) are view navigation, not editing.
   // A re-render (language toggle) or returning from an opened doc re-runs the RO
   // hardening; the jump buttons must survive it and still jump. (Regression: the
@@ -158,6 +176,42 @@ try {
   assert.equal(j.anyDisabled, false, "attach jump buttons must stay enabled after RO re-hardening");
   assert.equal(j.flashed, true, "an enabled jump button must still jump to its increment");
   console.log("[browser] PASS attach-point jump buttons stay live across re-render + RO hardening");
+
+  // A workspace can hold many initiatives. Search, status filtering, and tree
+  // folding are read-only navigation controls, so they must survive RO hardening
+  // and leave the document data untouched.
+  const f = probe(workspaceMap, "map-browse", `
+    const search=document.querySelector("#mapSearch");
+    const status=document.querySelector("#mapStatusFilter");
+    const collapse=document.querySelector("[data-map-collapse]");
+    const expand=document.querySelector("[data-map-expand]");
+    const findNode=id=>[...document.querySelectorAll(".sitemap .stype")]
+      .find(e=>e.textContent===id)?.closest("li");
+    search.value="Pay";
+    search.dispatchEvent(new Event("input",{bubbles:true}));
+    const paymentAfterSearch=findNode("payment/P2");
+    const paymentSearchVisible=!!paymentAfterSearch&&!paymentAfterSearch.hidden;
+    status.value="proposed";
+    status.dispatchEvent(new Event("change",{bubbles:true}));
+    const paymentAfterStatus=findNode("payment/P2");
+    const paymentStatusVisible=!!paymentAfterStatus&&!paymentAfterStatus.hidden;
+    collapse.click();
+    const folded=[...document.querySelectorAll(".sitemap ul ul")].filter(e=>e.hidden).length;
+    expand.click();
+    const expanded=[...document.querySelectorAll(".sitemap ul ul")].filter(e=>e.hidden).length;
+    return {
+      controlsEnabled: [search,status,collapse,expand].every(e=>!e.disabled),
+      paymentSearchVisible, paymentStatusVisible, folded, expanded,
+      historyLen:HISTORY.length
+    };
+  `);
+  assert.equal(f.controlsEnabled, true, "map browse controls must stay enabled in read-only mode");
+  assert.equal(f.paymentSearchVisible, true, "search must keep matching initiative screens visible");
+  assert.equal(f.paymentStatusVisible, true, "status filtering must keep matching initiative screens visible");
+  assert.ok(f.folded > 0, "collapse must hide nested map branches");
+  assert.equal(f.expanded, 0, "expand must restore all nested map branches");
+  assert.equal(f.historyLen, 0, "map browsing must not write undo history");
+  console.log("[browser] PASS map search, status filtering, and folding remain read-only navigation");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

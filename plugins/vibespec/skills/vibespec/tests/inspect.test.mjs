@@ -78,6 +78,27 @@ const empty = inspectDocs([]);
 assert.deepEqual(empty.suggestedModes, ["generate"]);
 console.log("[inspect] PASS empty input suggests generate");
 
+// A pre-version legacy SOT is supported by the deterministic migrator. It must
+// not be mistaken for a blank document or silently treated as a current main.
+const legacySot = clone(main); delete legacySot.schemaVersion;
+const legacy = inspectDocs([doc("old.sot.json", legacySot)], { fromFolder: true });
+assert.equal(legacy.files[0].kind, "legacy");
+assert.equal(legacy.legacyCount, 1);
+assert.equal(legacy.invalidReason, null);
+assert.deepEqual(legacy.suggestedModes, ["migrate"]);
+console.log("[inspect] PASS a schemaVersion-omitted legacy SOT routes to migrate");
+
+// A legacy sibling does not make an unknown file safe to migrate. Repair must
+// win so the tool never gives a false impression that the whole folder is safe.
+const mixedLegacyUnknown = inspectDocs([
+  doc("old.sot.json", legacySot),
+  doc("future.sot.json", { schemaVersion: "9.9" })
+], { fromFolder: true });
+assert.equal(mixedLegacyUnknown.legacyCount, 1);
+assert.equal(mixedLegacyUnknown.unknownCount, 1);
+assert.deepEqual(mixedLegacyUnknown.suggestedModes, ["repair"], "an unknown sibling must block migration routing");
+console.log("[inspect] PASS an unknown sibling blocks legacy migration routing");
+
 // An unrecognized SOT (unsupported schemaVersion) must NEVER route to generate —
 // that would mistake an existing document for a blank slate and overwrite it.
 const unknownSot = clone(main); unknownSot.schemaVersion = "9.9";

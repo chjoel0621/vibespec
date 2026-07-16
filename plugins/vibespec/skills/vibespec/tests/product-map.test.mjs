@@ -42,6 +42,21 @@ assert.ok(m2.excluded.some(e => e.id === "payment" && /proposed/.test(e.reason))
 assert.equal(nodeById(m2, "payment/P2"), null, "a proposed initiative must not appear in the composite");
 console.log("[map] PASS proposed initiative is excluded from the map");
 
+// Workspace maps are for review, not release. They compose a proposed
+// initiative and carry its parent relationship so the viewer can navigate
+// main ↔ initiative without promoting the proposal to the active set.
+const workspaceProposed = buildProductMap([doc("main", main), doc("pay", proposed)], { mode: "workspace", embedDocs: true });
+assert.equal(workspaceProposed.mode, "workspace");
+assert.deepEqual(workspaceProposed.active, [], "review visibility must not redefine active");
+assert.deepEqual(workspaceProposed.visible, ["payment"]);
+assert.ok(nodeById(workspaceProposed, "payment/P2"), "a proposed increment must appear in the workspace map");
+assert.deepEqual(workspaceProposed.scopes.map(s => [s.id, s.parentScopeId, s.path]), [
+  ["root", null, "root"],
+  ["payment", "root", "1-2"]
+], "workspace scopes expose the hierarchy for navigation");
+assert.ok(workspaceProposed.scopes.every(s => s.sot), "a standalone workspace map must embed all visible documents");
+console.log("[map] PASS workspace map shows proposed work without releasing it");
+
 // A stale approved tree does not produce a map at all (rebase first).
 const changedMain = clone(main); changedMain.title = "Changed";
 const m3 = buildProductMap([doc("main", changedMain), doc("pay", payment)]);

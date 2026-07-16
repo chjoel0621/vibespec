@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Build the read-only product map for a tree: the main SOT composed with its
-// ACTIVE initiatives (approved-fresh + implemented), grafted at their boundary
-// attach points, with composite ids. Prints a summary, or the full map as JSON.
+// Build a read-only product map for a tree. The default release map composes
+// ACTIVE initiatives (approved-fresh + implemented); --workspace additionally
+// includes proposed increments for review, without treating them as released.
 // A map is only built for a validate-tree-clean tree (rebase stale approveds
 // first). Usage:
 //   node scripts/product-map.mjs <folder | file.sot.json ...>
@@ -35,7 +35,8 @@ export function printMap(map) {
     map.errors.forEach(e => console.error(`  error ${e.file} ${e.path}: ${e.message}`));
     return;
   }
-  console.log(`[map] product ${map.productId} · 본편 + 활성 이니셔티브 ${map.active.length}개`);
+  const count = map.mode === "workspace" ? map.visible.length : map.active.length;
+  console.log(`[map] product ${map.productId} · 본편 + ${map.mode === "workspace" ? "작업 이니셔티브" : "활성 이니셔티브"} ${count}개`);
   if (map.active.length) console.log(`활성: ${map.active.join(", ")}${map.stale.length ? ` (기준 낡음: ${map.stale.join(", ")})` : ""}`);
   if (map.excluded.length) console.log(`제외: ${map.excluded.map(e => `${e.id}(${e.reason})`).join(", ")}`);
   if (map.attachments.length) console.log(`접점: ${map.attachments.map(a => `${a.initiative}→${a.at}`).join(", ")}`);
@@ -46,6 +47,7 @@ export function printMap(map) {
 
 async function main(argv) {
   const json = argv.includes("--json");
+  const workspace = argv.includes("--workspace");
   const htmlIdx = argv.indexOf("--html");
   const htmlOut = htmlIdx >= 0 ? argv[htmlIdx + 1] : null;
   // --link <scopeId>=<url> (repeatable): give a scope a link to its own document
@@ -60,7 +62,7 @@ async function main(argv) {
     }
   });
   const paths = argv.filter((a, i) => !a.startsWith("--") && !(htmlIdx >= 0 && i === htmlIdx + 1) && !linkValueIdx.has(i));
-  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--json] [--html <out.html>] [--link <scopeId>=<url> ...]"); process.exitCode = 2; return; }
+  if (!paths.length) { console.error("Usage: node scripts/product-map.mjs <folder | file.sot.json ...> [--workspace] [--json] [--html <out.html>] [--link <scopeId>=<url> ...]"); process.exitCode = 2; return; }
   let files;
   try { files = collectFiles(paths); } catch (cause) { console.error(`[FAIL] ${cause.message}`); process.exitCode = 2; return; }
   const docs = [];
@@ -72,7 +74,7 @@ async function main(argv) {
   // map itself (one self-contained file). --link points at separate pages instead
   // (a deployed site); --embed-docs forces embedding into --json output too.
   const embedDocs = argv.includes("--embed-docs") || (!!htmlOut && !Object.keys(links).length);
-  const map = buildProductMap(docs, { embedDocs });
+  const map = buildProductMap(docs, { embedDocs, mode: workspace ? "workspace" : "release" });
   if (map.valid && map.scopes) map.scopes.forEach(s => { if (links[s.id]) s.href = links[s.id]; });
   if (json) console.log(JSON.stringify(map, null, 2));
   else printMap(map);

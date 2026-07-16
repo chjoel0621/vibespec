@@ -47,6 +47,12 @@
   .ib-dot.main{background:#1e1e22}
   /* read-only product map */
   .map-head{padding:14px 18px 4px;font-weight:650;font-size:14px}
+  .map-tools{display:flex;align-items:end;gap:8px;flex-wrap:wrap;padding:12px 18px 2px}
+  .map-tools label{display:grid;gap:3px;color:var(--sub);font-size:11px}
+  .map-tools input,.map-tools select{height:30px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);padding:0 8px;font:12px inherit}
+  .map-tools input{width:min(260px,58vw)}
+  .map-tool-icon{width:30px;height:30px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);font:18px/1 sans-serif;cursor:pointer}
+  .map-tool-icon:hover{border-color:var(--accent);color:var(--accent)}
   .map-legend{display:flex;flex-wrap:wrap;gap:8px 18px;padding:8px 18px 4px}
   .map-scope{display:flex;align-items:center;gap:6px;font-size:12.5px}
   .map-scope-id{color:var(--muted);font-size:11.5px}
@@ -1456,8 +1462,10 @@ function renderFlowEditPanel(){
    payload (kind: "vibespec-product-map"). Dormant for normal SOT documents. ---- */
 let MAP = null;      // the composed map payload
 let MAPDOC = null;   // scope id of the source document currently open from the map
+let MAP_FILTER = { query:"", status:"all" };
 function mapStatusLabel(s){ const m=INIT_STATUS[s]; return m?t(m.t,m.e):s; }
 function mapScope(id){ return ((MAP&&MAP.scopes)||[]).find(x=>x.id===id) || null; }
+function mapScopeChildren(id){ return ((MAP&&MAP.scopes)||[]).filter(x=>x.parentScopeId===id); }
 // A map that only shows an increment is a dead end. Every node offers a way into
 // the document that defines it: an embedded copy of that scope's SOT (the normal
 // case — the map is one self-contained file), or an href when the map was built
@@ -1481,6 +1489,7 @@ function renderMapNode(p){
 }
 function renderMap(){
   const M=MAP; if(!M) return;
+  const workspace=M.mode==="workspace";
   MAPDOC=null;
   // Hide the editing chrome — a map is a read-only overview, not an editor.
   ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
@@ -1490,12 +1499,13 @@ function renderMap(){
   const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
     const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
+    const ancestry = s.parentScopeId ? ` · ${t("상위","parent")} ${esc(s.parentScopeId)} · ${esc(s.path||"")}` : "";
     const name = s.href
       ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>`
       : s.sot
         ? `<span class="map-scope-link" role="button" tabindex="0" data-open="${esc(s.id)}">${esc(s.title||s.id)}</span>`
         : `<b>${esc(s.title||s.id)}</b>`;
-    return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span>${name} <span class="map-scope-id">${esc(s.id)} · ${meta}</span></span>`;
+    return `<span class="map-scope"><span class="ib-dot ${s.status==="main"?"main":s.status}"></span>${name} <span class="map-scope-id">${esc(s.id)} · ${meta}${ancestry}</span></span>`;
   }).join("");
   const excluded = (M.excluded&&M.excluded.length) ? `<div class="map-excluded">${t("제외","Excluded")}: ${M.excluded.map(e=>`${esc(e.id)} (${esc(e.reason)})`).join(", ")}</div>` : "";
   // A composite tree can be far wider than the viewport, so name where each
@@ -1505,6 +1515,13 @@ function renderMap(){
   const attach = (M.attachments&&M.attachments.length)
     ? `<div class="map-attach">${t("접점","Attaches at")}: ${M.attachments.map(a=>`<button class="map-jump" data-jump="${esc(a.initiative)}"><b>${esc(scopeTitle(a.initiative))}</b> → ${esc(titleOf(a.at))}</button>`).join(" ")}</div>`
     : "";
+  const statuses=["all",...new Set((M.scopes||[]).map(scope=>scope.status).filter(status=>status&&status!=="main"))];
+  const tools=`<div class="map-tools">
+    <label><span>${t("검색","Search")}</span><input id="mapSearch" data-ro-ok type="search" value="${esc(MAP_FILTER.query)}" placeholder="${t("화면·범위 검색","Search screens or scopes")}"></label>
+    <label><span>${t("상태","Status")}</span><select id="mapStatusFilter" data-ro-ok>${statuses.map(status=>`<option value="${esc(status)}"${MAP_FILTER.status===status?" selected":""}>${status==="all"?t("전체","All"):mapStatusLabel(status)}</option>`).join("")}</select></label>
+    <button class="map-tool-icon" data-ro-ok data-map-collapse title="${t("전체 접기","Collapse all")}" aria-label="${t("전체 접기","Collapse all")}">−</button>
+    <button class="map-tool-icon" data-ro-ok data-map-expand title="${t("전체 펼치기","Expand all")}" aria-label="${t("전체 펼치기","Expand all")}">+</button>
+  </div>`;
   const tree = `<div class="sitemap"><ul>${(M.ia||[]).map(sec=>`<li>
       <div class="snode sec${sec.scope&&sec.scope!=="root"?" map-init":""}"><span class="stype">${t("섹션","Section")}</span><span class="stitle">${esc(sec.title)}${sec.scope&&sec.scope!=="root"?` <span class="map-scopetag">+${esc(sec.scope)}</span>`:""}</span></div>
       ${sec.pages.length?`<ul>${sec.pages.map(renderMapNode).join("")}</ul>`:""}
@@ -1512,7 +1529,8 @@ function renderMap(){
   const el=document.getElementById("stage");
   el.className="wrap ia";
   el.innerHTML = `<div class="ia-canvas">
-    <div class="map-head">${t("제품 지도 (읽기 전용)","Product map (read-only)")} · ${t("본편 + 활성 이니셔티브","main + active initiatives")} ${M.active?M.active.length:0}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
+    ${tools}
+    <div class="map-head">${workspace?t("작업공간 지도 (읽기 전용)","Workspace map (read-only)"):t("제품 지도 (읽기 전용)","Product map (read-only)")} · ${workspace?t("본편 + 작업 이니셔티브","main + working initiatives"):t("본편 + 활성 이니셔티브","main + active initiatives")} ${workspace?(M.visible||[]).length:(M.active||[]).length}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
     <div class="map-legend">${legend}</div>
     ${excluded}
     ${attach}
@@ -1526,6 +1544,13 @@ function renderMap(){
     n.addEventListener("click",()=>openMapDoc(n.dataset.open));
     n.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openMapDoc(n.dataset.open); } });
   });
+  const search=el.querySelector("#mapSearch");
+  const statusFilter=el.querySelector("#mapStatusFilter");
+  if(search) search.addEventListener("input",()=>{ MAP_FILTER.query=search.value; applyMapFilter(); });
+  if(statusFilter) statusFilter.addEventListener("change",()=>{ MAP_FILTER.status=statusFilter.value; applyMapFilter(); });
+  el.querySelector("[data-map-collapse]")?.addEventListener("click",()=>setMapCollapsed(true));
+  el.querySelector("[data-map-expand]")?.addEventListener("click",()=>setMapCollapsed(false));
+  applyMapFilter();
   const first=el.querySelector(".snode.map-init");
   if(first&&first.scrollIntoView) try{ first.scrollIntoView({block:"center",inline:"center"}); }catch(e){}
 }
@@ -1550,10 +1575,16 @@ function roHarden(){
     const s=mapScope(MAPDOC)||{};
     const bar=document.createElement("div");
     bar.className="map-back";
+    const related=[];
+    if(MAPDOC!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="root">${t("본편","Main")}</button>`);
+    if(s.parentScopeId&&s.parentScopeId!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(s.parentScopeId)}">${t("상위","Parent")}</button>`);
+    mapScopeChildren(MAPDOC).forEach(child=>related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(child.id)}">${t("하위","Child")}: ${esc(child.title||child.id)}</button>`));
     bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("제품 지도","Product map")}</button>
+      ${related.join("")}
       <span>${esc(s.title||MAPDOC)} · ${t("읽기 전용 스냅샷 — 편집은 원본 파일에서","read-only snapshot — edit the source file")}</span>`;
     back.insertBefore(bar, back.firstChild);
     bar.querySelector("[data-back-to-map]").addEventListener("click",renderMap);
+    bar.querySelectorAll("[data-map-open-scope]").forEach(b=>b.addEventListener("click",()=>openMapDoc(b.dataset.mapOpenScope)));
   }
   document.querySelectorAll('#stage [contenteditable="true"], #stage [contenteditable=""]')
     .forEach(e=>e.setAttribute("contenteditable","false"));
@@ -1576,6 +1607,30 @@ function mapJumpTo(scopeId){
   try{ target.scrollIntoView({block:"center",inline:"center",behavior:"smooth"}); }catch(e){ target.scrollIntoView(); }
   target.classList.add("map-flash");
   setTimeout(()=>target.classList.remove("map-flash"),1400);
+}
+function mapScopeFromNode(li){
+  const id=(li.querySelector(":scope > .snode .stype")||{}).textContent||"";
+  return id.includes("/") ? id.split("/")[0] : ((li.querySelector(":scope > .map-scopetag")||{}).textContent||"").replace(/^\+/,"");
+}
+function applyMapFilter(){
+  const root=document.querySelector(".sitemap > ul"); if(!root) return;
+  const query=String(MAP_FILTER.query||"").trim().toLowerCase();
+  const status=MAP_FILTER.status||"all";
+  const visit=li=>{
+    const children=[...li.querySelectorAll(":scope > ul > li")].map(visit);
+    const scope=mapScopeFromNode(li);
+    const meta=mapScope(scope);
+    const own=(li.querySelector(":scope > .snode")||{}).textContent||"";
+    const matchesQuery=!query||own.toLowerCase().includes(query)||String(scope).toLowerCase().includes(query);
+    const matchesStatus=status==="all"||scope==="root"||(meta&&meta.status===status);
+    const visible=(matchesQuery&&matchesStatus)||children.some(Boolean);
+    li.hidden=!visible;
+    return visible;
+  };
+  [...root.children].forEach(visit);
+}
+function setMapCollapsed(collapsed){
+  document.querySelectorAll(".sitemap ul ul").forEach(list=>{ list.hidden=collapsed; });
 }
 
 

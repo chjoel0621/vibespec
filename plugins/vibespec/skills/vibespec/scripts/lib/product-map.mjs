@@ -5,9 +5,11 @@
 // Every node carries a composite id ("root/P6", "notif/P2") and its provenance
 // scope, so nothing collides and the viewer can show what came from where.
 //
-// Only the ancestry-closed active set (validate-tree's rule: approved with a
-// fresh digest + implemented) is composed; proposed/dropped/stale are excluded
-// with a reason. A map is only built for a tree that validate-tree accepts.
+// The default release map composes only the ancestry-closed active set
+// (approved with a fresh digest + implemented). Workspace mode additionally
+// shows proposed increments for review, without changing the release meaning
+// of "active". Dropped and landed increments are never composed. A map is only
+// built for a tree that validate-tree accepts.
 import { validateTree } from "./tree.mjs";
 
 const isObject = v => v !== null && typeof v === "object" && !Array.isArray(v);
@@ -34,14 +36,19 @@ export function buildProductMap(docs, opts = {}) {
   const tree = validateTree(docs);
   if (!tree.valid) return { valid: false, errors: tree.errors, warnings: tree.warnings };
 
+  const mode = opts.mode === "workspace" ? "workspace" : "release";
+
   const active = new Set(tree.product.activeSet);
   const initiatives = docs.filter(d => isObject(d.sot) && d.sot.schemaVersion === "1.1" && isObject(d.sot.initiative));
   const root = docs.find(d => isObject(d.sot) && d.sot.schemaVersion === "1.0");
 
   // Excluded initiatives (with reason) so the map is honest about what it omits.
   const staleSet = new Set(tree.product.staleSet);
+  const visible = d => mode === "workspace"
+    ? !["dropped", "landed"].includes(d.sot.initiative.status)
+    : active.has(d.sot.initiative.id);
   const excluded = initiatives
-    .filter(d => !active.has(d.sot.initiative.id))
+    .filter(d => !visible(d))
     .map(d => {
       const s = d.sot.initiative.status;
       const reason = s === "proposed" ? "proposed (not yet approved)"
@@ -55,7 +62,7 @@ export function buildProductMap(docs, opts = {}) {
   //    "scope/localId" so graft targets resolve.
   const index = new Map();
   const embed = sot => (opts.embedDocs ? { sot: JSON.parse(JSON.stringify(sot)) } : {});
-  const scopeInfo = [{ id: "root", title: (root && root.sot.title) || "Main", status: "main", ...(root ? embed(root.sot) : {}) }];
+  const scopeInfo = [{ id: "root", title: (root && root.sot.title) || "Main", status: "main", path: "root", parentScopeId: null, ...(root ? embed(root.sot) : {}) }];
   const cloneInto = (pages, scope) => (pages || []).map(p => {
     const node = compositePage(p, scope);
     index.set(node.compositeId, node);
@@ -69,16 +76,24 @@ export function buildProductMap(docs, opts = {}) {
     sectionIndex.set(`root/${sec.id}`, s);
     return s;
   }) : [];
-  // 2) Graft each ACTIVE initiative, shallowest first, so an ancestor scope is
-  //    already in the index before its descendants attach.
-  const activeDocs = initiatives.filter(d => active.has(d.sot.initiative.id))
+  // 2) Graft each visible initiative, shallowest first, so an ancestor scope
+  //    is already in the index before its descendants attach.
+  const visibleDocs = initiatives.filter(visible)
     .sort((a, b) => a.sot.initiative.path.split("-").length - b.sot.initiative.path.split("-").length
       || a.sot.initiative.path.localeCompare(b.sot.initiative.path, undefined, { numeric: true }));
   const attachments = [];
 
-  for (const d of activeDocs) {
+  for (const d of visibleDocs) {
     const meta = d.sot.initiative;
-    scopeInfo.push({ id: meta.id, title: d.sot.title, status: meta.status, path: meta.path, ...embed(d.sot) });
+    scopeInfo.push({
+      id: meta.id,
+      title: d.sot.title,
+      status: meta.status,
+      path: meta.path,
+      parentScopeId: meta.parent.scopeId,
+      stale: staleSet.has(meta.id),
+      ...embed(d.sot)
+    });
     // Walk the initiative IA at ANY depth. A page boundary stub is a reference,
     // not a real node: it is not materialized; its children graft under the
     // boundary target. A non-boundary page is a new screen and becomes a
@@ -117,10 +132,12 @@ export function buildProductMap(docs, opts = {}) {
     // `kind` lets the viewer detect a read-only map payload vs an editable SOT.
     kind: "vibespec-product-map",
     valid: true,
+    mode,
     lang: (root && root.sot.lang) || "ko",
     productId: tree.product.productId,
     scopes: scopeInfo,
     active: [...active],
+    visible: visibleDocs.map(d => d.sot.initiative.id),
     excluded,
     stale: [...staleSet],
     attachments,

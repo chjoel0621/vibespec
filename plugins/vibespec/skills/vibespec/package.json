@@ -1,7 +1,7 @@
 {
   "name": "vibespec-viewer",
   "private": true,
-  "version": "0.11.1",
+  "version": "0.13.0",
   "description": "Modular source for the VibeSpec viewer. Build inlines src/ into a single self-contained assets/viewer.html.",
   "type": "module",
   "scripts": {
@@ -11,10 +11,15 @@
     "digest": "node scripts/sot-digest.mjs",
     "rebase": "node scripts/rebase.mjs",
     "map": "node scripts/product-map.mjs",
+    "workspace": "node scripts/workspace.mjs",
+    "apply:plan": "node scripts/apply-change-plan.mjs",
+    "query": "node scripts/query-sot.mjs",
+    "review": "node scripts/review-sot.mjs",
+    "migrate": "node scripts/migrate-sot.mjs",
     "inspect": "node scripts/inspect.mjs",
-    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs",
+    "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/workspace.test.mjs && node tests/change-plan.test.mjs && node tests/sot-query.test.mjs && node tests/content-review.test.mjs && node tests/migration.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs && node tests/host-smoke.mjs && node tests/installed-plugin-smoke.mjs",
     "test:browser": "npm run check:browser",
-    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs && node tests/plugin-contract.mjs",
+    "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/workspace.test.mjs && node tests/change-plan.test.mjs && node tests/sot-query.test.mjs && node tests/content-review.test.mjs && node tests/migration.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs && node tests/plugin-contract.mjs && node tests/host-smoke.mjs && node tests/installed-plugin-smoke.mjs",
     "check:browser": "node tests/browser-flow.mjs && node tests/browser-initiative.mjs && node tests/browser-map.mjs",
     "check:all": "npm run check && npm run check:browser"
   }

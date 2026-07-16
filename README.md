@@ -58,15 +58,14 @@ To update, run `/plugin marketplace update vibespec`, then update it from the In
 
 ### OpenAI Codex (CLI / desktop app)
 
-Clone the repository, register its repo-local marketplace, and install the plugin:
+Clone the repository and register its repo-local marketplace:
 
 ```
 git clone https://github.com/chjoel0621/vibespec.git
 codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
-codex plugin add vibespec@vibespec
 ```
 
-Start a new Codex task after installing or updating so the plugin skills are loaded. Invoke it naturally or explicitly with `$vibespec`.
+Then install **VibeSpec** from the marketplace: in the ChatGPT desktop app, open **Codex → Plugins**, choose the `vibespec` marketplace, install the plugin, and start a new task. In Codex CLI, run `codex`, open `/plugins`, choose the `vibespec` marketplace, install VibeSpec, then start a new session. Invoke it naturally or explicitly with `$vibespec`.
 
 ## Usage
 
@@ -74,11 +73,15 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 **Updating an existing plan:** attach your `*.sot.json` with a request like "rename F3 and add an acceptance criterion." The skill applies a minimal edit — every existing id stays stable — then validates the result and reports exactly what changed, what it touches (screens, transitions, KPIs), and which sections are untouched byte-for-byte.
 
+**Safe edits for large plans:** the skill no longer needs to rewrite the whole JSON for a scoped change. It reads only the requested requirement, feature, spec, section, screen, or PRD fields; then applies a typed `change-plan-v2` with a base digest, explicit IDs, and the exact expected diff paths. A feature, acceptance row, KPI, or scope item cannot silently disappear as a clean-looking rewrite. Boundary and initiative-meta changes remain deliberate tree work because they require cross-file validation.
+
 **Adding an initiative (a scoped increment):** attach your main `*.sot.json` and ask "add a payment initiative on top." Instead of bloating the main plan, the skill creates a **separate initiative file** (`<product>.<path>.<id>.sot.json`) layered on it — with its own lean PRD (problem, solution, in-scope, non-goals) and a **boundary** marking where it attaches to a main screen. The main file is left untouched, so an initiative can be reviewed, approved, and shipped on its own. Each initiative records a digest of the main it was written against; if the main later changes, the skill can **rebase** the affected initiatives (parent-to-child) so nothing silently drifts.
 
 **Seeing the whole product:** ask "show the product map" and the skill composes the main with its **active** initiatives into one read-only view — each initiative's screens grafted under the main screen it attaches to, with composite ids (`root/P6`, `notif/P2`) showing provenance. Proposed and dropped initiatives are listed as excluded.
 
 The map is a way in, not just a picture: it embeds each scope's source document, so **clicking any node opens the plan that defines that screen** — read-only, with a back link to the map. It stays one self-contained file, so handing a teammate the map hands them the whole product. Try the composed **[product map demo](https://chjoel0621.github.io/vibespec/en/map/)** (booking app + a notification initiative); a [Korean map](https://chjoel0621.github.io/vibespec/map/) is also deployed.
+
+**Reviewing work in progress:** keep one `main.sot.json` and put increments under `initiatives/`. The workspace builder creates a self-contained `workspace.html` that includes proposed, approved, and implemented initiatives for review, with main/parent/child/map navigation. It also creates a separate release map, where proposed work remains excluded.
 
 ### If the skill doesn't auto-trigger (invoke it manually)
 
@@ -192,6 +195,11 @@ node scripts/validate-tree.mjs path/to/product-folder    # scope, digest, bounda
 node scripts/rebase.mjs path/to/product-folder           # dry-run cascade; add --apply to write
 node scripts/merge.mjs path/to/product-folder --only <id> # land an implemented initiative into the main (--apply)
 node scripts/product-map.mjs path/to/product-folder --html map.html   # read-only composite
+node scripts/workspace.mjs path/to/product-folder                    # workspace.html + release-map.html
+node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # bounded edit context
+node scripts/apply-change-plan.mjs main.sot.json edit.plan.json      # dry-run; add --apply to write
+node scripts/review-sot.mjs main.sot.json                            # advisory content-quality review
+node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # dry-run legacy upgrade; add --apply to write
 ```
 
 For an older SOT, load it in the viewer and save it once to promote it to the 1.0 format, then validate the newly saved file. Loading normalizes legacy KPI, scenario, and field shapes.

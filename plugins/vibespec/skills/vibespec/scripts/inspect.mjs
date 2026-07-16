@@ -16,10 +16,12 @@ export function printInspect(r) {
   for (const f of r.files) {
     if (f.kind === "main") console.log(`  main        ${basename(f.name)}  "${f.title ?? ""}"`);
     else if (f.kind === "initiative") console.log(`  initiative  ${basename(f.name)}  id=${f.id} path=${f.path} status=${f.status} parent=${f.parentScopeId}`);
+    else if (f.kind === "legacy") console.log(`  legacy      ${basename(f.name)}  schemaVersion omitted`);
     else console.log(`  unknown     ${basename(f.name)}`);
   }
   if (r.tree) console.log(`트리: ${r.tree.valid ? "valid" : `INVALID(${r.tree.errorCount} errors)`} · product ${r.tree.productId ?? "?"} · 활성 [${r.tree.activeSet.join(", ")}]${r.tree.staleSet.length ? ` · 기준낡음 [${r.tree.staleSet.join(", ")}]` : ""}`);
   if (r.invalidReason) console.log(`⚠ 무효: ${r.invalidReason}`);
+  if (r.legacyCount) console.log(`⚠ 레거시 ${r.legacyCount}개 — migrate 후 다시 inspect하세요.`);
   if (r.incompleteTree) console.log(`⚠ 본편 없음 — 이니셔티브 작업 전에 본편 SOT가 필요합니다.`);
   if (r.needsRebase) console.log(`⚠ 재기준 필요: ${r.staleInitiatives.join(", ")}`);
   const np = Object.entries(r.nextPath).map(([k, v]) => `${k}→${v}`).join(", ");

@@ -43,6 +43,12 @@
   .ib-dot.main{background:#1e1e22}
   /* read-only product map */
   .map-head{padding:14px 18px 4px;font-weight:650;font-size:14px}
+  .map-tools{display:flex;align-items:end;gap:8px;flex-wrap:wrap;padding:12px 18px 2px}
+  .map-tools label{display:grid;gap:3px;color:var(--sub);font-size:11px}
+  .map-tools input,.map-tools select{height:30px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);padding:0 8px;font:12px inherit}
+  .map-tools input{width:min(260px,58vw)}
+  .map-tool-icon{width:30px;height:30px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);font:18px/1 sans-serif;cursor:pointer}
+  .map-tool-icon:hover{border-color:var(--accent);color:var(--accent)}
   .map-legend{display:flex;flex-wrap:wrap;gap:8px 18px;padding:8px 18px 4px}
   .map-scope{display:flex;align-items:center;gap:6px;font-size:12.5px}
   .map-scope-id{color:var(--muted);font-size:11.5px}

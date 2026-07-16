@@ -1,6 +1,6 @@
 {
   "name": "vibespec",
-  "version": "0.11.1",
+  "version": "0.13.0",
   "description": "VibeSpec — turn a product idea or planning doc into a single SOT (JSON) and view/edit PRD, Feature Spec, IA, and User Flow in one HTML viewer (Korean/English toggle). 제품 아이디어나 기획 문서로부터 단일 SOT(JSON)를 생성하고 PRD·기능명세서·IA·유저플로우를 한 화면에서 보고 편집하는 바이브 기획 도구. 한/영 언어 토글 지원.",
   "author": { "name": "chjoel0621" },
   "license": "MIT",

@@ -1,7 +1,7 @@
 ---
 name: vibespec
 description: >-
-  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 단일 SOT(JSON)와 편집용 HTML 뷰어를 생성하고, 기존 SOT의 국소 수정, 그리고 본편 위에 얹는 증분 이니셔티브 생성까지 처리한다. Turn a product idea or planning document into a single SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; also applies targeted edits to an existing SOT and creates incremental "initiatives" layered on a main SOT. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 기능 추가 이니셔티브, 결제/검색 기능 얹어줘, 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT, add a feature initiative on top of an existing product. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
+  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 SOT(JSON)와 HTML 뷰어를 생성하고, ID 기반 안전 수정, 본편 위 증분 이니셔티브, 제품 작업공간 지도를 처리한다. Turn a product idea or planning document into a SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; apply ID-addressed safe edits, create incremental initiatives, and build navigable product workspaces. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 기능 추가 이니셔티브, 결제/검색 기능 얹어줘, 제품 작업공간/지도, 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT, add a feature initiative on top of an existing product. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
 ---
 
 # SOT 기획 도구 생성
@@ -16,14 +16,15 @@ description: >-
 1. **입력 수집 및 모드 판별**
    - **먼저 사전판별을 돌려 사실을 확보한다(추측 금지).** `.sot.json`(또는 그것이 든 폴더)이 첨부·제시되면 `node "<VIBESPEC_SKILL_DIR>/scripts/inspect.mjs" "<파일 또는 폴더 절대경로>" --json`을 실행한다. 출력은 각 파일의 종류(main/initiative), 트리 유효성·활성/기준낡음, **다음 발급 path**, `needsRebase`, `incompleteTree`, `suggestedModes`를 담는다. 이 값으로 결정적으로 라우팅한다.
    - **라우팅 규칙 — 아래 순서대로 판정한다(차단 조건이 먼저다).** `suggestedModes`가 곧 판정 결과이니 그것을 신뢰하고, 순서를 뒤집어 도구 판단을 무시하지 말 것.
-     1. **차단**: `invalidReason`이 있으면(=`suggestedModes`가 `["repair"]`) 다른 모드를 시도하지 말고 그 오류를 알리고 고친다. 사유는 셋 — 인식 불가 SOT(지원하지 않는 `schemaVersion`), 본편 다중, 구조 오류(경계 대상 없음·id 중복·순환 등). **구조 오류가 있으면 stale이더라도 rebase를 먼저 하지 말 것** — rebase는 구조 오류가 있는 트리에 기록을 거부하므로 막다른 길이다.
-     2. **본편 부족**: `incompleteTree`가 true면(이니셔티브만 있고 본편 없음) 트리 작업을 하지 말고 **본편 파일을 요청**한다.
-     3. **재기준**: 위 둘이 아니고 `needsRebase`가 true면 그 사실을 알리고 → **재기준(rebase)**을 우선 제안한다.
-     4. **신규 생성**: `.sot.json`이 하나도 없고 아이디어·기획 문서만 있으면 → **신규 생성**(아래 2~4단계, 본편 SOT 1.0). 인식 불가 파일이 섞여 있으면 여기로 오지 않는다(1번에서 차단) — 기존 파일을 새 기획으로 오인해 덮어쓰지 않기 위함이다.
-     5. **수정**: main이 있고 요청이 작은 제자리 수정(오타·상태·수용 기준·문구)이면 → **수정 모드**.
-     6. **이니셔티브**: main이 있고 요청이 범위 있는 증분("결제 얹어줘", "검색 개선 이니셔티브")이면 → **이니셔티브 모드**. 새 path는 inspect의 `nextPath`(예 `root→1-3`)를 그대로 쓴다(직접 번호를 지어내지 말 것). ⚠️ 단, `pathAuthority`가 `incomplete`이면(단일 파일만 줬을 때) 형제 이니셔티브를 놓쳐 번호를 재발급할 수 있으니, **제품 폴더 전체를 inspect에 다시 넘겨** `complete` 상태로 만든 뒤 발급한다.
-     7. **조망**: "전체를 한눈에/합쳐 보여줘"(편집이 아닌 조망)면 → **제품 지도**.
-     8. **병합(land)**: "이 이니셔티브를 본편에 접어/병합해줘"처럼 **구현된 이니셔티브를 본편 baseline에 영구 반영**하라는 요청이면 → **병합 모드**. 지도(읽기전용 조망)와 다르다 — 지도는 스냅샷, 병합은 본편 파일을 실제로 바꾼다.
+     1. **차단**: `invalidReason`이 있으면(=`suggestedModes`가 `["repair"]`) 다른 모드를 시도하지 말고 그 오류를 알리고 고친다. 사유는 셋 — 인식 불가 SOT(지원하지 않는 `schemaVersion`), 본편 다중, 구조 오류(경계 대상 없음·id 중복·순환 등). 레거시 파일이 섞여 있어도 인식 불가 파일이 하나라도 있으면 먼저 repair다. **구조 오류가 있으면 stale이더라도 rebase를 먼저 하지 말 것** — rebase는 구조 오류가 있는 트리에 기록을 거부하므로 막다른 길이다.
+     2. **마이그레이션**: 위 차단 사유가 없고 `legacyCount`가 있으면(`schemaVersion`이 생략된 구버전 파일) 다른 변경 전에 `node "<VIBESPEC_SKILL_DIR>/scripts/migrate-sot.mjs" "<입력>" --out "<새 파일>"`을 드라이런하고, 결과 검증 뒤에만 `--apply`로 새 파일을 쓴다. 원본을 덮어쓰지 않는다.
+     3. **본편 부족**: `incompleteTree`가 true면(이니셔티브만 있고 본편 없음) 트리 작업을 하지 말고 **본편 파일을 요청**한다.
+     4. **재기준**: 위 셋이 아니고 `needsRebase`가 true면 그 사실을 알리고 → **재기준(rebase)**을 우선 제안한다.
+     5. **신규 생성**: `.sot.json`이 하나도 없고 아이디어·기획 문서만 있으면 → **신규 생성**(아래 2~4단계, 본편 SOT 1.0). 인식 불가 파일이 섞여 있으면 여기로 오지 않는다(1번에서 차단) — 기존 파일을 새 기획으로 오인해 덮어쓰지 않기 위함이다.
+     6. **수정**: main이 있고 요청이 작은 제자리 수정(오타·상태·수용 기준·문구)이면 → **수정 모드**.
+     7. **이니셔티브**: main이 있고 요청이 범위 있는 증분("결제 얹어줘", "검색 개선 이니셔티브")이면 → **이니셔티브 모드**. 새 path는 inspect의 `nextPath`(예 `root→1-3`)를 그대로 쓴다(직접 번호를 지어내지 말 것). ⚠️ 단, `pathAuthority`가 `incomplete`이면(단일 파일만 줬을 때) 형제 이니셔티브를 놓쳐 번호를 재발급할 수 있으니, **제품 폴더 전체를 inspect에 다시 넘겨** `complete` 상태로 만든 뒤 발급한다.
+     8. **조망**: "전체를 한눈에/합쳐 보여줘", "본편과 제안을 오가며 검토"면 → **제품 작업공간/지도**.
+     9. **병합(land)**: "이 이니셔티브를 본편에 접어/병합해줘"처럼 **구현된 이니셔티브를 본편 baseline에 영구 반영**하라는 요청이면 → **병합 모드**. 지도(읽기전용 조망)와 다르다 — 지도는 스냅샷, 병합은 본편 파일을 실제로 바꾼다.
    - 수정 vs 이니셔티브가 애매하면 한 번 확인한다("본편을 직접 고칠까요, 별도 이니셔티브로 얹을까요?"). 판단 기준: 기존 화면·기능의 소규모 교정=수정, 독립적으로 검토·승인·구현할 새 기능 묶음=이니셔티브.
    - 사용자가 제품을 설명했거나 문서를 첨부했으면 그것을 근거로 삼는다. 첨부 문서는 현재 플랫폼에서 제공하는 파일 읽기 도구로 읽는다.
    - 정보가 부족할 때만(제품 목적·핵심 사용자·주요 기능이 불명확) 2~3개 핵심 질문을 한다. 충분하면 묻지 말고 진행한다.
@@ -46,6 +47,7 @@ description: >-
 3. **산출물 저장** (outputs 폴더)
    - `<제품명>.sot.json` — 생성한 SOT JSON(순수 데이터, 공유·백업용).
    - JSON 저장 직후, HTML에 넣기 전에 이 `SKILL.md`가 있는 디렉터리의 절대 경로를 `<VIBESPEC_SKILL_DIR>`로 확인하고 `node "<VIBESPEC_SKILL_DIR>/scripts/validate-sot.mjs" "<outputs 절대 경로>/<제품명>.sot.json"`을 실행한다. 현재 작업 디렉터리를 기준으로 `scripts/...`를 실행하지 말 것. `FAIL`이면 보고된 경로를 고치고 `PASS`가 될 때까지 다시 검증한다. 경고는 검토하되 의도적으로 플로우에서 제외한 보조 화면이면 허용할 수 있다. Node.js를 실행할 수 없는 환경에서는 같은 항목(필수 구조, ID 중복, IA 커버리지, KPI·시나리오·flow 참조)을 수동 점검한다.
+   - 구조 검증 다음에 `node "<VIBESPEC_SKILL_DIR>/scripts/review-sot.mjs" "<outputs 절대 경로>/<제품명>.sot.json"`을 실행한다. 이는 실패를 막는 검증기가 아니라 **내용 품질 리뷰**다. 모호한 수용 기준, 빈 nonGoals, 얇은 problem/solution, IA에는 있으나 flow 트리거가 없는 기능을 사용자에게 경고·질문으로 전달한다.
    - `<제품명>.html` — 이 스킬의 `assets/viewer.html`을 복사하되, 파일 안의 `<script type="application/json" id="embedded-sot"></script>` 태그의 내용으로 생성한 SOT JSON을 넣는다. (넣기 전 `JSON.stringify(sot).replace(/</g, "\u003c")` 로 `<`를 이스케이프해 `</script>` 조기 종료를 막는다. 뷰어는 이 태그를 최우선으로 읽어 데모 대신 사용자의 제품을 바로 표시한다.)
    - ⚠️ 반드시 embedded-sot 태그에 데이터를 심어라. 비워두면 데모만 보인다.
    - 현재 플랫폼이 지원하는 파일 전달 방식으로 두 파일을 함께 제공한다. 로컬 작업 환경에서는 사용자가 바로 열 수 있도록 두 파일의 절대 경로를 명확히 안내한다.
@@ -56,14 +58,16 @@ description: >-
 
 ## 수정 모드 (기존 SOT 국소 수정)
 
-기존 `.sot.json`에 변경을 적용할 때는 재생성이 아니라 **최소 편집**이다. 원본 파일은 그대로 두고, 수정본을 outputs 폴더에 쓴 뒤 아래를 지킨다.
+기존 `.sot.json`에 변경을 적용할 때는 재생성이 아니라 **ID 기반 변경 계획**이다. AI가 큰 SOT를 통째로 다시 출력하거나 재정렬하지 않는다. 작은 수정은 아래의 결정적 도구 경로를 기본으로 쓴다.
 
-1. **id는 절대 재발급하지 않는다.** 기존 `R#`·`F#`·`S#`·`P#`와 상세기능 인덱스(`F#:i`)를 바꾸거나 번호를 당기지 않는다. 새 항목의 id는 파일 전체에서 해당 접두사의 최대 번호 + 1. 상세기능·시나리오는 배열 끝에만 추가한다(중간 삽입은 `F#:i` 참조를 어긋나게 한다).
-2. **요청 범위 밖은 건드리지 않는다.** 부탁받지 않은 문장을 다듬거나 재서술하지 않는다 — 목표는 diff에 요청한 변경만 남는 것.
-3. **삭제 시 참조를 정리한다.** 기능을 지우면 IA 페이지 `refs`, flow의 `ref`, KPI `refs`에서도 제거한다. 삭제된 id는 재사용 금지.
-4. **검증**: 신규 생성과 동일하게 `validate-sot.mjs`를 PASS까지 돌린다.
-5. **변경 리포트**: `node "<VIBESPEC_SKILL_DIR>/scripts/diff-sot.mjs" "<원본 경로>" "<수정본 경로>"`를 실행해 그 출력(변경 목록·영향 반경·바이트 동일 섹션)을 사용자에게 요약 전달한다. 영향 반경에 뜬 화면·전환·KPI는 함께 검토가 필요하다는 신호다. diff에 요청 범위 밖 변경이 보이면 되돌리고 다시 diff한다.
-6. **산출물**: 수정된 `<제품명>.sot.json`과 embedded-sot를 갱신한 `<제품명>.html`을 신규 생성과 같은 방식으로 전달한다.
+1. **필요한 문맥만 조회한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/query-sot.mjs" "<sot 절대경로>" --ids R1,F5,F5:0,S2,P8 --prd problem,kpis --json`처럼 요청한 requirement·feature·상세기능·section·화면과 필요한 PRD 필드만 읽는다. 출력의 `baseDigest`와 그 문맥만 근거로 삼고, 전체 SOT를 AI가 재직렬화하지 않는다.
+2. **변경 계획 v2를 만든다.** `vibespec-change-plan-v2` JSON에 `baseDigest`, `operations`, `expected.touchedIds/addedIds/removedIds/**touchedPaths**`를 모두 넣는다. `touchedPaths`는 실제 diff 경로 전체와 정확히 일치해야 하므로, id 없는 PRD·acceptance 항목도 조용히 사라질 수 없다. v1은 기존 계획 호환용일 뿐 새 계획에 쓰지 않는다.
+   - 지원 연산: 문서 제목/언어(`updateDocument`), PRD 텍스트(`updatePrdText`)·목록 항목 append/update/remove, requirement·feature·section의 추가/수정/삭제, feature 이동, 상세기능 update/append/final-remove, page 추가/수정/삭제/이동, flow start·전환 추가/삭제/수정.
+   - 범용 JSON Patch, 전체 배열 교체, 위치 기반 중간 삽입은 쓰지 않는다. 상세기능은 `F#:index` 참조가 있으므로 append 또는 **마지막 항목만** 삭제한다. 수정·삭제에는 현재 상세기능 전체를 `before`로 넣어 정확한 대상을 증명한다.
+   - **경계(boundary)와 initiative 메타는 이 단일 파일 계획으로 수정하지 않는다.** 본편 소유 접점은 부모 파일과 함께 검증해야 하므로, 본편/이니셔티브 구조를 다시 설계하고 `validate-tree`를 통과시키는 별도 트리 작업으로 처리한다.
+3. **삭제는 명시적 승인 대상이다.** 기능·requirement·section·page를 지우거나 PRD 목록에서 항목을 제거할 때, 해당 삭제 경로와 안정 id가 `expected.removedIds/touchedPaths`에 정확히 선언되지 않으면 적용 도구가 거부한다. 삭제 id는 재사용하지 않는다.
+4. **드라이런 후 적용한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/apply-change-plan.mjs" "<sot 절대경로>" "<plan 절대경로>"`로 변경·영향을 확인하고, 사용자 요청 범위와 일치할 때만 같은 명령에 `--apply`를 붙인다. base digest가 달라졌거나 예상 ID 집합과 실제 diff가 다르면 기록하지 않는다.
+5. **검증과 산출물 갱신.** 적용 뒤 `validate-sot.mjs`를 PASS까지 돌리고 `review-sot.mjs`의 내용 품질 경고를 함께 검토한다. 제품 작업공간이면 `validate-tree.mjs`도 실행한다. embedded HTML 또는 workspace HTML을 다시 생성해 전달한다. 큰 구조 개편은 먼저 삭제·추가 목록과 영향 반경을 사용자에게 제시해 확인받고, 작은 계획 여러 개로 나눠 적용한다.
 
 ## 이니셔티브 모드 (본편 위에 얹는 증분, SOT 1.1)
 
@@ -115,11 +119,28 @@ description: >-
 3. rebase는 **stale digest만** 고친다. 트리에 다른 오류(중복 id·구조 등)가 있으면 `--apply`가 거부되므로 validate-tree로 먼저 정리한다.
 4. 갱신된 이니셔티브 파일들의 embedded-sot HTML도 다시 만들어 함께 전달하고, 무엇이 최신이 되었고 무엇이 남았는지 사용자에게 요약한다.
 
+## 제품 작업공간 (본편 1개 + 병합 가능한 이니셔티브)
+
+본편은 제품의 유일한 기준선이고, 이니셔티브는 그 기준선 위에 얹는 병합 가능한 변경 SOT다. 아래 레이아웃을 쓴다. `history/`와 `output/`은 트리 입력이 아니므로 비교본·이전 산출물이 두 번째 본편으로 오인되지 않는다.
+
+```text
+<product>/
+  main.sot.json
+  initiatives/
+    1-1-<initiative>.sot.json
+  history/
+  output/
+```
+
+1. `node "<VIBESPEC_SKILL_DIR>/scripts/workspace.mjs" "<product 폴더 절대경로>"`를 실행한다. `output/workspace.html`(검토 지도)와 `output/release-map.html`(출시 지도)을 함께 만든다.
+2. **workspace**는 본편 + `proposed`·`approved`·`implemented` 이니셔티브를 보여준다. proposed는 검토용일 뿐 활성/출시로 취급하지 않는다. 노드에서 문서를 열고, 문서 안에서 본편·상위/하위 이니셔티브·지도로 이동한다.
+3. **release map**은 approved-신선 + implemented만 합성한다. dropped·landed는 어느 지도에도 합성하지 않는다. 본편 수정 뒤에는 rebase와 workspace 재생성을 수행한다.
+
 ## 제품 지도 (본편+활성 이니셔티브 합성, 읽기 전용)
 
 "제품 전체를 한눈에", "본편에 이니셔티브들 합쳐서 보여줘" 같은 조망 요청에는 편집용 뷰어 대신 **읽기 전용 제품 지도**를 낸다. 본편과 **활성**(approved-신선 + implemented) 이니셔티브를 합성해, 각 이니셔티브가 본편 화면 아래에 더한 화면을 복합 id로 보여준다.
 
-1. 본편+이니셔티브가 든 폴더에서 지도 HTML을 만든다: `node "<VIBESPEC_SKILL_DIR>/scripts/product-map.mjs" "<폴더 절대경로>" --html "<outputs 절대경로>/<제품명>.map.html"`.
+1. 출시 기준 지도만 따로 만들 때: `node "<VIBESPEC_SKILL_DIR>/scripts/product-map.mjs" "<폴더 절대경로>" --html "<outputs 절대경로>/<제품명>.map.html"`. proposed까지 검토해야 하면 이 명령에 `--workspace`를 붙이거나 위의 `workspace.mjs`를 쓴다.
    - 트리에 오류가 있으면(특히 approved가 stale) 지도를 만들지 않는다 — 먼저 rebase로 정리하라는 메시지가 나온다.
    - `--json`으로 지도 데이터만 얻어 검토할 수도 있다(이때는 문서를 내장하지 않는다).
 2. 지도 HTML에는 **각 scope의 원본 문서가 내장**된다. 지도는 그림이 아니라 입구다 — 노드나 범례를 누르면 그 화면을 정의한 문서(본편/이니셔티브)가 **읽기 전용**으로 열리고, "← 제품 지도"로 돌아온다. 파일 하나가 자기완결이므로 지도만 넘겨도 팀원이 전체를 열람할 수 있다.
@@ -140,6 +161,6 @@ description: >-
 - 상세 스키마와 예시는 `references/sot-schema.md`(이니셔티브 1.1·경량 PRD·경계 스텁 포함).
 - 표준 JSON Schema는 `references/sot.schema.json`. 단일 파일 검증기는 `scripts/validate-sot.mjs`, 교차 파일(트리) 검증기는 `scripts/validate-tree.mjs`.
 - 라우팅 사전판별(입력 분류·다음 path·rebase 필요·추천 모드)은 `scripts/inspect.mjs`(`--json`).
-- 부모 digest 계산은 `scripts/sot-digest.mjs`, 본편 변경 후 연쇄 재기준은 `scripts/rebase.mjs`, 구현된 이니셔티브를 본편에 접어 넣는 병합은 `scripts/merge.mjs`(`--only <id>`·`--apply`), 두 SOT 변경·영향 비교는 `scripts/diff-sot.mjs`(`--json` 지원), 본편+활성 이니셔티브 합성 지도는 `scripts/product-map.mjs`(`--html`/`--json`).
+- 부모 digest 계산은 `scripts/sot-digest.mjs`, 레거시 승격은 `scripts/migrate-sot.mjs`, ID 범위 문맥 조회는 `scripts/query-sot.mjs`, 결정적 변경 계획 적용은 `scripts/apply-change-plan.mjs`, 내용 품질 리뷰는 `scripts/review-sot.mjs`, 본편 변경 후 연쇄 재기준은 `scripts/rebase.mjs`, 구현된 이니셔티브를 본편에 접어 넣는 병합은 `scripts/merge.mjs`(`--only <id>`·`--apply`), 두 SOT 변경·영향 비교는 `scripts/diff-sot.mjs`(`--json` 지원), 작업공간 산출은 `scripts/workspace.mjs`, 본편+활성 이니셔티브 합성 지도는 `scripts/product-map.mjs`(`--html`/`--json`).
 - IA와 기능명세서는 refs로 연결된 별개 축이다. flow는 실제 이동 경로로 채운다.
 - 이니셔티브 산출 파일은 항상 자기완결이다(본편 없이도 뷰어에서 열림). 본편 데이터를 이니셔티브에 복사하지 말고 경계 스텁으로만 접점을 표시한다.

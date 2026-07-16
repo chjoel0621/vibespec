@@ -59,15 +59,14 @@ UI에서 클릭으로 설치합니다.
 
 ### OpenAI Codex (CLI / 데스크탑 앱)
 
-저장소를 복제하고 저장소 내부 Codex 마켓플레이스를 등록한 뒤 플러그인을 설치합니다.
+저장소를 복제하고 저장소 내부 Codex 마켓플레이스를 등록합니다.
 
 ```
 git clone https://github.com/chjoel0621/vibespec.git
 codex plugin marketplace add <복제한-vibespec-저장소의-절대-경로>
-codex plugin add vibespec@vibespec
 ```
 
-설치하거나 업데이트한 뒤에는 새 Codex 작업을 시작해야 스킬이 반영됩니다. 자연어로 요청하거나 `$vibespec`으로 직접 호출할 수 있습니다.
+그다음 ChatGPT 데스크톱 앱의 **Codex → Plugins**에서 `vibespec` 마켓플레이스를 고르고 VibeSpec을 설치한 뒤 새 작업을 시작합니다. Codex CLI에서는 `codex`를 실행하고 `/plugins`를 열어 `vibespec` 마켓플레이스에서 VibeSpec을 설치한 다음 새 세션을 시작합니다. 설치하거나 업데이트한 뒤 새 작업을 시작해야 스킬이 반영됩니다. 자연어로 요청하거나 `$vibespec`으로 직접 호출할 수 있습니다.
 
 ## 사용
 
@@ -75,10 +74,14 @@ codex plugin add vibespec@vibespec
 
 **기존 기획 수정하기:** `*.sot.json`을 첨부하고 "F3 이름 바꾸고 수용 기준 하나 추가해줘"처럼 요청하세요. 스킬이 기존 id를 전부 보존한 채 최소한만 고치고, 검증을 통과시킨 뒤 무엇이 바뀌었는지·어디에 영향이 가는지(화면·전환·KPI)·어느 섹션이 바이트 단위로 그대로인지 리포트합니다.
 
+**큰 기획도 안전하게 수정하기:** 스킬은 큰 JSON 전체를 다시 쓰지 않습니다. 요청한 requirement·기능·상세기능·section·화면 또는 PRD 필드만 읽고, base digest·안정 id·실제 diff 경로 전체를 명시한 `change-plan-v2`를 드라이런합니다. 기능·수용 기준·KPI·범위 항목이 참조와 함께 조용히 사라지는 누락을 막습니다. 다만 boundary·initiative 메타 변경은 교차 파일 검증이 필요하므로 별도 트리 작업으로 처리합니다.
+
 **이니셔티브 추가하기(범위 있는 증분):** 본편 `*.sot.json`을 첨부하고 "결제 기능 이니셔티브로 얹어줘"처럼 요청하세요. 본편을 비대하게 만드는 대신, 스킬이 그 위에 얹히는 **별도 이니셔티브 파일**(`<제품>.<경로>.<id>.sot.json`)을 만듭니다 — 자체 경량 PRD(문제·해결·포함범위·비목표)와, 본편 화면에 붙는 지점을 표시하는 **경계(boundary)**를 담아서요. 본편은 그대로 두므로 이니셔티브를 독립적으로 검토·승인·출시할 수 있습니다. 각 이니셔티브는 작성 기준이 된 본편의 digest를 기록하고, 나중에 본편이 바뀌면 스킬이 영향받은 이니셔티브들을 **재기준(rebase)**(부모→자식 순서)해 조용한 드리프트가 없게 합니다.
 
 **제품 전체 보기:** "제품 지도 보여줘"라고 하면 스킬이 본편과 **활성** 이니셔티브들을 하나의 읽기 전용 뷰로 합성합니다 — 각 이니셔티브의 화면이 붙는 본편 화면 아래에 접붙고, 복합 id(`root/P6`·`notif/P2`)로 출처를 보여줍니다. proposed·dropped 이니셔티브는 "제외"로 표시됩니다. 
 지도는 그림이 아니라 **들어가는 입구**입니다. 각 scope의 원본 문서를 파일 안에 품고 있어서, **아무 노드나 누르면 그 화면을 정의한 기획서가 열립니다** — 읽기 전용이고, 지도로 돌아오는 링크가 있습니다. 파일 하나로 자기완결이라 지도만 건네도 팀원이 제품 전체를 열람할 수 있습니다. 합성된 **[제품 지도 데모](https://chjoel0621.github.io/vibespec/map/)**(예약 앱 + 알림 이니셔티브)를 열어보세요. [영어 지도](https://chjoel0621.github.io/vibespec/en/map/)도 있습니다.
+
+**작업 중인 제품 함께 검토하기:** 제품 폴더에 `main.sot.json` 하나와 `initiatives/` 아래 증분 파일들을 둡니다. workspace 빌더는 proposed·approved·implemented를 모두 포함한 자기완결 `workspace.html`을 만들고, 본편·상위/하위 이니셔티브·지도를 오갈 수 있게 합니다. 별도 release map에서는 proposed를 출시 기능으로 취급하지 않습니다.
 
 ### 스킬이 자동으로 안 뜰 때 (직접 호출)
 
@@ -191,6 +194,11 @@ node scripts/validate-tree.mjs path/to/product-folder    # scope·digest·bounda
 node scripts/rebase.mjs path/to/product-folder           # 드라이런 연쇄; --apply로 기록
 node scripts/merge.mjs path/to/product-folder --only <id> # 구현된 이니셔티브를 본편에 접어 넣기(--apply)
 node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 지도
+node scripts/workspace.mjs path/to/product-folder                    # workspace.html + release-map.html
+node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # 필요한 수정 문맥만 조회
+node scripts/apply-change-plan.mjs main.sot.json edit.plan.json      # 드라이런; --apply로 기록
+node scripts/review-sot.mjs main.sot.json                            # 내용 품질 경고 검토
+node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # 구버전 승격 드라이런; --apply로 기록
 ```
 
 구버전 SOT는 먼저 뷰어에서 불러온 뒤 저장하여 1.0 형식으로 승격하고, 새로 저장된 파일을 검증하세요. 뷰어의 불러오기가 구형 KPI·시나리오·필드명을 현재 구조로 정규화합니다.

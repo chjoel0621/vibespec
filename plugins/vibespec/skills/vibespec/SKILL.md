@@ -48,8 +48,9 @@ description: >-
    - `<제품명>.sot.json` — 생성한 SOT JSON(순수 데이터, 공유·백업용).
    - JSON 저장 직후, HTML에 넣기 전에 이 `SKILL.md`가 있는 디렉터리의 절대 경로를 `<VIBESPEC_SKILL_DIR>`로 확인하고 `node "<VIBESPEC_SKILL_DIR>/scripts/validate-sot.mjs" "<outputs 절대 경로>/<제품명>.sot.json"`을 실행한다. 현재 작업 디렉터리를 기준으로 `scripts/...`를 실행하지 말 것. `FAIL`이면 보고된 경로를 고치고 `PASS`가 될 때까지 다시 검증한다. 경고는 검토하되 의도적으로 플로우에서 제외한 보조 화면이면 허용할 수 있다. Node.js를 실행할 수 없는 환경에서는 같은 항목(필수 구조, ID 중복, IA 커버리지, KPI·시나리오·flow 참조)을 수동 점검한다.
    - 구조 검증 다음에 `node "<VIBESPEC_SKILL_DIR>/scripts/review-sot.mjs" "<outputs 절대 경로>/<제품명>.sot.json"`을 실행한다. 이는 실패를 막는 검증기가 아니라 **내용 품질 리뷰**다. 모호한 수용 기준, 빈 nonGoals, 얇은 problem/solution, IA에는 있으나 flow 트리거가 없는 기능을 사용자에게 경고·질문으로 전달한다.
-   - `<제품명>.html` — 이 스킬의 `assets/viewer.html`을 복사하되, 파일 안의 `<script type="application/json" id="embedded-sot"></script>` 태그의 내용으로 생성한 SOT JSON을 넣는다. (넣기 전 `JSON.stringify(sot).replace(/</g, "\u003c")` 로 `<`를 이스케이프해 `</script>` 조기 종료를 막는다. 뷰어는 이 태그를 최우선으로 읽어 데모 대신 사용자의 제품을 바로 표시한다.)
-   - ⚠️ 반드시 embedded-sot 태그에 데이터를 심어라. 비워두면 데모만 보인다.
+   - `<제품명>.html`은 **JSON을 직접 복사하거나 다시 작성하지 말고**, 다음 결정적 명령으로 만든다. 이 도구가 `<` 이스케이프와 embedded-sot 주입을 맡아 JSON과 HTML이 갈라지는 것을 막는다:
+     `node "<VIBESPEC_SKILL_DIR>/scripts/embed-sot.mjs" "<VIBESPEC_SKILL_DIR>/assets/viewer.html" "<outputs 절대경로>/<제품명>.sot.json" "<outputs 절대경로>/<제품명>.html"`
+   - ⚠️ 반드시 이 명령으로 embedded-sot 태그에 데이터를 심어라. 비워두면 데모만 보이고, JSON을 수동 복사하면 두 산출물이 서로 다른 버전이 될 수 있다.
    - 현재 플랫폼이 지원하는 파일 전달 방식으로 두 파일을 함께 제공한다. 로컬 작업 환경에서는 사용자가 바로 열 수 있도록 두 파일의 절대 경로를 명확히 안내한다.
 
 4. **사용법 안내**(평이한 표현)
@@ -67,7 +68,7 @@ description: >-
    - **경계(boundary)와 initiative 메타는 이 단일 파일 계획으로 수정하지 않는다.** 본편 소유 접점은 부모 파일과 함께 검증해야 하므로, 본편/이니셔티브 구조를 다시 설계하고 `validate-tree`를 통과시키는 별도 트리 작업으로 처리한다.
 3. **삭제는 명시적 승인 대상이다.** 기능·requirement·section·page를 지우거나 PRD 목록에서 항목을 제거할 때, 해당 삭제 경로와 안정 id가 `expected.removedIds/touchedPaths`에 정확히 선언되지 않으면 적용 도구가 거부한다. 삭제 id는 재사용하지 않는다.
 4. **드라이런 후 적용한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/apply-change-plan.mjs" "<sot 절대경로>" "<plan 절대경로>"`로 변경·영향을 확인하고, 사용자 요청 범위와 일치할 때만 같은 명령에 `--apply`를 붙인다. base digest가 달라졌거나 예상 ID 집합과 실제 diff가 다르면 기록하지 않는다.
-5. **검증과 산출물 갱신.** 적용 뒤 `validate-sot.mjs`를 PASS까지 돌리고 `review-sot.mjs`의 내용 품질 경고를 함께 검토한다. 제품 작업공간이면 `validate-tree.mjs`도 실행한다. embedded HTML 또는 workspace HTML을 다시 생성해 전달한다. 큰 구조 개편은 먼저 삭제·추가 목록과 영향 반경을 사용자에게 제시해 확인받고, 작은 계획 여러 개로 나눠 적용한다.
+5. **검증과 산출물 갱신.** 적용 뒤 `validate-sot.mjs`를 PASS까지 돌리고 `review-sot.mjs`의 내용 품질 경고를 함께 검토한다. 제품 작업공간이면 `validate-tree.mjs`도 실행한다. 단일 SOT의 HTML은 3단계와 같은 `embed-sot.mjs` 명령으로 다시 만든다. 큰 구조 개편은 먼저 삭제·추가 목록과 영향 반경을 사용자에게 제시해 확인받고, 작은 계획 여러 개로 나눠 적용한다.
 
 ## 이니셔티브 모드 (본편 위에 얹는 증분, SOT 1.1)
 
@@ -108,7 +109,7 @@ description: >-
    - 파일 단독: `node "<VIBESPEC_SKILL_DIR>/scripts/validate-sot.mjs" "<이니셔티브 절대경로>"` → PASS.
    - 트리(본편+이니셔티브가 든 폴더): `node "<VIBESPEC_SKILL_DIR>/scripts/validate-tree.mjs" "<폴더 절대경로>"` → 오류 0. digest·경계 대상 실존·path·순환을 교차 검사한다. 오류가 나면 고치고 다시 돌린다.
 
-7. **산출물**: `<제품명>.<path>.<id>.sot.json`(예 `shop.1-2.payment.sot.json`)으로 저장하고, 신규 생성과 같은 방식으로 embedded-sot를 심은 HTML을 함께 낸다. 뷰어는 이니셔티브 헤더 밴드·경량 PRD·경계 스텁 읽기전용을 자동으로 보여준다. 본편 파일은 그대로 두고, 사용자에게 "본편은 수정하지 않았고 결제 이니셔티브만 추가했다"처럼 명확히 안내한다.
+7. **산출물**: `<제품명>.<path>.<id>.sot.json`(예 `shop.1-2.payment.sot.json`)으로 저장하고, 신규 생성 3단계의 `embed-sot.mjs` 명령으로 같은 파일에서 HTML을 만든다. 뷰어는 이니셔티브 헤더 밴드·경량 PRD·경계 스텁 읽기전용을 자동으로 보여준다. 본편 파일은 그대로 두고, 사용자에게 "본편은 수정하지 않았고 결제 이니셔티브만 추가했다"처럼 명확히 안내한다.
 
 ## 재기준(rebase) — 본편이 바뀐 뒤 이니셔티브 갱신
 
@@ -117,7 +118,7 @@ description: >-
 1. 본편+이니셔티브가 든 폴더에서 먼저 **드라이런**: `node "<VIBESPEC_SKILL_DIR>/scripts/rebase.mjs" "<폴더 절대경로>"`. 어떤 이니셔티브가 어떤 순서로 갱신되는지 계획이 출력된다.
 2. 적용: `... rebase.mjs "<폴더>" --apply`(전체 연쇄) 또는 `--apply --only <id,...>`(일부). 부모가 갱신되지 않은 자식은 기록을 거부하고 "stale로 남는다"고 리포트한다 — 조용한 부분 복구는 없다.
 3. rebase는 **stale digest만** 고친다. 트리에 다른 오류(중복 id·구조 등)가 있으면 `--apply`가 거부되므로 validate-tree로 먼저 정리한다.
-4. 갱신된 이니셔티브 파일들의 embedded-sot HTML도 다시 만들어 함께 전달하고, 무엇이 최신이 되었고 무엇이 남았는지 사용자에게 요약한다.
+4. 갱신된 이니셔티브 파일마다 신규 생성 3단계의 `embed-sot.mjs` 명령으로 HTML도 다시 만들고, 무엇이 최신이 되었고 무엇이 남았는지 사용자에게 요약한다.
 
 ## 제품 작업공간 (본편 1개 + 병합 가능한 이니셔티브)
 

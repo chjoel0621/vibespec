@@ -62,12 +62,12 @@ description: >-
 기존 `.sot.json`에 변경을 적용할 때는 재생성이 아니라 **ID 기반 변경 계획**이다. AI가 큰 SOT를 통째로 다시 출력하거나 재정렬하지 않는다. 작은 수정은 아래의 결정적 도구 경로를 기본으로 쓴다.
 
 1. **필요한 문맥만 조회한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/query-sot.mjs" "<sot 절대경로>" --ids R1,F5,F5:0,S2,P8 --prd problem,kpis --json`처럼 요청한 requirement·feature·상세기능·section·화면과 필요한 PRD 필드만 읽는다. 출력의 `baseDigest`와 그 문맥만 근거로 삼고, 전체 SOT를 AI가 재직렬화하지 않는다.
-2. **변경 계획 v2를 만든다.** `vibespec-change-plan-v2` JSON에 `baseDigest`, `operations`, `expected.touchedIds/addedIds/removedIds/**touchedPaths**`를 모두 넣는다. `touchedPaths`는 실제 diff 경로 전체와 정확히 일치해야 하므로, id 없는 PRD·acceptance 항목도 조용히 사라질 수 없다. v1은 기존 계획 호환용일 뿐 새 계획에 쓰지 않는다.
+2. **변경 계획 v2를 만든다.** `vibespec-change-plan-v2` JSON에 `baseDigest`, `operations`, `expected.touchedIds/addedIds/removedIds/**touchedPaths**`를 모두 넣는다. `touchedPaths`는 실제 diff 경로 전체와 정확히 일치해야 하므로, id 없는 PRD·acceptance 항목도 조용히 사라질 수 없다. v1은 기존 계획 호환용일 뿐 새 계획에 쓰지 않는다. 계획 파일은 `outputs/`에 두지 말고 `<제품 폴더>/history/change-plans/<날짜>-<요약>.plan.json`에 둔다. `outputs/`에는 현재 열람용 SOT·HTML만 둔다.
    - 지원 연산: 문서 제목/언어(`updateDocument`), PRD 텍스트(`updatePrdText`)·목록 항목 append/update/remove, requirement·feature·section의 추가/수정/삭제, feature 이동, 상세기능 update/append/final-remove, page 추가/수정/삭제/이동, flow start·전환 추가/삭제/수정.
    - 범용 JSON Patch, 전체 배열 교체, 위치 기반 중간 삽입은 쓰지 않는다. 상세기능은 `F#:index` 참조가 있으므로 append 또는 **마지막 항목만** 삭제한다. 수정·삭제에는 현재 상세기능 전체를 `before`로 넣어 정확한 대상을 증명한다.
    - **경계(boundary)와 initiative 메타는 이 단일 파일 계획으로 수정하지 않는다.** 제품 기획 소유 접점은 부모 파일과 함께 검증해야 하므로, 제품 기획/추가 기획 구조를 다시 설계하고 `validate-tree`를 통과시키는 별도 트리 작업으로 처리한다.
 3. **삭제는 명시적 승인 대상이다.** 기능·requirement·section·page를 지우거나 PRD 목록에서 항목을 제거할 때, 해당 삭제 경로와 안정 id가 `expected.removedIds/touchedPaths`에 정확히 선언되지 않으면 적용 도구가 거부한다. 삭제 id는 재사용하지 않는다.
-4. **드라이런 후 적용한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/apply-change-plan.mjs" "<sot 절대경로>" "<plan 절대경로>"`로 변경·영향을 확인하고, 사용자 요청 범위와 일치할 때만 같은 명령에 `--apply`를 붙인다. base digest가 달라졌거나 예상 ID 집합과 실제 diff가 다르면 기록하지 않는다.
+4. **드라이런 후 적용한다.** `node "<VIBESPEC_SKILL_DIR>/scripts/apply-change-plan.mjs" "<sot 절대경로>" "<plan 절대경로>"`로 변경·영향을 확인하고, 사용자 요청 범위와 일치할 때만 `--apply --receipt "<제품 폴더>/history/change-plans/<같은-요약>.receipt.json"`을 붙인다. receipt는 적용된 계획의 base digest·결과 digest·변경 경로를 기록한다. history의 plan은 감사 기록이며, 적용 뒤에는 base digest가 의도적으로 낡으므로 **다시 실행하지 않는다**. 다음 수정에는 새 plan을 만든다. base digest가 달라졌거나 예상 ID 집합과 실제 diff가 다르면 기록하지 않는다.
 5. **검증과 산출물 갱신.** 적용 뒤 `validate-sot.mjs`를 PASS까지 돌리고 `review-sot.mjs`의 내용 품질 경고를 함께 검토한다. 제품 작업공간이면 `validate-tree.mjs`도 실행한다. 단일 SOT의 HTML은 3단계와 같은 `embed-sot.mjs` 명령으로 다시 만든다. 큰 구조 개편은 먼저 삭제·추가 목록과 영향 반경을 사용자에게 제시해 확인받고, 작은 계획 여러 개로 나눠 적용한다.
 
 ## 추가 기획 모드 (제품 기획 위에 얹는 증분, SOT 1.1)

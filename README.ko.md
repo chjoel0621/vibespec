@@ -76,7 +76,7 @@ codex plugin marketplace add <복제한-vibespec-저장소의-절대-경로>
 
 **기존 기획 수정하기:** `*.sot.json`을 첨부하고 "F3 이름 바꾸고 수용 기준 하나 추가해줘"처럼 요청하세요. 스킬이 기존 id를 전부 보존한 채 최소한만 고치고, 검증을 통과시킨 뒤 무엇이 바뀌었는지·어디에 영향이 가는지(화면·전환·KPI)·어느 섹션이 바이트 단위로 그대로인지 리포트합니다.
 
-**큰 기획도 안전하게 수정하기:** 스킬은 큰 JSON 전체를 다시 쓰지 않습니다. 요청한 requirement·기능·상세기능·section·화면 또는 PRD 필드만 읽고, base digest·안정 id·실제 diff 경로 전체를 명시한 `change-plan-v2`를 드라이런합니다. 기능·수용 기준·KPI·범위 항목이 참조와 함께 조용히 사라지는 누락을 막습니다. 다만 boundary·initiative 메타 변경은 교차 파일 검증이 필요하므로 별도 트리 작업으로 처리합니다.
+**큰 기획도 안전하게 수정하기:** 스킬은 큰 JSON 전체를 다시 쓰지 않습니다. 요청한 requirement·기능·상세기능·section·화면 또는 PRD 필드만 읽고, base digest·안정 id·실제 diff 경로 전체를 명시한 `change-plan-v2`를 드라이런합니다. 기능·수용 기준·KPI·범위 항목이 참조와 함께 조용히 사라지는 누락을 막습니다. 적용한 plan과 기준·결과 해시 영수증은 `history/change-plans/`에 감사 이력으로 보관하고, `outputs/`에는 현재 SOT·HTML만 둡니다. 다만 boundary·initiative 메타 변경은 교차 파일 검증이 필요하므로 별도 트리 작업으로 처리합니다.
 
 **추가 기획 추가하기(범위 있는 증분):** 제품 기획 `*.sot.json`을 첨부하고 "결제 기능 추가 기획으로 얹어줘"처럼 요청하세요. 제품 기획을 비대하게 만드는 대신, 스킬이 그 위에 얹히는 **별도 추가 기획 파일**(`<제품>.<경로>.<id>.sot.json`)을 만듭니다 — 자체 경량 PRD(문제·해결·포함범위·비목표)와, 제품 기획 화면에 붙는 지점을 표시하는 **경계(boundary)**를 담아서요. 제품 기획은 그대로 두므로 추가 기획을 독립적으로 검토·승인·출시할 수 있습니다. 각 추가 기획은 작성 기준이 된 제품 기획의 digest를 기록하고, 나중에 제품 기획이 바뀌면 스킬이 영향받은 추가 기획들을 **재기준(rebase)**(부모→자식 순서)해 조용한 드리프트가 없게 합니다.
 
@@ -198,7 +198,7 @@ node scripts/merge.mjs path/to/product-folder --only <id> # 구현된 추가 기
 node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 버전
 node scripts/workspace.mjs path/to/product-folder                    # workspace.html + release-map.html
 node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # 필요한 수정 문맥만 조회
-node scripts/apply-change-plan.mjs main.sot.json edit.plan.json      # 드라이런; --apply로 기록
+node scripts/apply-change-plan.mjs main.sot.json history/change-plans/edit.plan.json  # 드라이런; --apply --receipt history/change-plans/edit.receipt.json으로 기록
 node scripts/review-sot.mjs main.sot.json                            # 내용 품질 경고 검토
 node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # 구버전 승격 드라이런; --apply로 기록
 ```

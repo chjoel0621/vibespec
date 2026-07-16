@@ -180,15 +180,23 @@ const workspace = mkdtempSync(join(tmpdir(), "vibespec-plan-"));
 try {
   const sotPath = join(workspace, "main.sot.json");
   const planPath = join(workspace, "rename.plan.json");
+  const receiptPath = join(workspace, "history", "change-plans", "rename.receipt.json");
   writeFileSync(sotPath, JSON.stringify(valid));
   writeFileSync(planPath, JSON.stringify(rename));
   const cli = join(here, "..", "scripts", "apply-change-plan.mjs");
   const run = args => spawnSync(process.execPath, [cli, sotPath, planPath, ...args], { encoding: "utf8" });
   assert.equal(run([]).status, 0, "dry run must pass: " + run([]).stderr);
   assert.equal(JSON.parse(readFileSync(sotPath, "utf8")).requirements[0].features[0].title, "Run validation", "dry run must not write");
-  assert.equal(run(["--apply"]).status, 0, "apply must pass: " + run(["--apply"]).stderr);
+  assert.equal(run(["--receipt", receiptPath]).status, 2, "a receipt must not be written for a dry run");
+  assert.equal(run(["--apply", "--receipt", receiptPath]).status, 0, "apply must pass: " + run(["--apply", "--receipt", receiptPath]).stderr);
   assert.equal(JSON.parse(readFileSync(sotPath, "utf8")).requirements[0].features[0].title, "Validate generated plans");
-  console.log("[plan] PASS CLI dry-run preserves disk and --apply writes only a verified plan");
+  const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
+  assert.equal(receipt.kind, "vibespec-change-receipt-v1");
+  assert.equal(receipt.status, "applied");
+  assert.equal(receipt.plan.baseDigest, rename.baseDigest);
+  assert.equal(receipt.target.digest, sotDigest(JSON.parse(readFileSync(sotPath, "utf8"))));
+  assert.deepEqual(receipt.changes, [{ type: "modified", path: "F1.title" }]);
+  console.log("[plan] PASS CLI dry-run preserves disk and --apply records an immutable receipt");
 } finally {
   try { rmSync(workspace, { recursive: true, force: true }); } catch {}
 }

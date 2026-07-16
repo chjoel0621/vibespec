@@ -75,7 +75,7 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 **Updating an existing plan:** attach your `*.sot.json` with a request like "rename F3 and add an acceptance criterion." The skill applies a minimal edit — every existing id stays stable — then validates the result and reports exactly what changed, what it touches (screens, transitions, KPIs), and which sections are untouched byte-for-byte.
 
-**Safe edits for large plans:** the skill no longer needs to rewrite the whole JSON for a scoped change. It reads only the requested requirement, feature, spec, section, screen, or PRD fields; then applies a typed `change-plan-v2` with a base digest, explicit IDs, and the exact expected diff paths. A feature, acceptance row, KPI, or scope item cannot silently disappear as a clean-looking rewrite. Boundary and initiative-meta changes remain deliberate tree work because they require cross-file validation.
+**Safe edits for large plans:** the skill no longer needs to rewrite the whole JSON for a scoped change. It reads only the requested requirement, feature, spec, section, screen, or PRD fields; then applies a typed `change-plan-v2` with a base digest, explicit IDs, and the exact expected diff paths. A feature, acceptance row, KPI, or scope item cannot silently disappear as a clean-looking rewrite. Applied plans and their before/after-digest receipts are audit history in `history/change-plans/`; `outputs/` holds only the current SOT and HTML. Boundary and initiative-meta changes remain deliberate tree work because they require cross-file validation.
 
 **Adding an initiative (a scoped increment):** attach your main `*.sot.json` and ask "add a payment initiative on top." Instead of bloating the main plan, the skill creates a **separate initiative file** (`<product>.<path>.<id>.sot.json`) layered on it — with its own lean PRD (problem, solution, in-scope, non-goals) and a **boundary** marking where it attaches to a main screen. The main file is left untouched, so an initiative can be reviewed, approved, and shipped on its own. Each initiative records a digest of the main it was written against; if the main later changes, the skill can **rebase** the affected initiatives (parent-to-child) so nothing silently drifts.
 
@@ -199,7 +199,7 @@ node scripts/merge.mjs path/to/product-folder --only <id> # land an implemented 
 node scripts/product-map.mjs path/to/product-folder --html map.html   # read-only composite
 node scripts/workspace.mjs path/to/product-folder                    # workspace.html + release-map.html
 node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # bounded edit context
-node scripts/apply-change-plan.mjs main.sot.json edit.plan.json      # dry-run; add --apply to write
+node scripts/apply-change-plan.mjs main.sot.json history/change-plans/edit.plan.json  # dry-run; add --apply --receipt history/change-plans/edit.receipt.json to write
 node scripts/review-sot.mjs main.sot.json                            # advisory content-quality review
 node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # dry-run legacy upgrade; add --apply to write
 ```

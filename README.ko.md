@@ -68,6 +68,8 @@ codex plugin marketplace add <복제한-vibespec-저장소의-절대-경로>
 
 그다음 ChatGPT 데스크톱 앱의 **Codex → Plugins**에서 `vibespec` 마켓플레이스를 고르고 VibeSpec을 설치한 뒤 새 작업을 시작합니다. Codex CLI에서는 `codex`를 실행하고 `/plugins`를 열어 `vibespec` 마켓플레이스에서 VibeSpec을 설치한 다음 새 세션을 시작합니다. 설치하거나 업데이트한 뒤 새 작업을 시작해야 스킬이 반영됩니다. 자연어로 요청하거나 `$vibespec`으로 직접 호출할 수 있습니다.
 
+**첫 설치 수용 확인.** 쓰기 가능한 폴더에서 새 작업을 열고 `$vibespec`으로 “회의실 예약 기획을 간단히 만들고 `outputs/meeting-room.sot.json`과 `outputs/meeting-room.html`에 저장해줘”라고 요청합니다. 두 파일이 생기고, HTML을 열었을 때 뷰어 데모가 아닌 방금 만든 기획이 보이며, `node <VibeSpec-스킬-디렉터리>/scripts/validate-sot.mjs outputs/meeting-room.sot.json`이 `PASS`면 성공입니다. 새 작업에서 VibeSpec이 보이지 않으면 설치 뒤 작업을 다시 열거나 데스크톱 앱을 재시작하세요.
+
 ## 사용
 
 "내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 열면 바로 5개 뷰가 표시되고, 편집·저장·불러오기가 됩니다.

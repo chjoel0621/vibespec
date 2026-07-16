@@ -67,6 +67,8 @@ codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
 
 Then install **VibeSpec** from the marketplace: in the ChatGPT desktop app, open **Codex → Plugins**, choose the `vibespec` marketplace, install the plugin, and start a new task. In Codex CLI, run `codex`, open `/plugins`, choose the `vibespec` marketplace, install VibeSpec, then start a new session. Invoke it naturally or explicitly with `$vibespec`.
 
+**First-install acceptance check.** In a new task opened on a writable folder, invoke `$vibespec` with “Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`.” Success means both files appear, the HTML opens with that plan rather than the viewer demo, and `node <VibeSpec-skill-dir>/scripts/validate-sot.mjs outputs/meeting-room.sot.json` reports `PASS`. If VibeSpec is not available in the new task, reopen the task after installation or restart the desktop app.
+
 ## Usage
 
 Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. Open it and all five views appear immediately — edit, save, and load right there.

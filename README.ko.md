@@ -12,7 +12,7 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 
 데모는 서로 연결된 세 페이지로 되어 있습니다. 오른쪽 아래 이동 바로 옮겨 다닐 수 있습니다 — **[본편](https://chjoel0621.github.io/vibespec/)**, 그 위에 얹은 **[이니셔티브](https://chjoel0621.github.io/vibespec/notif/)**(알림 증분), 둘을 합성한 **[제품 지도](https://chjoel0621.github.io/vibespec/map/)**. 지도에서는 아무 노드나 누르면 그 노드를 정의한 문서가 열립니다.
 
-**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래 + 안전결제(에스크로) 이니셔티브)는 플러그인으로 처음부터 끝까지(생성 → 이니셔티브 → 지도) 직접 만든 결과물입니다. 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
+**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래)는 **작업공간 데모**입니다. 승인된 안전결제(에스크로) 이니셔티브 *와* 제안 단계인 가격 제안 증분을 함께 담고 있어, 두 지도를 비교할 수 있습니다 — **[출시 지도](https://chjoel0621.github.io/vibespec/flea/map/)**(출시 범위만) vs **[작업공간 지도](https://chjoel0621.github.io/vibespec/flea/workspace/)**(제안 중인 작업까지 검토용 포함). 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
 
 ## 핵심 개념
 
@@ -81,7 +81,7 @@ codex plugin marketplace add <복제한-vibespec-저장소의-절대-경로>
 **제품 전체 보기:** "제품 지도 보여줘"라고 하면 스킬이 본편과 **활성** 이니셔티브들을 하나의 읽기 전용 뷰로 합성합니다 — 각 이니셔티브의 화면이 붙는 본편 화면 아래에 접붙고, 복합 id(`root/P6`·`notif/P2`)로 출처를 보여줍니다. proposed·dropped 이니셔티브는 "제외"로 표시됩니다. 
 지도는 그림이 아니라 **들어가는 입구**입니다. 각 scope의 원본 문서를 파일 안에 품고 있어서, **아무 노드나 누르면 그 화면을 정의한 기획서가 열립니다** — 읽기 전용이고, 지도로 돌아오는 링크가 있습니다. 파일 하나로 자기완결이라 지도만 건네도 팀원이 제품 전체를 열람할 수 있습니다. 합성된 **[제품 지도 데모](https://chjoel0621.github.io/vibespec/map/)**(예약 앱 + 알림 이니셔티브)를 열어보세요. [영어 지도](https://chjoel0621.github.io/vibespec/en/map/)도 있습니다.
 
-**작업 중인 제품 함께 검토하기:** 제품 폴더에 `main.sot.json` 하나와 `initiatives/` 아래 증분 파일들을 둡니다. workspace 빌더는 proposed·approved·implemented를 모두 포함한 자기완결 `workspace.html`을 만들고, 본편·상위/하위 이니셔티브·지도를 오갈 수 있게 합니다. 별도 release map에서는 proposed를 출시 기능으로 취급하지 않습니다.
+**작업 중인 제품 함께 검토하기:** 제품 폴더에 `main.sot.json` 하나와 `initiatives/` 아래 증분 파일들을 둡니다. workspace 빌더는 proposed·approved·implemented를 모두 포함한 자기완결 `workspace.html`을 만들고, 본편·상위/하위 이니셔티브·지도를 오갈 수 있게 합니다. 별도 release map에서는 proposed를 출시 기능으로 취급하지 않습니다. 동네장터 데모에서 라이브로 보세요: [작업공간 지도](https://chjoel0621.github.io/vibespec/flea/workspace/)(제안 포함) vs [출시 지도](https://chjoel0621.github.io/vibespec/flea/map/)(제외).
 
 ### 스킬이 자동으로 안 뜰 때 (직접 호출)
 

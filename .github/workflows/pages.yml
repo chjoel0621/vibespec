@@ -52,6 +52,11 @@ jobs:
           }
           validate_product demo/meeting-room-booking 1-2.notif
           validate_product demo/flea-market 1-1.escrow
+          # Flea is the workspace demo: it also carries a proposed increment (offer).
+          node $S/scripts/validate-sot.mjs demo/flea-market.ko.1-2.offer.sot.json
+          node $S/scripts/validate-sot.mjs demo/flea-market.en.1-2.offer.sot.json
+          node $S/scripts/validate-tree.mjs demo/flea-market.ko.sot.json demo/flea-market.ko.1-1.escrow.sot.json demo/flea-market.ko.1-2.offer.sot.json
+          node $S/scripts/validate-tree.mjs demo/flea-market.en.sot.json demo/flea-market.en.1-1.escrow.sot.json demo/flea-market.en.1-2.offer.sot.json
       - name: Stage site
         run: |
           S=plugins/vibespec/skills/vibespec
@@ -72,7 +77,19 @@ jobs:
             node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json --html "$dir/en/map/index.html"
           }
           stage_product demo/meeting-room-booking "" 1-2.notif notif
-          stage_product demo/flea-market flea 1-1.escrow escrow
+          # Flea is the workspace demo: escrow (approved) + offer (proposed). The
+          # release map excludes the proposed offer; the workspace map includes it,
+          # so the two pages show the difference side by side. Same inputs, two modes.
+          F=demo/flea-market
+          mkdir -p _site/flea/en _site/flea/map _site/flea/en/map _site/flea/escrow _site/flea/en/escrow _site/flea/workspace _site/flea/en/workspace
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html $F.ko.sot.json _site/flea/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html $F.en.sot.json _site/flea/en/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html $F.ko.1-1.escrow.sot.json _site/flea/escrow/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html $F.en.1-1.escrow.sot.json _site/flea/en/escrow/index.html
+          node $S/scripts/product-map.mjs $F.ko.sot.json $F.ko.1-1.escrow.sot.json $F.ko.1-2.offer.sot.json --html _site/flea/map/index.html
+          node $S/scripts/product-map.mjs $F.en.sot.json $F.en.1-1.escrow.sot.json $F.en.1-2.offer.sot.json --html _site/flea/en/map/index.html
+          node $S/scripts/product-map.mjs $F.ko.sot.json $F.ko.1-1.escrow.sot.json $F.ko.1-2.offer.sot.json --workspace --html _site/flea/workspace/index.html
+          node $S/scripts/product-map.mjs $F.en.sot.json $F.en.1-1.escrow.sot.json $F.en.1-2.offer.sot.json --workspace --html _site/flea/en/workspace/index.html
       # Each product's pages are separate documents; without this strip a map is
       # unreachable from its demo and the two products don't cross-link. Demo-only.
       - name: Add demo navigation
@@ -92,10 +109,20 @@ jobs:
           }
           verify_product "" notif
           verify_product flea escrow
+          # Flea's extra workspace pages carry the nav strip too.
+          for f in flea/workspace/ flea/en/workspace/; do
+            grep -q 'class="demo-nav"' "_site/${f}index.html" || { echo "no nav strip: _site/${f}index.html"; exit 1; }
+          done
+          # The workspace demo's whole point: the proposed increment (offer, unique
+          # word "네고"/"negotiation") shows in the workspace map but NOT the release map.
+          grep -qF "네고" _site/flea/workspace/index.html || { echo "ko workspace map is missing the proposed increment"; exit 1; }
+          grep -qF "negotiation" _site/flea/en/workspace/index.html || { echo "en workspace map is missing the proposed increment"; exit 1; }
+          if grep -qF "네고" _site/flea/map/index.html; then echo "ko release map must NOT include the proposed increment"; exit 1; fi
+          if grep -qF "negotiation" _site/flea/en/map/index.html; then echo "en release map must NOT include the proposed increment"; exit 1; fi
           # Cross-product link present on both mains.
           grep -q 'demo-nav-alt' _site/index.html || { echo "root demo missing cross-product link"; exit 1; }
           grep -q 'demo-nav-alt' _site/flea/index.html || { echo "flea demo missing cross-product link"; exit 1; }
-          echo "[verify] 12 pages carry the nav strip; both maps embed their documents; products cross-link"
+          echo "[verify] nav on every page; maps embed docs; proposed shows in workspace only; products cross-link"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

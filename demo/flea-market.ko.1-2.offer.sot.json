@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.1",
+  "title": "가격 제안(네고)",
+  "lang": "ko",
+  "initiative": {
+    "productId": "flea-market",
+    "id": "offer",
+    "path": "1-2",
+    "status": "proposed",
+    "parent": { "scopeId": "root", "canonicalization": "sot-c14n-v1", "digest": "sha256:f485c4e1556232c0cfb7cd44e1c86d40391f822dde07a09f66ef996facf8f791" }
+  },
+  "prd": {
+    "problem": "판매자가 부른 가격이 부담스러운 구매자는 문의도 없이 그냥 이탈한다. 동네 거래엔 흥정이 흔한데 앱 안에는 값을 조율할 창구가 없어, 채팅으로 어색하게 '깎아주세요'를 꺼내야 한다",
+    "solution": "상품 상세에서 바로 원하는 가격을 제안하고, 판매자가 수락·거절·역제안으로 응답한다. 흥정을 구조화된 흐름으로 만들어 거래 진입 문턱을 낮춘다",
+    "inScope": [
+      "상품 상세에서 가격 제안 보내기",
+      "판매자의 수락·거절·역제안",
+      "제안 상태 알림"
+    ],
+    "nonGoals": [
+      "자동 가격 협상(봇)",
+      "경매·입찰 방식"
+    ],
+    "goal": "가격 제안을 받은 매물의 채팅 전환율을 도입 전 대비 15% 높인다",
+    "scenarios": [
+      { "text": "지영은 12만원 소파에 10만원을 제안하고, 판매자가 11만원으로 역제안하자 수락해 거래를 시작한다", "start": "P2" }
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "가격 제안", "desc": "구매자가 제안하고 판매자가 응답하는 흥정 흐름", "status": "todo", "priority": "mid",
+      "acceptance": [{ "text": "판매자가 응답하기 전에는 거래가 확정되지 않는다", "done": false }],
+      "features": [
+        { "id": "F1", "title": "제안 보내기", "desc": "구매자가 희망 가격을 제안한다", "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "금액 입력", "desc": "판매가 이하로 희망 금액을 입력한다", "acceptance": [] },
+            { "title": "메시지 첨부", "desc": "제안에 짧은 메시지를 덧붙인다", "acceptance": [] }
+          ] },
+        { "id": "F2", "title": "판매자 응답", "desc": "수락·거절·역제안으로 답한다", "status": "todo", "priority": "mid", "acceptance": [],
+          "specs": [
+            { "title": "수락·거절·역제안", "desc": "제안에 세 갈래로 응답한다", "acceptance": [] }
+          ] }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      { "id": "S1", "title": "상품", "boundary": { "scopeId": "root", "sectionId": "S3" }, "pages": [
+        { "id": "P1", "title": "상품 상세", "type": "page", "refs": [], "boundary": { "scopeId": "root", "pageId": "P7" }, "children": [
+          { "id": "P2", "title": "가격 제안", "type": "page", "refs": ["F1", "F1:0", "F1:1"], "children": [] },
+          { "id": "P3", "title": "제안 관리", "type": "page", "refs": ["F2", "F2:0"], "children": [] }
+        ] }
+      ] }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F1" },
+      { "from": "P2", "to": "P3", "ref": "F2" },
+      { "from": "P3", "to": "P1", "label": "협상 완료" }
+    ]
+  }
+}

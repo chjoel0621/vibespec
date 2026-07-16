@@ -11,7 +11,7 @@ VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code
 
 The demo has three linked pages — use the strip in the bottom-right corner to move between them: the **[main plan](https://chjoel0621.github.io/vibespec/en/)**, an **[initiative](https://chjoel0621.github.io/vibespec/en/notif/)** layered on it (a notification increment), and the **[product map](https://chjoel0621.github.io/vibespec/en/map/)** that composes the two. In the map, click any node to open the document that defines it.
 
-A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)**, a location-based secondhand marketplace, is the **workspace demo**: it carries an approved safe-payment (escrow) initiative *and* a proposed price-offer increment. Compare its two maps — the **[release map](https://chjoel0621.github.io/vibespec/flea/en/map/)** (shipping scope only) versus the **[workspace map](https://chjoel0621.github.io/vibespec/flea/en/workspace/)** (proposed work included for review). Use the same corner strip to hop between the two demos.
+A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)**, a location-based secondhand marketplace, is the **workspace demo**: it carries an approved safe-payment (escrow) initiative *and* a proposed price-offer increment. Compare its two composed views — **[Integrated](https://chjoel0621.github.io/vibespec/flea/en/map/)** (what ships) versus **[Review](https://chjoel0621.github.io/vibespec/flea/en/workspace/)** (proposed work included). Use the same corner strip to hop between the two demos.
 
 ## Core idea
 
@@ -83,7 +83,7 @@ Ask something like "turn my product idea into a planning tool" or attach a busin
 
 The map is a way in, not just a picture: it embeds each scope's source document, so **clicking any node opens the plan that defines that screen** — read-only, with a back link to the map. It stays one self-contained file, so handing a teammate the map hands them the whole product. Try the composed **[product map demo](https://chjoel0621.github.io/vibespec/en/map/)** (booking app + a notification initiative); a [Korean map](https://chjoel0621.github.io/vibespec/map/) is also deployed.
 
-**Reviewing work in progress:** keep one `main.sot.json` and put increments under `initiatives/`. The workspace builder creates a self-contained `workspace.html` that includes proposed, approved, and implemented initiatives for review, with main/parent/child/map navigation. It also creates a separate release map, where proposed work remains excluded. See it live in the Neighborly demo: [workspace map](https://chjoel0621.github.io/vibespec/flea/en/workspace/) (proposed included) vs [release map](https://chjoel0621.github.io/vibespec/flea/en/map/) (excluded).
+**Reviewing work in progress:** keep one `main.sot.json` and put increments under `initiatives/`. The workspace builder creates a self-contained `workspace.html` that includes proposed, approved, and implemented initiatives for review, with main/parent/child/map navigation. It also creates a separate release map, where proposed work remains excluded. See it live in the Neighborly demo: [Review](https://chjoel0621.github.io/vibespec/flea/en/workspace/) (proposed included) vs [Integrated](https://chjoel0621.github.io/vibespec/flea/en/map/) (excluded).
 
 ### If the skill doesn't auto-trigger (invoke it manually)
 

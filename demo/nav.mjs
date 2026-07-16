@@ -7,9 +7,12 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
+// Visitor-facing labels: plain words, no VibeSpec jargon. The two composed views
+// differ only by what they include — the integrated release vs the review that
+// also shows proposed work — so they read as "버전" (version), not "지도" (map).
 const L = {
-  ko: { main: "본편", init: "이니셔티브", map: "제품 지도", release: "출시 지도", workspace: "작업공간", other: "EN" },
-  en: { main: "Main", init: "Initiative", map: "Product map", release: "Release map", workspace: "Workspace", other: "한국어" },
+  ko: { main: "제품 기획", init: "추가 기능", map: "통합 버전", release: "통합 버전", workspace: "검토 버전", other: "EN" },
+  en: { main: "Product plan", init: "Add-on", map: "Integrated", release: "Integrated", workspace: "Review", other: "한국어" },
 };
 // Each product declares its pages as [labelKey, urlSlug]. The meeting-room demo
 // shows the basics (main · initiative · map); the flea demo is the workspace

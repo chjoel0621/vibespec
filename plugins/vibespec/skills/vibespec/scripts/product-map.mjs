@@ -31,12 +31,12 @@ function printTree(pages, depth, out) {
 
 export function printMap(map) {
   if (!map.valid) {
-    console.error("[map] FAIL: 제품 지도는 validate-tree를 통과한 트리에서만 만듭니다. 먼저 오류를 해결하세요(stale이면 rebase):");
+    console.error("[map] FAIL: 통합 버전은 validate-tree를 통과한 트리에서만 만듭니다. 먼저 오류를 해결하세요(stale이면 rebase):");
     map.errors.forEach(e => console.error(`  error ${e.file} ${e.path}: ${e.message}`));
     return;
   }
   const count = map.mode === "workspace" ? map.visible.length : map.active.length;
-  console.log(`[map] product ${map.productId} · 본편 + ${map.mode === "workspace" ? "작업 이니셔티브" : "활성 이니셔티브"} ${count}개`);
+  console.log(`[map] product ${map.productId} · 제품 기획 + ${map.mode === "workspace" ? "작업 추가 기획" : "활성 추가 기획"} ${count}개`);
   if (map.active.length) console.log(`활성: ${map.active.join(", ")}${map.stale.length ? ` (기준 낡음: ${map.stale.join(", ")})` : ""}`);
   if (map.excluded.length) console.log(`제외: ${map.excluded.map(e => `${e.id}(${e.reason})`).join(", ")}`);
   if (map.attachments.length) console.log(`접점: ${map.attachments.map(a => `${a.initiative}→${a.at}`).join(", ")}`);
@@ -80,7 +80,7 @@ async function main(argv) {
   else printMap(map);
   if (map.valid && htmlOut) {
     writeMapHtml(map, htmlOut);
-    if (!json) console.log(`\n[map] 읽기전용 지도 HTML: ${htmlOut}${embedDocs ? ` (${map.scopes.length}개 문서 내장 — 노드를 눌러 원문 열람)` : ""}`);
+    if (!json) console.log(`\n[map] 읽기전용 합성 버전 HTML: ${htmlOut}${embedDocs ? ` (${map.scopes.length}개 문서 내장 — 노드를 눌러 원문 열람)` : ""}`);
   }
   if (!map.valid) process.exitCode = 1;
 }

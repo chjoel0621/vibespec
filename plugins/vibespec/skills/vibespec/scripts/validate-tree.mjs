@@ -43,7 +43,7 @@ export function collectFiles(args) {
 export function printTreeResult(result, fileCount) {
   const { valid, errors, warnings, info, product } = result;
   console.log(`[${valid ? "PASS" : "FAIL"}] tree: product ${product.productId ?? "?"} · ${fileCount} file(s) · ${product.scopeCount} scope(s)`);
-  if (product.activeSet.length) console.log(`활성 이니셔티브: ${product.activeSet.join(", ")}${product.staleSet.length ? ` (기준 낡음: ${product.staleSet.join(", ")})` : ""}`);
+  if (product.activeSet.length) console.log(`활성 추가 기획: ${product.activeSet.join(", ")}${product.staleSet.length ? ` (기준 낡음: ${product.staleSet.join(", ")})` : ""}`);
   errors.forEach(e => console.error(`  error ${e.file} ${e.path}: ${e.message}`));
   warnings.forEach(w => console.warn(`  warn  ${w.file} ${w.path}: ${w.message}`));
   info.forEach(i => console.log(`  info  ${i.file} ${i.path}: ${i.message}`));

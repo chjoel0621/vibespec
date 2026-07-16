@@ -96,8 +96,8 @@ async function main(argv) {
   if (json) console.log(JSON.stringify(summary, null, 2));
   else {
     console.log(`[workspace] PASS product ${summary.productId} · ${summary.documents.length} SOT file(s)`);
-    console.log(`  workspace: ${summary.workspace} (본편 + 작업 이니셔티브: ${summary.visible.join(", ") || "없음"})`);
-    console.log(`  release:   ${summary.releaseMap} (활성 이니셔티브: ${summary.active.join(", ") || "없음"})`);
+    console.log(`  workspace: ${summary.workspace} (제품 기획 + 작업 추가 기획: ${summary.visible.join(", ") || "없음"})`);
+    console.log(`  release:   ${summary.releaseMap} (활성 추가 기획: ${summary.active.join(", ") || "없음"})`);
   }
 }
 

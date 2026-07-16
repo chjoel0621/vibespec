@@ -65,14 +65,14 @@ function renderPRD(){
   const order = init
     ? ["scope","problem","overview","users","metrics","risks"]
     : ["overview","problem","users","metrics","scope","risks"];
-  const doctype = init ? t('이니셔티브 명세 (증분)','Initiative specification (increment)') : "Product Requirements Document";
+  const doctype = init ? t('추가 기획 명세 (증분)','Add-on specification (increment)') : "Product Requirements Document";
   const body = order.map((k,i)=>`<section><h2>${i+1}. ${title[k]}</h2>\n      ${sec[k]}\n    </section>`).join("\n\n    ");
   let notice = "";
   if(init){
     const stray = strayIdentityFields();
     if(stray.length){
       const names = stray.map(([,ko,en])=>t(ko,en)).join(", ");
-      notice = `<div class="prd-idnotice">⚠ ${t('이 이니셔티브에 본편 소관 필드가 들어 있습니다','This initiative carries fields owned by the main document')}: <b>${esc(names)}</b>. ${t('이니셔티브는 이를 두지 않습니다.','An initiative should not restate them.')} <button class="addbtn" data-clear-identity>${t('제품 정체성 필드 비우기','Clear product-identity fields')}</button></div>`;
+      notice = `<div class="prd-idnotice">⚠ ${t('이 추가 기획에 제품 기획 소관 필드가 들어 있습니다','This initiative carries fields owned by the main document')}: <b>${esc(names)}</b>. ${t('추가 기획은 이를 두지 않습니다.','An initiative should not restate them.')} <button class="addbtn" data-clear-identity>${t('제품 정체성 필드 비우기','Clear product-identity fields')}</button></div>`;
     }
   }
   return `<div class="prd-doc">

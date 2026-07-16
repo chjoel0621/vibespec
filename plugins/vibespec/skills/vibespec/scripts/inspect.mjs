@@ -12,7 +12,7 @@ import { collectFiles } from "./validate-tree.mjs";
 import { inspectDocs } from "./lib/inspect.mjs";
 
 export function printInspect(r) {
-  console.log(`[inspect] 파일 ${r.files.length}개 · 본편 ${r.hasMain ? "있음" : "없음"} · 이니셔티브 ${r.initiativeCount}개`);
+  console.log(`[inspect] 파일 ${r.files.length}개 · 제품 기획 ${r.hasMain ? "있음" : "없음"} · 추가 기획 ${r.initiativeCount}개`);
   for (const f of r.files) {
     if (f.kind === "main") console.log(`  main        ${basename(f.name)}  "${f.title ?? ""}"`);
     else if (f.kind === "initiative") console.log(`  initiative  ${basename(f.name)}  id=${f.id} path=${f.path} status=${f.status} parent=${f.parentScopeId}`);
@@ -22,7 +22,7 @@ export function printInspect(r) {
   if (r.tree) console.log(`트리: ${r.tree.valid ? "valid" : `INVALID(${r.tree.errorCount} errors)`} · product ${r.tree.productId ?? "?"} · 활성 [${r.tree.activeSet.join(", ")}]${r.tree.staleSet.length ? ` · 기준낡음 [${r.tree.staleSet.join(", ")}]` : ""}`);
   if (r.invalidReason) console.log(`⚠ 무효: ${r.invalidReason}`);
   if (r.legacyCount) console.log(`⚠ 레거시 ${r.legacyCount}개 — migrate 후 다시 inspect하세요.`);
-  if (r.incompleteTree) console.log(`⚠ 본편 없음 — 이니셔티브 작업 전에 본편 SOT가 필요합니다.`);
+  if (r.incompleteTree) console.log(`⚠ 제품 기획 없음 — 추가 기획 작업 전에 제품 기획 SOT가 필요합니다.`);
   if (r.needsRebase) console.log(`⚠ 재기준 필요: ${r.staleInitiatives.join(", ")}`);
   const np = Object.entries(r.nextPath).map(([k, v]) => `${k}→${v}`).join(", ");
   if (np) console.log(`다음 path 발급: ${np} (권한: ${r.pathAuthority})`);

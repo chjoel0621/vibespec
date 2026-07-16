@@ -65,7 +65,7 @@ const plain = JSON.parse(readFileSync(join(here, "fixtures", "valid-minimal.sot.
 const [state, name, parent, status, dotClass] = probe(initiative, BAND_HARNESS).split("|");
 assert.equal(state, "shown", "initiative document must show the band");
 assert.equal(name, "payment", "band must show the initiative id");
-assert.match(parent, /main document|본편/, "band must name the parent scope");
+assert.match(parent, /main document|제품 기획/, "band must name the parent scope");
 assert.match(status, /Proposed|제안/, "band must show the status");
 assert.ok(dotClass.includes("proposed"), "status dot must reflect the status");
 console.log("[browser] PASS initiative band shows id, parent, and status for a 1.1 document");
@@ -103,7 +103,7 @@ document.documentElement.setAttribute("data-probe",[
 const [initFirst, iCat, iPlat, iAlt, iDiff, iNorth, initDoctype] = probe(initiative, PRD_HARNESS).split("~");
 assert.match(initFirst, /1\. (Scope|범위)/, "initiative PRD must lead with Scope");
 assert.equal([iCat, iPlat, iAlt, iDiff, iNorth].join(""), "00000", "initiative must hide every product-identity field");
-assert.match(initDoctype, /Initiative|이니셔티브/, "initiative doctype label");
+assert.match(initDoctype, /Add-on|추가 기획/, "initiative doctype label");
 console.log("[browser] PASS initiative PRD hides product-identity fields and leads with Scope");
 
 const [plainFirst, pCat, pPlat, pAlt, pDiff, pNorth] = probe(plain, PRD_HARNESS).split("~");

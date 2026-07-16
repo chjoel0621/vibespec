@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 // differ only by what they include — the integrated release vs the review that
 // also shows proposed work — so they read as "버전" (version), not "지도" (map).
 const L = {
-  ko: { main: "제품 기획", init: "추가 기능", map: "통합 버전", release: "통합 버전", workspace: "검토 버전", other: "EN" },
+  ko: { main: "제품 기획", init: "추가 기획", map: "통합 버전", release: "통합 버전", workspace: "검토 버전", other: "EN" },
   en: { main: "Product plan", init: "Add-on", map: "Integrated", release: "Integrated", workspace: "Review", other: "한국어" },
 };
 // Each product declares its pages as [labelKey, urlSlug]. The meeting-room demo

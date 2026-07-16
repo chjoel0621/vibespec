@@ -153,7 +153,7 @@ try {
     'if(mainButton) mainButton.click();' +
     'return {heading,paymentVisible:!!document.querySelector("[data-open=payment]")||!!document.querySelector(".map-back"),parentVisible,openedMain:(document.getElementById("prodTitle")||{}).textContent||""};'
   );
-  assert.match(w.heading, /Workspace|작업공간/, "workspace map must identify its review-only mode");
+  assert.match(w.heading, /Review|검토/, "workspace map must identify its review-only mode");
   assert.equal(w.parentVisible, true, "an initiative document must offer a direct Main route");
   assert.match(w.openedMain, /Shop/, "the direct Main route must open the parent document");
   console.log("[browser] PASS workspace map shows proposed work and navigates initiative → main directly");

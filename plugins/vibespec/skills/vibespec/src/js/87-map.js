@@ -38,7 +38,7 @@ function renderMap(){
   // A map is read-only — the title must not be editable (no history/SOT writes).
   const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
-    const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
+    const meta = s.status==="main" ? t("제품 기획","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
     const ancestry = s.parentScopeId ? ` · ${t("상위","parent")} ${esc(s.parentScopeId)} · ${esc(s.path||"")}` : "";
     const name = s.href
       ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>`
@@ -70,11 +70,11 @@ function renderMap(){
   el.className="wrap ia";
   el.innerHTML = `<div class="ia-canvas">
     ${tools}
-    <div class="map-head">${workspace?t("작업공간 지도 (읽기 전용)","Workspace map (read-only)"):t("제품 지도 (읽기 전용)","Product map (read-only)")} · ${workspace?t("본편 + 작업 이니셔티브","main + working initiatives"):t("본편 + 활성 이니셔티브","main + active initiatives")} ${workspace?(M.visible||[]).length:(M.active||[]).length}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
+    <div class="map-head">${workspace?t("검토 버전 (읽기 전용)","Review (read-only)"):t("통합 버전 (읽기 전용)","Integrated (read-only)")} · ${workspace?t("제품 기획 + 검토 중 추가 기획","product plan + add-ons under review"):t("제품 기획 + 반영된 추가 기획","product plan + shipped add-ons")} ${workspace?(M.visible||[]).length:(M.active||[]).length}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
     <div class="map-legend">${legend}</div>
     ${excluded}
     ${attach}
-    <div class="map-hint">${t("복합 id(scope/로컬id)로 출처를 표시합니다. +표시 노드는 이니셔티브가 본편 화면 아래에 더한 화면입니다.","Composite ids (scope/local-id) show provenance. +marked nodes are screens an initiative adds under a main screen.")}</div>
+    <div class="map-hint">${t("복합 id(scope/로컬id)로 출처를 표시합니다. +표시 노드는 추가 기획이 제품 기획 화면 아래에 더한 화면입니다.","Composite ids (scope/local-id) show provenance. +marked nodes are screens an initiative adds under a main screen.")}</div>
     ${tree}
   </div>`;
   // The map exists to show what initiatives add — it must not open scrolled away
@@ -116,10 +116,10 @@ function roHarden(){
     const bar=document.createElement("div");
     bar.className="map-back";
     const related=[];
-    if(MAPDOC!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="root">${t("본편","Main")}</button>`);
+    if(MAPDOC!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="root">${t("제품 기획","Main")}</button>`);
     if(s.parentScopeId&&s.parentScopeId!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(s.parentScopeId)}">${t("상위","Parent")}</button>`);
     mapScopeChildren(MAPDOC).forEach(child=>related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(child.id)}">${t("하위","Child")}: ${esc(child.title||child.id)}</button>`));
-    bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("제품 지도","Product map")}</button>
+    bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("돌아가기","Back")}</button>
       ${related.join("")}
       <span>${esc(s.title||MAPDOC)} · ${t("읽기 전용 스냅샷 — 편집은 원본 파일에서","read-only snapshot — edit the source file")}</span>`;
     back.insertBefore(bar, back.firstChild);

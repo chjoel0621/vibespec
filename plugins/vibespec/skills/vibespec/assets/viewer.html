@@ -772,9 +772,9 @@ function renderInitiativeBand(){
   const meta=SOT&&SOT.initiative;
   if(!meta){ band.hidden=true; return; }
   band.hidden=false;
-  document.getElementById("ibBadge").textContent=t("이니셔티브","Initiative");
+  document.getElementById("ibBadge").textContent=t("추가 기획","Add-on");
   document.getElementById("ibName").textContent=meta.id||"";
-  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("본편","the main document") : (meta.parent&&meta.parent.scopeId)||"";
+  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("제품 기획","the main document") : (meta.parent&&meta.parent.scopeId)||"";
   document.getElementById("ibParent").textContent=t(`${parent} 기준 · ${meta.productId||""}`,`over ${parent} · ${meta.productId||""}`);
   const st=INIT_STATUS[meta.status]||{t:meta.status,e:meta.status};
   const dot=document.getElementById("ibDot"); dot.className="ib-dot "+(meta.status||"");
@@ -887,14 +887,14 @@ function renderPRD(){
   const order = init
     ? ["scope","problem","overview","users","metrics","risks"]
     : ["overview","problem","users","metrics","scope","risks"];
-  const doctype = init ? t('이니셔티브 명세 (증분)','Initiative specification (increment)') : "Product Requirements Document";
+  const doctype = init ? t('추가 기획 명세 (증분)','Add-on specification (increment)') : "Product Requirements Document";
   const body = order.map((k,i)=>`<section><h2>${i+1}. ${title[k]}</h2>\n      ${sec[k]}\n    </section>`).join("\n\n    ");
   let notice = "";
   if(init){
     const stray = strayIdentityFields();
     if(stray.length){
       const names = stray.map(([,ko,en])=>t(ko,en)).join(", ");
-      notice = `<div class="prd-idnotice">⚠ ${t('이 이니셔티브에 본편 소관 필드가 들어 있습니다','This initiative carries fields owned by the main document')}: <b>${esc(names)}</b>. ${t('이니셔티브는 이를 두지 않습니다.','An initiative should not restate them.')} <button class="addbtn" data-clear-identity>${t('제품 정체성 필드 비우기','Clear product-identity fields')}</button></div>`;
+      notice = `<div class="prd-idnotice">⚠ ${t('이 추가 기획에 제품 기획 소관 필드가 들어 있습니다','This initiative carries fields owned by the main document')}: <b>${esc(names)}</b>. ${t('추가 기획은 이를 두지 않습니다.','An initiative should not restate them.')} <button class="addbtn" data-clear-identity>${t('제품 정체성 필드 비우기','Clear product-identity fields')}</button></div>`;
     }
   }
   return `<div class="prd-doc">
@@ -1071,7 +1071,7 @@ function iaPageLi(p){
   // A boundary stub references a parent page — keep ＋add child (the initiative
   // hangs its own screens here), keep ×delete (re-attach is the user's call).
   return `<li><div class="snode ${cls}${bnd} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
-      <span class="stype">${p.boundary?t('본편 접점','Main boundary'):ptype(p.type)}</span>
+      <span class="stype">${p.boundary?t('제품 기획 접점','Main boundary'):ptype(p.type)}</span>
       <span class="stitle">${esc(p.title)}</span>
       <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="${t('하위 추가','Add child')}">＋</button><button class="mini" data-del-page="${p.id}" title="${t('삭제','Delete')}">×</button></span>
     </div>${kids}</li>`;
@@ -1082,10 +1082,10 @@ function renderIA(){
   const secLis = SOT.ia.sections.map(s=>{
     const pages = s.pages.length?`<ul>${s.pages.map(iaPageLi).join("")}</ul>`:"";
     // A section boundary mirrors a main section (like a page stub mirrors a main
-    // page): badge it 본편 접점, keep ＋add page (the initiative adds screens to it).
+    // page): badge it 제품 기획 접점, keep ＋add page (the initiative adds screens to it).
     const bnd = s.boundary ? " boundary" : "";
     return `<li><div class="snode sec${bnd} ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
-        <span class="stype">${s.boundary?t('본편 접점 · 섹션','Main boundary · section'):'Depth 1'}</span>
+        <span class="stype">${s.boundary?t('제품 기획 접점 · 섹션','Main boundary · section'):'Depth 1'}</span>
         <span class="stitle">${esc(s.title)}</span>
         <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="${t('페이지 추가','Add page')}">＋</button><button class="mini" data-del-sec="${s.id}" title="${t('섹션 삭제','Delete section')}">×</button></span>
       </div>${pages}</li>`;
@@ -1124,10 +1124,10 @@ function renderIADetail(){
     // the target, and adds the initiative's screens beneath it (like a page stub).
     if(sec.boundary){
       return `<div class="detail">
-        <div class="dt-title" style="color:var(--sub)">${esc(sec.title)} <span class="boundary-tag">${t('본편 섹션','Main section')}</span></div>
-        <div class="dt-row"><span class="dt-k">${t('본편 접점 · 섹션','Main boundary · section')}</span><span class="dt-v">${esc(sec.boundary.scopeId)}/${esc(sec.boundary.sectionId)}</span></div>
+        <div class="dt-title" style="color:var(--sub)">${esc(sec.title)} <span class="boundary-tag">${t('제품 기획 섹션','Main section')}</span></div>
+        <div class="dt-row"><span class="dt-k">${t('제품 기획 접점 · 섹션','Main boundary · section')}</span><span class="dt-v">${esc(sec.boundary.scopeId)}/${esc(sec.boundary.sectionId)}</span></div>
         <div class="dt-row"><span class="dt-k">${t('페이지','Pages')}</span><span class="dt-v">${countPages(sec.pages)}${t('개','')}</span></div>
-        <div class="ia-boundary-note">${t('본편 섹션을 가리키는 참조입니다. 제목은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브가 이 섹션에 더하는 화면을 추가하세요.','A reference to a section in the main document. Its title is owned there and cannot be edited here. Add the screens this initiative contributes to that section beneath it.')}</div>
+        <div class="ia-boundary-note">${t('제품 기획 섹션을 가리키는 참조입니다. 제목은 제품 기획이 정하므로 여기서 편집할 수 없습니다. 이 아래에 추가 기획이 이 섹션에 더하는 화면을 추가하세요.','A reference to a section in the main document. Its title is owned there and cannot be edited here. Add the screens this initiative contributes to that section beneath it.')}</div>
         <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">${t('＋ 최상위 페이지 추가','＋ Add top page')}</button>
           <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
       </div>`;
@@ -1152,17 +1152,17 @@ function renderIADetail(){
     // (validate-sot warns). If it does, the linking UI is hidden — so surface a
     // notice with an explicit clear action rather than trapping the value.
     const strayRefs = (p.refs||[]).length
-      ? `<div class="prd-idnotice">⚠ ${t('이 본편 접점에 이니셔티브 자체 기능 참조가 들어 있습니다','This boundary stub carries the initiative’s own feature refs')}: <b>${(p.refs||[]).map(rid=>esc(refLabel(rid))).join(", ")}</b>. ${t('접점은 본편 화면의 참조라 자체 참조를 두지 않습니다.','A boundary is a reference to a main-document screen and should not hold its own refs.')} <button class="addbtn" data-clear-boundary-refs="${p.id}">${t('기능 참조 비우기','Clear feature refs')}</button></div>`
+      ? `<div class="prd-idnotice">⚠ ${t('이 제품 기획 접점에 추가 기획 자체 기능 참조가 들어 있습니다','This boundary stub carries the initiative’s own feature refs')}: <b>${(p.refs||[]).map(rid=>esc(refLabel(rid))).join(", ")}</b>. ${t('접점은 제품 기획 화면의 참조라 자체 참조를 두지 않습니다.','A boundary is a reference to a main-document screen and should not hold its own refs.')} <button class="addbtn" data-clear-boundary-refs="${p.id}">${t('기능 참조 비우기','Clear feature refs')}</button></div>`
       : "";
     return `<div class="detail">
-      <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('본편','Main')}</span></div>
+      <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('제품 기획','Main')}</span></div>
       <div class="dt-goto"><button class="topbtn" data-add-page="${p.id}">${t('＋ 하위 화면','＋ Child screen')}</button>
         <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
       <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
       <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${ptype(p.type)}</span></div>
-      <div class="dt-row"><span class="dt-k">${t('본편 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
+      <div class="dt-row"><span class="dt-k">${t('제품 기획 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
       ${strayRefs}
-      <div class="ia-boundary-note">${t('본편 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
+      <div class="ia-boundary-note">${t('제품 기획 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 제품 기획이 정하므로 여기서 편집할 수 없습니다. 이 아래에 추가 기획의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
     </div>`;
   }
   const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${ptype(k)}</option>`).join("");
@@ -1498,7 +1498,7 @@ function renderMap(){
   // A map is read-only — the title must not be editable (no history/SOT writes).
   const pt=document.getElementById("prodTitle"); if(pt){ pt.setAttribute("contenteditable","false"); if(pt.firstChild) pt.firstChild.textContent=M.productId||"Product"; }
   const legend = (M.scopes||[]).map(s=>{
-    const meta = s.status==="main" ? t("본편","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
+    const meta = s.status==="main" ? t("제품 기획","Main") : `${mapStatusLabel(s.status)}${(M.stale||[]).includes(s.id)?` · ${t("기준 낡음","stale")}`:""}`;
     const ancestry = s.parentScopeId ? ` · ${t("상위","parent")} ${esc(s.parentScopeId)} · ${esc(s.path||"")}` : "";
     const name = s.href
       ? `<a class="map-scope-link" href="${esc(s.href)}">${esc(s.title||s.id)}</a>`
@@ -1530,11 +1530,11 @@ function renderMap(){
   el.className="wrap ia";
   el.innerHTML = `<div class="ia-canvas">
     ${tools}
-    <div class="map-head">${workspace?t("작업공간 지도 (읽기 전용)","Workspace map (read-only)"):t("제품 지도 (읽기 전용)","Product map (read-only)")} · ${workspace?t("본편 + 작업 이니셔티브","main + working initiatives"):t("본편 + 활성 이니셔티브","main + active initiatives")} ${workspace?(M.visible||[]).length:(M.active||[]).length}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
+    <div class="map-head">${workspace?t("검토 버전 (읽기 전용)","Review (read-only)"):t("통합 버전 (읽기 전용)","Integrated (read-only)")} · ${workspace?t("제품 기획 + 검토 중 추가 기획","product plan + add-ons under review"):t("제품 기획 + 반영된 추가 기획","product plan + shipped add-ons")} ${workspace?(M.visible||[]).length:(M.active||[]).length}${(M.stale&&M.stale.length)?` · ${t("기준 낡음","stale")} ${M.stale.length}`:""}</div>
     <div class="map-legend">${legend}</div>
     ${excluded}
     ${attach}
-    <div class="map-hint">${t("복합 id(scope/로컬id)로 출처를 표시합니다. +표시 노드는 이니셔티브가 본편 화면 아래에 더한 화면입니다.","Composite ids (scope/local-id) show provenance. +marked nodes are screens an initiative adds under a main screen.")}</div>
+    <div class="map-hint">${t("복합 id(scope/로컬id)로 출처를 표시합니다. +표시 노드는 추가 기획이 제품 기획 화면 아래에 더한 화면입니다.","Composite ids (scope/local-id) show provenance. +marked nodes are screens an initiative adds under a main screen.")}</div>
     ${tree}
   </div>`;
   // The map exists to show what initiatives add — it must not open scrolled away
@@ -1576,10 +1576,10 @@ function roHarden(){
     const bar=document.createElement("div");
     bar.className="map-back";
     const related=[];
-    if(MAPDOC!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="root">${t("본편","Main")}</button>`);
+    if(MAPDOC!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="root">${t("제품 기획","Main")}</button>`);
     if(s.parentScopeId&&s.parentScopeId!=="root") related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(s.parentScopeId)}">${t("상위","Parent")}</button>`);
     mapScopeChildren(MAPDOC).forEach(child=>related.push(`<button class="topbtn" data-ro-ok data-map-open-scope="${esc(child.id)}">${t("하위","Child")}: ${esc(child.title||child.id)}</button>`));
-    bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("제품 지도","Product map")}</button>
+    bar.innerHTML=`<button class="topbtn" data-ro-ok data-back-to-map>← ${t("돌아가기","Back")}</button>
       ${related.join("")}
       <span>${esc(s.title||MAPDOC)} · ${t("읽기 전용 스냅샷 — 편집은 원본 파일에서","read-only snapshot — edit the source file")}</span>`;
     back.insertBefore(bar, back.firstChild);

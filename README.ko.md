@@ -10,9 +10,9 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 
 **🕹️ [라이브 데모](https://chjoel0621.github.io/vibespec/)** — "내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면 데모와 같은 HTML을 산출합니다. 설치 없이 브라우저에서 바로 뷰어를 체험해 보세요. 샘플 제품(회의실 예약 앱)이 열리고, 모든 항목을 편집할 수 있으며 저장을 누르면 SOT JSON이 내보내집니다. [영어 데모](https://chjoel0621.github.io/vibespec/en/)도 있습니다.
 
-데모는 서로 연결된 세 페이지로 되어 있습니다. 오른쪽 아래 이동 바로 옮겨 다닐 수 있습니다 — **[본편](https://chjoel0621.github.io/vibespec/)**, 그 위에 얹은 **[이니셔티브](https://chjoel0621.github.io/vibespec/notif/)**(알림 증분), 둘을 합성한 **[제품 지도](https://chjoel0621.github.io/vibespec/map/)**. 지도에서는 아무 노드나 누르면 그 노드를 정의한 문서가 열립니다.
+데모는 서로 연결된 세 페이지로 되어 있습니다. 오른쪽 아래 이동 바로 옮겨 다닐 수 있습니다 — **[제품 기획](https://chjoel0621.github.io/vibespec/)**, 그 위에 얹은 **[추가 기획](https://chjoel0621.github.io/vibespec/notif/)**(알림 증분), 둘을 합성한 **[통합 버전](https://chjoel0621.github.io/vibespec/map/)**. 합성 버전에서는 아무 노드나 누르면 그 노드를 정의한 문서가 열립니다.
 
-**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래)는 **작업공간 데모**입니다. 승인된 안전결제(에스크로) 이니셔티브 *와* 제안 단계인 가격 제안 증분을 함께 담고 있어, 합쳐진 두 화면을 비교할 수 있습니다 — **[통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)**(출시할 것만) vs **[검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)**(제안 중인 작업까지 포함). 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
+**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래)는 **작업공간 데모**입니다. 승인된 안전결제(에스크로) 추가 기획 *와* 제안 단계인 가격 제안 증분을 함께 담고 있어, 합쳐진 두 화면을 비교할 수 있습니다 — **[통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)**(출시할 것만) vs **[검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)**(제안 중인 작업까지 포함). 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
 
 ## 핵심 개념
 
@@ -78,12 +78,12 @@ codex plugin marketplace add <복제한-vibespec-저장소의-절대-경로>
 
 **큰 기획도 안전하게 수정하기:** 스킬은 큰 JSON 전체를 다시 쓰지 않습니다. 요청한 requirement·기능·상세기능·section·화면 또는 PRD 필드만 읽고, base digest·안정 id·실제 diff 경로 전체를 명시한 `change-plan-v2`를 드라이런합니다. 기능·수용 기준·KPI·범위 항목이 참조와 함께 조용히 사라지는 누락을 막습니다. 다만 boundary·initiative 메타 변경은 교차 파일 검증이 필요하므로 별도 트리 작업으로 처리합니다.
 
-**이니셔티브 추가하기(범위 있는 증분):** 본편 `*.sot.json`을 첨부하고 "결제 기능 이니셔티브로 얹어줘"처럼 요청하세요. 본편을 비대하게 만드는 대신, 스킬이 그 위에 얹히는 **별도 이니셔티브 파일**(`<제품>.<경로>.<id>.sot.json`)을 만듭니다 — 자체 경량 PRD(문제·해결·포함범위·비목표)와, 본편 화면에 붙는 지점을 표시하는 **경계(boundary)**를 담아서요. 본편은 그대로 두므로 이니셔티브를 독립적으로 검토·승인·출시할 수 있습니다. 각 이니셔티브는 작성 기준이 된 본편의 digest를 기록하고, 나중에 본편이 바뀌면 스킬이 영향받은 이니셔티브들을 **재기준(rebase)**(부모→자식 순서)해 조용한 드리프트가 없게 합니다.
+**추가 기획 추가하기(범위 있는 증분):** 제품 기획 `*.sot.json`을 첨부하고 "결제 기능 추가 기획으로 얹어줘"처럼 요청하세요. 제품 기획을 비대하게 만드는 대신, 스킬이 그 위에 얹히는 **별도 추가 기획 파일**(`<제품>.<경로>.<id>.sot.json`)을 만듭니다 — 자체 경량 PRD(문제·해결·포함범위·비목표)와, 제품 기획 화면에 붙는 지점을 표시하는 **경계(boundary)**를 담아서요. 제품 기획은 그대로 두므로 추가 기획을 독립적으로 검토·승인·출시할 수 있습니다. 각 추가 기획은 작성 기준이 된 제품 기획의 digest를 기록하고, 나중에 제품 기획이 바뀌면 스킬이 영향받은 추가 기획들을 **재기준(rebase)**(부모→자식 순서)해 조용한 드리프트가 없게 합니다.
 
-**제품 전체 보기:** "제품 지도 보여줘"라고 하면 스킬이 본편과 **활성** 이니셔티브들을 하나의 읽기 전용 뷰로 합성합니다 — 각 이니셔티브의 화면이 붙는 본편 화면 아래에 접붙고, 복합 id(`root/P6`·`notif/P2`)로 출처를 보여줍니다. proposed·dropped 이니셔티브는 "제외"로 표시됩니다. 
-지도는 그림이 아니라 **들어가는 입구**입니다. 각 scope의 원본 문서를 파일 안에 품고 있어서, **아무 노드나 누르면 그 화면을 정의한 기획서가 열립니다** — 읽기 전용이고, 지도로 돌아오는 링크가 있습니다. 파일 하나로 자기완결이라 지도만 건네도 팀원이 제품 전체를 열람할 수 있습니다. 합성된 **[제품 지도 데모](https://chjoel0621.github.io/vibespec/map/)**(예약 앱 + 알림 이니셔티브)를 열어보세요. [영어 지도](https://chjoel0621.github.io/vibespec/en/map/)도 있습니다.
+**제품 전체 보기:** "통합 버전 보여줘"라고 하면 스킬이 제품 기획과 **활성** 추가 기획들을 하나의 읽기 전용 뷰로 합성합니다 — 각 추가 기획의 화면이 붙는 제품 기획 화면 아래에 접붙고, 복합 id(`root/P6`·`notif/P2`)로 출처를 보여줍니다. proposed·dropped 추가 기획은 "제외"로 표시됩니다. 
+합성 버전은 그림이 아니라 **들어가는 입구**입니다. 각 scope의 원본 문서를 파일 안에 품고 있어서, **아무 노드나 누르면 그 화면을 정의한 기획서가 열립니다** — 읽기 전용이고, 합성 버전으로 돌아오는 링크가 있습니다. 파일 하나로 자기완결이라 합성 버전만 건네도 팀원이 제품 전체를 열람할 수 있습니다. 합성된 **[통합 버전 데모](https://chjoel0621.github.io/vibespec/map/)**(예약 앱 + 알림 추가 기획)를 열어보세요. [영어 합성 버전](https://chjoel0621.github.io/vibespec/en/map/)도 있습니다.
 
-**작업 중인 제품 함께 검토하기:** 제품 폴더에 `main.sot.json` 하나와 `initiatives/` 아래 증분 파일들을 둡니다. workspace 빌더는 proposed·approved·implemented를 모두 포함한 자기완결 `workspace.html`을 만들고, 본편·상위/하위 이니셔티브·지도를 오갈 수 있게 합니다. 별도 release map에서는 proposed를 출시 기능으로 취급하지 않습니다. 동네장터 데모에서 라이브로 보세요: [검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)(제안 포함) vs [통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)(제외).
+**작업 중인 제품 함께 검토하기:** 제품 폴더에 `main.sot.json` 하나와 `initiatives/` 아래 증분 파일들을 둡니다. workspace 빌더는 proposed·approved·implemented를 모두 포함한 자기완결 `workspace.html`을 만들고, 제품 기획·상위/하위 추가 기획·합성 버전을 오갈 수 있게 합니다. 별도 release map에서는 proposed를 출시 기능으로 취급하지 않습니다. 동네장터 데모에서 라이브로 보세요: [검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)(제안 포함) vs [통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)(제외).
 
 ### 스킬이 자동으로 안 뜰 때 (직접 호출)
 
@@ -145,20 +145,20 @@ vibespec/
 │       │   ├── inspect.mjs             # 라우팅 사전판별(분류·다음 path·추천 모드)
 │       │   ├── validate-sot.mjs        # 단일 파일 검증기(구조·참조·커버리지)
 │       │   ├── validate-tree.mjs       # 교차 파일 검증(scope·digest·boundary·path)
-│       │   ├── sot-digest.mjs          # 부모 digest 계산(이니셔티브가 기록할 값)
-│       │   ├── rebase.mjs              # 본편 변경 후 root→leaf 연쇄 재기준
-│       │   ├── merge.mjs               # 구현된 이니셔티브를 본편에 접어 넣기(land)
-│       │   ├── product-map.mjs         # 본편+활성 이니셔티브 합성 지도(--html/--json)
+│       │   ├── sot-digest.mjs          # 부모 digest 계산(추가 기획이 기록할 값)
+│       │   ├── rebase.mjs              # 제품 기획 변경 후 root→leaf 연쇄 재기준
+│       │   ├── merge.mjs               # 구현된 추가 기획을 제품 기획에 접어 넣기(land)
+│       │   ├── product-map.mjs         # 제품 기획+활성 추가 기획 합성 버전(--html/--json)
 │       │   ├── diff-sot.mjs            # 두 SOT의 변경·영향 반경 리포트
 │       │   ├── embed-sot.mjs           # SOT를 뷰어 embedded-sot 태그에 주입
 │       │   └── lib/                    # 공용: c14n(sot-c14n-v1)·diff·tree·rebase·product-map·inspect
-│       ├── tests/                      # 검증기·트리·재기준·지도·inspect + 헤드리스 뷰어 회귀
+│       ├── tests/                      # 검증기·트리·재기준·합성 버전·inspect + 헤드리스 뷰어 회귀
 │       ├── assets/viewer.html          # HTML 뷰어(앱) — 빌드 산출물
 │       ├── src/                        # 뷰어 소스 (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # src/ 를 단일 파일 뷰어로 인라인
 │       └── package.json                # npm run build · check · validate
-├── demo/                               # 데모 제품 둘(ko/en), 각각 본편 + 승인된 이니셔티브를
-│                                       #   합성 지도로: meeting-room-booking(/), flea-market(/flea/).
+├── demo/                               # 데모 제품 둘(ko/en), 각각 제품 기획 + 승인된 추가 기획을
+│                                       #   합성 버전로: meeting-room-booking(/), flea-market(/flea/).
 │                                       #   nav.mjs가 페이지를 잇고 두 제품을 상호 연결
 ├── .github/workflows/                  # CI(빌드+테스트)와 Pages 데모 배포
 ├── LICENSE
@@ -188,14 +188,14 @@ npm run validate -- path/to/product.sot.json
 node scripts/diff-sot.mjs before.sot.json after.sot.json
 ```
 
-제품 트리(본편 + 이니셔티브들)를 사전판별·검증하고, 본편이 바뀐 뒤 재기준하고, 읽기전용 제품 지도를 합성하려면:
+제품 트리(제품 기획 + 추가 기획들)를 사전판별·검증하고, 제품 기획이 바뀐 뒤 재기준하고, 읽기전용 통합 버전을 합성하려면:
 
 ```
 node scripts/inspect.mjs path/to/product-folder          # 입력 분류·다음 path·추천 모드
 node scripts/validate-tree.mjs path/to/product-folder    # scope·digest·boundary·path 검사
 node scripts/rebase.mjs path/to/product-folder           # 드라이런 연쇄; --apply로 기록
-node scripts/merge.mjs path/to/product-folder --only <id> # 구현된 이니셔티브를 본편에 접어 넣기(--apply)
-node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 지도
+node scripts/merge.mjs path/to/product-folder --only <id> # 구현된 추가 기획을 제품 기획에 접어 넣기(--apply)
+node scripts/product-map.mjs path/to/product-folder --html map.html   # 읽기전용 합성 버전
 node scripts/workspace.mjs path/to/product-folder                    # workspace.html + release-map.html
 node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # 필요한 수정 문맥만 조회
 node scripts/apply-change-plan.mjs main.sot.json edit.plan.json      # 드라이런; --apply로 기록

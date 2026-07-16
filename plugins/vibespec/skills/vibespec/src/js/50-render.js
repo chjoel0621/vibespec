@@ -4,9 +4,9 @@ function renderInitiativeBand(){
   const meta=SOT&&SOT.initiative;
   if(!meta){ band.hidden=true; return; }
   band.hidden=false;
-  document.getElementById("ibBadge").textContent=t("이니셔티브","Initiative");
+  document.getElementById("ibBadge").textContent=t("추가 기획","Add-on");
   document.getElementById("ibName").textContent=meta.id||"";
-  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("본편","the main document") : (meta.parent&&meta.parent.scopeId)||"";
+  const parent=meta.parent&&meta.parent.scopeId==="root" ? t("제품 기획","the main document") : (meta.parent&&meta.parent.scopeId)||"";
   document.getElementById("ibParent").textContent=t(`${parent} 기준 · ${meta.productId||""}`,`over ${parent} · ${meta.productId||""}`);
   const st=INIT_STATUS[meta.status]||{t:meta.status,e:meta.status};
   const dot=document.getElementById("ibDot"); dot.className="ib-dot "+(meta.status||"");

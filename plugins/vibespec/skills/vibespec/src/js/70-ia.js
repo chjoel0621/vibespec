@@ -29,7 +29,7 @@ function iaPageLi(p){
   // A boundary stub references a parent page — keep ＋add child (the initiative
   // hangs its own screens here), keep ×delete (re-attach is the user's call).
   return `<li><div class="snode ${cls}${bnd} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
-      <span class="stype">${p.boundary?t('본편 접점','Main boundary'):ptype(p.type)}</span>
+      <span class="stype">${p.boundary?t('제품 기획 접점','Main boundary'):ptype(p.type)}</span>
       <span class="stitle">${esc(p.title)}</span>
       <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="${t('하위 추가','Add child')}">＋</button><button class="mini" data-del-page="${p.id}" title="${t('삭제','Delete')}">×</button></span>
     </div>${kids}</li>`;
@@ -40,10 +40,10 @@ function renderIA(){
   const secLis = SOT.ia.sections.map(s=>{
     const pages = s.pages.length?`<ul>${s.pages.map(iaPageLi).join("")}</ul>`:"";
     // A section boundary mirrors a main section (like a page stub mirrors a main
-    // page): badge it 본편 접점, keep ＋add page (the initiative adds screens to it).
+    // page): badge it 제품 기획 접점, keep ＋add page (the initiative adds screens to it).
     const bnd = s.boundary ? " boundary" : "";
     return `<li><div class="snode sec${bnd} ${s.id===selSec&&!selPage?'sel':''}" data-selsec="${s.id}">
-        <span class="stype">${s.boundary?t('본편 접점 · 섹션','Main boundary · section'):'Depth 1'}</span>
+        <span class="stype">${s.boundary?t('제품 기획 접점 · 섹션','Main boundary · section'):'Depth 1'}</span>
         <span class="stitle">${esc(s.title)}</span>
         <span class="srowbtns"><button class="mini" data-add-toppage="${s.id}" title="${t('페이지 추가','Add page')}">＋</button><button class="mini" data-del-sec="${s.id}" title="${t('섹션 삭제','Delete section')}">×</button></span>
       </div>${pages}</li>`;
@@ -82,10 +82,10 @@ function renderIADetail(){
     // the target, and adds the initiative's screens beneath it (like a page stub).
     if(sec.boundary){
       return `<div class="detail">
-        <div class="dt-title" style="color:var(--sub)">${esc(sec.title)} <span class="boundary-tag">${t('본편 섹션','Main section')}</span></div>
-        <div class="dt-row"><span class="dt-k">${t('본편 접점 · 섹션','Main boundary · section')}</span><span class="dt-v">${esc(sec.boundary.scopeId)}/${esc(sec.boundary.sectionId)}</span></div>
+        <div class="dt-title" style="color:var(--sub)">${esc(sec.title)} <span class="boundary-tag">${t('제품 기획 섹션','Main section')}</span></div>
+        <div class="dt-row"><span class="dt-k">${t('제품 기획 접점 · 섹션','Main boundary · section')}</span><span class="dt-v">${esc(sec.boundary.scopeId)}/${esc(sec.boundary.sectionId)}</span></div>
         <div class="dt-row"><span class="dt-k">${t('페이지','Pages')}</span><span class="dt-v">${countPages(sec.pages)}${t('개','')}</span></div>
-        <div class="ia-boundary-note">${t('본편 섹션을 가리키는 참조입니다. 제목은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브가 이 섹션에 더하는 화면을 추가하세요.','A reference to a section in the main document. Its title is owned there and cannot be edited here. Add the screens this initiative contributes to that section beneath it.')}</div>
+        <div class="ia-boundary-note">${t('제품 기획 섹션을 가리키는 참조입니다. 제목은 제품 기획이 정하므로 여기서 편집할 수 없습니다. 이 아래에 추가 기획이 이 섹션에 더하는 화면을 추가하세요.','A reference to a section in the main document. Its title is owned there and cannot be edited here. Add the screens this initiative contributes to that section beneath it.')}</div>
         <div class="dt-goto"><button class="topbtn" data-add-toppage="${sec.id}">${t('＋ 최상위 페이지 추가','＋ Add top page')}</button>
           <button class="topbtn danger" data-del-sec="${sec.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
       </div>`;
@@ -110,17 +110,17 @@ function renderIADetail(){
     // (validate-sot warns). If it does, the linking UI is hidden — so surface a
     // notice with an explicit clear action rather than trapping the value.
     const strayRefs = (p.refs||[]).length
-      ? `<div class="prd-idnotice">⚠ ${t('이 본편 접점에 이니셔티브 자체 기능 참조가 들어 있습니다','This boundary stub carries the initiative’s own feature refs')}: <b>${(p.refs||[]).map(rid=>esc(refLabel(rid))).join(", ")}</b>. ${t('접점은 본편 화면의 참조라 자체 참조를 두지 않습니다.','A boundary is a reference to a main-document screen and should not hold its own refs.')} <button class="addbtn" data-clear-boundary-refs="${p.id}">${t('기능 참조 비우기','Clear feature refs')}</button></div>`
+      ? `<div class="prd-idnotice">⚠ ${t('이 제품 기획 접점에 추가 기획 자체 기능 참조가 들어 있습니다','This boundary stub carries the initiative’s own feature refs')}: <b>${(p.refs||[]).map(rid=>esc(refLabel(rid))).join(", ")}</b>. ${t('접점은 제품 기획 화면의 참조라 자체 참조를 두지 않습니다.','A boundary is a reference to a main-document screen and should not hold its own refs.')} <button class="addbtn" data-clear-boundary-refs="${p.id}">${t('기능 참조 비우기','Clear feature refs')}</button></div>`
       : "";
     return `<div class="detail">
-      <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('본편','Main')}</span></div>
+      <div class="dt-title" style="color:var(--sub)">${esc(p.title)} <span class="boundary-tag">${t('제품 기획','Main')}</span></div>
       <div class="dt-goto"><button class="topbtn" data-add-page="${p.id}">${t('＋ 하위 화면','＋ Child screen')}</button>
         <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">${t('접점 삭제','Delete boundary')}</button></div>
       <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
       <div class="dt-row"><span class="dt-k">${t('유형','Type')}</span><span class="dt-v">${ptype(p.type)}</span></div>
-      <div class="dt-row"><span class="dt-k">${t('본편 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
+      <div class="dt-row"><span class="dt-k">${t('제품 기획 접점','Main boundary')}</span><span class="dt-v">${esc(p.boundary.scopeId)}/${esc(p.boundary.pageId)}</span></div>
       ${strayRefs}
-      <div class="ia-boundary-note">${t('본편 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 본편이 정하므로 여기서 편집할 수 없습니다. 이 아래에 이니셔티브의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
+      <div class="ia-boundary-note">${t('제품 기획 화면을 가리키는 참조입니다. 제목·타입·기능 연결은 제품 기획이 정하므로 여기서 편집할 수 없습니다. 이 아래에 추가 기획의 하위 화면을 추가하세요.','A reference to a screen in the main document. Its title, type, and feature links are owned there and cannot be edited here. Add the child screens for this initiative beneath it.')}</div>
     </div>`;
   }
   const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${ptype(k)}</option>`).join("");

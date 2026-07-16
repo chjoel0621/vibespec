@@ -19,7 +19,7 @@ function shortHash(d) { return typeof d === "string" ? d.slice(0, 19) + "…" : 
 
 export function printPlan(result, applied) {
   const { plan, unrebasable, alreadyFresh } = result;
-  if (alreadyFresh) { console.log("[rebase] 트리가 이미 최신입니다 — 갱신할 이니셔티브가 없습니다."); return; }
+  if (alreadyFresh) { console.log("[rebase] 트리가 이미 최신입니다 — 갱신할 추가 기획이 없습니다."); return; }
   if (plan.length) {
     console.log(`[rebase] 연쇄 계획 (root→leaf, ${plan.length}개):`);
     for (const step of plan) {
@@ -30,7 +30,7 @@ export function printPlan(result, applied) {
   for (const u of unrebasable) console.error(`  ⚠ ${u.id}: ${u.reason} · ${u.file}`);
   if (applied) {
     const stale = remainingStale(plan, applied);
-    if (stale.length) console.log(`\n⚠ 적용 후에도 stale·비활성으로 남는 이니셔티브: ${stale.join(", ")} — 이들을 복구하려면 부모부터 연쇄 적용하세요.`);
+    if (stale.length) console.log(`\n⚠ 적용 후에도 stale·비활성으로 남는 추가 기획: ${stale.join(", ")} — 이들을 복구하려면 부모부터 연쇄 적용하세요.`);
     else console.log("\n✓ 적용 대상 전체가 연쇄로 복구되어 트리가 최신이 됩니다.");
   } else {
     console.log("\n(드라이런 — 실제 갱신은 --apply. 일부만 원하면 --apply --only <id,...>. 부모 없이 자식만 적용은 거부됩니다.)");

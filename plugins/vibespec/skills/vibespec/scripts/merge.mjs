@@ -22,20 +22,20 @@ export function printPlan(r) {
     return;
   }
   const rep = r.report;
-  console.log(`[merge] "${rep.initiative}" → 본편에 접어 넣기 (landed)`);
+  console.log(`[merge] "${rep.initiative}" → 제품 기획에 접어 넣기 (landed)`);
   if (rep.addedSections.length) console.log(`  섹션: ${rep.addedSections.join(", ")}`);
   if (rep.addedPages.length) console.log(`  페이지: ${rep.addedPages.join(", ")}`);
   if (rep.addedRequirements.length) console.log(`  요구사항: ${rep.addedRequirements.join(", ")}`);
   if (rep.addedFeatures.length) console.log(`  기능: ${rep.addedFeatures.join(", ")}`);
   if (rep.attachedAt.length) console.log(`  접점: ${rep.attachedAt.map(a => a.at).join(", ")}`);
-  if (rep.mergedInScope.length) console.log(`  본편 inScope에 추가됨: ${rep.mergedInScope.map(s => JSON.stringify(s)).join(", ")}`);
+  if (rep.mergedInScope.length) console.log(`  제품 기획 inScope에 추가됨: ${rep.mergedInScope.map(s => JSON.stringify(s)).join(", ")}`);
   const keys = Object.keys(rep.manualPrdReview);
   if (keys.length) {
-    console.log(`  ⚠ PRD 수동 검토 필요(자동 병합 안 됨 — 본편에 사람이 반영): ${keys.join(", ")}`);
+    console.log(`  ⚠ PRD 수동 검토 필요(자동 병합 안 됨 — 제품 기획에 사람이 반영): ${keys.join(", ")}`);
     console.log(`    ${JSON.stringify(rep.manualPrdReview)}`);
-    if (rep.manualPrdReview.kpis || rep.manualPrdReview.scenarios) console.log("    (kpi refs·scenario start는 본편 id로 재번호되어 있음)");
+    if (rep.manualPrdReview.kpis || rep.manualPrdReview.scenarios) console.log("    (kpi refs·scenario start는 제품 기획 id로 재번호되어 있음)");
   }
-  if (r.staleSiblings.length) console.log(`\n⚠ 머지 후 stale이 되는 본편 이니셔티브: ${r.staleSiblings.join(", ")} — rebase로 갱신하세요.`);
+  if (r.staleSiblings.length) console.log(`\n⚠ 머지 후 stale이 되는 제품 기획 추가 기획: ${r.staleSiblings.join(", ")} — rebase로 갱신하세요.`);
 }
 
 async function main(argv) {
@@ -62,7 +62,7 @@ async function main(argv) {
   if (apply) {
     writeFileSync(r.mainName, stableStringify(r.main));
     writeFileSync(r.landedName, stableStringify(r.landed));
-    if (!json) console.log(`\n[merge] 적용 완료: 본편 갱신(${r.mainName}) + 이니셔티브 landed 표시(${r.landedName}).${r.staleSiblings.length ? " 이제 rebase로 나머지를 갱신하세요." : ""}`);
+    if (!json) console.log(`\n[merge] 적용 완료: 제품 기획 갱신(${r.mainName}) + 추가 기획 landed 표시(${r.landedName}).${r.staleSiblings.length ? " 이제 rebase로 나머지를 갱신하세요." : ""}`);
   } else if (!json) {
     console.log("\n(드라이런 — 실제 적용은 --apply.)");
   }

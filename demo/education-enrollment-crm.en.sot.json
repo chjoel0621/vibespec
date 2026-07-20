@@ -26,16 +26,30 @@
         "role": "Operations administrator",
         "needs": "Manage priority and history and review operations metrics.",
         "pain": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult."
+      },
+      {
+        "name": "System and policy administrator",
+        "role": "Operations and security administrator",
+        "needs": "Manage access, policy, and audit history.",
+        "pain": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult."
       }
     ],
     "scenarios": [
       {
-        "text": "Admissions or course advisor completes course inquiry and consultation-request capture and checks progress.",
+        "text": "An operational user registers required work and checks its status.",
         "start": "P1"
       },
       {
-        "text": "Education operations and admissions coordinator reviews inquiry source, consultation conversion, and enrollment-performance reporting by course.",
-        "start": "P4"
+        "text": "An operator processes queued work and handles exceptions.",
+        "start": "P5"
+      },
+      {
+        "text": "System and policy administrator reviews policy and access.",
+        "start": "P9"
+      },
+      {
+        "text": "System and policy administrator reviews audit records and operating metrics.",
+        "start": "P10"
       }
     ],
     "northStar": "Share of operations requests completed on time",
@@ -44,18 +58,27 @@
         "name": "On-time processing rate",
         "target": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
         "baseline": "Not measured",
-        "method": "Monthly aggregation of completion history against target dates",
+        "method": "Monthly aggregation of state changes against target dates",
         "refs": [
-          "F3"
+          "F6"
         ]
       },
       {
         "name": "Operations visibility",
-        "target": "100% of key requests tracked",
+        "target": "100% of key work tracked",
         "baseline": "Not measured",
-        "method": "Share of registered requests connected to operations reporting",
+        "method": "Share of records connected to reporting",
         "refs": [
-          "F4"
+          "F11"
+        ]
+      },
+      {
+        "name": "Auditable operations rate",
+        "target": "100% of key changes retained",
+        "baseline": "Not measured",
+        "method": "Monthly audit-log and change-history review",
+        "refs": [
+          "F12"
         ]
       }
     ],
@@ -63,7 +86,15 @@
       "Course inquiry and consultation-request capture",
       "Learner interest, consultation, application, and enrollment-status lookup",
       "Advisor assignment, course recommendation, application-document, and enrollment-progress management",
-      "Inquiry source, consultation conversion, and enrollment-performance reporting by course"
+      "Inquiry source, consultation conversion, and enrollment-performance reporting by course",
+      "Course inquiry and consultation-request capture validation and duplicate prevention",
+      "Search, filter, and history management",
+      "Owner, priority, and SLA management",
+      "Approval and policy review",
+      "Exception, rejection, and reprocessing",
+      "Notifications and subscriptions",
+      "External integration and data synchronization",
+      "Role, permission, and audit management"
     ],
     "nonGoals": [
       "External customer portal",
@@ -83,19 +114,20 @@
     ],
     "constraints": [
       "State, owner, and priority changes require audit logs.",
-      "Access is limited by role."
+      "Access is limited by role.",
+      "Permission, policy, and state changes require audit logs."
     ]
   },
   "requirements": [
     {
       "id": "R1",
-      "title": "Intake and status lookup",
+      "title": "Intake and data quality",
       "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Users can provide required context and view the current state.",
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
           "done": false
         }
       ],
@@ -108,17 +140,27 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Users can provide required context and view the current state.",
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Required context and validation",
+              "title": "Course inquiry and consultation-request capture core processing rule",
               "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
               "acceptance": [
                 {
-                  "text": "Users can provide required context and view the current state.",
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Course inquiry and consultation-request capture exception and audit handling",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
                   "done": false
                 }
               ]
@@ -127,23 +169,33 @@
         },
         {
           "id": "F2",
-          "title": "Learner interest, consultation, application, and enrollment-status lookup",
+          "title": "Course inquiry and consultation-request capture validation and duplicate prevention",
           "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Users can provide required context and view the current state.",
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "State and history lookup",
+              "title": "Course inquiry and consultation-request capture validation and duplicate prevention core processing rule",
               "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
               "acceptance": [
                 {
-                  "text": "Users can provide required context and view the current state.",
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Course inquiry and consultation-request capture validation and duplicate prevention exception and audit handling",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
                   "done": false
                 }
               ]
@@ -154,36 +206,46 @@
     },
     {
       "id": "R2",
-      "title": "Processing and operations analysis",
+      "title": "Records and search",
       "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Users can provide required context and view the current state.",
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
           "done": false
         }
       ],
       "features": [
         {
           "id": "F3",
-          "title": "Advisor assignment, course recommendation, application-document, and enrollment-progress management",
-          "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+          "title": "Learner interest, consultation, application, and enrollment-status lookup",
+          "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Processing ownership and state-change history are retained.",
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Processing policy and history",
-              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+              "title": "Learner interest, consultation, application, and enrollment-status lookup core processing rule",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
               "acceptance": [
                 {
-                  "text": "Processing ownership and state-change history are retained.",
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Learner interest, consultation, application, and enrollment-status lookup exception and audit handling",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
                   "done": false
                 }
               ]
@@ -192,23 +254,373 @@
         },
         {
           "id": "F4",
-          "title": "Inquiry source, consultation conversion, and enrollment-performance reporting by course",
-          "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+          "title": "Search, filter, and history management",
+          "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
           "status": "todo",
-          "priority": "mid",
+          "priority": "high",
           "acceptance": [
             {
-              "text": "Operators can filter metrics by period and category.",
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Operations metrics",
+              "title": "Search, filter, and history management core processing rule",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Search, filter, and history management exception and audit handling",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Processing and ownership",
+      "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F5",
+          "title": "Advisor assignment, course recommendation, application-document, and enrollment-progress management",
+          "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Advisor assignment, course recommendation, application-document, and enrollment-progress management core processing rule",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Advisor assignment, course recommendation, application-document, and enrollment-progress management exception and audit handling",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F6",
+          "title": "Owner, priority, and SLA management",
+          "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Owner, priority, and SLA management core processing rule",
               "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
               "acceptance": [
                 {
-                  "text": "Operators can filter metrics by period and category.",
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Owner, priority, and SLA management exception and audit handling",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Approval and exceptions",
+      "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F7",
+          "title": "Approval and policy review",
+          "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Approval and policy review core processing rule",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Approval and policy review exception and audit handling",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F8",
+          "title": "Exception, rejection, and reprocessing",
+          "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Exception, rejection, and reprocessing core processing rule",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Exception, rejection, and reprocessing exception and audit handling",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "Notifications and integrations",
+      "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F9",
+          "title": "Notifications and subscriptions",
+          "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Notifications and subscriptions core processing rule",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Notifications and subscriptions exception and audit handling",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F10",
+          "title": "External integration and data synchronization",
+          "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "External integration and data synchronization core processing rule",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "External integration and data synchronization exception and audit handling",
+              "desc": "Connect learner goals, course interest, consultation and application history, enrollment stages, and course performance. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Insights and controls",
+      "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F11",
+          "title": "Inquiry source, consultation conversion, and enrollment-performance reporting by course",
+          "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Inquiry source, consultation conversion, and enrollment-performance reporting by course core processing rule",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Inquiry source, consultation conversion, and enrollment-performance reporting by course exception and audit handling",
+              "desc": "Inquiries, consultation notes, application documents, and enrollment status are scattered, making tailored course advice and follow-up difficult. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F12",
+          "title": "Role, permission, and audit management",
+          "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Role, permission, and audit management core processing rule",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Role, permission, and audit management exception and audit handling",
+              "desc": "Increase consultation-to-enrollment conversion by 15% and standardize applicant follow-up. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
                   "done": false
                 }
               ]
@@ -222,25 +634,48 @@
     "sections": [
       {
         "id": "S1",
-        "title": "Intake and status lookup",
+        "title": "Intake and data quality",
         "pages": [
           {
             "id": "P1",
-            "title": "Overview dashboard",
+            "title": "Operations dashboard",
             "type": "top",
             "refs": [
               "F1",
-              "F1:0"
+              "F1:0",
+              "F3",
+              "F4:0",
+              "F7:1",
+              "F11"
             ],
             "children": []
           },
           {
             "id": "P2",
-            "title": "Request or record detail",
+            "title": "Work list",
             "type": "page",
             "refs": [
+              "F3",
+              "F3:0",
+              "F4",
+              "F1:0",
+              "F4:1",
+              "F8",
+              "F11:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P3",
+            "title": "Create record",
+            "type": "page",
+            "refs": [
+              "F1",
+              "F1:1",
               "F2",
-              "F2:0"
+              "F5",
+              "F8:0",
+              "F11:1"
             ],
             "children": []
           }
@@ -248,25 +683,116 @@
       },
       {
         "id": "S2",
-        "title": "Processing and operations analysis",
+        "title": "Records and search",
         "pages": [
           {
-            "id": "P3",
-            "title": "Processing workspace",
-            "type": "top",
+            "id": "P4",
+            "title": "Record detail",
+            "type": "page",
             "refs": [
-              "F3",
-              "F3:0"
+              "F3:1",
+              "F4:1",
+              "F11",
+              "F2",
+              "F5:0",
+              "F8:1",
+              "F12"
             ],
             "children": []
           },
           {
-            "id": "P4",
-            "title": "Operations report",
+            "id": "P5",
+            "title": "Processing workspace",
             "type": "page",
             "refs": [
+              "F5",
+              "F5:0",
+              "F6",
+              "F2:0",
+              "F5:1",
+              "F9",
+              "F12:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Processing and ownership",
+        "pages": [
+          {
+            "id": "P6",
+            "title": "Approval and exception queue",
+            "type": "page",
+            "refs": [
+              "F7",
+              "F7:0",
+              "F8",
+              "F2:1",
+              "F6",
+              "F9:0",
+              "F12:1"
+            ],
+            "children": []
+          },
+          {
+            "id": "P7",
+            "title": "Notifications and integrations",
+            "type": "page",
+            "refs": [
+              "F9",
+              "F9:0",
+              "F10",
+              "F3",
+              "F6:0",
+              "F9:1"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Insights and controls",
+        "pages": [
+          {
+            "id": "P8",
+            "title": "Operations reports",
+            "type": "page",
+            "refs": [
+              "F11",
+              "F11:0",
+              "F3:0",
+              "F6:1",
+              "F10"
+            ],
+            "children": []
+          },
+          {
+            "id": "P9",
+            "title": "Policy and access settings",
+            "type": "page",
+            "refs": [
+              "F10:1",
+              "F12",
+              "F3:1",
+              "F7",
+              "F10:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P10",
+            "title": "Audit log",
+            "type": "page",
+            "refs": [
+              "F8:1",
+              "F12:0",
+              "F12:1",
               "F4",
-              "F4:0"
+              "F7:0",
+              "F10:1"
             ],
             "children": []
           }
@@ -294,8 +820,48 @@
       },
       {
         "from": "P4",
-        "to": "P1",
+        "to": "P5",
         "ref": "F4"
+      },
+      {
+        "from": "P5",
+        "to": "P6",
+        "ref": "F5"
+      },
+      {
+        "from": "P6",
+        "to": "P5",
+        "ref": "F8"
+      },
+      {
+        "from": "P5",
+        "to": "P7",
+        "ref": "F6"
+      },
+      {
+        "from": "P7",
+        "to": "P8",
+        "ref": "F9"
+      },
+      {
+        "from": "P8",
+        "to": "P9",
+        "ref": "F10"
+      },
+      {
+        "from": "P9",
+        "to": "P10",
+        "ref": "F12"
+      },
+      {
+        "from": "P10",
+        "to": "P4",
+        "ref": "F11"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "label": "Refresh operations status"
       }
     ]
   }

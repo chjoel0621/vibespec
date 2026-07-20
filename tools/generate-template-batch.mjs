@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { deepenSot } from './deepen-sot.mjs';
 
 const vibeRoot = 'C:/VibeSpec';
 const marketingRoot = 'C:/VibeSpec-Marketing';
@@ -111,7 +112,7 @@ function locale(config, lang) {
 const allSystems = [...systems, ...industryCrmSystems, ...coreItSystems, ...coreItSystems2];
 
 for (const config of allSystems) {
-  for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(sot(config, lang), null, 2) + '\n');
+  for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang)), null, 2) + '\n');
 }
 await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
 await writeFile(resolve(marketingRoot, 'content', 'batch-templates.json'), JSON.stringify({ templates: allSystems.map((config) => ({ slug: config.slug, published: '2026-07-20', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } })) }, null, 2) + '\n');

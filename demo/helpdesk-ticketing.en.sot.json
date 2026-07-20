@@ -1,1 +1,873 @@
-{"schemaVersion":"1.0","title":"Internal IT Help Desk and Ticketing System","lang":"en","prd":{"oneLiner":"A help-desk system that connects employee IT and facilities requests, assignment, SLA, resolution records, knowledge articles, and operations analysis.","goal":"Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.","whyNow":"Requests across multiple channels leave priority and ownership unclear, while the same problems are solved repeatedly.","category":"Workplace operations / IT service management","platforms":["Web"],"problem":"Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.","solution":"Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.","alternatives":"Email, chat, shared spreadsheets, and verbal requests.","differentiator":"Connect ticket handling with reusable knowledge and analysis of SLA and repeated issues.","targets":[{"name":"Requester","role":"Employee","needs":"Quickly submit a problem and know its status and resolution path.","pain":"They cannot tell who owns their request or when it will be solved."},{"name":"Support agent","role":"IT or workplace help desk","needs":"Receive prioritized work and leave a reusable resolution history.","pain":"Duplicate tickets and incomplete context increase handling time."}],"scenarios":[{"text":"An employee searches for a VPN answer, then submits a prioritized ticket with a screenshot when it does not resolve the issue.","start":"P1"},{"text":"A support lead reviews SLA-risk tickets and reassigns ownership.","start":"P5"}],"northStar":"Share of tickets resolved within SLA","kpis":[{"name":"SLA-compliant resolution rate","target":"90% or more within three months","baseline":"Not measured","method":"Tickets resolved within SLA ÷ all resolved tickets","refs":["F4"]},{"name":"Self-service resolution rate","target":"20% or more within three months","baseline":"Not measured","method":"Sessions that view a knowledge article without creating a ticket","refs":["F5"]}],"inScope":["Request portal and ticket creation and review","Category, priority, owner, SLA, and status management","Comments, attachments, resolution records, and notifications","Knowledge articles plus ticket and SLA operations reporting"],"nonGoals":["External customer support","Remote desktop control","Automated incident on-call"],"assumptions":["Employee and support-team data are available through company SSO.","Support administrators manage request categories and SLA policies."],"risks":["Weak initial routing rules may assign tickets to the wrong queue.","Stale knowledge articles may reduce trust in self-service."],"openQuestions":["What defines an urgent request and its approval path?","How long should requester confirmation remain open before automatic closure?"],"constraints":["Ticket status, owner, and priority changes require audit logs.","Attachments follow organization security policy."]},"requirements":[{"id":"R1","title":"Request intake and self-service","desc":"Employees search knowledge and create a ticket with required context.","status":"todo","priority":"high","acceptance":[{"text":"A requester can see a ticket number and current state.","done":false}],"features":[{"id":"F1","title":"Request portal and ticket creation","desc":"Create a ticket with category, priority, description, and attachments.","status":"todo","priority":"high","acceptance":[{"text":"Missing required information is explained before save.","done":false}],"specs":[{"title":"Category and priority","desc":"Choose request type and impact to set initial priority.","acceptance":[{"text":"Urgent tickets receive a dedicated queue and instruction.","done":false}]}]},{"id":"F2","title":"My tickets and communication","desc":"Requesters view status, comments, attachments, and resolution detail.","status":"todo","priority":"high","acceptance":[{"text":"A requester can comment on and attach information to their ticket.","done":false}],"specs":[{"title":"Status notifications","desc":"Notify intake, assignment, pending, resolved, and closed changes.","acceptance":[{"text":"Each notice includes the ticket number and next action.","done":false}]}]}]},{"id":"R2","title":"Support operations and knowledge","desc":"Support teams assign and resolve tickets, then turn repeated solutions into knowledge.","status":"todo","priority":"high","acceptance":[{"text":"A support lead can manage queues by priority and SLA.","done":false}],"features":[{"id":"F3","title":"Queues and assignment","desc":"Assign or reassign tickets by category, priority, and skill.","status":"todo","priority":"high","acceptance":[{"text":"Owner change history and reason remain on the ticket.","done":false}],"specs":[{"title":"SLA timer","desc":"Calculate response and resolution targets and flag approaching or breached tickets.","acceptance":[{"text":"SLA policy applies by request type and priority.","done":false}]}]},{"id":"F4","title":"Resolution and closure","desc":"Agents record a fix and close after requester confirmation.","status":"todo","priority":"high","acceptance":[{"text":"Resolved tickets retain a resolution summary and handling time.","done":false}],"specs":[{"title":"Resolution confirmation","desc":"Allow requester confirmation or close automatically after a defined period.","acceptance":[{"text":"Closed tickets can be reopened with a reason.","done":false}]}]},{"id":"F5","title":"Knowledge and operations dashboard","desc":"Publish reusable solutions and review ticket and SLA trends.","status":"todo","priority":"mid","acceptance":[{"text":"Operators can filter resolution and SLA metrics by period, category, and owner.","done":false}],"specs":[{"title":"Knowledge linkage","desc":"Create reusable articles from resolved tickets and search them in the portal.","acceptance":[{"text":"Operators can see linked tickets and article-view counts.","done":false}]}]}]}],"ia":{"sections":[{"id":"S1","title":"Employee requests","pages":[{"id":"P1","title":"Request portal","type":"top","refs":["F1","F1:0"],"children":[]},{"id":"P2","title":"My ticket detail","type":"page","refs":["F2","F2:0"],"children":[]}]},{"id":"S2","title":"Support operations","pages":[{"id":"P3","title":"Support queue","type":"top","refs":["F3","F3:0"],"children":[]},{"id":"P4","title":"Ticket resolution","type":"page","refs":["F4","F4:0"],"children":[]}]},{"id":"S3","title":"Knowledge and analysis","pages":[{"id":"P5","title":"Knowledge and operations dashboard","type":"top","refs":["F5","F5:0"],"children":[]}]}]},"flow":{"start":"P1","transitions":[{"from":"P1","to":"P2","ref":"F1"},{"from":"P2","to":"P3","ref":"F3"},{"from":"P3","to":"P4","ref":"F4"},{"from":"P4","to":"P2","ref":"F2"},{"from":"P5","to":"P1","ref":"F5"}]}}
+{
+  "schemaVersion": "1.0",
+  "title": "Internal IT Help Desk and Ticketing System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "A help-desk system that connects employee IT and facilities requests, assignment, SLA, resolution records, knowledge articles, and operations analysis.",
+    "goal": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+    "whyNow": "Requests across multiple channels leave priority and ownership unclear, while the same problems are solved repeatedly.",
+    "category": "Workplace operations / IT service management",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+    "solution": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+    "alternatives": "Email, chat, shared spreadsheets, and verbal requests.",
+    "differentiator": "Connect ticket handling with reusable knowledge and analysis of SLA and repeated issues.",
+    "targets": [
+      {
+        "name": "Requester",
+        "role": "Employee",
+        "needs": "Quickly submit a problem and know its status and resolution path.",
+        "pain": "They cannot tell who owns their request or when it will be solved."
+      },
+      {
+        "name": "Support agent",
+        "role": "IT or workplace help desk",
+        "needs": "Receive prioritized work and leave a reusable resolution history.",
+        "pain": "Duplicate tickets and incomplete context increase handling time."
+      },
+      {
+        "name": "System and policy administrator",
+        "role": "Operations and security administrator",
+        "needs": "Manage access, policy, and audit history.",
+        "pain": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "An employee searches for a VPN answer, then submits a prioritized ticket with a screenshot when it does not resolve the issue.",
+        "start": "P1"
+      },
+      {
+        "text": "A support lead reviews SLA-risk tickets and reassigns ownership.",
+        "start": "P5"
+      },
+      {
+        "text": "System and policy administrator reviews policy and exception handling status.",
+        "start": "P9"
+      },
+      {
+        "text": "System and policy administrator reviews policy and exception handling status.",
+        "start": "P6"
+      }
+    ],
+    "northStar": "Share of tickets resolved within SLA",
+    "kpis": [
+      {
+        "name": "SLA-compliant resolution rate",
+        "target": "90% or more within three months",
+        "baseline": "Not measured",
+        "method": "Tickets resolved within SLA ÷ all resolved tickets",
+        "refs": [
+          "F4"
+        ]
+      },
+      {
+        "name": "Self-service resolution rate",
+        "target": "20% or more within three months",
+        "baseline": "Not measured",
+        "method": "Sessions that view a knowledge article without creating a ticket",
+        "refs": [
+          "F5"
+        ]
+      },
+      {
+        "name": "Auditable operations rate",
+        "target": "100% of key changes retained",
+        "baseline": "Not measured",
+        "method": "Monthly audit-log and change-history review",
+        "refs": [
+          "F12"
+        ]
+      }
+    ],
+    "inScope": [
+      "Request portal and ticket creation and review",
+      "Category, priority, owner, SLA, and status management",
+      "Comments, attachments, resolution records, and notifications",
+      "Knowledge articles plus ticket and SLA operations reporting",
+      "Request portal and ticket creation",
+      "Request portal and ticket creation validation and duplicate prevention",
+      "My tickets and communication",
+      "Search, filter, and history management",
+      "Queues and assignment",
+      "Owner, priority, and SLA management",
+      "Approval and policy review",
+      "Exception, rejection, and reprocessing",
+      "Notifications and subscriptions",
+      "External integration and data synchronization",
+      "Resolution and closure",
+      "Role, permission, and audit management"
+    ],
+    "nonGoals": [
+      "External customer support",
+      "Remote desktop control",
+      "Automated incident on-call"
+    ],
+    "assumptions": [
+      "Employee and support-team data are available through company SSO.",
+      "Support administrators manage request categories and SLA policies."
+    ],
+    "risks": [
+      "Weak initial routing rules may assign tickets to the wrong queue.",
+      "Stale knowledge articles may reduce trust in self-service."
+    ],
+    "openQuestions": [
+      "What defines an urgent request and its approval path?",
+      "How long should requester confirmation remain open before automatic closure?"
+    ],
+    "constraints": [
+      "Ticket status, owner, and priority changes require audit logs.",
+      "Attachments follow organization security policy.",
+      "Permission, policy, and state changes require audit logs."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and data quality",
+      "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Request portal and ticket creation",
+          "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Request portal and ticket creation core processing rule",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Request portal and ticket creation exception and audit handling",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Request portal and ticket creation validation and duplicate prevention",
+          "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Request portal and ticket creation validation and duplicate prevention core processing rule",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Request portal and ticket creation validation and duplicate prevention exception and audit handling",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Records and search",
+      "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Request portal and ticket creation validation and duplicate prevention",
+          "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Request portal and ticket creation validation and duplicate prevention core processing rule",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Request portal and ticket creation validation and duplicate prevention exception and audit handling",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Search, filter, and history management",
+          "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Search, filter, and history management core processing rule",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Search, filter, and history management exception and audit handling",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Processing and ownership",
+      "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F5",
+          "title": "My tickets and communication",
+          "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "My tickets and communication core processing rule",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "My tickets and communication exception and audit handling",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F6",
+          "title": "Owner, priority, and SLA management",
+          "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Owner, priority, and SLA management core processing rule",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Owner, priority, and SLA management exception and audit handling",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Approval and exceptions",
+      "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F7",
+          "title": "Approval and policy review",
+          "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Approval and policy review core processing rule",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Approval and policy review exception and audit handling",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F8",
+          "title": "Exception, rejection, and reprocessing",
+          "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Exception, rejection, and reprocessing core processing rule",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Exception, rejection, and reprocessing exception and audit handling",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "Notifications and integrations",
+      "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F9",
+          "title": "Notifications and subscriptions",
+          "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Notifications and subscriptions core processing rule",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Notifications and subscriptions exception and audit handling",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F10",
+          "title": "External integration and data synchronization",
+          "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "External integration and data synchronization core processing rule",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "External integration and data synchronization exception and audit handling",
+              "desc": "Provide a request portal, category and priority, queues and assignment, SLA and status notifications, resolution records, knowledge articles, and an operations dashboard. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Insights and controls",
+      "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F11",
+          "title": "Search, filter, and history management",
+          "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Search, filter, and history management core processing rule",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Search, filter, and history management exception and audit handling",
+              "desc": "Employees cannot easily track request status or expected resolution, and support teams manually chase delayed or repeated issues. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F12",
+          "title": "Role, permission, and audit management",
+          "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Role, permission, and audit management core processing rule",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Role, permission, and audit management exception and audit handling",
+              "desc": "Move 70% of email and chat requests into tickets and achieve 90% or more SLA-compliant resolutions within three months. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and data quality",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Operations dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0",
+              "F3",
+              "F4:0",
+              "F7:1",
+              "F11"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Work list",
+            "type": "page",
+            "refs": [
+              "F3",
+              "F3:0",
+              "F4",
+              "F1:0",
+              "F4:1",
+              "F8",
+              "F11:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P3",
+            "title": "Create record",
+            "type": "page",
+            "refs": [
+              "F1",
+              "F1:1",
+              "F2",
+              "F5",
+              "F8:0",
+              "F11:1"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Records and search",
+        "pages": [
+          {
+            "id": "P4",
+            "title": "Record detail",
+            "type": "page",
+            "refs": [
+              "F3:1",
+              "F4:1",
+              "F11",
+              "F2",
+              "F5:0",
+              "F8:1",
+              "F12"
+            ],
+            "children": []
+          },
+          {
+            "id": "P5",
+            "title": "Processing workspace",
+            "type": "page",
+            "refs": [
+              "F5",
+              "F5:0",
+              "F6",
+              "F2:0",
+              "F5:1",
+              "F9",
+              "F12:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Processing and ownership",
+        "pages": [
+          {
+            "id": "P6",
+            "title": "Approval and exception queue",
+            "type": "page",
+            "refs": [
+              "F7",
+              "F7:0",
+              "F8",
+              "F2:1",
+              "F6",
+              "F9:0",
+              "F12:1"
+            ],
+            "children": []
+          },
+          {
+            "id": "P7",
+            "title": "Notifications and integrations",
+            "type": "page",
+            "refs": [
+              "F9",
+              "F9:0",
+              "F10",
+              "F3",
+              "F6:0",
+              "F9:1"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Insights and controls",
+        "pages": [
+          {
+            "id": "P8",
+            "title": "Operations reports",
+            "type": "page",
+            "refs": [
+              "F11",
+              "F11:0",
+              "F3:0",
+              "F6:1",
+              "F10"
+            ],
+            "children": []
+          },
+          {
+            "id": "P9",
+            "title": "Policy and access settings",
+            "type": "page",
+            "refs": [
+              "F10:1",
+              "F12",
+              "F3:1",
+              "F7",
+              "F10:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P10",
+            "title": "Audit log",
+            "type": "page",
+            "refs": [
+              "F8:1",
+              "F12:0",
+              "F12:1",
+              "F4",
+              "F7:0",
+              "F10:1"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P5",
+        "ref": "F4"
+      },
+      {
+        "from": "P5",
+        "to": "P6",
+        "ref": "F5"
+      },
+      {
+        "from": "P6",
+        "to": "P5",
+        "ref": "F8"
+      },
+      {
+        "from": "P5",
+        "to": "P7",
+        "ref": "F6"
+      },
+      {
+        "from": "P7",
+        "to": "P8",
+        "ref": "F9"
+      },
+      {
+        "from": "P8",
+        "to": "P9",
+        "ref": "F10"
+      },
+      {
+        "from": "P9",
+        "to": "P10",
+        "ref": "F12"
+      },
+      {
+        "from": "P10",
+        "to": "P4",
+        "ref": "F11"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "label": "Refresh operations status"
+      }
+    ]
+  }
+}

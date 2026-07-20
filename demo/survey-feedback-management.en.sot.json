@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Survey and Feedback Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+    "goal": "Improve key-survey response rate and achieve 90% or more follow-up completion.",
+    "whyNow": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change.",
+    "solution": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "User responding to a survey or submitting feedback",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change."
+      },
+      {
+        "name": "Product, HR, or CX research operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "User responding to a survey or submitting feedback completes survey creation, distribution, and feedback submission and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "Product, HR, or CX research operations coordinator reviews response rate, satisfaction, theme, and follow-up completion reporting.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Improve key-survey response rate and achieve 90% or more follow-up completion.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "Survey creation, distribution, and feedback submission",
+      "Survey, response, segment, and follow-up-status lookup",
+      "Audience selection, distribution, response analysis, and follow-up assignment",
+      "Response rate, satisfaction, theme, and follow-up completion reporting"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Survey creation, distribution, and feedback submission",
+          "desc": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Survey, response, segment, and follow-up-status lookup",
+          "desc": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Surveys, customer and employee feedback, analysis results, and improvement work are separated, so input rarely turns into visible change.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Audience selection, distribution, response analysis, and follow-up assignment",
+          "desc": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect survey design, audiences, responses, segment analysis, insights, and follow-up work.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Response rate, satisfaction, theme, and follow-up completion reporting",
+          "desc": "Improve key-survey response rate and achieve 90% or more follow-up completion.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Improve key-survey response rate and achieve 90% or more follow-up completion.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "IT Change Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+    "goal": "Achieve 95% or more advance-review coverage for high-risk changes.",
+    "whyNow": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct.",
+    "solution": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Engineering or operations employee requesting a system change",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct."
+      },
+      {
+        "name": "IT change and service operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "Engineering or operations employee requesting a system change completes change request, impact analysis, and implementation-plan submission and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "IT change and service operations coordinator reviews change success, emergency change, and failure-cause reporting.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Achieve 95% or more advance-review coverage for high-risk changes.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "Change request, impact analysis, and implementation-plan submission",
+      "Change, service, risk, approval, and deployment-status lookup",
+      "Risk assessment, change review, approval, implementation, and rollback verification",
+      "Change success, emergency change, and failure-cause reporting"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Change request, impact analysis, and implementation-plan submission",
+          "desc": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Change, service, risk, approval, and deployment-status lookup",
+          "desc": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Change requests, risk assessments, approvals, and deployment history are separated, making incident and audit context difficult to reconstruct.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Risk assessment, change review, approval, implementation, and rollback verification",
+          "desc": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect change requests, impacted services, risks and approvals, implementation schedules, rollback, and post-change review.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Change success, emergency change, and failure-cause reporting",
+          "desc": "Achieve 95% or more advance-review coverage for high-risk changes.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Achieve 95% or more advance-review coverage for high-risk changes.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

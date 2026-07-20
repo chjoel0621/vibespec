@@ -17,7 +17,26 @@ const deepEnough = (sot) => {
     && (sot.flow?.transitions?.length ?? 0) >= 10;
 };
 
+function ensureFlowTriggers(sot) {
+  const features = sot.requirements?.flatMap((requirement) => requirement.features ?? []) ?? [];
+  const present = new Set((sot.flow?.transitions ?? []).map((transition) => transition.ref).filter(Boolean));
+  const missing = features.map((feature) => feature.id).filter((id) => !present.has(id));
+  if (!missing.length) return sot;
+
+  const pages = sot.ia?.sections?.flatMap((section) => section.pages ?? []) ?? [];
+  const pageIds = new Set(pages.map((page) => page.id));
+  const transitions = [...(sot.flow?.transitions ?? [])];
+  for (const id of missing) {
+    const approvalFlow = id === 'F7' && pageIds.has('P5') && pageIds.has('P6');
+    const source = approvalFlow ? 'P5' : (pages.find((page) => page.refs?.includes(id))?.id ?? pages[0]?.id);
+    const destination = approvalFlow ? 'P6' : pages.find((page) => page.id !== source)?.id;
+    if (source && destination && source !== destination) transitions.push({ from: source, to: destination, ref: id });
+  }
+  return { ...sot, flow: { ...sot.flow, transitions } };
+}
+
 export function deepenSot(sot) {
+  sot = ensureFlowTriggers(sot);
   const covered = new Set(sot.ia?.sections?.flatMap((section) => (section.pages ?? []).flatMap((page) => page.refs ?? [])) ?? []);
   const completeCoverage = sot.requirements?.flatMap((requirement) => (requirement.features ?? []).flatMap((feature) => [feature.id, ...(feature.specs ?? []).map((_, index) => `${feature.id}:${index}`)])).every((ref) => covered.has(ref));
   const pageIds = new Set(sot.ia?.sections?.flatMap((section) => (section.pages ?? []).map((page) => page.id)) ?? []);
@@ -44,7 +63,7 @@ export function deepenSot(sot) {
   const targets = [...(p.targets ?? [])]; if (targets.length < 3) targets.push({ name: labels.admin, role: ko ? '운영·보안 관리자' : 'Operations and security administrator', needs: labels.adminNeed, pain: p.problem });
   const scenarios = [{ text: ko ? '실무 사용자는 필요한 업무를 등록하고 상태를 확인한다.' : 'An operational user registers required work and checks its status.', start:'P1' }, { text: ko ? '운영 담당자는 대기 업무를 처리하고 예외를 조치한다.' : 'An operator processes queued work and handles exceptions.', start:'P5' }, { text: ko ? `${labels.admin}는 정책과 권한을 검토한다.` : `${labels.admin} reviews policy and access.`, start:'P9' }, { text: ko ? `${labels.admin}는 감사 기록과 운영 지표를 검토한다.` : `${labels.admin} reviews audit records and operating metrics.`, start:'P10' }];
   const kpis = [{ name: ko ? '기한 내 처리 비율' : 'On-time processing rate', target:p.goal, baseline:ko?'측정 전':'Not measured', method:ko?'상태 변경과 목표 기한을 월별 집계':'Monthly aggregation of state changes against target dates', refs:['F6'] }, { name: ko ? '운영 가시성' : 'Operations visibility', target:ko?'핵심 업무 100% 추적':'100% of key work tracked', baseline:ko?'측정 전':'Not measured', method:ko?'등록 기록과 리포트 연결 비율':'Share of records connected to reporting', refs:['F11'] }, { name: ko ? '감사 가능 운영 비율' : 'Auditable operations rate', target:ko?'핵심 변경 100% 기록':'100% of key changes retained', baseline:ko?'측정 전':'Not measured', method:ko?'감사 로그와 변경 이력 월별 점검':'Monthly audit-log and change-history review', refs:['F12'] }];
-  return { ...sot, prd: { ...p, targets, scenarios, kpis, inScope: [...new Set([...(p.inScope ?? []), ...labels.names])], constraints: [...new Set([...(p.constraints ?? []), ko ? '권한, 정책, 상태 변경은 감사 로그로 남긴다.' : 'Permission, policy, and state changes require audit logs.'])] }, requirements, ia: { sections: [{ id:'S1',title:labels.req[0],pages:pages.slice(0,3) },{ id:'S2',title:labels.req[1],pages:pages.slice(3,5) },{ id:'S3',title:labels.req[2],pages:pages.slice(5,7) },{ id:'S4',title:labels.req[5],pages:pages.slice(7) }] }, flow: { start:'P1', transitions: [{from:'P1',to:'P2',ref:'F1'},{from:'P2',to:'P3',ref:'F2'},{from:'P3',to:'P4',ref:'F3'},{from:'P4',to:'P5',ref:'F4'},{from:'P5',to:'P6',ref:'F5'},{from:'P6',to:'P5',ref:'F8'},{from:'P5',to:'P7',ref:'F6'},{from:'P7',to:'P8',ref:'F9'},{from:'P8',to:'P9',ref:'F10'},{from:'P9',to:'P10',ref:'F12'},{from:'P10',to:'P4',ref:'F11'},{from:'P4',to:'P1',label:ko?'운영 현황 갱신':'Refresh operations status'}] } };
+  return { ...sot, prd: { ...p, targets, scenarios, kpis, inScope: [...new Set([...(p.inScope ?? []), ...labels.names])], constraints: [...new Set([...(p.constraints ?? []), ko ? '권한, 정책, 상태 변경은 감사 로그로 남긴다.' : 'Permission, policy, and state changes require audit logs.'])] }, requirements, ia: { sections: [{ id:'S1',title:labels.req[0],pages:pages.slice(0,3) },{ id:'S2',title:labels.req[1],pages:pages.slice(3,5) },{ id:'S3',title:labels.req[2],pages:pages.slice(5,7) },{ id:'S4',title:labels.req[5],pages:pages.slice(7) }] }, flow: { start:'P1', transitions: [{from:'P1',to:'P2',ref:'F1'},{from:'P2',to:'P3',ref:'F2'},{from:'P3',to:'P4',ref:'F3'},{from:'P4',to:'P5',ref:'F4'},{from:'P5',to:'P6',ref:'F5'},{from:'P5',to:'P6',ref:'F7'},{from:'P6',to:'P5',ref:'F8'},{from:'P5',to:'P7',ref:'F6'},{from:'P7',to:'P8',ref:'F9'},{from:'P8',to:'P9',ref:'F10'},{from:'P9',to:'P10',ref:'F12'},{from:'P10',to:'P4',ref:'F11'},{from:'P4',to:'P1',label:ko?'운영 현황 갱신':'Refresh operations status'}] } };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

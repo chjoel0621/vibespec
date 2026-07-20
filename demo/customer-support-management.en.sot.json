@@ -862,6 +862,11 @@
         "from": "P4",
         "to": "P1",
         "label": "Refresh operations status"
+      },
+      {
+        "from": "P5",
+        "to": "P6",
+        "ref": "F7"
       }
     ]
   }

@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Employee Onboarding Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+    "goal": "Raise first-week required onboarding completion to 95% or more.",
+    "whyNow": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays.",
+    "solution": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "New hire",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays."
+      },
+      {
+        "name": "HR and people operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "New hire completes new-hire profile and onboarding task setup and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "HR and people operations coordinator reviews onboarding completion reporting by hire and department.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Raise first-week required onboarding completion to 95% or more.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "New-hire profile and onboarding task setup",
+      "Onboarding progress and required-document lookup",
+      "Team task assignment and completion verification",
+      "Onboarding completion reporting by hire and department"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "New-hire profile and onboarding task setup",
+          "desc": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Onboarding progress and required-document lookup",
+          "desc": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Accounts, equipment, documents, and training requests are split across teams, causing missed steps and delays.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Team task assignment and completion verification",
+          "desc": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect new-hire profiles, role-based checklists, owner tasks, document and training confirmation, and operations analysis.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Onboarding completion reporting by hire and department",
+          "desc": "Raise first-week required onboarding completion to 95% or more.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Raise first-week required onboarding completion to 95% or more.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

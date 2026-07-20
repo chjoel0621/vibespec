@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Leave and Attendance Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+    "goal": "Process 95% of leave requests through self-service and reduce attendance reconciliation errors by 30%.",
+    "whyNow": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation.",
+    "solution": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Employee requesting leave or recording attendance",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation."
+      },
+      {
+        "name": "HR and attendance operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "Employee requesting leave or recording attendance completes leave request and attendance record submission and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "HR and attendance operations coordinator reviews leave usage and attendance reporting by organization.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Process 95% of leave requests through self-service and reduce attendance reconciliation errors by 30%.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "Leave request and attendance record submission",
+      "Leave balance and attendance status lookup",
+      "Manager approval, rejection, and attendance-exception handling",
+      "Leave usage and attendance reporting by organization"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Leave request and attendance record submission",
+          "desc": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Leave balance and attendance status lookup",
+          "desc": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Leave balances, clock records, and approval history are separated, creating employee questions and slow month-end reconciliation.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Manager approval, rejection, and attendance-exception handling",
+          "desc": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect leave policy, requests and approvals, attendance exceptions, balance calculations, and organization reporting in one flow.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Leave usage and attendance reporting by organization",
+          "desc": "Process 95% of leave requests through self-service and reduce attendance reconciliation errors by 30%.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Process 95% of leave requests through self-service and reduce attendance reconciliation errors by 30%.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

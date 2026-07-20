@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "OKR and Goal Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+    "goal": "Raise monthly check-in completion for active OKRs to 90% or more.",
+    "whyNow": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see.",
+    "solution": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Team member managing goals and progress",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see."
+      },
+      {
+        "name": "Strategy and people operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "Team member managing goals and progress completes organization, team, and individual okr registration and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "Strategy and people operations coordinator reviews organization goal attainment, check-in, and alignment reporting.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Raise monthly check-in completion for active OKRs to 90% or more.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "Organization, team, and individual OKR registration",
+      "Goal, key result, alignment, and progress lookup",
+      "Goal alignment, check-in, status update, and risk-escalation handling",
+      "Organization goal attainment, check-in, and alignment reporting"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Organization, team, and individual OKR registration",
+          "desc": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Goal, key result, alignment, and progress lookup",
+          "desc": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Team goals and execution status live in documents and meeting decks, making priority alignment and risk signals difficult to see.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Goal alignment, check-in, status update, and risk-escalation handling",
+          "desc": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect organization goals, key results, owner check-ins, alignment relationships, and performance reporting.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Organization goal attainment, check-in, and alignment reporting",
+          "desc": "Raise monthly check-in completion for active OKRs to 90% or more.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Raise monthly check-in completion for active OKRs to 90% or more.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

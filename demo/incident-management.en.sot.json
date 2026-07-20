@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.0",
+  "title": "IT Incident Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+    "goal": "Reduce initial detection time for major incidents and achieve 90% or more post-incident action completion.",
+    "whyNow": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning.",
+    "solution": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Service user reporting or affected by an incident",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning."
+      },
+      {
+        "name": "IT operations, SRE, and incident manager",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "Service user reporting or affected by an incident completes incident report and impact-scope submission and checks progress.",
+        "start": "P1"
+      },
+      {
+        "text": "IT operations, SRE, and incident manager reviews mtta, mttr, recurring incident, and follow-up-action reporting.",
+        "start": "P4"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Reduce initial detection time for major incidents and achieve 90% or more post-incident action completion.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of completion history against target dates",
+        "refs": [
+          "F3"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key requests tracked",
+        "baseline": "Not measured",
+        "method": "Share of registered requests connected to operations reporting",
+        "refs": [
+          "F4"
+        ]
+      }
+    ],
+    "inScope": [
+      "Incident report and impact-scope submission",
+      "Incident, service, timeline, owner, and status lookup",
+      "Severity triage, responder paging, status communication, and post-incident review handling",
+      "MTTA, MTTR, recurring incident, and follow-up-action reporting"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and status lookup",
+      "desc": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Incident report and impact-scope submission",
+          "desc": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Required context and validation",
+              "desc": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Incident, service, timeline, owner, and status lookup",
+          "desc": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Users can provide required context and view the current state.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "State and history lookup",
+              "desc": "Incident reports, response discussion, status communications, and follow-up work are scattered across channels, slowing impact control and learning.",
+              "acceptance": [
+                {
+                  "text": "Users can provide required context and view the current state.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Processing and operations analysis",
+      "desc": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Users can provide required context and view the current state.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Severity triage, responder paging, status communication, and post-incident review handling",
+          "desc": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Processing ownership and state-change history are retained.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Processing policy and history",
+              "desc": "Connect incident intake, service impact, response roles, timelines, status communications, and post-incident review.",
+              "acceptance": [
+                {
+                  "text": "Processing ownership and state-change history are retained.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "MTTA, MTTR, recurring incident, and follow-up-action reporting",
+          "desc": "Reduce initial detection time for major incidents and achieve 90% or more post-incident action completion.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Operators can filter metrics by period and category.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Operations metrics",
+              "desc": "Reduce initial detection time for major incidents and achieve 90% or more post-incident action completion.",
+              "acceptance": [
+                {
+                  "text": "Operators can filter metrics by period and category.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and status lookup",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Overview dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Request or record detail",
+            "type": "page",
+            "refs": [
+              "F2",
+              "F2:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Processing and operations analysis",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Processing workspace",
+            "type": "top",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P4",
+            "title": "Operations report",
+            "type": "page",
+            "refs": [
+              "F4",
+              "F4:0"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "ref": "F4"
+      }
+    ]
+  }
+}

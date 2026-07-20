@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('C:/Users/chjoe/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright');
 const marketingRoot = 'C:/VibeSpec-Marketing';
-const systems = ['leave-attendance', 'recruitment-ats', 'procurement-request', 'vendor-management', 'electronic-approval', 'knowledge-base', 'learning-management', 'vehicle-reservation', 'parking-management', 'event-registration'];
+const systems = ['leave-attendance', 'recruitment-ats', 'procurement-request', 'vendor-management', 'electronic-approval', 'knowledge-base', 'learning-management', 'vehicle-reservation', 'parking-management', 'event-registration', 'b2b-saas-crm', 'real-estate-crm', 'clinic-patient-crm', 'education-enrollment-crm', 'recruiting-agency-crm', 'insurance-agent-crm', 'automotive-dealer-crm', 'legal-client-intake-crm', 'travel-agency-crm', 'nonprofit-donor-crm'];
 const views = ['prd', 'spec', 'flow'];
 
 const browser = await chromium.launch({ headless: true, channel: 'chrome' });

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "title": "CRM for B2B SaaS Sales Teams",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "A CRM that connects lead intake, accounts, opportunities, activities, tasks, and forecasting for B2B SaaS sales teams.",
+    "goal": "Within six months of launch, increase weekly follow-up coverage per seller by 30% and reduce stale pipeline records to less than 20%.",
+    "whyNow": "Small and mid-sized SaaS sales teams often outgrow spreadsheets before they can justify an enterprise CRM rollout.",
+    "category": "B2B SaaS CRM",
+    "platforms": ["Web", "Mobile web"],
+    "problem": "Lead sources, account context, contact relationships, activity history, and next steps are scattered across spreadsheets, email, and project tools. Sellers lose context and miss follow-ups.",
+    "solution": "Use one account- and opportunity-centered data model to connect lead intake, pipeline management, accounts, contacts, activities, tasks, and sales reporting.",
+    "alternatives": "Teams combine spreadsheets, email labels, generic project-management tools, or a heavyweight enterprise CRM.",
+    "differentiator": "The default workflow is designed around the B2B SaaS journey from lead to account, opportunity, activity, next action, and forecast without requiring complex customization.",
+    "targets": [
+      {"name":"Account Executive","role":"AE","needs":"Understand lead and account context quickly and never miss the next action.","pain":"Email, call notes, and tasks are fragmented, so follow-up timing is easy to miss."},
+      {"name":"Sales Development Representative","role":"SDR","needs":"Qualify new leads quickly and hand them to the right owner and pipeline stage.","pain":"Lead quality and duplicates are difficult to assess across different sources."},
+      {"name":"Sales Manager","role":"Sales Manager","needs":"See pipeline health, activity, forecast, and bottlenecks across the team.","pain":"Stale opportunities and at-risk deals are discovered too late."},
+      {"name":"Revenue Operations","role":"RevOps","needs":"Keep sales data quality, definitions, permissions, and process rules consistent.","pain":"Duplicate records and inconsistent stages make reporting unreliable."}
+    ],
+    "scenarios": [
+      {"text":"An SDR reviews leads from web forms and CSV imports, merges duplicates, and assigns qualified leads to the appropriate AE.","start":"P1"},
+      {"text":"An AE adds a new opportunity to the pipeline, reviews account context and past activity, then schedules the next meeting task.","start":"P4"},
+      {"text":"A sales manager reviews conversion, overdue follow-ups, and at-risk deals before coaching the team.","start":"P10"},
+      {"text":"A RevOps administrator updates roles, required fields, and pipeline stages while preserving an audit trail.","start":"P13"}
+    ],
+    "northStar": "Share of active opportunities with a recorded next action",
+    "kpis": [
+      {"name":"Follow-up coverage","target":"At least 90% of active opportunities","baseline":"Not consistently measurable today","method":"Weekly share of active opportunities with a due task or scheduled activity","refs":["F7","F8"]},
+      {"name":"Pipeline freshness","target":"Fewer than 20% of opportunities stale for seven days","baseline":"Assumed above 50% before adoption","method":"Measure the last update to stage, amount, close date, or activity","refs":["F3","F4"]},
+      {"name":"Lead response time","target":"Qualify 80% of new leads within 24 hours","baseline":"Two to three business days","method":"Time from lead creation to qualification or owner assignment","refs":["F1","F2"]},
+      {"name":"Forecast accuracy","target":"Monthly committed revenue variance below 15%","baseline":"Spreadsheet-based manual forecast","method":"Compare committed amount with closed-won revenue","refs":["F14"]}
+    ],
+    "inScope": [
+      "Lead capture, duplicate detection, qualification, and assignment",
+      "Pipeline stages, opportunity amounts, probabilities, and close dates",
+      "Account and contact profiles with ownership and relationships",
+      "Call, email, meeting, and note activity logging",
+      "Tasks, due dates, reminders, and seller work queues",
+      "Pipeline and activity dashboards, automation, global search, and forecast analysis",
+      "Role-based access, team management, and configurable sales process settings"
+    ],
+    "nonGoals": [
+      "Invoice issuance and payment collection",
+      "A full marketing automation campaign builder",
+      "A replacement for a customer-support ticketing system",
+      "Native offline mobile applications",
+      "A complex CPQ pricing rules engine"
+    ],
+    "assumptions": [
+      "Initial customers are B2B SaaS sales organizations with 10 to 100 sellers.",
+      "Early lead and activity data arrives primarily through manual entry and CSV import.",
+      "Pipeline stages and required fields are managed at workspace level."
+    ],
+    "risks": [
+      "Data quality and forecast accuracy decline if sellers do not record activities.",
+      "Migration from an existing CRM can be a substantial onboarding burden.",
+      "Too many mandatory fields can reduce adoption.",
+      "Broad email and calendar permissions can delay security review."
+    ],
+    "openQuestions": [
+      "How much email and calendar synchronization should the first release support?",
+      "Should lead scoring begin as rules-based scoring or manual grading?",
+      "How much team, role, and regional permission configuration is required initially?",
+      "Which forecast categories and probability rules should be customizable by team?"
+    ],
+    "constraints": [
+      "The MVP is web-first; mobile web focuses on viewing and simple updates.",
+      "Personal and sales-sensitive data must use role-based access.",
+      "Core objects require auditable create and update history."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1", "title": "Lead management", "desc": "Capture, qualify, de-duplicate, and assign incoming leads.", "status": "todo", "priority": "high",
+      "acceptance": [{"text":"A seller can identify lead source, owner, qualification state, and duplicate candidates.","done":false}],
+      "features": [
+        {"id":"F1","title":"Lead inbox","desc":"Collect leads from manual entry, CSV imports, web forms, and APIs in a reviewable inbox.","status":"todo","priority":"high","acceptance":[{"text":"Each lead shows source, created date, owner, and processing status.","done":false}],"specs":[{"title":"Create and import leads","desc":"Create a lead manually or import a batch with source metadata.","acceptance":[{"text":"Imported rows with errors are reported before final submission.","done":false}]}]},
+        {"id":"F2","title":"Lead qualification","desc":"Validate, merge, score, and assign leads before converting them into sales work.","status":"todo","priority":"high","acceptance":[{"text":"A qualified lead can be assigned to an AE with an auditable decision.","done":false}],"specs":[{"title":"Duplicate review","desc":"Detect likely duplicates using email, company domain, and normalized company name.","acceptance":[{"text":"A user can merge a duplicate while retaining source history.","done":false}]}]}
+      ]
+    },
+    {
+      "id": "R2", "title": "Pipeline and opportunities", "desc": "Manage a shared sales pipeline and the work around every opportunity.", "status": "todo", "priority": "high",
+      "acceptance": [{"text":"A seller can update an opportunity from the pipeline or its detail page.","done":false}],
+      "features": [
+        {"id":"F3","title":"Pipeline board","desc":"Visualize opportunities by stage, amount, close date, probability, and owner.","status":"todo","priority":"high","acceptance":[{"text":"The board can filter by team, owner, period, and stage.","done":false}],"specs":[{"title":"Stage movement","desc":"Move an opportunity between configured sales stages.","acceptance":[{"text":"Stage changes preserve previous stage and timestamp in history.","done":false}]}]},
+        {"id":"F4","title":"Opportunity workspace","desc":"Maintain deal details, stakeholders, timeline, amount, probability, and next action in one view.","status":"todo","priority":"high","acceptance":[{"text":"An opportunity shows its account, contacts, related activities, and open tasks.","done":false}],"specs":[{"title":"Deal health","desc":"Highlight missing next actions, stale activity, and close-date risk.","acceptance":[{"text":"A warning links directly to the corrective action.","done":false}]}]}
+      ]
+    },
+    {
+      "id": "R3", "title": "Account and contact data", "desc": "Maintain trustworthy customer-company and stakeholder context.", "status": "todo", "priority": "high",
+      "acceptance": [{"text":"Users can navigate from an account to its contacts and active opportunities.","done":false}],
+      "features": [
+        {"id":"F5","title":"Account profiles","desc":"Store company information, ownership, relationships, and linked opportunities.","status":"todo","priority":"high","acceptance":[{"text":"An account profile shows related contacts, open opportunities, and recent activity.","done":false}],"specs":[{"title":"Account timeline","desc":"Surface account-level activity in chronological order.","acceptance":[{"text":"Timeline items link to the originating activity or opportunity.","done":false}]}]},
+        {"id":"F6","title":"Contact management","desc":"Maintain contact roles, email addresses, relationship context, and engagement history.","status":"todo","priority":"high","acceptance":[{"text":"A contact can be linked to an account and multiple opportunities.","done":false}],"specs":[{"title":"Contact relationships","desc":"Show the contact role and influence for each linked opportunity.","acceptance":[{"text":"Users can add and update opportunity-specific contact roles.","done":false}]}]}
+      ]
+    },
+    {
+      "id": "R4", "title": "Activities and follow-up tasks", "desc": "Make customer engagement and next actions visible and actionable.", "status": "todo", "priority": "high",
+      "acceptance": [{"text":"A seller can create a follow-up task from an activity, account, contact, or opportunity.","done":false}],
+      "features": [
+        {"id":"F7","title":"Activity timeline","desc":"Record calls, emails, meetings, and notes against the relevant customer context.","status":"todo","priority":"high","acceptance":[{"text":"Activities are visible on linked account, contact, and opportunity timelines.","done":false}],"specs":[{"title":"Activity logging","desc":"Capture type, time, participants, summary, and related objects.","acceptance":[{"text":"A user can log an activity without leaving the current object.","done":false}]}]},
+        {"id":"F8","title":"Task management","desc":"Create, complete, defer, and reassign personal and team follow-up work.","status":"todo","priority":"high","acceptance":[{"text":"Users can distinguish their own, team, and overdue tasks.","done":false}],"specs":[{"title":"Task reminders","desc":"Set due dates, reminders, and optional recurrence.","acceptance":[{"text":"Incomplete tasks past their due date appear as overdue.","done":false}]}]}
+      ]
+    },
+    {
+      "id": "R5", "title": "Insights and operating controls", "desc": "Give sales leaders and RevOps the information and controls needed to run the sales process.", "status": "todo", "priority": "high",
+      "acceptance": [{"text":"A manager can move from a summary metric to the underlying sales records.","done":false}],
+      "features": [
+        {"id":"F9","title":"Sales dashboard","desc":"Summarize pipeline value, conversion, lead handling, activity, and overdue follow-up.","status":"todo","priority":"mid","acceptance":[{"text":"Metrics update for the selected period, team, owner, and product filters.","done":false}],"specs":[{"title":"Pipeline summary","desc":"Show opportunity count, amount, weighted value, and expected close period by stage.","acceptance":[{"text":"A summary card opens the corresponding filtered pipeline view.","done":false}]}]},
+        {"id":"F10","title":"Operational alerts","desc":"Collect at-risk opportunities, unprocessed leads, overdue tasks, and data gaps in one queue.","status":"todo","priority":"mid","acceptance":[{"text":"Every alert includes its reason, owner, affected object, and recommended action.","done":false}],"specs":[{"title":"Risk rules","desc":"Detect long inactivity, missing next action, imminent close dates, and required-field gaps.","acceptance":[{"text":"Each alert shows the triggering rule and last checked time.","done":false}]}]},
+        {"id":"F11","title":"Sales process settings","desc":"Configure pipeline stages, required fields, lead sources, task types, and notification rules.","status":"todo","priority":"high","acceptance":[{"text":"An administrator sees the expected impact of a setting change before saving it.","done":false}],"specs":[{"title":"Pipeline configuration","desc":"Define stage names, order, probability, and movement requirements.","acceptance":[{"text":"Removing an active stage requires selecting a destination stage.","done":false}]}]},
+        {"id":"F12","title":"Role-based access","desc":"Control access to accounts, opportunities, activities, and dashboards by role, team, and ownership.","status":"todo","priority":"high","acceptance":[{"text":"Restricted users see only permitted data in lists, details, and search.","done":false}],"specs":[{"title":"Role templates","desc":"Provide starter roles for administrator, sales manager, AE, SDR, and RevOps.","acceptance":[{"text":"Each role differentiates view, create, edit, delete, and export access.","done":false}]}]},
+        {"id":"F13","title":"Sales automation and global search","desc":"Automate repetitive follow-up and find relevant CRM objects from one search surface.","status":"todo","priority":"mid","acceptance":[{"text":"A user can move directly from a result or automation event to its related record.","done":false}],"specs":[{"title":"Automation rules","desc":"Create conditions for lead intake, stage changes, inactivity, approaching due dates, and field changes.","acceptance":[{"text":"Rules show expected volume before activation.","done":false}]},{"title":"Global search","desc":"Search accounts, contacts, leads, opportunities, activities, and tasks with access-aware results.","acceptance":[{"text":"Top results are keyboard-accessible and show record type and last update.","done":false}]}]},
+        {"id":"F14","title":"Sales forecast","desc":"Manage commit categories, expected wins, pipeline coverage, and at-risk deals.","status":"todo","priority":"mid","acceptance":[{"text":"Forecast totals can be filtered by period, team, owner, and product line.","done":false}],"specs":[{"title":"Forecast drill-down","desc":"Open the opportunities and risk reasons behind a forecast total.","acceptance":[{"text":"Drill-down preserves the active forecast filters and commit category.","done":false}]}]}
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {"id":"S1","title":"Leads","pages":[{"id":"P1","title":"Lead Inbox","type":"top","refs":["F1"],"children":[{"id":"P2","title":"Create Lead","type":"action","refs":["F1:0"],"children":[]},{"id":"P3","title":"Qualify Lead","type":"page","refs":["F2","F2:0"],"children":[]}]}]},
+      {"id":"S2","title":"Pipeline","pages":[{"id":"P4","title":"Pipeline Board","type":"top","refs":["F3","F3:0"],"children":[{"id":"P5","title":"Opportunity Detail","type":"page","refs":["F4","F4:0"],"children":[]}]}]},
+      {"id":"S3","title":"Customer Data","pages":[{"id":"P6","title":"Account List","type":"top","refs":["F5"],"children":[{"id":"P7","title":"Account Profile","type":"page","refs":["F5:0"],"children":[]},{"id":"P8","title":"Contact List","type":"page","refs":["F6"],"children":[{"id":"P9","title":"Contact Profile","type":"page","refs":["F6:0"],"children":[]}]}]}]},
+      {"id":"S4","title":"Activities and Tasks","pages":[{"id":"P10","title":"Activity Timeline","type":"top","refs":["F7","F7:0"],"children":[{"id":"P11","title":"Log Activity","type":"action","refs":[],"children":[]}]},{"id":"P12","title":"Task List","type":"top","refs":["F8","F8:0"],"children":[{"id":"P13","title":"Create or Complete Task","type":"action","refs":[],"children":[]}]}]},
+      {"id":"S5","title":"Sales Operations","pages":[{"id":"P14","title":"Sales Dashboard","type":"top","refs":["F9","F9:0","F10","F10:0"],"children":[]},{"id":"P15","title":"Sales Process Settings","type":"top","refs":["F11","F11:0","F12","F12:0"],"children":[]},{"id":"P16","title":"Productivity Hub","type":"top","refs":["F13","F13:0","F13:1"],"children":[]},{"id":"P17","title":"Sales Forecast","type":"top","refs":["F14","F14:0"],"children":[]}]}
+    ]
+  },
+  "flow": {
+    "start":"P14",
+    "transitions":[
+      {"from":"P14","to":"P4","ref":"F9:0"},
+      {"from":"P1","to":"P2","ref":"F1"},
+      {"from":"P1","to":"P3","ref":"F2"},
+      {"from":"P3","to":"P4","label":"Create qualified opportunity"},
+      {"from":"P4","to":"P5","ref":"F3"},
+      {"from":"P5","to":"P7","ref":"F4"},
+      {"from":"P7","to":"P8","ref":"F5"},
+      {"from":"P8","to":"P9","ref":"F6"},
+      {"from":"P5","to":"P10","ref":"F4:0"},
+      {"from":"P10","to":"P11","ref":"F7"},
+      {"from":"P5","to":"P12","ref":"F8"},
+      {"from":"P12","to":"P13","ref":"F8:0"},
+      {"from":"P14","to":"P15","ref":"F10"},
+      {"from":"P15","to":"P16","ref":"F13"},
+      {"from":"P14","to":"P17","ref":"F14"}
+    ]
+  }
+}

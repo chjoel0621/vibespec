@@ -52,6 +52,8 @@ jobs:
           }
           validate_product demo/meeting-room-booking 1-2.notif
           validate_product demo/flea-market 1-1.escrow
+          node $S/scripts/validate-sot.mjs demo/crm.ko.sot.json
+          node $S/scripts/validate-sot.mjs demo/crm.en.sot.json
           # Flea is the workspace demo: it also carries a proposed increment (offer).
           node $S/scripts/validate-sot.mjs demo/flea-market.ko.1-2.offer.sot.json
           node $S/scripts/validate-sot.mjs demo/flea-market.en.1-2.offer.sot.json
@@ -77,6 +79,9 @@ jobs:
             node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json --html "$dir/en/map/index.html"
           }
           stage_product demo/meeting-room-booking "" 1-2.notif notif
+          mkdir -p _site/crm/en
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.ko.sot.json _site/crm/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.en.sot.json _site/crm/en/index.html
           # Flea is the workspace demo: escrow (approved) + offer (proposed). The
           # release map excludes the proposed offer; the workspace map includes it,
           # so the two pages show the difference side by side. Same inputs, two modes.
@@ -109,6 +114,9 @@ jobs:
           }
           verify_product "" notif
           verify_product flea escrow
+          for f in crm/index.html crm/en/index.html; do
+            grep -q 'class="demo-nav"' "_site/$f" || { echo "no nav strip: _site/$f"; exit 1; }
+          done
           # Flea's extra workspace pages carry the nav strip too.
           for f in flea/workspace/ flea/en/workspace/; do
             grep -q 'class="demo-nav"' "_site/${f}index.html" || { echo "no nav strip: _site/${f}index.html"; exit 1; }

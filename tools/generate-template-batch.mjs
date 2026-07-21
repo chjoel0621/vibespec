@@ -1,9 +1,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 import { resolve } from 'node:path';
 import { deepenSot } from './deepen-sot.mjs';
+import { promisify } from 'node:util';
 
 const vibeRoot = 'C:/VibeSpec';
 const marketingRoot = 'C:/VibeSpec-Marketing';
+const execFileAsync = promisify(execFile);
 
 const systems = [
   { slug: 'visitor-management', ko: { title: '방문자 관리 시스템', user: '방문을 예약하는 임직원', operator: '리셉션·총무 담당자', entry: '방문 예약과 사전 등록', record: '방문자·호스트·출입 정보 조회', process: '방문 승인과 체크인·체크아웃', report: '방문 현황과 보안 운영 리포트', goal: '방문 등록의 80% 이상을 사전 예약으로 전환하고 현장 등록 시간을 50% 줄인다.', problem: '방문자 정보와 호스트 확인이 메신저·종이 대장에 흩어져 보안과 안내가 지연된다.', solution: '사전 예약, 호스트 승인, QR 체크인·체크아웃, 방문 이력과 운영 대시보드를 연결한다.' }, en: { title: 'Visitor Management System', user: 'Employee host', operator: 'Reception and workplace operator', entry: 'Visitor pre-registration', record: 'Visitor, host, and access lookup', process: 'Visitor approval and check-in/check-out', report: 'Visitor activity and security operations reporting', goal: 'Move 80% of visitor registrations to pre-registration and reduce on-site registration time by 50%.', problem: 'Visitor details and host confirmation are scattered across chat and paper logs, delaying security and reception.', solution: 'Connect pre-registration, host approval, QR check-in and check-out, visit history, and operations reporting.' } },
@@ -121,4 +124,6 @@ for (const config of allSystems) {
 }
 await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
 await writeFile(resolve(marketingRoot, 'content', 'batch-templates.json'), JSON.stringify({ templates: allSystems.map((config) => ({ slug: config.slug, published: '2026-07-20', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } })) }, null, 2) + '\n');
-console.log(`Generated ${allSystems.length * 2} SOT files and ${allSystems.length} template records.`);
+const { stdout } = await execFileAsync(process.execPath, [resolve(marketingRoot, 'scripts', 'regenerate-template-downloads.mjs')]);
+process.stdout.write(stdout);
+console.log(`Generated ${allSystems.length * 2} SOT files, ${allSystems.length} template records, and refreshed download HTML.`);

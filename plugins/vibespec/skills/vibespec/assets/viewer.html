@@ -706,7 +706,17 @@ function flowTransition(from,to,ref="",label=""){
   return transition;
 }
 let SOT = normalize(structuredClone(SEED));
-let VIEW = "prd";
+const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow"]);
+const requestedView = new URLSearchParams(window.location.search).get("view");
+let VIEW = DEEP_LINK_VIEWS.has(requestedView) ? requestedView : "prd";
+function syncViewInUrl(){
+  try{
+    const url=new URL(window.location.href);
+    if(VIEW==="prd") url.searchParams.delete("view");
+    else url.searchParams.set("view",VIEW);
+    window.history.replaceState(null,"",url);
+  }catch(_){ /* file previews can restrict history changes */ }
+}
 let selReq, selFeat, selNode;
 let colReqCol = false, colFeatCol = false;
 let selSec, selPage;
@@ -1636,7 +1646,7 @@ function setMapCollapsed(collapsed){
 
 /* ==== 90-init.js ==== */
 /* ============================ EVENT WIRING ============================ */
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;render();}));
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;syncViewInUrl();render();}));
 document.getElementById("resetBtn").addEventListener("click",()=>{ if(!HISTORY.length) return; restoreTo(0); const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title||"제품"; });
 document.getElementById("sotBtn").addEventListener("click",()=>{
   const w=window.open("","_blank","width=520,height=640");

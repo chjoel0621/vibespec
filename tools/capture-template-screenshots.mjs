@@ -8,7 +8,14 @@ const { chromium } = require('C:/Users/chjoe/AppData/Local/npm-cache/_npx/e41f20
 const marketingRoot = 'C:/VibeSpec-Marketing';
 const source = JSON.parse(await readFile(resolve(marketingRoot, 'content', 'templates.json'), 'utf8'));
 const batch = JSON.parse(await readFile(resolve(marketingRoot, 'content', 'batch-templates.json'), 'utf8'));
-const templates = [...source.templates, ...batch.templates].filter((template) => template.published);
+const requestedSlugs = new Set(process.argv.slice(2));
+const templates = [...source.templates, ...batch.templates]
+  .filter((template) => template.published)
+  .filter((template) => !requestedSlugs.size || requestedSlugs.has(template.slug));
+if (requestedSlugs.size && templates.length !== requestedSlugs.size) {
+  const found = new Set(templates.map((template) => template.slug));
+  throw new Error(`Unknown template slug: ${[...requestedSlugs].filter((slug) => !found.has(slug)).join(', ')}`);
+}
 
 function viewFor(filename) {
   if (filename.includes('feature-spec') || filename.includes('-spec-')) return 'spec';

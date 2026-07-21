@@ -12,7 +12,7 @@ const templates = [...source.templates, ...batch.templates].filter((template) =>
 
 function viewFor(filename) {
   if (filename.includes('feature-spec') || filename.includes('-spec-')) return 'spec';
-  if (filename.includes('requirements-tree')) return 'tree';
+  if (filename.includes('requirements-tree') || filename.includes('-tree-')) return 'tree';
   if (filename.includes('information-architecture')) return 'ia';
   if (filename.includes('user-flow') || filename.includes('-flow-')) return 'flow';
   return 'prd';

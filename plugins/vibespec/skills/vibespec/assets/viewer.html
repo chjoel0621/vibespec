@@ -29,6 +29,10 @@
   .tab{border:0;background:transparent;color:var(--sub);padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
   .tab[aria-selected="true"]{background:#fff;color:var(--text);box-shadow:var(--shadow)}
   .topbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--sub);cursor:pointer}
+  .file-status{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;padding:3px 0}
+  .file-status.connected{color:var(--ok);font-weight:650}
+  .file-status.warning{color:#9b6200}
+  .file-status.error{color:#b42318}
   .topbtn.primary{background:#151519;color:#fff;border-color:#151519}
   .topbtn.danger{color:#c0392b;border-color:#f0d4d0}
   .topbtn.danger:hover{background:#fdeeec}
@@ -145,6 +149,11 @@
   .fnode.page .fref{background:#fff;color:var(--accent)}
   .fnode.action .fref{background:var(--accent-soft);color:var(--accent)}
   .topbtn:disabled{opacity:.35;cursor:default}
+  @media(max-width:980px){
+    .topbar{gap:8px;flex-wrap:wrap;padding:9px 12px}
+    .tabs{order:3;margin:0;width:100%;overflow:auto}
+    .file-status{max-width:140px}
+  }
   .hist-drawer{position:fixed;top:0;right:0;width:320px;height:100vh;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(20,20,30,.08);transform:translateX(100%);transition:transform .22s;z-index:60;display:flex;flex-direction:column}
   .hist-drawer.open{transform:translateX(0)}
   .hist-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;font-weight:650;font-size:14px;border-bottom:1px solid var(--line)}
@@ -445,7 +454,10 @@
     <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
     <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
     <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
-    <button class="topbtn" id="loadBtn" data-i18n="불러오기|Load" data-i18n-title="JSON 파일 불러오기|Load JSON" title="JSON 파일 불러오기">불러오기</button>
+    <button class="topbtn" id="reloadBtn" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
+    <button class="topbtn" id="loadBtn" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
+    <button class="topbtn" id="locationBtn" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
+    <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
     <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
     <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
     <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>
@@ -471,7 +483,10 @@
 const PRIO = {high:{c:"high",t:"높음",e:"High"}, mid:{c:"mid",t:"보통",e:"Mid"}, low:{c:"low",t:"낮음",e:"Low"}};
 const STAT = {todo:{c:"st-todo",t:"시작전",e:"To do"}, doing:{c:"st-doing",t:"진행중",e:"In progress"}, done:{c:"st-done",t:"완료",e:"Done"}};
 const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
-const LS_KEY="sot-proto-v3-flow";
+// SOT body data must never be persisted in web storage. This legacy key exists
+// only so a one-time migration can offer the user a download before removing it.
+const LEGACY_SOT_KEY="sot-proto-v3-flow";
+const LANG_KEY="vibespec-lang";
 const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
 const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
@@ -481,8 +496,8 @@ const INIT_STATUS = {proposed:{t:"제안됨",e:"Proposed"}, approved:{t:"승인�
 // never hardcoded — saving must not downgrade a 1.1 initiative to 1.0.
 function schemaVersionFor(s){ return s && s.initiative ? "1.1" : "1.0"; }
 // Read-only mode (product map and the documents opened from it). A map is a
-// snapshot: edits belong in the source files, and a map must never write to
-// localStorage, which is shared with the user's own working document.
+// snapshot: edits belong in the source files. A map must never mutate a source
+// document or establish a file connection.
 let RO = false;
 // Deny-by-default: in RO every control is disabled unless it is navigation.
 // A new editing control added later is therefore read-only until someone
@@ -510,7 +525,7 @@ function stableStringify(obj){
 
 
 /* ==== 10-i18n.js ==== */
-let LANG = "ko"; const LANG_KEY = "vibespec-lang";
+let LANG = "ko";
 function t(ko,en){ return LANG==="en" ? en : ko; }
 function applyStaticI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ const p=el.dataset.i18n.split("|"); el.textContent = LANG==="en"?(p[1]||p[0]):p[0]; });
@@ -710,7 +725,7 @@ function flowTransition(from,to,ref="",label=""){
 }
 let SOT = normalize(structuredClone(SEED));
 const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow"]);
-const requestedView = new URLSearchParams(window.location.search).get("view");
+const requestedView = typeof window!=="undefined" && typeof URLSearchParams!=="undefined" ? new URLSearchParams(window.location.search).get("view") : null;
 let VIEW = DEEP_LINK_VIEWS.has(requestedView) ? requestedView : "prd";
 function syncViewInUrl(){
   try{
@@ -736,10 +751,8 @@ function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x
 /* ---- persistence + history ---- */
 let HISTORY=[], HPTR=-1, restoring=false;
 function snapshot(){ return JSON.stringify(SOT); }
-// RO guards live here, at the persistence boundary: whatever slips past the UI,
-// a read-only document can neither be stored nor become an undo step — and it
-// can never overwrite the user's own working SOT in localStorage.
-function saveLocal(){ if(RO) return; try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
+// History is intentionally in-memory only. The connected file is the durable
+// SOT; browser storage must not retain its body text.
 function pushHistory(label){
   if(RO) return;
   const snap=snapshot();
@@ -748,12 +761,12 @@ function pushHistory(label){
   HISTORY.push({t:Date.now(), label: label || (t(VIEWNAME[VIEW],VIEWNAME_EN[VIEW])+t(" 편집"," edit")), sot:snap});
   if(HISTORY.length>120){ HISTORY.shift(); }
   HPTR = HISTORY.length-1;
-  saveLocal(); renderHistory(); updateUndoButtons();
+  renderHistory(); updateUndoButtons();
 }
 function restoreTo(i){
   if(i<0 || i>=HISTORY.length) return;
   HPTR=i; SOT=normalize(JSON.parse(HISTORY[i].sot));
-  saveLocal(); render(); renderHistory(); updateUndoButtons();
+  render(); renderHistory(); updateUndoButtons();
 }
 function undo(){ if(HPTR>0) restoreTo(HPTR-1); }
 function redo(){ if(HPTR<HISTORY.length-1) restoreTo(HPTR+1); }
@@ -776,6 +789,200 @@ function snapshotIfChanged(label){ const s=snapshot(); if(!(HPTR>=0 && HISTORY[H
 /* ==== 40-io.js ==== */
 /* stableStringify lives in 05-c14n.js (sot-c14n-v1, frozen — do not redefine here). */
 function canonicalSOT(){ const c=normalize(JSON.parse(JSON.stringify(SOT))); c.schemaVersion=schemaVersionFor(c); return stableStringify(c); }
+
+
+/* ==== 45-file-connection.js ==== */
+/* ---- connected SOT file I/O (File System Access API with download fallback) ---- */
+// Only a FileSystemFileHandle is persisted. SOT text, history, and drafts stay
+// in memory so a browser profile never becomes a second source of truth.
+const FILE_DB_NAME="vibespec-file-connections-v1";
+const FILE_DB_STORE="connections";
+let CONNECTED_FILE_HANDLE=null;
+let CONNECTED_FILE_SIGNATURE="";
+let LAST_SAVED_CANONICAL="";
+
+function supportsFileConnection(){
+  return !RO && typeof window!=="undefined" && window.isSecureContext===true && typeof window.showSaveFilePicker==="function";
+}
+function fileConnectionKey(){
+  try{return "viewer:"+window.location.href.split("#")[0];}catch(_){return "viewer:default";}
+}
+function fileTextSignature(text){
+  // A lightweight change detector, not a security hash. The full SOT text is
+  // never stored; only this in-memory signature is used before overwriting.
+  let hash=2166136261;
+  for(let i=0;i<text.length;i++){ hash^=text.charCodeAt(i); hash=Math.imul(hash,16777619); }
+  return text.length+":"+(hash>>>0).toString(16);
+}
+function connectedFileName(){ return CONNECTED_FILE_HANDLE&&CONNECTED_FILE_HANDLE.name ? CONNECTED_FILE_HANDLE.name : ""; }
+function setFileStatus(kind,message){
+  const el=document.getElementById("fileStatus"); if(!el) return;
+  el.className="file-status"+(kind?" "+kind:""); el.textContent=message||"";
+}
+function refreshFileConnectionStatus(){
+  if(RO) return;
+  if(!supportsFileConnection()) return setFileStatus("warning",t("다운로드로 저장됩니다","Downloads in this browser"));
+  if(CONNECTED_FILE_HANDLE) return setFileStatus("connected",t("연결됨 · ","Connected · ")+connectedFileName());
+  setFileStatus("",t("저장 위치 미연결","No file connected"));
+}
+function downloadText(text,name){
+  const blob=new Blob([text],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function downloadCurrentSot(){ downloadText(canonicalSOT(),(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json"); }
+function hasUnsavedViewerChanges(){ return !!LAST_SAVED_CANONICAL && canonicalSOT()!==LAST_SAVED_CANONICAL; }
+function markViewerSaved(){ LAST_SAVED_CANONICAL=canonicalSOT(); }
+
+function openFileDatabase(){
+  return new Promise((resolve,reject)=>{
+    if(typeof indexedDB==="undefined") return reject(new Error("IndexedDB unavailable"));
+    const request=indexedDB.open(FILE_DB_NAME,1);
+    request.onupgradeneeded=()=>request.result.createObjectStore(FILE_DB_STORE,{keyPath:"key"});
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error||new Error("IndexedDB unavailable"));
+  });
+}
+async function persistConnectedHandle(){
+  if(!CONNECTED_FILE_HANDLE) return false;
+  try{
+    const db=await openFileDatabase();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(FILE_DB_STORE,"readwrite");
+      tx.objectStore(FILE_DB_STORE).put({key:fileConnectionKey(),handle:CONNECTED_FILE_HANDLE});
+      tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error); tx.onabort=()=>reject(tx.error);
+    });
+    db.close(); return true;
+  }catch(_){ return false; }
+}
+async function restoreConnectedHandle(){
+  if(!supportsFileConnection()) return false;
+  try{
+    const db=await openFileDatabase();
+    const row=await new Promise((resolve,reject)=>{
+      const tx=db.transaction(FILE_DB_STORE,"readonly"), request=tx.objectStore(FILE_DB_STORE).get(fileConnectionKey());
+      request.onsuccess=()=>resolve(request.result); request.onerror=()=>reject(request.error);
+    });
+    db.close();
+    if(row&&row.handle){ CONNECTED_FILE_HANDLE=row.handle; refreshFileConnectionStatus(); return true; }
+  }catch(_){ /* Persistence is optional; same-tab connection still works. */ }
+  return false;
+}
+async function ensureConnectedPermission(mode,requestIfNeeded){
+  if(!CONNECTED_FILE_HANDLE) return false;
+  if(typeof CONNECTED_FILE_HANDLE.queryPermission!=="function") return true;
+  try{
+    let state=await CONNECTED_FILE_HANDLE.queryPermission({mode});
+    if(state!=="granted" && requestIfNeeded && typeof CONNECTED_FILE_HANDLE.requestPermission==="function"){
+      state=await CONNECTED_FILE_HANDLE.requestPermission({mode});
+    }
+    return state==="granted";
+  }catch(_){ return false; }
+}
+async function readConnectedFile(){
+  const file=await CONNECTED_FILE_HANDLE.getFile();
+  const text=await file.text();
+  return {text,signature:fileTextSignature(text),name:file.name||connectedFileName()};
+}
+function applyLoadedSot(text,label){
+  try{
+    SOT=normalize(JSON.parse(text)); resetSelections(); pushHistory(label||t("파일 다시 불러오기","File reload")); markViewerSaved(); render(); return true;
+  }catch(_){
+    setFileStatus("error",t("불러오기 실패: 올바른 SOT JSON이 아닙니다","Load failed: invalid SOT JSON"));
+    alert(t("불러오기 실패: 올바른 JSON 파일이 아닙니다.","Load failed: not a valid JSON file.")); return false;
+  }
+}
+async function writeConnectedSot(forceOverwrite){
+  const next=canonicalSOT();
+  try{
+    // A newly selected save location may not exist until createWritable() closes.
+    // Only inspect a file when this viewer has a prior connected-file baseline.
+    if(CONNECTED_FILE_SIGNATURE && !forceOverwrite){
+      const remote=await readConnectedFile();
+      if(remote.signature!==CONNECTED_FILE_SIGNATURE){
+        const overwrite=window.confirm(t("연결된 파일이 AI 또는 다른 도구로 변경되었습니다. 현재 뷰어의 내용으로 덮어쓸까요? 취소하면 다시 불러올 수 있습니다.","The connected file changed outside this viewer. Overwrite it with the current viewer content? Cancel to reload it instead."));
+        if(!overwrite){ setFileStatus("warning",t("외부 변경 감지 · 다시 불러오기 필요","External change detected · reload needed")); return false; }
+      }
+    }
+    let writable;
+    try{ writable=await CONNECTED_FILE_HANDLE.createWritable(); await writable.write(next); await writable.close(); }
+    catch(error){ try{ if(writable) await writable.abort(); }catch(_){} throw error; }
+    CONNECTED_FILE_SIGNATURE=fileTextSignature(next); markViewerSaved(); refreshFileConnectionStatus(); flash(); return true;
+  }catch(_){
+    setFileStatus("error",t("파일에 저장하지 못했습니다 · 권한 또는 파일 상태를 확인하세요","Could not save · check file permission or availability")); return false;
+  }
+}
+async function chooseSaveLocation(){
+  try{
+    CONNECTED_FILE_HANDLE=await window.showSaveFilePicker({
+      id:"vibespec-sot",
+      suggestedName:(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json",
+      types:[{description:"VibeSpec SOT JSON",accept:{"application/json":[".json"]}}]
+    });
+    CONNECTED_FILE_SIGNATURE=""; await persistConnectedHandle(); refreshFileConnectionStatus();
+    return await saveCurrentSot();
+  }catch(error){
+    if(error&&error.name==="AbortError") return false;
+    setFileStatus("error",t("저장 위치를 선택하지 못했습니다","Could not choose a save location")); return false;
+  }
+}
+async function saveCurrentSot(){
+  if(RO) return false;
+  if(!supportsFileConnection()){ downloadCurrentSot(); refreshFileConnectionStatus(); return true; }
+  if(!CONNECTED_FILE_HANDLE) return chooseSaveLocation();
+  if(!await ensureConnectedPermission("readwrite",true)){
+    setFileStatus("warning",t("파일 권한이 필요합니다 · 위치 변경 또는 다운로드를 사용하세요","File permission is required · change location or download a copy")); return false;
+  }
+  return writeConnectedSot(false);
+}
+async function reloadConnectedSot(skipUnsavedConfirm){
+  if(RO) return false;
+  if(!CONNECTED_FILE_HANDLE) return connectExistingSot();
+  if(!skipUnsavedConfirm && hasUnsavedViewerChanges() && !window.confirm(t("저장하지 않은 뷰어 수정이 사라집니다. 연결된 파일을 다시 불러올까요?","Unsaved viewer edits will be lost. Reload the connected file?"))) return false;
+  if(!await ensureConnectedPermission("read",true)){
+    setFileStatus("warning",t("파일 읽기 권한이 필요합니다","File read permission is required")); return false;
+  }
+  try{
+    const remote=await readConnectedFile();
+    if(!applyLoadedSot(remote.text,t("파일 다시 불러오기","File reload"))) return false;
+    CONNECTED_FILE_SIGNATURE=remote.signature; refreshFileConnectionStatus(); return true;
+  }catch(_){
+    setFileStatus("error",t("연결된 파일을 읽지 못했습니다","Could not read the connected file")); return false;
+  }
+}
+async function connectExistingSot(){
+  if(!supportsFileConnection() || typeof window.showOpenFilePicker!=="function"){
+    document.getElementById("fileInput").click(); return false;
+  }
+  if(hasUnsavedViewerChanges() && !window.confirm(t("저장하지 않은 뷰어 수정이 사라집니다. 다른 파일을 연결할까요?","Unsaved viewer edits will be lost. Connect another file?"))) return false;
+  try{
+    const handles=await window.showOpenFilePicker({multiple:false,types:[{description:"VibeSpec SOT JSON",accept:{"application/json":[".json"]}}]});
+    CONNECTED_FILE_HANDLE=handles[0]||null; if(!CONNECTED_FILE_HANDLE) return false;
+    await persistConnectedHandle(); refreshFileConnectionStatus(); return reloadConnectedSot(true);
+  }catch(error){
+    if(error&&error.name==="AbortError") return false;
+    setFileStatus("error",t("파일을 연결하지 못했습니다","Could not connect the file")); return false;
+  }
+}
+function changeSaveLocation(){ return supportsFileConnection() ? chooseSaveLocation() : (downloadCurrentSot(),refreshFileConnectionStatus(),Promise.resolve(true)); }
+function loadFallbackFile(file){
+  if(!file) return; const rd=new FileReader();
+  rd.onload=()=>{ if(applyLoadedSot(rd.result,t("파일 불러오기","File load"))) setFileStatus("warning",t("다운로드 모드 · 파일이 연결되지는 않았습니다","Download mode · file is not connected")); };
+  rd.readAsText(file);
+}
+function migrateLegacySotDraft(){
+  try{
+    const legacy=localStorage.getItem(LEGACY_SOT_KEY); if(!legacy) return;
+    localStorage.removeItem(LEGACY_SOT_KEY);
+    if(window.confirm(t("이전 버전의 브라우저 임시 SOT가 있습니다. 사본을 다운로드할까요?", "A legacy browser SOT draft was found. Download a copy?"))){
+      downloadText(legacy,"vibespec-legacy-draft.sot.json");
+    }
+  }catch(_){ /* Storage can be unavailable in privacy-restricted contexts. */ }
+}
+async function initializeFileConnection(){
+  if(RO) return;
+  markViewerSaved(); migrateLegacySotDraft(); refreshFileConnectionStatus(); await restoreConnectedHandle();
+}
 
 
 /* ==== 50-render.js ==== */
@@ -1505,7 +1712,7 @@ function renderMap(){
   const workspace=M.mode==="workspace";
   MAPDOC=null;
   // Hide the editing chrome — a map is a read-only overview, not an editor.
-  ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
+  ["undoBtn","redoBtn","histBtn","saveBtn","reloadBtn","loadBtn","locationBtn","fileStatus","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
   document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
   const band=document.getElementById("initBand"); if(band) band.hidden=true;
   // A map is read-only — the title must not be editable (no history/SOT writes).
@@ -1768,22 +1975,16 @@ document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
 document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
 document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
-document.getElementById("saveBtn").addEventListener("click",()=>{
-  const blob=new Blob([canonicalSOT()],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download=(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json"; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-});
-document.getElementById("loadBtn").addEventListener("click",()=>document.getElementById("fileInput").click());
+document.getElementById("saveBtn").addEventListener("click",saveCurrentSot);
+document.getElementById("reloadBtn").addEventListener("click",reloadConnectedSot);
+document.getElementById("loadBtn").addEventListener("click",connectExistingSot);
+document.getElementById("locationBtn").addEventListener("click",changeSaveLocation);
 document.getElementById("fileInput").addEventListener("change",e=>{
-  const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ SOT=normalize(JSON.parse(rd.result)); resetSelections(); pushHistory(t("불러오기","Load")); render(); }catch(err){ alert(t("불러오기 실패: 올바른 JSON 파일이 아닙니다.","Load failed: not a valid JSON file.")); } e.target.value=""; };
-  rd.readAsText(f);
+  loadFallbackFile(e.target.files[0]); e.target.value="";
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
-if(!MAP && !_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
 if(!MAP){
   if(!SOT.title) SOT.title="제품";
   (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
@@ -1791,6 +1992,7 @@ if(!MAP){
   selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
   pushHistory(t("현재 상태","Current state"));
   updateUndoButtons();
+  initializeFileConnection();
 }
 // An embedded document is authoritative for its own language: the skill baked
 // in a product with an intended language, so honor SOT.lang over a leftover
@@ -1798,7 +2000,7 @@ if(!MAP){
 // between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
 // embedded SOT) falls back to the remembered preference.
 try{ LANG = MAP ? ((MAP.lang) || "ko") : (_loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko")); }catch(e){}
-document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); rerender(); });
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); refreshFileConnectionStatus(); rerender(); });
 applyStaticI18n();
 MAP?renderMap():render();
 roWatch();

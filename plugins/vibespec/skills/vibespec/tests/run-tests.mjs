@@ -70,7 +70,11 @@ const sourceRoot = join(here, "..", "src", "js");
 const viewerContractSource = ["00-config.js", "05-c14n.js", "20-state.js", "40-io.js"]
   .map(file => readFileSync(join(sourceRoot, file), "utf8"))
   .join("\n") + "\nthis.canonical = canonicalSOT(); this.promote = input => { SOT=normalize(structuredClone(input)); return canonicalSOT(); }; this.makeTransition = flowTransition;";
-const viewerContext = { structuredClone };
+const viewerContext = {
+  structuredClone,
+  URLSearchParams,
+  window: {location:{search:"",href:"https://example.test/"},history:{replaceState(){}}}
+};
 vm.runInNewContext(viewerContractSource, viewerContext);
 const viewerExport = JSON.parse(viewerContext.canonical);
 const viewerResult = validateSot(viewerExport);

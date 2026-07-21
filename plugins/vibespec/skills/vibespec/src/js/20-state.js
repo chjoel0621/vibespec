@@ -186,7 +186,17 @@ function flowTransition(from,to,ref="",label=""){
   return transition;
 }
 let SOT = normalize(structuredClone(SEED));
-let VIEW = "prd";
+const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow"]);
+const requestedView = typeof window!=="undefined" && typeof URLSearchParams!=="undefined" ? new URLSearchParams(window.location.search).get("view") : null;
+let VIEW = DEEP_LINK_VIEWS.has(requestedView) ? requestedView : "prd";
+function syncViewInUrl(){
+  try{
+    const url=new URL(window.location.href);
+    if(VIEW==="prd") url.searchParams.delete("view");
+    else url.searchParams.set("view",VIEW);
+    window.history.replaceState(null,"",url);
+  }catch(_){ /* file previews can restrict history changes */ }
+}
 let selReq, selFeat, selNode;
 let colReqCol = false, colFeatCol = false;
 let selSec, selPage;

@@ -1,5 +1,5 @@
 /* ============================ EVENT WIRING ============================ */
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;render();}));
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{VIEW=t.dataset.view;syncViewInUrl();render();}));
 document.getElementById("resetBtn").addEventListener("click",()=>{ if(!HISTORY.length) return; restoreTo(0); const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title||"제품"; });
 document.getElementById("sotBtn").addEventListener("click",()=>{
   const w=window.open("","_blank","width=520,height=640");
@@ -118,22 +118,16 @@ document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
 document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
 document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
-document.getElementById("saveBtn").addEventListener("click",()=>{
-  const blob=new Blob([canonicalSOT()],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download=(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json"; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-});
-document.getElementById("loadBtn").addEventListener("click",()=>document.getElementById("fileInput").click());
+document.getElementById("saveBtn").addEventListener("click",saveCurrentSot);
+document.getElementById("reloadBtn").addEventListener("click",reloadConnectedSot);
+document.getElementById("loadBtn").addEventListener("click",connectExistingSot);
+document.getElementById("locationBtn").addEventListener("click",changeSaveLocation);
 document.getElementById("fileInput").addEventListener("change",e=>{
-  const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ SOT=normalize(JSON.parse(rd.result)); resetSelections(); pushHistory(t("불러오기","Load")); render(); }catch(err){ alert(t("불러오기 실패: 올바른 JSON 파일이 아닙니다.","Load failed: not a valid JSON file.")); } e.target.value=""; };
-  rd.readAsText(f);
+  loadFallbackFile(e.target.files[0]); e.target.value="";
 });
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
-if(!MAP && !_loaded){ try{ const saved=localStorage.getItem(LS_KEY); if(saved){ SOT=normalize(JSON.parse(saved)); } }catch(e){} }
 if(!MAP){
   if(!SOT.title) SOT.title="제품";
   (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();
@@ -141,6 +135,7 @@ if(!MAP){
   selPage=SOT.ia.sections[0]&&SOT.ia.sections[0].pages[0]?SOT.ia.sections[0].pages[0].id:null;
   pushHistory(t("현재 상태","Current state"));
   updateUndoButtons();
+  initializeFileConnection();
 }
 // An embedded document is authoritative for its own language: the skill baked
 // in a product with an intended language, so honor SOT.lang over a leftover
@@ -148,7 +143,7 @@ if(!MAP){
 // between, e.g., the /ko and /en demos). Only the empty skeleton viewer (no
 // embedded SOT) falls back to the remembered preference.
 try{ LANG = MAP ? ((MAP.lang) || "ko") : (_loaded ? ((SOT&&SOT.lang) || "ko") : (localStorage.getItem(LANG_KEY) || "ko")); }catch(e){}
-document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); rerender(); });
+document.getElementById("langBtn").addEventListener("click",()=>{ LANG = LANG==="en"?"ko":"en"; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} applyStaticI18n(); refreshFileConnectionStatus(); rerender(); });
 applyStaticI18n();
 MAP?renderMap():render();
 roWatch();

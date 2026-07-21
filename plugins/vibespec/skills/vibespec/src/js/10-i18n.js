@@ -1,4 +1,4 @@
-let LANG = "ko"; const LANG_KEY = "vibespec-lang";
+let LANG = "ko";
 function t(ko,en){ return LANG==="en" ? en : ko; }
 function applyStaticI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ const p=el.dataset.i18n.split("|"); el.textContent = LANG==="en"?(p[1]||p[0]):p[0]; });

@@ -2,8 +2,9 @@
   <div class="topbar">
     <div class="logo">VS</div>
     <div class="title" id="prodTitle" contenteditable="true" spellcheck="false">회의실 예약 앱
-      <small data-i18n="VibeSpec · 기획 뷰어|VibeSpec · Planning Viewer">VibeSpec · 기획 뷰어</small>
+      <small data-i18n="VibeSpec은 Claude와 Codex용 무료 오픈소스 AI 제품 기획 플러그인입니다.|VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.">VibeSpec은 Claude와 Codex용 무료 오픈소스 AI 제품 기획 플러그인입니다.</small>
     </div>
+    <a class="made-with" data-vibespec-attribution="viewer" href="https://vbspec.com/?ref=viewer" target="_blank" rel="noopener noreferrer" data-i18n="VibeSpec으로 만듦 · 내 기획 만들기|Made with VibeSpec · Create yours">VibeSpec으로 만듦 · 내 기획 만들기</a>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-view="prd" aria-selected="true">PRD</button>
       <button class="tab" role="tab" data-view="spec" data-i18n="기능명세서|Feature Spec">기능명세서</button>
@@ -16,7 +17,10 @@
     <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
     <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
     <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
-    <button class="topbtn" id="loadBtn" data-i18n="불러오기|Load" data-i18n-title="JSON 파일 불러오기|Load JSON" title="JSON 파일 불러오기">불러오기</button>
+    <button class="topbtn" id="reloadBtn" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
+    <button class="topbtn" id="loadBtn" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
+    <button class="topbtn" id="locationBtn" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
+    <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
     <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
     <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
     <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>

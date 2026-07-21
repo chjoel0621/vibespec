@@ -20,7 +20,7 @@
     "test": "node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/workspace.test.mjs && node tests/change-plan.test.mjs && node tests/sot-query.test.mjs && node tests/content-review.test.mjs && node tests/migration.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs && node tests/embed-sot.test.mjs && node tests/host-smoke.mjs && node tests/installed-plugin-smoke.mjs",
     "test:browser": "npm run check:browser",
     "check": "node build.mjs && node --check .build/app.js && node tests/run-tests.mjs && node tests/tree.test.mjs && node tests/rebase.test.mjs && node tests/product-map.test.mjs && node tests/workspace.test.mjs && node tests/change-plan.test.mjs && node tests/sot-query.test.mjs && node tests/content-review.test.mjs && node tests/migration.test.mjs && node tests/inspect.test.mjs && node tests/merge.test.mjs && node tests/embed-sot.test.mjs && node tests/plugin-contract.mjs && node tests/host-smoke.mjs && node tests/installed-plugin-smoke.mjs",
-    "check:browser": "node tests/browser-flow.mjs && node tests/browser-initiative.mjs && node tests/browser-map.mjs",
+    "check:browser": "node tests/browser-flow.mjs && node tests/browser-initiative.mjs && node tests/browser-map.mjs && node tests/browser-file-connection.mjs",
     "check:all": "npm run check && npm run check:browser"
   }
 }

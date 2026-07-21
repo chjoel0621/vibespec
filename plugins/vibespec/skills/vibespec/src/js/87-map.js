@@ -32,7 +32,7 @@ function renderMap(){
   const workspace=M.mode==="workspace";
   MAPDOC=null;
   // Hide the editing chrome — a map is a read-only overview, not an editor.
-  ["undoBtn","redoBtn","histBtn","saveBtn","loadBtn","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
+  ["undoBtn","redoBtn","histBtn","saveBtn","reloadBtn","loadBtn","locationBtn","fileStatus","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
   document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
   const band=document.getElementById("initBand"); if(band) band.hidden=true;
   // A map is read-only — the title must not be editable (no history/SOT writes).

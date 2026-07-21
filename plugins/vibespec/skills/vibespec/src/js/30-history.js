@@ -1,10 +1,8 @@
 /* ---- persistence + history ---- */
 let HISTORY=[], HPTR=-1, restoring=false;
 function snapshot(){ return JSON.stringify(SOT); }
-// RO guards live here, at the persistence boundary: whatever slips past the UI,
-// a read-only document can neither be stored nor become an undo step — and it
-// can never overwrite the user's own working SOT in localStorage.
-function saveLocal(){ if(RO) return; try{ localStorage.setItem(LS_KEY, snapshot()); }catch(e){} }
+// History is intentionally in-memory only. The connected file is the durable
+// SOT; browser storage must not retain its body text.
 function pushHistory(label){
   if(RO) return;
   const snap=snapshot();
@@ -13,12 +11,12 @@ function pushHistory(label){
   HISTORY.push({t:Date.now(), label: label || (t(VIEWNAME[VIEW],VIEWNAME_EN[VIEW])+t(" 편집"," edit")), sot:snap});
   if(HISTORY.length>120){ HISTORY.shift(); }
   HPTR = HISTORY.length-1;
-  saveLocal(); renderHistory(); updateUndoButtons();
+  renderHistory(); updateUndoButtons();
 }
 function restoreTo(i){
   if(i<0 || i>=HISTORY.length) return;
   HPTR=i; SOT=normalize(JSON.parse(HISTORY[i].sot));
-  saveLocal(); render(); renderHistory(); updateUndoButtons();
+  render(); renderHistory(); updateUndoButtons();
 }
 function undo(){ if(HPTR>0) restoreTo(HPTR-1); }
 function redo(){ if(HPTR<HISTORY.length-1) restoreTo(HPTR+1); }

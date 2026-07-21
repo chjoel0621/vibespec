@@ -134,6 +134,7 @@ console.log("[map] PASS embedDocs carries each scope's source document (opt-in, 
 const htmlOut = join(here, "..", ".build", "map-embed-probe.html");
 assert.equal(run([treeDir, "--html", htmlOut]).status, 0, "--html run must succeed");
 assert.ok(readFileSync(htmlOut, "utf8").includes('"kind":"vibespec-product-map"'), "the html map carries its payload");
+assert.ok(readFileSync(htmlOut, "utf8").includes('data-vibespec-attribution="product-map" href="https://vbspec.com/?ref=product-map"'), "a product map attributes its create-more link to product-map");
 assert.ok(/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "the html map embeds its scopes' documents by default");
 assert.equal(run([treeDir, "--html", htmlOut, "--link", "root=/"]).status, 0, "--link run must succeed");
 assert.ok(!/"sot":\{/.test(readFileSync(htmlOut, "utf8")), "--link points at real pages, so the html map does not embed docs");

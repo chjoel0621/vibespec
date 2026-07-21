@@ -23,6 +23,8 @@
   .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#b49bff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
   .title{font-weight:650;font-size:15px}
   .title small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  .made-with{font-size:11.5px;color:var(--muted);text-decoration:none;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:5px 8px}
+  .made-with:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
   .tabs{display:flex;gap:4px;margin:0 auto;background:var(--panel);padding:4px;border-radius:10px}
   .tab{border:0;background:transparent;color:var(--sub);padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
   .tab[aria-selected="true"]{background:#fff;color:var(--text);box-shadow:var(--shadow)}
@@ -430,6 +432,7 @@
     <div class="title" id="prodTitle" contenteditable="true" spellcheck="false">회의실 예약 앱
       <small data-i18n="VibeSpec · 기획 뷰어|VibeSpec · Planning Viewer">VibeSpec · 기획 뷰어</small>
     </div>
+    <a class="made-with" data-vibespec-attribution="viewer" href="https://vbspec.com/?ref=viewer" target="_blank" rel="noopener noreferrer" data-i18n="VibeSpec으로 만듦 · 내 기획 만들기|Made with VibeSpec · Create yours">VibeSpec으로 만듦 · 내 기획 만들기</a>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-view="prd" aria-selected="true">PRD</button>
       <button class="tab" role="tab" data-view="spec" data-i18n="기능명세서|Feature Spec">기능명세서</button>

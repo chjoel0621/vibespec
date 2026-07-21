@@ -5,6 +5,10 @@
 > Like vibe coding — but for **product planning.**
 > Drop in a product idea or a planning document, and VibeSpec organizes it into a single **SOT (Single Source of Truth, JSON)**, then lets you view and edit the **PRD · Feature Spec · IA (Information Architecture) · User Flow** all in one screen.
 
+**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOTs with PRDs, feature specs, information architecture, and user flows. Official site: [vbspec.com](https://vbspec.com/).
+
+**VibeSpec은 Claude와 Codex용 무료 오픈소스 AI 제품 기획 플러그인입니다.** 제품 아이디어를 PRD·기능 명세·IA·유저 플로우가 연결된 수정 가능한 SOT로 만듭니다. 공식 사이트: [vbspec.com/ko](https://vbspec.com/ko/).
+
 VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code and OpenAI Codex. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
 **🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — ask "turn my product idea into a planning tool" or attach a business plan, and the skill produces an HTML just like this demo. Try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable, and Save exports the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.

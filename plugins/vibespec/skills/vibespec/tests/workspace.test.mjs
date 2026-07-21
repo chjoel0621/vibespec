@@ -40,6 +40,9 @@ try {
   };
   const workMap = payload("workspace.html");
   const releaseMap = payload("release-map.html");
+  for (const name of ["workspace.html", "release-map.html"]) {
+    assert.ok(readFileSync(join(out, name), "utf8").includes('data-vibespec-attribution="workspace" href="https://vbspec.com/?ref=workspace"'), `${name} must attribute its create-more link to workspace`);
+  }
   assert.equal(workMap.mode, "workspace");
   assert.deepEqual(workMap.scopes.map(s => [s.id, s.parentScopeId]), [["root", null], ["payment", "root"]]);
   assert.equal(releaseMap.mode, "release");

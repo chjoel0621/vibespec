@@ -19,7 +19,8 @@ function writeMapHtml(map, out) {
   const viewer = readFileSync(join(scriptDir, "..", "assets", "viewer.html"), "utf8");
   const tag = '<script type="application/json" id="embedded-sot"></script>';
   const payload = JSON.stringify(map).replace(/</g, "\\u003c");
-  writeFileSync(out, viewer.replace(tag, tag.replace("></script>", `>${payload}</script>`)));
+  const attributedViewer = viewer.replace('data-vibespec-attribution="viewer" href="https://vbspec.com/?ref=viewer"', 'data-vibespec-attribution="product-map" href="https://vbspec.com/?ref=product-map"');
+  writeFileSync(out, attributedViewer.replace(tag, tag.replace("></script>", `>${payload}</script>`)));
 }
 
 function printTree(pages, depth, out) {

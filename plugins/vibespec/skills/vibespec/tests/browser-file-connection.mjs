@@ -55,6 +55,7 @@ const harness = `<script>
   const restoredTitle=SOT.title;
   const restoredHistoryLength=HISTORY.length;
   const writesAfterRestore=__connectedFile.writes;
+  const saveAsName=suggestedSotFileName(true);
   await saveCurrentSot();
   const firstWrite=JSON.parse(__connectedFile.text);
   SOT.title="Saved through handle";
@@ -74,6 +75,7 @@ const harness = `<script>
     restoredTitle,
     restoredHistoryLength,
     writesAfterRestore,
+    saveAsName,
     firstSchema:firstWrite.schemaVersion,
     secondTitle:secondWrite.title,
     reloaded,
@@ -104,6 +106,7 @@ try {
   assert.equal(measured.restoredTitle, "Recovered from existing file", "a recovered handle must reload the source SOT before any write");
   assert.equal(measured.restoredHistoryLength, 1, "connecting another SOT must replace, not mix, viewer history");
   assert.equal(measured.writesAfterRestore, 0, "the safety reload for a recovered handle must not write the stale viewer state");
+  assert.equal(measured.saveAsName, "connected-v2.sot.json", "Save as must propose a clearly separate next-version filename");
   assert.equal(measured.firstSchema, "1.0", "first connected save must keep schemaVersion");
   assert.equal(measured.secondTitle, "Saved through handle", "second save must overwrite the connected file without another picker");
   assert.equal(measured.reloaded, "Changed by AI", "reload must read external file changes");

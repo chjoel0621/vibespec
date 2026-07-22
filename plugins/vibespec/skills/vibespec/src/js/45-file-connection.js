@@ -44,6 +44,14 @@ function downloadText(text,name){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function downloadCurrentSot(){ downloadText(canonicalSOT(),(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json"); }
+function suggestedSotFileName(saveAs){
+  const fallback=(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json";
+  if(!saveAs) return fallback;
+  const current=connectedFileName()||fallback;
+  const match=current.match(/^(.*?)(?:[-_. ]v(\d+))?(\.sot\.json)$/i);
+  if(!match) return fallback.replace(/\.sot\.json$/i,"-v2.sot.json");
+  return match[1]+"-v"+(Number(match[2]||1)+1)+match[3];
+}
 function hasUnsavedViewerChanges(){ return !!LAST_SAVED_CANONICAL && canonicalSOT()!==LAST_SAVED_CANONICAL; }
 function markViewerSaved(){ LAST_SAVED_CANONICAL=canonicalSOT(); }
 
@@ -142,15 +150,17 @@ async function writeConnectedSot(forceOverwrite){
     setFileStatus("error",t("파일에 저장하지 못했습니다 · 권한 또는 파일 상태를 확인하세요","Could not save · check file permission or availability")); return false;
   }
 }
-async function chooseSaveLocation(){
+async function chooseSaveLocation(saveAs){
   try{
     CONNECTED_FILE_HANDLE=await window.showSaveFilePicker({
       id:"vibespec-sot",
-      suggestedName:(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json",
+      suggestedName:suggestedSotFileName(!!saveAs),
       types:[{description:"VibeSpec SOT JSON",accept:{"application/json":[".json"]}}]
     });
     CONNECTED_FILE_SIGNATURE=""; CONNECTED_FILE_RESTORE_PENDING=false; await persistConnectedHandle(); refreshFileConnectionStatus();
-    return await saveCurrentSot();
+    const saved=await saveCurrentSot();
+    if(saved&&saveAs) setFileStatus("connected",t("새 버전 · ","New version · ")+connectedFileName());
+    return saved;
   }catch(error){
     if(error&&error.name==="AbortError") return false;
     setFileStatus("error",t("저장 위치를 선택하지 못했습니다","Could not choose a save location")); return false;
@@ -159,7 +169,7 @@ async function chooseSaveLocation(){
 async function saveCurrentSot(){
   if(RO) return false;
   if(!supportsFileConnection()){ downloadCurrentSot(); refreshFileConnectionStatus(); return true; }
-  if(!CONNECTED_FILE_HANDLE) return chooseSaveLocation();
+  if(!CONNECTED_FILE_HANDLE) return chooseSaveLocation(false);
   if(CONNECTED_FILE_RESTORE_PENDING){
     const reloaded=await reloadConnectedSot(false,true);
     if(reloaded) setFileStatus("warning",t("연결된 파일을 불러왔습니다 · 저장하려면 다시 누르세요","Connected file loaded · save again to write"));
@@ -200,7 +210,7 @@ async function connectExistingSot(){
     setFileStatus("error",t("파일을 연결하지 못했습니다","Could not connect the file")); return false;
   }
 }
-function changeSaveLocation(){ return supportsFileConnection() ? chooseSaveLocation() : (downloadCurrentSot(),refreshFileConnectionStatus(),Promise.resolve(true)); }
+function changeSaveLocation(){ return supportsFileConnection() ? chooseSaveLocation(true) : (downloadCurrentSot(),refreshFileConnectionStatus(),Promise.resolve(true)); }
 function loadFallbackFile(file){
   if(!file) return; const rd=new FileReader();
   rd.onload=()=>{ if(applyLoadedSot(rd.result,t("파일 불러오기","File load"),true)) setFileStatus("warning",t("다운로드 모드 · 파일이 연결되지는 않았습니다","Download mode · file is not connected")); };

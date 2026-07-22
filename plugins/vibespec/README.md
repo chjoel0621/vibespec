@@ -1,9 +1,19 @@
 # VibeSpec
 
-제품 아이디어나 기획 문서를 단일 SOT(JSON)로 생성하고, PRD·기능명세서·IA·유저플로우를 한 화면에서 보는 HTML 뷰어로 열어 편집하는 "바이브 기획" 도구.
+**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOT JSON with a PRD, feature spec, information architecture, and user flow, plus a self-contained HTML viewer.
 
-Claude(`.claude-plugin`)와 OpenAI Codex(`.codex-plugin`)가 같은 스킬·스키마·뷰어를 공유하는 듀얼 포맷 플러그인이다.
+VibeSpec is a dual-format plugin: Claude reads `.claude-plugin/`, OpenAI Codex reads `.codex-plugin/`, and both share the same skill, schema, scripts, and viewer.
 
-- **HTML = 앱(뷰어)** · **JSON = 데이터(SOT)**
-- 스킬: 아이디어/문서 → SOT JSON 생성 (뷰어 동봉)
-- 스키마: `skills/vibespec/references/sot-schema.md`
+## Data and security boundaries
+
+- Node scripts make **no automatic network requests**. They read the SOT paths, schema, and viewer template explicitly supplied to them.
+- Scripts write only to an explicit output path, or to the selected SOT when a user explicitly runs an `--apply` command. Generated HTML and change-plan receipts are written only to their requested paths.
+- In Chromium browsers, the viewer writes only to a file selected by the user through the browser file picker. Unsupported browsers fall back to a normal download.
+- The viewer contains an optional, user-clicked link to [vbspec.com](https://vbspec.com/); it does not send SOT contents there.
+
+## Contents
+
+- **HTML = viewer/editor** · **JSON = SOT data**
+- Skill: idea or document → validated SOT JSON with viewer
+- Schema: `skills/vibespec/references/sot-schema.md`
+- Full installation, usage, and release notes: [repository README](../../README.md)

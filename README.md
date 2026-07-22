@@ -11,7 +11,7 @@
 
 VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code and OpenAI Codex. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
-**🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — ask "turn my product idea into a planning tool" or attach a business plan, and the skill produces an HTML just like this demo. Try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable, and Save exports the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.
+**🕹️ [Live demo](https://chjoel0621.github.io/vibespec/en/)** — ask "turn my product idea into a planning tool" or attach a business plan, and the skill produces an HTML just like this demo. Try the viewer in your browser right now, no install needed. It opens with a sample product in English (a meeting-room booking app); everything is editable. In Chrome or Edge, connect a SOT file and Save writes it directly; other browsers download the SOT JSON. A [Korean demo](https://chjoel0621.github.io/vibespec/) is also available.
 
 The demo has three linked pages — use the strip in the bottom-right corner to move between them: the **[main plan](https://chjoel0621.github.io/vibespec/en/)**, an **[initiative](https://chjoel0621.github.io/vibespec/en/notif/)** layered on it (a notification increment), and the **[product map](https://chjoel0621.github.io/vibespec/en/map/)** that composes the two. In the map, click any node to open the document that defines it.
 
@@ -99,7 +99,7 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 ## Tips for getting the most out of it
 
-- **For team collaboration, share only the JSON file.** The viewer (HTML) is the app, so you only need to hand it out once. After that, exchange the `*.sot.json` file you get from Save (JSON export); the other person opens it in the same viewer via Load and sees the **exact same five views**. No more copying around heavy documents.
+- **For team collaboration, share only the JSON file.** The viewer (HTML) is the app, so you only need to hand it out once. After that, exchange the saved `*.sot.json` file; the other person connects it in the same viewer and sees the **exact same five views**. No more copying around heavy documents.
 
 - **Edit once, in the Feature Spec.** Because every view reads and writes one SOT, renaming a feature automatically updates the user-flow label, the KPI link, and the IA mapping. Never retype the same thing in multiple places.
 
@@ -117,11 +117,11 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 ## Optional: version control with Git (for teams)
 
-**Git is not required.** Working solo, the viewer's undo/history (auto-saved in your browser) is enough, and sharing just means handing someone the `*.sot.json` file by any means you like. What follows is for **editing together** or when you want **durable history**.
+**Git is not required.** Working solo, the viewer's undo/history covers the current editing session, and sharing just means handing someone the `*.sot.json` file by any means you like. What follows is for **editing together** or when you want **durable history**.
 
 Because the data lives in a plain `*.sot.json` file, you can put it under Git and let Git handle history, branching, review, and rollback — no extra tooling needed.
 
-- **Save produces a Git-friendly file.** Export (Save) writes canonical JSON — stable key order and pretty-printing, with a `schemaVersion`. The filename is stable (`<title>.sot.json`, no date), so you drop the downloaded file straight over the tracked one and Git sees an edit rather than a delete-plus-add. The same content always serializes identically, so a diff shows only what actually changed.
+- **Save produces a Git-friendly file.** In Chrome or Edge, use **File → Connect file** once, then **Save** writes canonical JSON directly to that selected SOT. Use **Save as** to branch to a version such as `booking-v2.sot.json`; it becomes the new save target. Other browsers download the same canonical JSON. Stable key order, pretty-printing, and `schemaVersion` keep diffs focused on actual changes.
 - **Recommended workflow.** Edit in the viewer → **Save** → replace the `*.sot.json` in your repo → commit / open a PR. Teammates pull and open the file in the same viewer to see the exact same five views.
 - **`.gitattributes`.** Add this so the SOT is treated as text with consistent line endings:
 
@@ -130,6 +130,12 @@ Because the data lives in a plain `*.sot.json` file, you can put it under Git an
   ```
 
 - **Merges.** The canonical format keeps most diffs readable and conflicts hand-resolvable.
+
+## Data and security boundaries
+
+- VibeSpec's Node scripts make **no automatic network requests**. They read only the SOT paths, schema, and viewer template explicitly supplied to them.
+- They write only to explicit output paths, or to a selected SOT when the user explicitly runs an `--apply` command. The browser viewer writes only to a file selected through its file picker.
+- The viewer includes an optional link to [vbspec.com](https://vbspec.com/) when a user clicks it; SOT contents are not sent there.
 
 ## Repository structure
 

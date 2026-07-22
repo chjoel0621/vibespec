@@ -118,10 +118,16 @@ document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
 document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
 document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
+const fileMenuBtn=document.getElementById("fileMenuBtn"), fileMenuPanel=document.getElementById("fileMenuPanel");
+function closeFileMenu(){ if(fileMenuBtn&&fileMenuPanel){ fileMenuPanel.hidden=true; fileMenuBtn.setAttribute("aria-expanded","false"); } }
+function toggleFileMenu(){ if(!fileMenuBtn||!fileMenuPanel) return; const open=fileMenuPanel.hidden; fileMenuPanel.hidden=!open; fileMenuBtn.setAttribute("aria-expanded",String(open)); }
+fileMenuBtn.addEventListener("click",e=>{e.stopPropagation();toggleFileMenu();});
+document.addEventListener("click",e=>{ if(!e.target.closest("#fileTools")) closeFileMenu(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeFileMenu(); });
 document.getElementById("saveBtn").addEventListener("click",saveCurrentSot);
-document.getElementById("reloadBtn").addEventListener("click",reloadConnectedSot);
-document.getElementById("loadBtn").addEventListener("click",connectExistingSot);
-document.getElementById("locationBtn").addEventListener("click",changeSaveLocation);
+document.getElementById("reloadBtn").addEventListener("click",()=>{closeFileMenu(); return reloadConnectedSot();});
+document.getElementById("loadBtn").addEventListener("click",()=>{closeFileMenu(); return connectExistingSot();});
+document.getElementById("locationBtn").addEventListener("click",()=>{closeFileMenu(); return changeSaveLocation();});
 document.getElementById("fileInput").addEventListener("change",e=>{
   loadFallbackFile(e.target.files[0]); e.target.value="";
 });

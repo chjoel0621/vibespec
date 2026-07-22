@@ -16,11 +16,18 @@
     <button class="topbtn" id="undoBtn" data-i18n-title="실행 취소 (Ctrl+Z)|Undo (Ctrl+Z)" title="실행 취소 (Ctrl+Z)">↩</button>
     <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
     <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
-    <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
-    <button class="topbtn" id="reloadBtn" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
-    <button class="topbtn" id="loadBtn" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
-    <button class="topbtn" id="locationBtn" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
-    <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
+    <div class="file-tools" id="fileTools">
+      <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="연결된 SOT 파일에 저장|Save to the connected SOT file" title="연결된 SOT 파일에 저장">저장</button>
+      <div class="file-menu">
+        <button class="topbtn" id="fileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fileMenuPanel" data-i18n="파일 ▾|File ▾" data-i18n-title="파일 작업|File actions" title="파일 작업">파일 ▾</button>
+        <div class="file-menu-panel" id="fileMenuPanel" role="menu" hidden>
+          <button class="file-menu-item" id="reloadBtn" role="menuitem" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
+          <button class="file-menu-item" id="loadBtn" role="menuitem" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
+          <button class="file-menu-item" id="locationBtn" role="menuitem" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
+        </div>
+      </div>
+      <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
+    </div>
     <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
     <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
     <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>

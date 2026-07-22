@@ -19,16 +19,22 @@
   }
   .app{display:flex;flex-direction:column;height:100vh}
   /* top bar */
-  .topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .topbar{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);flex:0 0 auto;min-width:0}
   .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#b49bff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
-  .title{font-weight:650;font-size:15px}
-  .title small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  .title{font-weight:650;font-size:15px;flex:0 1 270px;min-width:150px}
+  .title small{display:block;color:var(--muted);font-weight:500;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .made-with{font-size:11.5px;color:var(--muted);text-decoration:none;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:5px 8px}
   .made-with:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
-  .tabs{display:flex;gap:4px;margin:0 auto;background:var(--panel);padding:4px;border-radius:10px}
-  .tab{border:0;background:transparent;color:var(--sub);padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
+  .tabs{display:flex;gap:4px;margin:0 auto;min-width:0;background:var(--panel);padding:4px;border-radius:10px;overflow-x:auto}
+  .tab{border:0;background:transparent;color:var(--sub);padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex:0 0 auto}
   .tab[aria-selected="true"]{background:#fff;color:var(--text);box-shadow:var(--shadow)}
   .topbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--sub);cursor:pointer}
+  .file-tools{display:flex;align-items:center;gap:7px;flex:0 0 auto;min-width:0}
+  .file-menu{position:relative;flex:0 0 auto}
+  .file-menu-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:70;min-width:150px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(20,20,30,.13)}
+  .file-menu-panel[hidden]{display:none}
+  .file-menu-item{display:block;width:100%;border:0;border-radius:6px;background:transparent;color:var(--text);padding:8px 10px;text-align:left;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .file-menu-item:hover,.file-menu-item:focus-visible{background:var(--accent-soft);color:var(--accent);outline:0}
   .file-status{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;padding:3px 0}
   .file-status.connected{color:var(--ok);font-weight:650}
   .file-status.warning{color:#9b6200}
@@ -149,6 +155,7 @@
   .fnode.page .fref{background:#fff;color:var(--accent)}
   .fnode.action .fref{background:var(--accent-soft);color:var(--accent)}
   .topbtn:disabled{opacity:.35;cursor:default}
+  @media(max-width:1480px){.made-with{display:none}}
   @media(max-width:980px){
     .topbar{gap:8px;flex-wrap:wrap;padding:9px 12px}
     .tabs{order:3;margin:0;width:100%;overflow:auto}
@@ -453,11 +460,18 @@
     <button class="topbtn" id="undoBtn" data-i18n-title="실행 취소 (Ctrl+Z)|Undo (Ctrl+Z)" title="실행 취소 (Ctrl+Z)">↩</button>
     <button class="topbtn" id="redoBtn" data-i18n-title="다시 실행 (Ctrl+Shift+Z)|Redo (Ctrl+Shift+Z)" title="다시 실행 (Ctrl+Shift+Z)">↪</button>
     <button class="topbtn" id="histBtn" data-i18n="히스토리|History" data-i18n-title="변경 히스토리|Change history" title="변경 히스토리">히스토리</button>
-    <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="JSON 파일로 저장|Save as JSON" title="JSON 파일로 저장">저장</button>
-    <button class="topbtn" id="reloadBtn" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
-    <button class="topbtn" id="loadBtn" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
-    <button class="topbtn" id="locationBtn" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
-    <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
+    <div class="file-tools" id="fileTools">
+      <button class="topbtn" id="saveBtn" data-i18n="저장|Save" data-i18n-title="연결된 SOT 파일에 저장|Save to the connected SOT file" title="연결된 SOT 파일에 저장">저장</button>
+      <div class="file-menu">
+        <button class="topbtn" id="fileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fileMenuPanel" data-i18n="파일 ▾|File ▾" data-i18n-title="파일 작업|File actions" title="파일 작업">파일 ▾</button>
+        <div class="file-menu-panel" id="fileMenuPanel" role="menu" hidden>
+          <button class="file-menu-item" id="reloadBtn" role="menuitem" data-i18n="다시 불러오기|Reload" data-i18n-title="연결된 SOT 파일을 다시 불러오기|Reload the connected SOT file" title="연결된 SOT 파일을 다시 불러오기">다시 불러오기</button>
+          <button class="file-menu-item" id="loadBtn" role="menuitem" data-i18n="파일 연결|Connect file" data-i18n-title="기존 SOT 파일 연결|Connect an existing SOT file" title="기존 SOT 파일 연결">파일 연결</button>
+          <button class="file-menu-item" id="locationBtn" role="menuitem" data-i18n="위치 변경|Change location" data-i18n-title="새 저장 위치 선택|Choose a new save location" title="새 저장 위치 선택">위치 변경</button>
+        </div>
+      </div>
+      <span class="file-status" id="fileStatus" role="status" aria-live="polite"></span>
+    </div>
     <input type="file" id="fileInput" accept="application/json,.json" style="display:none">
     <button class="topbtn" id="sotBtn" data-i18n="SOT 보기|View SOT">SOT 보기</button>
     <button class="topbtn primary" id="resetBtn" data-i18n="초기화|Reset">초기화</button>
@@ -799,6 +813,10 @@ const FILE_DB_NAME="vibespec-file-connections-v1";
 const FILE_DB_STORE="connections";
 let CONNECTED_FILE_HANDLE=null;
 let CONNECTED_FILE_SIGNATURE="";
+// A recovered handle is not safe to write until its file content has been read
+// into this viewer. This prevents a reopened viewer from overwriting the SOT
+// with its embedded/default document before the user reloads it.
+let CONNECTED_FILE_RESTORE_PENDING=false;
 let LAST_SAVED_CANONICAL="";
 
 function supportsFileConnection(){
@@ -822,7 +840,10 @@ function setFileStatus(kind,message){
 function refreshFileConnectionStatus(){
   if(RO) return;
   if(!supportsFileConnection()) return setFileStatus("warning",t("다운로드로 저장됩니다","Downloads in this browser"));
-  if(CONNECTED_FILE_HANDLE) return setFileStatus("connected",t("연결됨 · ","Connected · ")+connectedFileName());
+  if(CONNECTED_FILE_HANDLE){
+    if(CONNECTED_FILE_RESTORE_PENDING) return setFileStatus("warning",t("연결됨 · ","Connected · ")+connectedFileName()+t(" · 다시 불러오기 필요"," · reload required"));
+    return setFileStatus("connected",t("연결됨 · ","Connected · ")+connectedFileName());
+  }
   setFileStatus("",t("저장 위치 미연결","No file connected"));
 }
 function downloadText(text,name){
@@ -864,7 +885,22 @@ async function restoreConnectedHandle(){
       request.onsuccess=()=>resolve(request.result); request.onerror=()=>reject(request.error);
     });
     db.close();
-    if(row&&row.handle){ CONNECTED_FILE_HANDLE=row.handle; refreshFileConnectionStatus(); return true; }
+    if(row&&row.handle){
+      CONNECTED_FILE_HANDLE=row.handle;
+      CONNECTED_FILE_RESTORE_PENDING=true;
+      // Read automatically only when the browser has already granted access.
+      // A prompt is deliberately deferred to the next user click.
+      if(await ensureConnectedPermission("read",false)){
+        try{
+          const remote=await readConnectedFile();
+          if(applyLoadedSot(remote.text,t("연결된 파일 복원","Connected file restored"),true)){
+            CONNECTED_FILE_SIGNATURE=remote.signature;
+            CONNECTED_FILE_RESTORE_PENDING=false;
+          }
+        }catch(_){ /* Keep the handle, but require an explicit reload. */ }
+      }
+      refreshFileConnectionStatus(); return true;
+    }
   }catch(_){ /* Persistence is optional; same-tab connection still works. */ }
   return false;
 }
@@ -884,9 +920,11 @@ async function readConnectedFile(){
   const text=await file.text();
   return {text,signature:fileTextSignature(text),name:file.name||connectedFileName()};
 }
-function applyLoadedSot(text,label){
+function applyLoadedSot(text,label,replaceHistory){
   try{
-    SOT=normalize(JSON.parse(text)); resetSelections(); pushHistory(label||t("파일 다시 불러오기","File reload")); markViewerSaved(); render(); return true;
+    SOT=normalize(JSON.parse(text)); resetSelections();
+    if(replaceHistory){ HISTORY=[]; HPTR=-1; }
+    pushHistory(label||t("파일 다시 불러오기","File reload")); markViewerSaved(); render(); return true;
   }catch(_){
     setFileStatus("error",t("불러오기 실패: 올바른 SOT JSON이 아닙니다","Load failed: invalid SOT JSON"));
     alert(t("불러오기 실패: 올바른 JSON 파일이 아닙니다.","Load failed: not a valid JSON file.")); return false;
@@ -907,7 +945,7 @@ async function writeConnectedSot(forceOverwrite){
     let writable;
     try{ writable=await CONNECTED_FILE_HANDLE.createWritable(); await writable.write(next); await writable.close(); }
     catch(error){ try{ if(writable) await writable.abort(); }catch(_){} throw error; }
-    CONNECTED_FILE_SIGNATURE=fileTextSignature(next); markViewerSaved(); refreshFileConnectionStatus(); flash(); return true;
+    CONNECTED_FILE_SIGNATURE=fileTextSignature(next); CONNECTED_FILE_RESTORE_PENDING=false; markViewerSaved(); refreshFileConnectionStatus(); flash(); return true;
   }catch(_){
     setFileStatus("error",t("파일에 저장하지 못했습니다 · 권한 또는 파일 상태를 확인하세요","Could not save · check file permission or availability")); return false;
   }
@@ -919,7 +957,7 @@ async function chooseSaveLocation(){
       suggestedName:(SOT.title||"sot").replace(/\s+/g,"_")+".sot.json",
       types:[{description:"VibeSpec SOT JSON",accept:{"application/json":[".json"]}}]
     });
-    CONNECTED_FILE_SIGNATURE=""; await persistConnectedHandle(); refreshFileConnectionStatus();
+    CONNECTED_FILE_SIGNATURE=""; CONNECTED_FILE_RESTORE_PENDING=false; await persistConnectedHandle(); refreshFileConnectionStatus();
     return await saveCurrentSot();
   }catch(error){
     if(error&&error.name==="AbortError") return false;
@@ -930,12 +968,17 @@ async function saveCurrentSot(){
   if(RO) return false;
   if(!supportsFileConnection()){ downloadCurrentSot(); refreshFileConnectionStatus(); return true; }
   if(!CONNECTED_FILE_HANDLE) return chooseSaveLocation();
+  if(CONNECTED_FILE_RESTORE_PENDING){
+    const reloaded=await reloadConnectedSot(false,true);
+    if(reloaded) setFileStatus("warning",t("연결된 파일을 불러왔습니다 · 저장하려면 다시 누르세요","Connected file loaded · save again to write"));
+    return false;
+  }
   if(!await ensureConnectedPermission("readwrite",true)){
     setFileStatus("warning",t("파일 권한이 필요합니다 · 위치 변경 또는 다운로드를 사용하세요","File permission is required · change location or download a copy")); return false;
   }
   return writeConnectedSot(false);
 }
-async function reloadConnectedSot(skipUnsavedConfirm){
+async function reloadConnectedSot(skipUnsavedConfirm,replaceHistory){
   if(RO) return false;
   if(!CONNECTED_FILE_HANDLE) return connectExistingSot();
   if(!skipUnsavedConfirm && hasUnsavedViewerChanges() && !window.confirm(t("저장하지 않은 뷰어 수정이 사라집니다. 연결된 파일을 다시 불러올까요?","Unsaved viewer edits will be lost. Reload the connected file?"))) return false;
@@ -944,8 +987,8 @@ async function reloadConnectedSot(skipUnsavedConfirm){
   }
   try{
     const remote=await readConnectedFile();
-    if(!applyLoadedSot(remote.text,t("파일 다시 불러오기","File reload"))) return false;
-    CONNECTED_FILE_SIGNATURE=remote.signature; refreshFileConnectionStatus(); return true;
+    if(!applyLoadedSot(remote.text,t("파일 다시 불러오기","File reload"),replaceHistory)) return false;
+    CONNECTED_FILE_SIGNATURE=remote.signature; CONNECTED_FILE_RESTORE_PENDING=false; refreshFileConnectionStatus(); return true;
   }catch(_){
     setFileStatus("error",t("연결된 파일을 읽지 못했습니다","Could not read the connected file")); return false;
   }
@@ -958,7 +1001,8 @@ async function connectExistingSot(){
   try{
     const handles=await window.showOpenFilePicker({multiple:false,types:[{description:"VibeSpec SOT JSON",accept:{"application/json":[".json"]}}]});
     CONNECTED_FILE_HANDLE=handles[0]||null; if(!CONNECTED_FILE_HANDLE) return false;
-    await persistConnectedHandle(); refreshFileConnectionStatus(); return reloadConnectedSot(true);
+    CONNECTED_FILE_SIGNATURE=""; CONNECTED_FILE_RESTORE_PENDING=false;
+    await persistConnectedHandle(); refreshFileConnectionStatus(); return reloadConnectedSot(true,true);
   }catch(error){
     if(error&&error.name==="AbortError") return false;
     setFileStatus("error",t("파일을 연결하지 못했습니다","Could not connect the file")); return false;
@@ -967,7 +1011,7 @@ async function connectExistingSot(){
 function changeSaveLocation(){ return supportsFileConnection() ? chooseSaveLocation() : (downloadCurrentSot(),refreshFileConnectionStatus(),Promise.resolve(true)); }
 function loadFallbackFile(file){
   if(!file) return; const rd=new FileReader();
-  rd.onload=()=>{ if(applyLoadedSot(rd.result,t("파일 불러오기","File load"))) setFileStatus("warning",t("다운로드 모드 · 파일이 연결되지는 않았습니다","Download mode · file is not connected")); };
+  rd.onload=()=>{ if(applyLoadedSot(rd.result,t("파일 불러오기","File load"),true)) setFileStatus("warning",t("다운로드 모드 · 파일이 연결되지는 않았습니다","Download mode · file is not connected")); };
   rd.readAsText(file);
 }
 function migrateLegacySotDraft(){
@@ -1712,7 +1756,7 @@ function renderMap(){
   const workspace=M.mode==="workspace";
   MAPDOC=null;
   // Hide the editing chrome — a map is a read-only overview, not an editor.
-  ["undoBtn","redoBtn","histBtn","saveBtn","reloadBtn","loadBtn","locationBtn","fileStatus","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
+  ["undoBtn","redoBtn","histBtn","fileTools","sotBtn","resetBtn"].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display="none"; });
   document.querySelectorAll(".topbar .tabs").forEach(el=>el.style.display="none");
   const band=document.getElementById("initBand"); if(band) band.hidden=true;
   // A map is read-only — the title must not be editable (no history/SOT writes).
@@ -1975,10 +2019,16 @@ document.getElementById("redoBtn").addEventListener("click",redo);
 document.getElementById("histBtn").addEventListener("click",()=>{document.getElementById("histDrawer").classList.toggle("open");renderHistory();});
 document.getElementById("histClose").addEventListener("click",()=>document.getElementById("histDrawer").classList.remove("open"));
 document.getElementById("histList").addEventListener("click",e=>{const it=e.target.closest("[data-hist]"); if(it) restoreTo(+it.dataset.hist);});
+const fileMenuBtn=document.getElementById("fileMenuBtn"), fileMenuPanel=document.getElementById("fileMenuPanel");
+function closeFileMenu(){ if(fileMenuBtn&&fileMenuPanel){ fileMenuPanel.hidden=true; fileMenuBtn.setAttribute("aria-expanded","false"); } }
+function toggleFileMenu(){ if(!fileMenuBtn||!fileMenuPanel) return; const open=fileMenuPanel.hidden; fileMenuPanel.hidden=!open; fileMenuBtn.setAttribute("aria-expanded",String(open)); }
+fileMenuBtn.addEventListener("click",e=>{e.stopPropagation();toggleFileMenu();});
+document.addEventListener("click",e=>{ if(!e.target.closest("#fileTools")) closeFileMenu(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeFileMenu(); });
 document.getElementById("saveBtn").addEventListener("click",saveCurrentSot);
-document.getElementById("reloadBtn").addEventListener("click",reloadConnectedSot);
-document.getElementById("loadBtn").addEventListener("click",connectExistingSot);
-document.getElementById("locationBtn").addEventListener("click",changeSaveLocation);
+document.getElementById("reloadBtn").addEventListener("click",()=>{closeFileMenu(); return reloadConnectedSot();});
+document.getElementById("loadBtn").addEventListener("click",()=>{closeFileMenu(); return connectExistingSot();});
+document.getElementById("locationBtn").addEventListener("click",()=>{closeFileMenu(); return changeSaveLocation();});
 document.getElementById("fileInput").addEventListener("change",e=>{
   loadFallbackFile(e.target.files[0]); e.target.value="";
 });

@@ -43,6 +43,18 @@ const source = readFileSync(viewer, "utf8")
   .replace('<script type="application/json" id="embedded-sot"></script>', `${shim}<script type="application/json" id="embedded-sot">${embedded}</script>`);
 const harness = `<script>
 (async()=>{
+  fileMenuBtn.click();
+  const fileMenuOpens=!fileMenuPanel.hidden;
+  document.body.click();
+  const fileMenuCloses=fileMenuPanel.hidden;
+  // A viewer may reopen with a persisted handle while its embedded SOT is
+  // stale. Save must reload that file first, never overwrite it.
+  const recovered=JSON.parse(__connectedFile.text); recovered.title="Recovered from existing file"; __connectedFile.text=JSON.stringify(recovered,null,2);
+  CONNECTED_FILE_HANDLE=__connectedHandle; CONNECTED_FILE_SIGNATURE=""; CONNECTED_FILE_RESTORE_PENDING=true;
+  await saveCurrentSot();
+  const restoredTitle=SOT.title;
+  const restoredHistoryLength=HISTORY.length;
+  const writesAfterRestore=__connectedFile.writes;
   await saveCurrentSot();
   const firstWrite=JSON.parse(__connectedFile.text);
   SOT.title="Saved through handle";
@@ -57,6 +69,11 @@ const harness = `<script>
   window.confirm=()=>false;
   await saveCurrentSot();
   const result={
+    fileMenuOpens,
+    fileMenuCloses,
+    restoredTitle,
+    restoredHistoryLength,
+    writesAfterRestore,
     firstSchema:firstWrite.schemaVersion,
     secondTitle:secondWrite.title,
     reloaded,
@@ -82,6 +99,11 @@ try {
   const match = result.stdout.match(/data-file-connection="([^"]+)"/);
   assert.ok(match, "browser did not emit file-connection results");
   const measured = JSON.parse(decodeURIComponent(match[1]));
+  assert.equal(measured.fileMenuOpens, true, "file actions must open from the compact toolbar menu");
+  assert.equal(measured.fileMenuCloses, true, "the compact file menu must close when focus moves outside it");
+  assert.equal(measured.restoredTitle, "Recovered from existing file", "a recovered handle must reload the source SOT before any write");
+  assert.equal(measured.restoredHistoryLength, 1, "connecting another SOT must replace, not mix, viewer history");
+  assert.equal(measured.writesAfterRestore, 0, "the safety reload for a recovered handle must not write the stale viewer state");
   assert.equal(measured.firstSchema, "1.0", "first connected save must keep schemaVersion");
   assert.equal(measured.secondTitle, "Saved through handle", "second save must overwrite the connected file without another picker");
   assert.equal(measured.reloaded, "Changed by AI", "reload must read external file changes");

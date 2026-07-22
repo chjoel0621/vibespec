@@ -1,6 +1,8 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vibespec",
   "owner": { "name": "YH" },
+  "description": "VibeSpec — AI product planning plugin for Claude and Codex. Turn product ideas into validated, editable SOTs with PRDs, feature specs, IA, user flows, and a self-contained HTML viewer.",
   "plugins": [
     {
       "name": "vibespec",

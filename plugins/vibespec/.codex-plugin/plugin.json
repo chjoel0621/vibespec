@@ -1,6 +1,6 @@
 {
   "name": "vibespec",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex. It turns product ideas into editable SOTs with PRDs, feature specs, IA, and user flows. Official site: https://vbspec.com/.",
   "author": {
     "name": "chjoel0621",

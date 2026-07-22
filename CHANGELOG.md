@@ -2,6 +2,12 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [0.14.1] - 2026-07-22
+
+### Changed
+
+- Added the official Claude marketplace schema and a clear marketplace description so `claude plugin validate .` passes without warnings.
+
 ## [0.14.0] - 2026-07-22
 
 ### Added

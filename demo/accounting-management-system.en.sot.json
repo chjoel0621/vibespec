@@ -1,0 +1,873 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Accounting Management System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+    "goal": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+    "whyNow": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+    "solution": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Accounting practitioner and leader managing transactions and close evidence",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate."
+      },
+      {
+        "name": "Accounting and finance operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate."
+      },
+      {
+        "name": "System and policy administrator",
+        "role": "Operations and security administrator",
+        "needs": "Manage access, policy, and audit history.",
+        "pain": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "An operational user registers required work and checks its status.",
+        "start": "P1"
+      },
+      {
+        "text": "An operator processes queued work and handles exceptions.",
+        "start": "P5"
+      },
+      {
+        "text": "System and policy administrator reviews policy and access.",
+        "start": "P9"
+      },
+      {
+        "text": "System and policy administrator reviews audit records and operating metrics.",
+        "start": "P10"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of state changes against target dates",
+        "refs": [
+          "F6"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key work tracked",
+        "baseline": "Not measured",
+        "method": "Share of records connected to reporting",
+        "refs": [
+          "F11"
+        ]
+      },
+      {
+        "name": "Auditable operations rate",
+        "target": "100% of key changes retained",
+        "baseline": "Not measured",
+        "method": "Monthly audit-log and change-history review",
+        "refs": [
+          "F12"
+        ]
+      }
+    ],
+    "inScope": [
+      "Chart of accounts, counterparty, journal, evidence, and close-calendar registration",
+      "Journal, ledger, receivable and payable, evidence, and close-status lookup",
+      "Journal preparation, review, approval, adjustment, close, and correction handling",
+      "Profit and loss, financial position, cash flow, open journal, and close reporting",
+      "Chart of accounts, counterparty, journal, evidence, and close-calendar registration validation and duplicate prevention",
+      "Search, filter, and history management",
+      "Owner, priority, and SLA management",
+      "Approval and policy review",
+      "Exception, rejection, and reprocessing",
+      "Notifications and subscriptions",
+      "External integration and data synchronization",
+      "Role, permission, and audit management"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role.",
+      "Permission, policy, and state changes require audit logs."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and data quality",
+      "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration",
+          "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration core processing rule",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration exception and audit handling",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration validation and duplicate prevention",
+          "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration validation and duplicate prevention core processing rule",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Chart of accounts, counterparty, journal, evidence, and close-calendar registration validation and duplicate prevention exception and audit handling",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Records and search",
+      "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Journal, ledger, receivable and payable, evidence, and close-status lookup",
+          "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Journal, ledger, receivable and payable, evidence, and close-status lookup core processing rule",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Journal, ledger, receivable and payable, evidence, and close-status lookup exception and audit handling",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Search, filter, and history management",
+          "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Search, filter, and history management core processing rule",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Search, filter, and history management exception and audit handling",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Processing and ownership",
+      "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F5",
+          "title": "Journal preparation, review, approval, adjustment, close, and correction handling",
+          "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Journal preparation, review, approval, adjustment, close, and correction handling core processing rule",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Journal preparation, review, approval, adjustment, close, and correction handling exception and audit handling",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F6",
+          "title": "Owner, priority, and SLA management",
+          "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Owner, priority, and SLA management core processing rule",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Owner, priority, and SLA management exception and audit handling",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Approval and exceptions",
+      "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F7",
+          "title": "Approval and policy review",
+          "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Approval and policy review core processing rule",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Approval and policy review exception and audit handling",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F8",
+          "title": "Exception, rejection, and reprocessing",
+          "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Exception, rejection, and reprocessing core processing rule",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Exception, rejection, and reprocessing exception and audit handling",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "Notifications and integrations",
+      "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F9",
+          "title": "Notifications and subscriptions",
+          "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Notifications and subscriptions core processing rule",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Notifications and subscriptions exception and audit handling",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F10",
+          "title": "External integration and data synchronization",
+          "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "External integration and data synchronization core processing rule",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "External integration and data synchronization exception and audit handling",
+              "desc": "Connect the chart of accounts, transactions, journals, evidence, approvals, adjustments, close activities, and financial reporting. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Insights and controls",
+      "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F11",
+          "title": "Profit and loss, financial position, cash flow, open journal, and close reporting",
+          "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Profit and loss, financial position, cash flow, open journal, and close reporting core processing rule",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Profit and loss, financial position, cash flow, open journal, and close reporting exception and audit handling",
+              "desc": "Journals, evidence, approvals, receivables, payables, and close work reside in spreadsheets and disconnected systems, making financial figures hard to substantiate. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F12",
+          "title": "Role, permission, and audit management",
+          "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Role, permission, and audit management core processing rule",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Role, permission, and audit management exception and audit handling",
+              "desc": "Improve traceability of close evidence and reduce open journals and manual adjustment time. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Intake and data quality",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Operations dashboard",
+            "type": "top",
+            "refs": [
+              "F1",
+              "F1:0",
+              "F3",
+              "F4:0",
+              "F7:1",
+              "F11"
+            ],
+            "children": []
+          },
+          {
+            "id": "P2",
+            "title": "Work list",
+            "type": "page",
+            "refs": [
+              "F3",
+              "F3:0",
+              "F4",
+              "F1:0",
+              "F4:1",
+              "F8",
+              "F11:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P3",
+            "title": "Create record",
+            "type": "page",
+            "refs": [
+              "F1",
+              "F1:1",
+              "F2",
+              "F5",
+              "F8:0",
+              "F11:1"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Records and search",
+        "pages": [
+          {
+            "id": "P4",
+            "title": "Record detail",
+            "type": "page",
+            "refs": [
+              "F3:1",
+              "F4:1",
+              "F11",
+              "F2",
+              "F5:0",
+              "F8:1",
+              "F12"
+            ],
+            "children": []
+          },
+          {
+            "id": "P5",
+            "title": "Processing workspace",
+            "type": "page",
+            "refs": [
+              "F5",
+              "F5:0",
+              "F6",
+              "F2:0",
+              "F5:1",
+              "F9",
+              "F12:0"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Processing and ownership",
+        "pages": [
+          {
+            "id": "P6",
+            "title": "Approval and exception queue",
+            "type": "page",
+            "refs": [
+              "F7",
+              "F7:0",
+              "F8",
+              "F2:1",
+              "F6",
+              "F9:0",
+              "F12:1"
+            ],
+            "children": []
+          },
+          {
+            "id": "P7",
+            "title": "Notifications and integrations",
+            "type": "page",
+            "refs": [
+              "F9",
+              "F9:0",
+              "F10",
+              "F3",
+              "F6:0",
+              "F9:1"
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Insights and controls",
+        "pages": [
+          {
+            "id": "P8",
+            "title": "Operations reports",
+            "type": "page",
+            "refs": [
+              "F11",
+              "F11:0",
+              "F3:0",
+              "F6:1",
+              "F10"
+            ],
+            "children": []
+          },
+          {
+            "id": "P9",
+            "title": "Policy and access settings",
+            "type": "page",
+            "refs": [
+              "F10:1",
+              "F12",
+              "F3:1",
+              "F7",
+              "F10:0"
+            ],
+            "children": []
+          },
+          {
+            "id": "P10",
+            "title": "Audit log",
+            "type": "page",
+            "refs": [
+              "F8:1",
+              "F12:0",
+              "F12:1",
+              "F4",
+              "F7:0",
+              "F10:1"
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F2"
+      },
+      {
+        "from": "P3",
+        "to": "P4",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P5",
+        "ref": "F4"
+      },
+      {
+        "from": "P5",
+        "to": "P6",
+        "ref": "F5"
+      },
+      {
+        "from": "P5",
+        "to": "P6",
+        "ref": "F7"
+      },
+      {
+        "from": "P6",
+        "to": "P5",
+        "ref": "F8"
+      },
+      {
+        "from": "P5",
+        "to": "P7",
+        "ref": "F6"
+      },
+      {
+        "from": "P7",
+        "to": "P8",
+        "ref": "F9"
+      },
+      {
+        "from": "P8",
+        "to": "P9",
+        "ref": "F10"
+      },
+      {
+        "from": "P9",
+        "to": "P10",
+        "ref": "F12"
+      },
+      {
+        "from": "P10",
+        "to": "P4",
+        "ref": "F11"
+      },
+      {
+        "from": "P4",
+        "to": "P1",
+        "label": "Refresh operations status"
+      }
+    ]
+  }
+}

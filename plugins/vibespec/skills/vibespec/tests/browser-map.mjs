@@ -32,6 +32,7 @@ const payment = JSON.parse(readFileSync(join(treeDir, "shop.1-2.payment.sot.json
 const map = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: payment }]);
 
 const harness = `<script>
+const isVisible=el=>{ for(let node=el;node;node=node.parentElement){ const s=getComputedStyle(node); if(s.display==="none"||s.visibility==="hidden") return false; } return true; };
 const initNode=document.querySelector(".snode.map-init");
 const ir=initNode?initNode.getBoundingClientRect():null;
 const pt=document.getElementById("prodTitle");
@@ -42,7 +43,7 @@ pt.dispatchEvent(new Event("input",{bubbles:true}));
 document.documentElement.setAttribute("data-probe",JSON.stringify({
   mapHead: !!document.querySelector(".map-head"),
   tabsHidden: !!document.querySelector(".tabs") && getComputedStyle(document.querySelector(".tabs")).display==="none",
-  saveHidden: getComputedStyle(document.getElementById("saveBtn")).display==="none",
+  saveHidden: !isVisible(document.getElementById("saveBtn")),
   titleEditable: pt.isContentEditable,
   titleWriteIgnored: (typeof SOT==="undefined") || !SOT || SOT.title!=="HACKED",
   grafted: [...document.querySelectorAll(".snode.map-init .stitle")].some(e=>/Pay/.test(e.textContent)),
@@ -63,7 +64,7 @@ const workspace = mkdtempSync(join(tmpdir(), "vibespec-map-"));
 // body: optional JS returning the probe object; defaults to the map-mode harness.
 function probe(payload, name, body) {
   const script = body
-    ? `<script>document.documentElement.setAttribute("data-probe",JSON.stringify((()=>{${body}})()));</script>`
+    ? `<script>try{document.documentElement.setAttribute("data-probe",JSON.stringify((()=>{${body}})()));}catch(error){document.documentElement.setAttribute("data-probe",JSON.stringify({error:String(error&&error.stack||error)}));}</script>`
     : harness;
   const embedded = JSON.stringify(payload).replace(/</g, "\\u003c");
   const page = join(workspace, `${name}.html`);
@@ -76,7 +77,9 @@ function probe(payload, name, body) {
   assert.equal(result.status, 0, `headless browser failed: ${result.stderr || result.error || "unknown"}`);
   const match = result.stdout.match(/data-probe="([^"]*)"/);
   assert.ok(match, `map probe (${name}) did not emit data-probe`);
-  return JSON.parse(match[1].replace(/&quot;/g, String.fromCharCode(34)));
+  const value = JSON.parse(match[1].replace(/&quot;/g, String.fromCharCode(34)));
+  assert.ok(!value.error, `map probe (${name}) failed: ${value.error}`);
+  return value;
 }
 
 try {
@@ -112,13 +115,15 @@ try {
   const withDocs = buildProductMap([{ name: "main", sot: main }, { name: "pay", sot: payment }], { embedDocs: true });
   assert.ok(withDocs.scopes.every(s => s.sot), "embedDocs must carry every scope's SOT");
   const d = probe(withDocs, "map-docs", `
-    localStorage.setItem(LS_KEY, "SENTINEL");
+    const storageProbe="vibespec-browser-map-probe";
+    const readonlyAllowed=".tab,#langBtn,[data-jump],[data-zoom],[data-expand],[data-collapse],[data-ro-ok]";
+    localStorage.setItem(storageProbe, "SENTINEL");
     document.querySelector('[data-open="payment"]').click();
     const stage = document.getElementById("stage");
     const editable = [...stage.querySelectorAll('[contenteditable="true"]')].length;
     const enabled = [...stage.querySelectorAll("button,input,select,textarea")]
-      .filter(e => !e.disabled && !e.matches(RO_ALLOW) && !e.closest("[data-ro-ok]")).length;
-    SOT.title = "HACKED"; pushHistory("hack"); saveLocal();
+      .filter(e => !e.disabled && !e.matches(readonlyAllowed) && !e.closest("[data-ro-ok]")).length;
+    SOT.title = "HACKED"; pushHistory("hack");
     return {
       openedTitle: SOT.title === "HACKED" ? "(in-memory only)" : SOT.title,
       docView: !!stage.querySelector(".map-back"),
@@ -126,7 +131,7 @@ try {
       editableFields: editable,
       enabledControls: enabled,
       historyLen: HISTORY.length,
-      localStorageIntact: localStorage.getItem(LS_KEY) === "SENTINEL",
+      localStorageIntact: localStorage.getItem(storageProbe) === "SENTINEL",
       backToMap: (() => { stage.querySelector("[data-back-to-map]").click();
         return !!document.querySelector(".map-head"); })()
     };

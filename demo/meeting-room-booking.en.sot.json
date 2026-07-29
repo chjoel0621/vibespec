@@ -53,8 +53,8 @@
           ]
         },
         {
-          "id": "F2", "title": "Login / logout", "desc": "",
-          "status": "done", "priority": "mid", "acceptance": [],
+          "id": "F2", "title": "Login / logout", "desc": "Authenticated users can sign in, and signing out removes access to protected booking screens.",
+          "status": "done", "priority": "mid", "acceptance": [{ "text": "A valid account reaches the home screen after login, and a protected URL redirects to login after logout.", "done": false }],
           "specs": [
             { "title": "Auto login / logout handling", "desc": "", "acceptance": [] },
             { "title": "Password recovery and reset", "desc": "", "acceptance": [] }
@@ -85,8 +85,8 @@
           ]
         },
         {
-          "id": "F4", "title": "View / change bookings", "desc": "",
-          "status": "todo", "priority": "high", "acceptance": [],
+          "id": "F4", "title": "View / change bookings", "desc": "Users can view their bookings in time order and change or cancel only bookings that have not started.",
+          "status": "todo", "priority": "high", "acceptance": [{ "text": "A user can change the time or cancel a future booking from My bookings, and the updated state appears immediately in the list.", "done": false }],
           "specs": [
             { "title": "List my bookings", "desc": "", "acceptance": [] },
             { "title": "Edit and cancel bookings", "desc": "", "acceptance": [] },
@@ -100,8 +100,8 @@
       "status": "todo", "priority": "mid", "acceptance": [],
       "features": [
         {
-          "id": "F5", "title": "Register rooms", "desc": "",
-          "status": "todo", "priority": "mid", "acceptance": [],
+          "id": "F5", "title": "Register rooms", "desc": "Administrators can register and edit rooms with location, capacity, equipment, and available hours.",
+          "status": "todo", "priority": "mid", "acceptance": [{ "text": "Only rooms with required details can be saved, and a saved room appears in the booking room list.", "done": false }],
           "specs": [
             { "title": "Register room details (location/photos)", "desc": "", "acceptance": [] },
             { "title": "Set capacity and equipment", "desc": "", "acceptance": [] },
@@ -109,8 +109,8 @@
           ]
         },
         {
-          "id": "F6", "title": "Live status", "desc": "",
-          "status": "todo", "priority": "low", "acceptance": [],
+          "id": "F6", "title": "Live status", "desc": "Users and administrators can see each room's current occupancy, remaining time, and next booking in one view.",
+          "status": "todo", "priority": "low", "acceptance": [{ "text": "Each room shows occupied, available, or next-booking status and refreshes after a booking changes.", "done": false }],
           "specs": [
             { "title": "Per-room usage board", "desc": "", "acceptance": [] },
             { "title": "Show remaining time and next booking", "desc": "", "acceptance": [] }
@@ -123,16 +123,16 @@
       "status": "todo", "priority": "mid", "acceptance": [],
       "features": [
         {
-          "id": "F7", "title": "Notifications", "desc": "",
-          "status": "todo", "priority": "mid", "acceptance": [],
+          "id": "F7", "title": "Notifications", "desc": "Users can set delivery channels and reminder timing for booking confirmations, changes, and cancellations.",
+          "status": "todo", "priority": "mid", "acceptance": [{ "text": "A saved channel and reminder time apply to future booking changes and pre-start reminders.", "done": false }],
           "specs": [
             { "title": "Reminder before the booking starts", "desc": "", "acceptance": [] },
             { "title": "Change/cancellation notifications", "desc": "", "acceptance": [] }
           ]
         },
         {
-          "id": "F8", "title": "Operations dashboard", "desc": "",
-          "status": "todo", "priority": "low", "acceptance": [],
+          "id": "F8", "title": "Operations dashboard", "desc": "Administrators can review utilization, cancellation rate, and no-show count by date range and room.",
+          "status": "todo", "priority": "low", "acceptance": [{ "text": "Selecting a date range and room shows utilization, cancellation rate, and no-show count with their aggregation basis.", "done": false }],
           "specs": [
             { "title": "Per-room utilization statistics", "desc": "", "acceptance": [] },
             { "title": "No-show / cancellation report", "desc": "", "acceptance": [] }
@@ -223,7 +223,11 @@
       { "from": "P10", "to": "P11", "ref": "F4:1" },
       { "from": "P11", "to": "P10", "label": "Cancellation complete" },
       { "from": "P6", "to": "P12", "label": "Admin" },
-      { "from": "P6", "to": "P15", "label": "Settings" }
+      { "from": "P6", "to": "P15", "label": "Settings" },
+      { "from": "P12", "to": "P13", "ref": "F5" },
+      { "from": "P12", "to": "P14", "ref": "F6" },
+      { "from": "P15", "to": "P16", "ref": "F7" },
+      { "from": "P12", "to": "P17", "ref": "F8" }
     ]
   }
 }

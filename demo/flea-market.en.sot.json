@@ -64,7 +64,7 @@
             { "title": "GPS-based neighborhood set", "desc": "Auto-detect and confirm the neighborhood from the current location", "acceptance": [] },
             { "title": "Adjust neighborhood range", "desc": "Adjust the exposure radius between near and far", "acceptance": [] }
           ] },
-        { "id": "F2", "title": "Profile", "desc": "Represent identity with a nickname and photo", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F2", "title": "Profile", "desc": "Represent identity with a nickname and photo", "status": "todo", "priority": "mid", "acceptance": [{ "text": "A user can save a nickname and profile photo, and the saved profile is shown on their listings and chats.", "done": false }],
           "specs": [
             { "title": "Nickname & photo", "desc": "Register a display name and profile photo", "acceptance": [] }
           ] }
@@ -74,7 +74,7 @@
       "id": "R2", "title": "Listing creation", "desc": "Sellers post items with ease", "status": "todo", "priority": "high",
       "acceptance": [{ "text": "At least one photo and a price are required to post", "done": false }],
       "features": [
-        { "id": "F3", "title": "Listing creation", "desc": "Post an item with photos, price, and category", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F3", "title": "Listing creation", "desc": "Post an item with photos, price, and category", "status": "todo", "priority": "high", "acceptance": [{ "text": "Publishing is blocked until at least one photo, a price, a category, and an item condition are provided.", "done": false }],
           "specs": [
             { "title": "Photo upload", "desc": "Attach up to 10 photos", "acceptance": [{ "text": "At least 1 is required", "done": false }] },
             { "title": "Price & condition", "desc": "Enter the asking price and item condition (new/used)", "acceptance": [] },
@@ -86,11 +86,11 @@
       "id": "R3", "title": "Browse & search", "desc": "Explore and find neighborhood listings", "status": "todo", "priority": "high",
       "acceptance": [],
       "features": [
-        { "id": "F4", "title": "Home feed", "desc": "Show the latest listings by neighborhood", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F4", "title": "Home feed", "desc": "Show the latest listings by neighborhood", "status": "todo", "priority": "high", "acceptance": [{ "text": "The feed shows only active listings in the verified neighborhood, ordered by distance and recency.", "done": false }],
           "specs": [
             { "title": "Neighborhood-based sorting", "desc": "Sort listings by distance and recency", "acceptance": [] }
           ] },
-        { "id": "F5", "title": "Search & filter", "desc": "Narrow listings by keyword and conditions", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F5", "title": "Search & filter", "desc": "Narrow listings by keyword and conditions", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Keyword, category, and price filters can be combined and the result count updates after each change.", "done": false }],
           "specs": [
             { "title": "Keyword search", "desc": "Search titles and descriptions by keyword", "acceptance": [] },
             { "title": "Price & category filter", "desc": "Filter results by price range and category", "acceptance": [] }
@@ -101,12 +101,12 @@
       "id": "R4", "title": "Chat & dealing", "desc": "Arrange meetups over chat and manage deal status", "status": "todo", "priority": "high",
       "acceptance": [{ "text": "On completion, the status changes to 'sold'", "done": false }],
       "features": [
-        { "id": "F6", "title": "Chat", "desc": "Buyer and seller talk 1:1", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F6", "title": "Chat", "desc": "Buyer and seller talk 1:1", "status": "todo", "priority": "high", "acceptance": [{ "text": "A buyer can start one chat per listing and both participants see messages in chronological order.", "done": false }],
           "specs": [
             { "title": "Real-time messages", "desc": "Exchange messages in real time", "acceptance": [] },
             { "title": "Photo sending", "desc": "Send photos within the chat", "acceptance": [] }
           ] },
-        { "id": "F7", "title": "Deal-status management", "desc": "Switch a listing between reserved and sold", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F7", "title": "Deal-status management", "desc": "Switch a listing between reserved and sold", "status": "todo", "priority": "high", "acceptance": [{ "text": "Only the seller can change a listing from selling to reserved or sold, and the current status is visible to buyers.", "done": false }],
           "specs": [
             { "title": "Status switch", "desc": "Switch selling → reserved → sold", "acceptance": [] },
             { "title": "Assign buyer", "desc": "Designate the actual buyer among chat partners", "acceptance": [] }
@@ -117,7 +117,7 @@
       "id": "R5", "title": "Trust & reputation", "desc": "Build trust with post-deal reviews and a manner score", "status": "todo", "priority": "mid",
       "acceptance": [],
       "features": [
-        { "id": "F8", "title": "Manner score & reviews", "desc": "Manage reputation with reviews and reports", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F8", "title": "Manner score & reviews", "desc": "Manage reputation with reviews and reports", "status": "todo", "priority": "mid", "acceptance": [{ "text": "After a completed sale, each participant can submit one review and a report is recorded for moderator review.", "done": false }],
           "specs": [
             { "title": "Post-deal review", "desc": "Leave a manner rating for the deal partner", "acceptance": [] },
             { "title": "Report", "desc": "Report fraud and bad-manner users", "acceptance": [] }
@@ -160,7 +160,7 @@
     "transitions": [
       { "from": "P1", "to": "P2", "ref": "F1" },
       { "from": "P2", "to": "P3", "ref": "F2" },
-      { "from": "P3", "to": "P4", "label": "setup done" },
+      { "from": "P3", "to": "P4", "ref": "F4" },
       { "from": "P4", "to": "P5", "ref": "F5" },
       { "from": "P5", "to": "P6", "ref": "F5:1" },
       { "from": "P4", "to": "P7", "label": "pick a listing" },

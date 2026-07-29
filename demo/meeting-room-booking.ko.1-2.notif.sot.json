@@ -1,7 +1,103 @@
-{ "schemaVersion":"1.1","title":"알림 고도화","lang":"ko",
-  "initiative":{"productId":"meeting-room-booking","id":"notif","path":"1-2","status":"approved",
-    "parent":{"scopeId":"root","canonicalization":"sot-c14n-v1","digest":"sha256:6016102a2d8c9c9db7f8fe7e01544c12300a9d1eb78093856c2e26f4ed4dd6fe"}},
-  "prd":{"problem":"예약 알림이 일괄 발송뿐이라 사용자가 원하는 채널·시점을 고를 수 없다.","solution":"채널(푸시·이메일)과 리마인드 시점을 사용자가 설정하는 알림 센터를 홈에 추가한다.","inScope":["채널별 on/off","리마인드 시점 설정"],"nonGoals":["외부 메신저 연동"]},
-  "requirements":[{"id":"R1","title":"알림 설정","desc":"","status":"todo","priority":"mid","acceptance":[],"features":[{"id":"F1","title":"채널·시점 설정","desc":"","status":"todo","priority":"mid","acceptance":[],"specs":[]}]}],
-  "ia":{"sections":[{"id":"S1","title":"예약","boundary":{"scopeId":"root","sectionId":"S2"},"pages":[{"id":"P1","title":"홈 / 대시보드","type":"top","refs":[],"boundary":{"scopeId":"root","pageId":"P6"},"children":[{"id":"P2","title":"알림 센터","type":"page","refs":["F1"],"children":[]}]}]}]},
-  "flow":{"start":"P1","transitions":[{"from":"P1","to":"P2","ref":"F1"}]} }
+{
+  "schemaVersion": "1.1",
+  "title": "알림 고도화",
+  "lang": "ko",
+  "initiative": {
+    "productId": "meeting-room-booking",
+    "id": "notif",
+    "path": "1-2",
+    "status": "approved",
+    "parent": {
+      "scopeId": "root",
+      "canonicalization": "sot-c14n-v1",
+      "digest": "sha256:d092a26f9a3edda84c71e1f4b3619f6edbb68f0152e54552c98937daa43eeaea"
+    }
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      }
+    ]
+  },
+  "ia": {
+    "sections": [
+      {
+        "title": "예약",
+        "id": "S1",
+        "boundary": {
+          "scopeId": "root",
+          "sectionId": "S2"
+        },
+        "pages": [
+          {
+            "title": "홈 / 대시보드",
+            "id": "P1",
+            "type": "top",
+            "refs": [],
+            "boundary": {
+              "pageId": "P6",
+              "scopeId": "root"
+            },
+            "children": [
+              {
+                "title": "알림 센터",
+                "id": "P2",
+                "type": "page",
+                "refs": [
+                  "F1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "prd": {
+    "inScope": [
+      "채널별 on/off",
+      "리마인드 시점 설정"
+    ],
+    "nonGoals": [
+      "외부 메신저 연동"
+    ],
+    "problem": "예약 알림이 일괄 발송뿐이라 사용자가 원하는 채널·시점을 고를 수 없다.",
+    "solution": "채널(푸시·이메일)과 리마인드 시점을 사용자가 설정하는 알림 센터를 홈에 추가한다."
+  },
+  "requirements": [
+    {
+      "title": "알림 설정",
+      "id": "R1",
+      "status": "todo",
+      "priority": "mid",
+      "desc": "사용자는 채널과 시점별 예약 알림을 설정한다.",
+      "acceptance": [
+        {
+          "done": false,
+          "text": "저장한 알림 설정은 이후 예약 리마인더에 적용되어야 한다."
+        }
+      ],
+      "features": [
+        {
+          "title": "채널·시점 설정",
+          "id": "F1",
+          "status": "todo",
+          "priority": "mid",
+          "desc": "사용자는 푸시 또는 이메일 수신 채널과 예약 전 리마인더 시간을 선택한다.",
+          "acceptance": [
+            {
+              "done": false,
+              "text": "사용자는 수신 채널 하나 이상과 리마인더 시점을 저장하고, 알림 센터에서 저장값을 확인할 수 있어야 한다."
+            }
+          ],
+          "specs": []
+        }
+      ]
+    }
+  ]
+}

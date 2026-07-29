@@ -64,7 +64,7 @@
             { "title": "GPS 기반 동네 설정", "desc": "현재 위치로 동네를 자동 인식하고 확정한다", "acceptance": [] },
             { "title": "동네 범위 조정", "desc": "노출 반경을 가까운/먼 단계로 조정한다", "acceptance": [] }
           ] },
-        { "id": "F2", "title": "프로필", "desc": "닉네임과 사진으로 신원을 표현한다", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F2", "title": "프로필", "desc": "닉네임과 사진으로 신원을 표현한다", "status": "todo", "priority": "mid", "acceptance": [{ "text": "사용자는 닉네임과 프로필 사진을 저장할 수 있고, 저장된 프로필은 매물과 채팅에 표시되어야 한다.", "done": false }],
           "specs": [
             { "title": "닉네임·사진 설정", "desc": "표시 이름과 프로필 사진을 등록한다", "acceptance": [] }
           ] }
@@ -74,7 +74,7 @@
       "id": "R2", "title": "상품 등록", "desc": "판매자가 매물을 손쉽게 올린다", "status": "todo", "priority": "high",
       "acceptance": [{ "text": "사진 1장 이상과 가격이 있어야 등록된다", "done": false }],
       "features": [
-        { "id": "F3", "title": "상품 등록", "desc": "사진·가격·카테고리로 매물을 등록한다", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F3", "title": "상품 등록", "desc": "사진·가격·카테고리로 매물을 등록한다", "status": "todo", "priority": "high", "acceptance": [{ "text": "사진 1장, 가격, 카테고리, 물건 상태를 모두 입력하기 전에는 매물을 등록할 수 없어야 한다.", "done": false }],
           "specs": [
             { "title": "사진 업로드", "desc": "최대 10장까지 사진을 첨부한다", "acceptance": [{ "text": "최소 1장은 필수", "done": false }] },
             { "title": "가격·상태 입력", "desc": "판매가와 물건 상태(새것/사용감)를 입력한다", "acceptance": [] },
@@ -86,11 +86,11 @@
       "id": "R3", "title": "탐색·검색", "desc": "동네 매물을 둘러보고 찾는다", "status": "todo", "priority": "high",
       "acceptance": [],
       "features": [
-        { "id": "F4", "title": "홈 피드", "desc": "동네 기준으로 최신 매물을 보여준다", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F4", "title": "홈 피드", "desc": "동네 기준으로 최신 매물을 보여준다", "status": "todo", "priority": "high", "acceptance": [{ "text": "인증한 동네의 판매중 매물만 거리와 최신순으로 정렬해 보여줘야 한다.", "done": false }],
           "specs": [
             { "title": "동네 기반 정렬", "desc": "가까운 거리·최신순으로 매물을 정렬한다", "acceptance": [] }
           ] },
-        { "id": "F5", "title": "검색·필터", "desc": "키워드와 조건으로 매물을 좁힌다", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F5", "title": "검색·필터", "desc": "키워드와 조건으로 매물을 좁힌다", "status": "todo", "priority": "mid", "acceptance": [{ "text": "키워드, 카테고리, 가격대 필터를 함께 적용할 수 있고 조건 변경 뒤 결과 수가 갱신되어야 한다.", "done": false }],
           "specs": [
             { "title": "키워드 검색", "desc": "제목·설명에서 키워드를 검색한다", "acceptance": [] },
             { "title": "가격·카테고리 필터", "desc": "가격대와 카테고리로 결과를 필터링한다", "acceptance": [] }
@@ -101,12 +101,12 @@
       "id": "R4", "title": "채팅·거래", "desc": "채팅으로 약속을 잡고 거래 상태를 관리한다", "status": "todo", "priority": "high",
       "acceptance": [{ "text": "거래 완료 시 상태가 '판매완료'로 바뀐다", "done": false }],
       "features": [
-        { "id": "F6", "title": "채팅", "desc": "구매자와 판매자가 1:1로 대화한다", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F6", "title": "채팅", "desc": "구매자와 판매자가 1:1로 대화한다", "status": "todo", "priority": "high", "acceptance": [{ "text": "구매자는 매물별로 채팅방 하나를 시작할 수 있고, 두 참여자는 시간순 메시지를 확인해야 한다.", "done": false }],
           "specs": [
             { "title": "실시간 메시지", "desc": "실시간으로 메시지를 주고받는다", "acceptance": [] },
             { "title": "사진 전송", "desc": "채팅 중 사진을 전송한다", "acceptance": [] }
           ] },
-        { "id": "F7", "title": "거래 상태 관리", "desc": "예약중·판매완료로 매물 상태를 전환한다", "status": "todo", "priority": "high", "acceptance": [],
+        { "id": "F7", "title": "거래 상태 관리", "desc": "예약중·판매완료로 매물 상태를 전환한다", "status": "todo", "priority": "high", "acceptance": [{ "text": "판매자만 판매중 매물을 예약중 또는 판매완료로 바꿀 수 있고, 현재 상태는 구매자에게 보여야 한다.", "done": false }],
           "specs": [
             { "title": "상태 전환", "desc": "판매중→예약중→판매완료로 전환한다", "acceptance": [] },
             { "title": "구매자 지정", "desc": "채팅 상대 중 실제 구매자를 지정한다", "acceptance": [] }
@@ -117,7 +117,7 @@
       "id": "R5", "title": "신뢰·평판", "desc": "거래 후기와 매너온도로 신뢰를 쌓는다", "status": "todo", "priority": "mid",
       "acceptance": [],
       "features": [
-        { "id": "F8", "title": "매너온도·후기", "desc": "거래 후기와 신고로 평판을 관리한다", "status": "todo", "priority": "mid", "acceptance": [],
+        { "id": "F8", "title": "매너온도·후기", "desc": "거래 후기와 신고로 평판을 관리한다", "status": "todo", "priority": "mid", "acceptance": [{ "text": "거래 완료 뒤 각 참여자는 후기 하나를 남길 수 있고, 신고는 운영 검토 대상으로 기록되어야 한다.", "done": false }],
           "specs": [
             { "title": "거래 후기", "desc": "거래 상대에게 매너 평가를 남긴다", "acceptance": [] },
             { "title": "신고", "desc": "사기·비매너 사용자를 신고한다", "acceptance": [] }
@@ -160,7 +160,7 @@
     "transitions": [
       { "from": "P1", "to": "P2", "ref": "F1" },
       { "from": "P2", "to": "P3", "ref": "F2" },
-      { "from": "P3", "to": "P4", "label": "설정 완료" },
+      { "from": "P3", "to": "P4", "ref": "F4" },
       { "from": "P4", "to": "P5", "ref": "F5" },
       { "from": "P5", "to": "P6", "ref": "F5:1" },
       { "from": "P4", "to": "P7", "label": "매물 선택" },

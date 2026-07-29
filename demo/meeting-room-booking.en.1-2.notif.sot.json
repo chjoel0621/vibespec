@@ -1,7 +1,103 @@
-{ "schemaVersion":"1.1","title":"Notification upgrade","lang":"en",
-  "initiative":{"productId":"meeting-room-booking","id":"notif","path":"1-2","status":"approved",
-    "parent":{"scopeId":"root","canonicalization":"sot-c14n-v1","digest":"sha256:c0b9332e626b0e3cd29d648592561213e0240b93392d22ccf65dc1aae4ffea08"}},
-  "prd":{"problem":"Booking notifications are batch-only; users cannot pick their channel or timing.","solution":"Add a notification center on Home where users set channels (push/email) and reminder timing.","inScope":["Per-channel on/off","Reminder timing"],"nonGoals":["External messenger integration"]},
-  "requirements":[{"id":"R1","title":"Notification settings","desc":"","status":"todo","priority":"mid","acceptance":[],"features":[{"id":"F1","title":"Channel & timing","desc":"","status":"todo","priority":"mid","acceptance":[],"specs":[]}]}],
-  "ia":{"sections":[{"id":"S1","title":"Booking","boundary":{"scopeId":"root","sectionId":"S2"},"pages":[{"id":"P1","title":"Home / dashboard","type":"top","refs":[],"boundary":{"scopeId":"root","pageId":"P6"},"children":[{"id":"P2","title":"Notification center","type":"page","refs":["F1"],"children":[]}]}]}]},
-  "flow":{"start":"P1","transitions":[{"from":"P1","to":"P2","ref":"F1"}]} }
+{
+  "schemaVersion": "1.1",
+  "title": "Notification upgrade",
+  "lang": "en",
+  "initiative": {
+    "productId": "meeting-room-booking",
+    "id": "notif",
+    "path": "1-2",
+    "status": "approved",
+    "parent": {
+      "scopeId": "root",
+      "canonicalization": "sot-c14n-v1",
+      "digest": "sha256:9bc9548e2026a59310ccea559afa04baeccd975213b7e6a9e9ae363791e3ce1f"
+    }
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "ref": "F1"
+      }
+    ]
+  },
+  "ia": {
+    "sections": [
+      {
+        "title": "Booking",
+        "id": "S1",
+        "boundary": {
+          "scopeId": "root",
+          "sectionId": "S2"
+        },
+        "pages": [
+          {
+            "title": "Home / dashboard",
+            "id": "P1",
+            "type": "top",
+            "refs": [],
+            "boundary": {
+              "pageId": "P6",
+              "scopeId": "root"
+            },
+            "children": [
+              {
+                "title": "Notification center",
+                "id": "P2",
+                "type": "page",
+                "refs": [
+                  "F1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "prd": {
+    "inScope": [
+      "Per-channel on/off",
+      "Reminder timing"
+    ],
+    "nonGoals": [
+      "External messenger integration"
+    ],
+    "problem": "Booking notifications are batch-only; users cannot pick their channel or timing.",
+    "solution": "Add a notification center on Home where users set channels (push/email) and reminder timing."
+  },
+  "requirements": [
+    {
+      "title": "Notification settings",
+      "id": "R1",
+      "status": "todo",
+      "priority": "mid",
+      "desc": "Users configure booking reminders by delivery channel and timing.",
+      "acceptance": [
+        {
+          "done": false,
+          "text": "Saved notification preferences apply to future booking reminders."
+        }
+      ],
+      "features": [
+        {
+          "title": "Channel & timing",
+          "id": "F1",
+          "status": "todo",
+          "priority": "mid",
+          "desc": "Users choose push or email delivery and set a reminder time for their bookings.",
+          "acceptance": [
+            {
+              "done": false,
+              "text": "A user can save at least one delivery channel and a reminder offset, and the saved values are shown on the notification center."
+            }
+          ],
+          "specs": []
+        }
+      ]
+    }
+  ]
+}

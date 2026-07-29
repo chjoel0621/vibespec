@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateSot } from "../scripts/validate-sot.mjs";
+import { reviewSot } from "../scripts/lib/content-review.mjs";
 import { validateTree } from "../scripts/lib/tree.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -47,4 +48,9 @@ for (const lang of ["ko", "en"]) {
   assert.equal(result.valid, true, `${name} must validate: ${JSON.stringify(result.errors)}`);
 }
 
-console.log("[demo] PASS demo SOTs and parent/Add-on trees validate in ko and en");
+for (const name of readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"))) {
+  const findings = reviewSot(load(name)).findings;
+  assert.equal(findings.length, 0, `${name} must not retain advisory content-review warnings: ${JSON.stringify(findings)}`);
+}
+
+console.log("[demo] PASS demo SOTs, content quality, and parent/Add-on trees validate in ko and en");

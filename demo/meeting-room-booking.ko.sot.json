@@ -89,6 +89,16 @@
         "from": "P12",
         "to": "P17",
         "ref": "F8"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F1:1"
+      },
+      {
+        "from": "P4",
+        "to": "P5",
+        "ref": "F2:1"
       }
     ]
   },
@@ -121,9 +131,11 @@
                     "refs": [
                       "F1:1"
                     ],
-                    "children": []
+                    "children": [],
+                    "surface": "modal"
                   }
-                ]
+                ],
+                "surface": "screen"
               },
               {
                 "title": "로그인",
@@ -141,11 +153,14 @@
                     "refs": [
                       "F2:1"
                     ],
-                    "children": []
+                    "children": [],
+                    "surface": "modal"
                   }
-                ]
+                ],
+                "surface": "screen"
               }
-            ]
+            ],
+            "surface": "screen"
           }
         ]
       },
@@ -175,7 +190,8 @@
                     "refs": [
                       "F3:0"
                     ],
-                    "children": []
+                    "children": [],
+                    "surface": "drawer"
                   },
                   {
                     "title": "예약 확정",
@@ -184,9 +200,11 @@
                     "refs": [
                       "F3:2"
                     ],
-                    "children": []
+                    "children": [],
+                    "surface": "modal"
                   }
-                ]
+                ],
+                "surface": "screen"
               },
               {
                 "title": "내 예약",
@@ -205,11 +223,14 @@
                     "refs": [
                       "F4:1"
                     ],
-                    "children": []
+                    "children": [],
+                    "surface": "modal"
                   }
-                ]
+                ],
+                "surface": "screen"
               }
-            ]
+            ],
+            "surface": "screen"
           }
         ]
       },
@@ -233,7 +254,8 @@
                   "F5:1",
                   "F5:2"
                 ],
-                "children": []
+                "children": [],
+                "surface": "screen"
               },
               {
                 "title": "실시간 현황",
@@ -244,9 +266,11 @@
                   "F6:0",
                   "F6:1"
                 ],
-                "children": []
+                "children": [],
+                "surface": "screen"
               }
-            ]
+            ],
+            "surface": "screen"
           }
         ]
       },
@@ -269,20 +293,29 @@
                   "F7:0",
                   "F7:1"
                 ],
-                "children": []
-              },
-              {
-                "title": "운영 대시보드",
-                "id": "P17",
-                "type": "page",
-                "refs": [
-                  "F8",
-                  "F8:0",
-                  "F8:1"
-                ],
-                "children": []
+                "children": [],
+                "surface": "drawer"
               }
-            ]
+            ],
+            "surface": "screen"
+          }
+        ]
+      },
+      {
+        "title": "운영 통제",
+        "id": "S5",
+        "pages": [
+          {
+            "title": "운영 대시보드",
+            "id": "P17",
+            "type": "top",
+            "refs": [
+              "F8",
+              "F8:0",
+              "F8:1"
+            ],
+            "children": [],
+            "surface": "screen"
           }
         ]
       }

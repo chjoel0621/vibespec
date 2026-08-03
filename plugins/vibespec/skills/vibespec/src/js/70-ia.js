@@ -6,10 +6,10 @@ function iaFillMissing(){
       if(!fpage){
         let sec=SOT.ia.sections.find(s=>s.title===r.title);
         if(!sec){ sec={id:nid("S"),title:r.title,pages:[]}; SOT.ia.sections.push(sec); }
-        fpage={id:nid("P"),title:f.title,type: sec.pages.length?"page":"top",refs:[f.id],children:[]};
+        fpage={id:nid("P"),title:f.title,type: sec.pages.length?"page":"top",surface:"screen",refs:[f.id],children:[]};
         sec.pages.push(fpage);
       }
-      f.specs.forEach((sp,si)=>{ const sid=f.id+":"+si; if(!findPageByRef(sid)) fpage.children.push({id:nid("P"),title:specTitle(sp),type:"action",refs:[sid],children:[]}); });
+      f.specs.forEach((sp,si)=>{ const sid=f.id+":"+si; if(!findPageByRef(sid)) fpage.children.push({id:nid("P"),title:specTitle(sp),type:"action",surface:"panel",refs:[sid],children:[]}); });
     });
   });
 }
@@ -17,8 +17,8 @@ function buildIAFromSpec(){
   SOT.ia.sections = SOT.requirements.map(r=>({
     id:nid("S"), title:r.title,
     pages: r.features.map((f,fi)=>({
-      id:nid("P"), title:f.title, type: fi===0?"top":"page", refs:[f.id],
-      children: f.specs.map((sp,si)=>({ id:nid("P"), title:specTitle(sp), type:"action", refs:[f.id+":"+si], children:[] }))
+      id:nid("P"), title:f.title, type: fi===0?"top":"page", surface:"screen", refs:[f.id],
+      children: f.specs.map((sp,si)=>({ id:nid("P"), title:specTitle(sp), type:"action", surface:"panel", refs:[f.id+":"+si], children:[] }))
     }))
   }));
 }
@@ -29,7 +29,7 @@ function iaPageLi(p){
   // A boundary stub references a parent page — keep ＋add child (the initiative
   // hangs its own screens here), keep ×delete (re-attach is the user's call).
   return `<li><div class="snode ${cls}${bnd} ${p.id===selPage?'sel':''}" data-selpage="${p.id}">
-      <span class="stype">${p.boundary?t('제품 기획 접점','Main boundary'):ptype(p.type)}</span>
+      <span class="stype">${p.boundary?t('제품 기획 접점','Main boundary'):(p.surface?psurface(p.surface):ptype(p.type))}</span>
       <span class="stitle">${esc(p.title)}</span>
       <span class="srowbtns"><button class="mini" data-add-page="${p.id}" title="${t('하위 추가','Add child')}">＋</button><button class="mini" data-del-page="${p.id}" title="${t('삭제','Delete')}">×</button></span>
     </div>${kids}</li>`;
@@ -60,7 +60,7 @@ function renderIA(){
   const warn = cov.unmapped.length
     ? `<div class="ia-warn">
         <div class="iw-head">⚠ ${t('아직 화면에 매핑되지 않은 기능·상세기능','Features/sub-features not yet mapped to a screen')} <b>${cov.unmapped.length}${t('개','')}</b>
-          <span class="iw-btns"><button class="addbtn sm" data-ia-fillmissing>${t('누락 자동 채우기','Auto-fill missing')}</button><button class="addbtn sm ghost" data-ia-rebuild>${t('기능명세서로 재생성','Rebuild from spec')}</button></span>
+          <span class="iw-btns"><button class="addbtn sm" data-ia-fillmissing>${t('누락 자동 채우기','Auto-fill missing')}</button><button class="addbtn sm ghost" data-ia-rebuild title="${t('기능 커버리지만 맞춘 초안입니다. 내비게이션과 작업 흐름을 검토해야 합니다.','This draft only covers features. Review navigation and task flow afterward.')}">${t('기능 커버리지 초안','Coverage draft')}</button></span>
         </div>
         <div class="iw-list">${cov.unmapped.slice(0,14).map(c=>`<span class="warn-chip">${esc(c.label)}</span>`).join("")}${cov.unmapped.length>14?`<span class="warn-chip more">＋${cov.unmapped.length-14}</span>`:""}</div>
       </div>`
@@ -124,6 +124,7 @@ function renderIADetail(){
     </div>`;
   }
   const typeOpt = Object.keys(PTYPE).map(k=>`<option value="${k}" ${p.type===k?'selected':''}>${ptype(k)}</option>`).join("");
+  const surfaceOpt = `<option value="">${t('지정 안 함','Not specified')}</option>`+Object.keys(SURFACE).map(k=>`<option value="${k}" ${p.surface===k?'selected':''}>${psurface(k)}</option>`).join("");
   const cat = specCatalog();
   const linked = (p.refs||[]).map((rid,i)=>`<div class="ia-link"><span class="ill">${esc(refLabel(rid))}</span><button class="ac-del" data-ia-unlink="${p.id}#${i}" style="opacity:1">×</button></div>`).join("") || `<div class="empty">${t('연결된 기능이 없습니다.','No linked features.')}</div>`;
   const opts = cat.filter(c=>!(p.refs||[]).includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.label)}</option>`).join("");
@@ -134,6 +135,7 @@ function renderIADetail(){
       <button class="topbtn danger" data-del-page="${p.id}" style="margin-left:6px">${t('화면 삭제','Delete screen')}</button></div>
     <div class="dt-row"><span class="dt-k">ID</span><span class="dt-v">${p.id}</span></div>
     <div class="dt-row"><span class="dt-k">${t('타입','Type')}</span><select data-ia-type="${p.id}">${typeOpt}</select></div>
+    <div class="dt-row"><span class="dt-k">${t('화면 역할','Surface')}</span><select data-ia-surface="${p.id}">${surfaceOpt}</select></div>
     <div class="dt-sec">${t('연결된 기능','Linked features')} <span class="di-meta" style="font-weight:400">${t('· 기능명세서에서 연결','· link in Feature Spec')}</span></div>
     <div class="ac-list">${linked}</div>
     <div class="ia-linkadd"><select data-ia-link="${p.id}"><option value="">${t('＋ 기능 연결…','＋ Link feature…')}</option>${opts}</select></div>

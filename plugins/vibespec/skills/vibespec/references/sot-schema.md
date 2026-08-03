@@ -125,9 +125,11 @@
 ] }
 ```
 
-- id: 섹션 `S1..`, 페이지 `P1..`(전체 유일). type: `top|page|action`.
+- id: 섹션 `S1..`, 페이지 `P1..`(전체 유일). `type`은 IA 계층 역할 `top|page|action`이다.
+- 선택 필드 `surface`는 실제 UI 표면 `screen|panel|drawer|modal|mode`를 표현한다. 생략하면 `type`만으로 해석한다. 패널·드로어·모달·모드는 그 표면을 여는 화면의 `children`에 둔다.
 - refs: 그 화면이 담는 기능/상세기능 id(`F1`, `F1:0`).
 - **커버리지**: 모든 기능·상세기능이 어떤 페이지 refs에든 최소 1번 등장해야 한다.
+- IA는 requirement/feature 목록의 복사본이 아니다. 사용자 내비게이션과 작업 흐름을 먼저 설계한 뒤 refs로 기능을 연결한다.
 
 ## flow (유저플로우: 화면 전환)
 

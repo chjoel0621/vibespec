@@ -9,7 +9,7 @@ import { validateSot } from "../validate-sot.mjs";
 const clone = value => JSON.parse(JSON.stringify(value));
 const FEATURE_KEYS = new Set(["title", "desc", "status", "priority", "acceptance"]);
 const REQUIREMENT_KEYS = new Set(["title", "desc", "status", "priority", "acceptance"]);
-const PAGE_KEYS = new Set(["title", "type", "refs"]);
+const PAGE_KEYS = new Set(["title", "type", "surface", "refs"]);
 const SECTION_KEYS = new Set(["title"]);
 const SPEC_KEYS = new Set(["title", "desc", "acceptance"]);
 const DOCUMENT_KEYS = new Set(["title", "lang"]);

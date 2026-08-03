@@ -136,6 +136,12 @@ const moved = applyChangePlan(rich, moveFeature).after;
 assert.equal(moved.requirements[1].features.some(feature => feature.id === "F2"), true);
 console.log("[plan] PASS feature moves preserve stable ids and references");
 
+const surfacePlan = planForV2(valid, [{ op: "updatePage", id: "P1", changes: { surface: "screen" } }], {
+  touchedIds: ["P1"], addedIds: [], removedIds: [], touchedPaths: ["P1.surface"]
+});
+assert.equal(applyChangePlan(valid, surfacePlan).after.ia.sections[0].pages[0].surface, "screen");
+console.log("[plan] PASS page surface roles are editable through typed plans");
+
 const addRequirement = planForV2(valid, [
   { op: "addRequirement", requirement: { id: "R2", title: "Report validation", desc: "Explain results", status: "todo", priority: "mid", acceptance: [], features: [{ id: "F2", title: "Show report", desc: "Render a report", status: "todo", priority: "mid", acceptance: [], specs: [] }] } },
   { op: "addPage", sectionId: "S1", page: { id: "P3", title: "Report", type: "action", refs: ["F2"], children: [] } },

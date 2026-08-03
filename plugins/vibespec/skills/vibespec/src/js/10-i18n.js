@@ -6,3 +6,4 @@ function applyStaticI18n(){
   const lb=document.getElementById("langBtn"); if(lb) lb.textContent = LANG==="en"?"한글":"EN";
 }
 function ptype(k){ return t(PTYPE[k]||k, PTYPE_EN[k]||k); }
+function psurface(k){ return t(SURFACE[k]||k, SURFACE_EN[k]||k); }

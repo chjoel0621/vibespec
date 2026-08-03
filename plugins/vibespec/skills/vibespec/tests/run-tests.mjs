@@ -18,6 +18,8 @@ console.log("[test] PASS machine-readable schema loads");
 
 const cases = [
   { name: "valid fixture", mutate: value => value, valid: true },
+  { name: "page surface role", mutate: value => { value.ia.sections[0].pages[0].surface = "screen"; return value; }, valid: true },
+  { name: "unknown page surface role", mutate: value => { value.ia.sections[0].pages[0].surface = "popover"; return value; }, message: "must be one of screen, panel, drawer, modal, mode" },
   { name: "triggerless transition", mutate: value => { value.flow.transitions[0] = { from: "P1", to: "P2" }; return value; }, valid: true },
   { name: "transition with ref and label", mutate: value => { value.flow.transitions[0].label = "Open"; return value; }, message: "must not contain both ref and label" },
   { name: "legacy transition fields", mutate: value => { value.flow.transitions[0] = { source: "P1", target: "P2", action: "Open" }; return value; }, message: "field is not allowed" },

@@ -150,7 +150,7 @@
     },
     "page": {
       "type": "object", "additionalProperties": false, "required": ["id", "title", "type", "refs", "children"],
-      "properties": { "id": { "type": "string", "pattern": "^P[1-9][0-9]*$" }, "title": { "$ref": "#/$defs/nonEmptyString" }, "type": { "enum": ["top", "page", "action"] }, "refs": { "type": "array", "items": { "$ref": "#/$defs/featureRef" } }, "boundary": { "$ref": "#/$defs/boundary" }, "children": { "type": "array", "items": { "$ref": "#/$defs/page" } } }
+      "properties": { "id": { "type": "string", "pattern": "^P[1-9][0-9]*$" }, "title": { "$ref": "#/$defs/nonEmptyString" }, "type": { "enum": ["top", "page", "action"] }, "surface": { "enum": ["screen", "panel", "drawer", "modal", "mode"] }, "refs": { "type": "array", "items": { "$ref": "#/$defs/featureRef" } }, "boundary": { "$ref": "#/$defs/boundary" }, "children": { "type": "array", "items": { "$ref": "#/$defs/page" } } }
     },
     "flow": {
       "type": "object", "additionalProperties": false, "required": ["start", "transitions"],

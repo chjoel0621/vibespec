@@ -80,7 +80,8 @@ function feature(id, title, desc, acceptance, specTitle) {
 function sot(config, lang) {
   const ko = lang === 'ko';
   const c = config[lang];
-  const consumer = vibeCodingConsumerSlugs.has(config.slug);
+  const marketplace = marketplaceSlugs.has(config.slug);
+  const consumer = vibeCodingConsumerSlugs.has(config.slug) && !marketplace;
   const labels = ko
     ? { r1: '접수와 현황 조회', r2: '처리와 운영 분석', p1: '현황 대시보드', p2: '요청·등록 상세', p3: '처리 작업 공간', p4: '운영 리포트', accept: '사용자는 필요한 정보를 입력하고 현재 상태를 확인할 수 있다.' }
     : { r1: 'Intake and status lookup', r2: 'Processing and operations analysis', p1: 'Overview dashboard', p2: 'Request or record detail', p3: 'Processing workspace', p4: 'Operations report', accept: 'Users can provide required context and view the current state.' };
@@ -91,9 +92,9 @@ function sot(config, lang) {
   return {
     schemaVersion: '1.0', title: c.title, lang,
     prd: {
-      oneLiner: c.solution, goal: c.goal, whyNow: c.problem, category: customerSupportExpansionSlugs.has(config.slug) ? (ko ? '고객지원·지식관리 시스템' : 'Customer Support & Knowledge system') : commerceSeoSlugs.has(config.slug) ? (ko ? '비즈니스·커머스 시스템' : 'Business & Commerce system') : vibeCodingConsumerSlugs.has(config.slug) ? (ko ? '개인 생산성·소비자 앱' : 'Personal Productivity & Consumer App') : (ko ? '사내 운영 시스템' : 'Internal operations system'), platforms: [ko ? '웹' : 'Web'],
+      oneLiner: c.solution, goal: c.goal, whyNow: c.problem, category: customerSupportExpansionSlugs.has(config.slug) ? (ko ? '고객지원·지식관리 시스템' : 'Customer Support & Knowledge system') : commerceSeoSlugs.has(config.slug) ? (ko ? '비즈니스·커머스 시스템' : 'Business & Commerce system') : marketplace ? (ko ? '구인구직·마켓플레이스' : 'Job marketplace') : consumer ? (ko ? '개인 생산성·소비자 앱' : 'Personal Productivity & Consumer App') : (ko ? '사내 운영 시스템' : 'Internal operations system'), platforms: [ko ? '웹' : 'Web'],
       problem: c.problem, solution: c.solution, alternatives: consumer ? (ko ? '메모, 스프레드시트, 범용 앱, 단일 기능 트래커' : 'Notes, spreadsheets, general-purpose apps, and single-purpose trackers') : (ko ? '이메일, 메신저, 스프레드시트, 수동 대장' : 'Email, chat, spreadsheets, and manual ledgers'), differentiator: consumer ? (ko ? '개인 목표·기록·진행 상황을 연결해 다음 행동을 분명하게 만든다.' : 'Connect personal goals, records, and progress so the next action is clear.') : (ko ? '요청·처리·운영 데이터를 하나의 연결된 기준으로 관리한다.' : 'Manage intake, processing, and operations data as one connected source of truth.'),
-      targets: [{ name: c.user, role: ko ? '요청자·실무 사용자' : 'Requester and operational user', needs: ko ? '필요한 업무를 빠르게 등록하고 상태를 알고 싶다.' : 'Quickly register needed work and know its status.', pain: c.problem }, { name: c.operator, role: ko ? '운영 관리자' : 'Operations administrator', needs: ko ? '처리 우선순위와 이력을 관리하고 지표를 확인하고 싶다.' : 'Manage priority and history and review operations metrics.', pain: c.problem }],
+      targets: consumer ? [{ name: c.user, role: ko ? '개인 사용자' : 'Individual user', needs: ko ? '자신의 목표와 기록을 빠르게 남기고 다음 행동을 알고 싶다.' : 'Capture personal goals and records quickly and know the next action.', pain: c.problem }] : marketplace ? [{ name: ko ? '구직자' : 'Job seeker', role: ko ? '구직 참여자' : 'Job-seeking participant', needs: ko ? '관련 공고를 비교하고 지원 상태를 확인하고 싶다.' : 'Compare relevant listings and check application status.', pain: c.problem }, { name: ko ? '고용주' : 'Employer', role: ko ? '채용 공고 게시자' : 'Job-listing publisher', needs: ko ? '공고를 게시하고 지원자 응답을 관리하고 싶다.' : 'Publish listings and manage applicant responses.', pain: c.problem }] : [{ name: c.user, role: ko ? '요청자·실무 사용자' : 'Requester and operational user', needs: ko ? '필요한 업무를 빠르게 등록하고 상태를 알고 싶다.' : 'Quickly register needed work and know its status.', pain: c.problem }, { name: c.operator, role: ko ? '운영 관리자' : 'Operations administrator', needs: ko ? '처리 우선순위와 이력을 관리하고 지표를 확인하고 싶다.' : 'Manage priority and history and review operations metrics.', pain: c.problem }],
       scenarios: [{ text: ko ? `${c.user}는 ${c.entry}을(를) 완료하고 진행 상태를 확인한다.` : `${c.user} completes ${c.entry.toLowerCase()} and checks progress.`, start: 'P1' }, { text: ko ? `${c.operator}는 ${c.report}을(를) 검토한다.` : `${c.operator} reviews ${c.report.toLowerCase()}.`, start: 'P4' }],
       northStar: consumer ? (ko ? '주간 계획 행동을 완료한 활성 사용자 비율' : 'Share of active users completing their planned weekly action') : (ko ? '기한 내 완료된 운영 요청 비율' : 'Share of operations requests completed on time'),
       kpis: [{ name: ko ? '기한 내 처리 비율' : 'On-time processing rate', target: c.goal, baseline: ko ? '측정 전' : 'Not measured', method: ko ? '완료 이력과 목표 기한을 기준으로 월별 집계' : 'Monthly aggregation of completion history against target dates', refs: ['F3'] }, { name: ko ? '운영 가시성' : 'Operations visibility', target: ko ? '핵심 요청 100% 추적' : '100% of key requests tracked', baseline: ko ? '측정 전' : 'Not measured', method: ko ? '등록된 요청과 운영 리포트의 연결 비율' : 'Share of registered requests connected to operations reporting', refs: ['F4'] }],
@@ -114,12 +115,14 @@ function sot(config, lang) {
 
 function locale(config, lang) {
   const ko = lang === 'ko'; const c = config[lang]; const slug = config.slug;
-  const consumer = vibeCodingConsumerSlugs.has(slug);
+  const marketplace = marketplaceSlugs.has(slug);
+  const consumer = vibeCodingConsumerSlugs.has(slug) && !marketplace;
   const baseTitle = ko ? `${c.title} PRD 템플릿 | 무료 기획서` : `${c.title} PRD Template`;
   const included = [c.entry, c.record, c.process, c.report];
   const connectedKo = `${included.join(', ')}으로 구성된`;
   const image = (kind) => `${slug}-${kind}-${lang}.png`;
   return {
+    contentProfile: marketplace ? 'marketplace' : consumer ? 'consumer' : 'operations',
     title: baseTitle,
     metaDescription: ko ? `무료 ${c.title} PRD 템플릿입니다. ${connectedKo} 기능 명세서·IA·유저 플로우를 다운로드하세요.` : `A free ${c.title} PRD template with connected ${included.join(', ').toLowerCase()}, feature specifications, information architecture, and user flows.`,
     summary: ko ? `${c.title} PRD 템플릿으로, ${connectedKo} 실제 SOT 기반 기획서입니다.` : `A real SOT-based ${c.title} PRD template connecting ${included.join(', ').toLowerCase()}.`,
@@ -209,6 +212,7 @@ const vibeCodingConsumerSystems = [
   { slug: 'job-board-platform', ko: { title: '구인구직·채용 공고 플랫폼', user: '일자리를 찾고 지원하는 구직자와 공고를 올리는 고용주', operator: '채용 공고·지원·신고를 관리하는 플랫폼 운영자', entry: '구직자 프로필·이력서·채용 공고·기업 정보 등록', record: '공고·지원·저장 공고·지원 상태·기업·신고 이력 조회', process: '공고 게시·검색·지원서 제출·지원 상태 안내·공고 검토·신고 처리', report: '공고 조회·지원 전환·지원 응답·공고 품질·신고 처리 리포트', goal: '구직자가 관련 공고를 빠르게 찾고 고용주가 지원 흐름을 투명하게 관리하도록 돕는다.', problem: '구직자는 여러 채널에서 공고를 비교하고 지원 상태를 따로 기록해야 하며, 고용주는 공고 품질과 지원자 문의를 일관되게 관리하기 어렵다.', solution: '구직자 프로필, 기업과 공고, 검색·저장, 지원, 상태 안내, 신고·검토와 플랫폼 성과를 하나의 구인구직 흐름으로 연결한다.' }, en: { title: 'Job Board and Candidate Application Platform', user: 'Job seeker applying for roles and employer publishing job listings', operator: 'Platform operator managing listings, applications, and reports', entry: 'Job-seeker profile, resume, job listing, and company-profile entry', record: 'Listing, application, saved job, application status, company, and report-history lookup', process: 'Listing publication, search, application submission, status update, listing review, and report handling', report: 'Listing views, application conversion, employer response, listing quality, and report-resolution reporting', goal: 'Help job seekers find relevant roles quickly and help employers manage a transparent application journey.', problem: 'Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.', solution: 'Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.' } }
 ];
 const vibeCodingConsumerSlugs = new Set(vibeCodingConsumerSystems.map((system) => system.slug));
+const marketplaceSlugs = new Set(['job-board-platform']);
 const allSystems = [...systems, ...industryCrmSystems, ...coreItSystems, ...coreItSystems2, ...newSystems, ...nextWaveSystems, ...customerSupportExpansionSystems, ...highDemandBusinessSystems, ...keywordSystemTemplates, ...commerceSeoSystems, ...vibeCodingConsumerSystems];
 const requestedSlugs = new Set(process.argv.slice(2));
 const selectedSystems = requestedSlugs.size
@@ -220,7 +224,8 @@ if (requestedSlugs.size && selectedSystems.length !== requestedSlugs.size) {
 }
 
 for (const config of selectedSystems) {
-  for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang)), null, 2) + '\n');
+  const profile = marketplaceSlugs.has(config.slug) ? 'marketplace' : vibeCodingConsumerSlugs.has(config.slug) ? 'consumer' : 'operations';
+  for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang), { profile }), null, 2) + '\n');
 }
 await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
 const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));

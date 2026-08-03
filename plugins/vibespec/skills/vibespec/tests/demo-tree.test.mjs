@@ -10,6 +10,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../../../../..");
 const demoRoot = join(repoRoot, "demo");
 const load = name => JSON.parse(readFileSync(join(demoRoot, name), "utf8"));
+const profileForDemo = name => name.startsWith("job-board-platform.")
+  ? "marketplace"
+  : /^(personal-finance-tracker|habit-tracker-app|meal-planning-grocery-app|workout-progress-tracker)\./.test(name)
+    ? "consumer"
+    : "operations";
 
 const products = [
   {
@@ -49,7 +54,7 @@ for (const lang of ["ko", "en"]) {
 }
 
 for (const name of readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"))) {
-  const findings = reviewSot(load(name)).findings;
+  const findings = reviewSot(load(name), { profile: profileForDemo(name) }).findings;
   assert.equal(findings.length, 0, `${name} must not retain advisory content-review warnings: ${JSON.stringify(findings)}`);
 }
 

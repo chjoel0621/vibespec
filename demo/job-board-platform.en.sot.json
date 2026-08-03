@@ -6,79 +6,73 @@
     "oneLiner": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
     "goal": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
     "whyNow": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
-    "category": "Personal Productivity & Consumer App",
+    "category": "Job marketplace",
     "platforms": [
       "Web"
     ],
     "problem": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
     "solution": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
-    "alternatives": "Notes, spreadsheets, general-purpose apps, and single-purpose trackers",
-    "differentiator": "Connect personal goals, records, and progress so the next action is clear.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
     "targets": [
       {
-        "name": "Job seeker applying for roles and employer publishing job listings",
-        "role": "Requester and operational user",
-        "needs": "Quickly register needed work and know its status.",
+        "name": "Job seeker",
+        "role": "Job-seeking participant",
+        "needs": "Compare relevant listings and check application status.",
         "pain": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently."
       },
       {
-        "name": "Platform operator managing listings, applications, and reports",
-        "role": "Operations administrator",
-        "needs": "Manage priority and history and review operations metrics.",
-        "pain": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently."
-      },
-      {
-        "name": "System and policy administrator",
-        "role": "Operations and security administrator",
-        "needs": "Manage access, policy, and audit history.",
+        "name": "Employer",
+        "role": "Job-listing publisher",
+        "needs": "Publish listings and manage applicant responses.",
         "pain": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently."
       }
     ],
     "scenarios": [
       {
-        "text": "An operational user registers required work and checks its status.",
+        "text": "A participant discovers and saves a relevant listing.",
         "start": "P1"
       },
       {
-        "text": "An operator processes queued work and handles exceptions.",
+        "text": "A publisher creates a listing and checks response status.",
+        "start": "P3"
+      },
+      {
+        "text": "A participant checks report outcomes and visibility settings.",
+        "start": "P6"
+      },
+      {
+        "text": "A participant adjusts alert preferences and returns.",
         "start": "P5"
-      },
-      {
-        "text": "System and policy administrator reviews policy and access.",
-        "start": "P9"
-      },
-      {
-        "text": "System and policy administrator reviews audit records and operating metrics.",
-        "start": "P10"
       }
     ],
-    "northStar": "Share of active users completing their planned weekly action",
+    "northStar": "Share of operations requests completed on time",
     "kpis": [
       {
-        "name": "On-time processing rate",
+        "name": "Discovery-to-action conversion",
         "target": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
         "baseline": "Not measured",
-        "method": "Monthly aggregation of state changes against target dates",
+        "method": "Share of discovery sessions that lead to a save, application, or response",
+        "refs": [
+          "F1"
+        ]
+      },
+      {
+        "name": "Response-status visibility",
+        "target": "Minimize missed status updates",
+        "baseline": "Not measured",
+        "method": "Share of participants who view a status update",
         "refs": [
           "F6"
         ]
       },
       {
-        "name": "Operations visibility",
-        "target": "100% of key work tracked",
+        "name": "Report-outcome visibility",
+        "target": "100% outcome notifications",
         "baseline": "Not measured",
-        "method": "Share of records connected to reporting",
+        "method": "Share of reports followed by an outcome or next-step notice",
         "refs": [
-          "F11"
-        ]
-      },
-      {
-        "name": "Auditable operations rate",
-        "target": "100% of key changes retained",
-        "baseline": "Not measured",
-        "method": "Monthly audit-log and change-history review",
-        "refs": [
-          "F12"
+          "F9"
         ]
       }
     ],
@@ -87,47 +81,48 @@
       "Listing, application, saved job, application status, company, and report-history lookup",
       "Listing publication, search, application submission, status update, listing review, and report handling",
       "Listing views, application conversion, employer response, listing quality, and report-resolution reporting",
-      "Job-seeker profile, resume, job listing, and company-profile entry validation and duplicate prevention",
-      "Search, filter, and history management",
-      "Owner, priority, and SLA management",
-      "Approval and policy review",
-      "Exception, rejection, and reprocessing",
-      "Notifications and subscriptions",
-      "External integration and data synchronization",
-      "Role, permission, and audit management"
+      "Job-seeker profile, resume, job listing, and company-profile entry review and saving",
+      "Saved items, response history, and search preferences",
+      "Application and response status updates",
+      "Alert and saved-search settings",
+      "Reporting, safety guidance, and outcome status",
+      "Profile and visibility controls",
+      "Account and trust settings",
+      "Participation insights and accessibility"
     ],
     "nonGoals": [
-      "Operating regulated financial, health, or employment services",
-      "Sharing personal data without explicit user consent"
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
     ],
     "assumptions": [
-      "Users manage their own profile and record data.",
-      "Notifications and optional data connections require explicit consent."
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
     ],
     "risks": [
-      "Incomplete personal records can weaken progress insights.",
-      "Exposure of sensitive personal data can reduce trust and retention."
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
     ],
     "openQuestions": [
-      "What first-week action makes the value clear to a new user?",
-      "Which reminders and data connections must remain opt-in?"
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
     ],
     "constraints": [
-      "Users must be able to export and delete their records.",
-      "Sensitive data follows data minimization and explicit consent.",
-      "Permission, policy, and state changes require audit logs."
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role.",
+      "Participants must be able to control their profile and visibility.",
+      "Reporting and safety actions must communicate an outcome or next step to the participant."
     ]
   },
   "requirements": [
     {
       "id": "R1",
-      "title": "Intake and data quality",
+      "title": "Discovery and preferences",
       "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
@@ -140,7 +135,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
@@ -150,17 +145,17 @@
               "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Job-seeker profile, resume, job listing, and company-profile entry exception and audit handling",
-              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Job-seeker profile, resume, job listing, and company-profile entry status feedback and recovery",
+              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -169,33 +164,33 @@
         },
         {
           "id": "F2",
-          "title": "Job-seeker profile, resume, job listing, and company-profile entry validation and duplicate prevention",
+          "title": "Job-seeker profile, resume, job listing, and company-profile entry review and saving",
           "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Job-seeker profile, resume, job listing, and company-profile entry validation and duplicate prevention core processing rule",
+              "title": "Job-seeker profile, resume, job listing, and company-profile entry review and saving core processing rule",
               "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Job-seeker profile, resume, job listing, and company-profile entry validation and duplicate prevention exception and audit handling",
-              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Job-seeker profile, resume, job listing, and company-profile entry review and saving status feedback and recovery",
+              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -206,13 +201,13 @@
     },
     {
       "id": "R2",
-      "title": "Records and search",
+      "title": "Publishing and response",
       "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
@@ -225,7 +220,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
@@ -235,17 +230,17 @@
               "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Listing, application, saved job, application status, company, and report-history lookup exception and audit handling",
-              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Listing, application, saved job, application status, company, and report-history lookup status feedback and recovery",
+              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -254,33 +249,33 @@
         },
         {
           "id": "F4",
-          "title": "Search, filter, and history management",
+          "title": "Saved items, response history, and search preferences",
           "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Search, filter, and history management core processing rule",
+              "title": "Saved items, response history, and search preferences core processing rule",
               "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Search, filter, and history management exception and audit handling",
-              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Saved items, response history, and search preferences status feedback and recovery",
+              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -291,13 +286,13 @@
     },
     {
       "id": "R3",
-      "title": "Processing and ownership",
+      "title": "Application or transaction status",
       "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
@@ -310,7 +305,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
@@ -320,17 +315,17 @@
               "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Listing publication, search, application submission, status update, listing review, and report handling exception and audit handling",
-              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Listing publication, search, application submission, status update, listing review, and report handling status feedback and recovery",
+              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -339,33 +334,33 @@
         },
         {
           "id": "F6",
-          "title": "Owner, priority, and SLA management",
+          "title": "Application and response status updates",
           "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Owner, priority, and SLA management core processing rule",
+              "title": "Application and response status updates core processing rule",
               "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Owner, priority, and SLA management exception and audit handling",
-              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Application and response status updates status feedback and recovery",
+              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -376,46 +371,46 @@
     },
     {
       "id": "R4",
-      "title": "Approval and exceptions",
+      "title": "Trust and safety",
       "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
       "features": [
         {
           "id": "F7",
-          "title": "Approval and policy review",
+          "title": "Alert and saved-search settings",
           "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Approval and policy review core processing rule",
+              "title": "Alert and saved-search settings core processing rule",
               "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Approval and policy review exception and audit handling",
-              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Alert and saved-search settings status feedback and recovery",
+              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -424,33 +419,33 @@
         },
         {
           "id": "F8",
-          "title": "Exception, rejection, and reprocessing",
+          "title": "Reporting, safety guidance, and outcome status",
           "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Exception, rejection, and reprocessing core processing rule",
+              "title": "Reporting, safety guidance, and outcome status core processing rule",
               "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Exception, rejection, and reprocessing exception and audit handling",
-              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Reporting, safety guidance, and outcome status status feedback and recovery",
+              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -461,46 +456,46 @@
     },
     {
       "id": "R5",
-      "title": "Notifications and integrations",
+      "title": "Alerts and visibility",
       "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
       "status": "todo",
       "priority": "mid",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
       "features": [
         {
           "id": "F9",
-          "title": "Notifications and subscriptions",
+          "title": "Profile and visibility controls",
           "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Notifications and subscriptions core processing rule",
+              "title": "Profile and visibility controls core processing rule",
               "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Notifications and subscriptions exception and audit handling",
-              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Profile and visibility controls status feedback and recovery",
+              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -509,33 +504,33 @@
         },
         {
           "id": "F10",
-          "title": "External integration and data synchronization",
+          "title": "Account and trust settings",
           "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "External integration and data synchronization core processing rule",
+              "title": "Account and trust settings core processing rule",
               "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "External integration and data synchronization exception and audit handling",
-              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Account and trust settings status feedback and recovery",
+              "desc": "Connect job-seeker profiles, companies and listings, search and saves, applications, status updates, reporting and review, and marketplace outcomes in one job-board flow. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -546,13 +541,13 @@
     },
     {
       "id": "R6",
-      "title": "Insights and controls",
+      "title": "Personal insights and accessibility",
       "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
       "status": "todo",
       "priority": "mid",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
           "done": false
         }
       ],
@@ -565,7 +560,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
@@ -575,17 +570,17 @@
               "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Listing views, application conversion, employer response, listing quality, and report-resolution reporting exception and audit handling",
-              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Listing views, application conversion, employer response, listing quality, and report-resolution reporting status feedback and recovery",
+              "desc": "Job seekers compare listings across channels and track applications separately, while employers struggle to manage listing quality and applicant questions consistently. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -594,33 +589,33 @@
         },
         {
           "id": "F12",
-          "title": "Role, permission, and audit management",
+          "title": "Participation insights and accessibility",
           "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Role, permission, and audit management core processing rule",
+              "title": "Participation insights and accessibility core processing rule",
               "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Role, permission, and audit management exception and audit handling",
-              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Participation insights and accessibility status feedback and recovery",
+              "desc": "Help job seekers find relevant roles quickly and help employers manage a transparent application journey. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Participants can control their profile and visibility and check the status of posts, applications, or reports.",
                   "done": false
                 }
               ]
@@ -634,11 +629,11 @@
     "sections": [
       {
         "id": "S1",
-        "title": "Intake and data quality",
+        "title": "Discovery and preferences",
         "pages": [
           {
             "id": "P1",
-            "title": "Operations dashboard",
+            "title": "Discover listings",
             "type": "top",
             "refs": [
               "F1",
@@ -652,7 +647,7 @@
           },
           {
             "id": "P2",
-            "title": "Work list",
+            "title": "Listing detail",
             "type": "page",
             "refs": [
               "F3",
@@ -667,7 +662,7 @@
           },
           {
             "id": "P3",
-            "title": "Create record",
+            "title": "Create listing",
             "type": "page",
             "refs": [
               "F1",
@@ -683,11 +678,11 @@
       },
       {
         "id": "S2",
-        "title": "Records and search",
+        "title": "Publishing and response",
         "pages": [
           {
             "id": "P4",
-            "title": "Record detail",
+            "title": "Application and response status",
             "type": "page",
             "refs": [
               "F3:1",
@@ -702,7 +697,7 @@
           },
           {
             "id": "P5",
-            "title": "Processing workspace",
+            "title": "Saves and alerts",
             "type": "page",
             "refs": [
               "F5",
@@ -719,11 +714,11 @@
       },
       {
         "id": "S3",
-        "title": "Processing and ownership",
+        "title": "Application or transaction status",
         "pages": [
           {
             "id": "P6",
-            "title": "Approval and exception queue",
+            "title": "Report and safety",
             "type": "page",
             "refs": [
               "F7",
@@ -738,7 +733,7 @@
           },
           {
             "id": "P7",
-            "title": "Notifications and integrations",
+            "title": "Profile and visibility",
             "type": "page",
             "refs": [
               "F9",
@@ -754,11 +749,11 @@
       },
       {
         "id": "S4",
-        "title": "Insights and controls",
+        "title": "Personal insights and accessibility",
         "pages": [
           {
             "id": "P8",
-            "title": "Operations reports",
+            "title": "Account and trust settings",
             "type": "page",
             "refs": [
               "F11",
@@ -771,7 +766,7 @@
           },
           {
             "id": "P9",
-            "title": "Policy and access settings",
+            "title": "My activity",
             "type": "page",
             "refs": [
               "F10:1",
@@ -784,7 +779,7 @@
           },
           {
             "id": "P10",
-            "title": "Audit log",
+            "title": "Help and accessibility",
             "type": "page",
             "refs": [
               "F8:1",
@@ -866,7 +861,7 @@
       {
         "from": "P4",
         "to": "P1",
-        "label": "Refresh operations status"
+        "label": "Refresh my activity"
       }
     ]
   }

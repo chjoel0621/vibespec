@@ -2,11 +2,12 @@
 // cache. Execute the plugin from a clean copied bundle so no script, asset, or
 // relative path can accidentally depend on this source checkout.
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { packagePlugin } from "../package-plugin.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = resolve(here, "..");
@@ -27,7 +28,7 @@ function run(script, args, cwd) {
 try {
   // Mirror the relevant cache shape without retaining a link to the source.
   const installedRoot = join(work, "cache", "vibespec", "vibespec", "local");
-  cpSync(pluginRoot, installedRoot, { recursive: true });
+  packagePlugin(installedRoot);
   const manifest = JSON.parse(readFileSync(join(installedRoot, ".codex-plugin", "plugin.json"), "utf8"));
   const installedSkill = resolve(installedRoot, manifest.skills, "vibespec");
   assert.ok(existsSync(join(installedSkill, "SKILL.md")), "installed skill must resolve from the manifest");

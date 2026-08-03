@@ -23,8 +23,13 @@ assert.equal(sharedSkill, resolve(skillRoot, "SKILL.md"));
 assert.ok(existsSync(sharedSkill), "both hosts must resolve the same SKILL.md");
 
 const text = readFileSync(sharedSkill, "utf8");
-const scripts = [...text.matchAll(/scripts\/([a-z-]+\.mjs)/g)].map(match => match[1]);
-for (const script of new Set(scripts)) assert.ok(existsSync(resolve(skillRoot, "scripts", script)), "SKILL.md references missing script " + script);
+const workflowRefs = [...text.matchAll(/references\/(workflows\/[a-z-]+\.md)/g)].map(match => match[1]);
+assert.ok(workflowRefs.length >= 7, "SKILL.md must route to common and mode-specific workflow references");
+const instructionFiles = [sharedSkill, ...new Set(workflowRefs.map(file => resolve(skillRoot, "references", file)))];
+for (const file of instructionFiles) assert.ok(existsSync(file), "SKILL.md references missing instruction " + file);
+const scripts = instructionFiles.flatMap(file => [...readFileSync(file, "utf8").matchAll(/scripts\/([a-z-]+\.mjs)/g)].map(match => match[1]));
+for (const script of new Set(scripts)) assert.ok(existsSync(resolve(skillRoot, "scripts", script)), "workflow references missing script " + script);
+assert.ok(text.length < 15000, "SKILL.md must stay a compact router; put mode details in references/workflows");
 assert.ok(existsSync(resolve(skillRoot, "agents", "openai.yaml")), "Codex UI metadata must exist beside the shared skill");
 for (const readme of ["README.md", "README.ko.md"]) {
   const docs = readFileSync(resolve(repoRoot, readme), "utf8");

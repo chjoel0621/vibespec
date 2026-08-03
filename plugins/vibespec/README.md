@@ -16,4 +16,4 @@ VibeSpec is a dual-format plugin: Claude reads `.claude-plugin/`, OpenAI Codex r
 - **HTML = viewer/editor** · **JSON = SOT data**
 - Skill: idea or document → validated SOT JSON with viewer
 - Schema: `skills/vibespec/references/sot-schema.md`
-- Full installation, usage, and release notes: [repository README](../../README.md)
+- Full installation, usage, and release notes: [repository README](https://github.com/chjoel0621/vibespec#readme)

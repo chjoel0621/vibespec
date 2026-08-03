@@ -37,6 +37,8 @@ A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)
 
 How you install depends on your environment. Claude and Codex use different plugin commands; the `/plugin` slash commands below are **Claude Code terminal only** and do **not** work in Cowork or Codex.
 
+**Runtime support.** Full mode (validated JSON plus a self-contained HTML viewer, safe edits, rebase, maps, and merge) requires Node.js 18+, access to the installed skill directory, and write access to the task folder. Claude Code and filesystem-enabled Codex tasks normally provide these capabilities. A Cowork task without Node or shell access can use reduced mode: VibeSpec creates the JSON and supplies the unchanged viewer, then the user loads the JSON in the viewer; it cannot claim validated embedded HTML or apply deterministic tree edits in that environment.
+
 ### Cowork (desktop app)
 
 Install through the UI:
@@ -71,7 +73,13 @@ codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
 
 Then install **VibeSpec** from the marketplace: in the ChatGPT desktop app, open **Codex → Plugins**, choose the `vibespec` marketplace, install the plugin, and start a new task. In Codex CLI, run `codex`, open `/plugins`, choose the `vibespec` marketplace, install VibeSpec, then start a new session. Invoke it naturally or explicitly with `$vibespec`.
 
-**First-install acceptance check.** In a new task opened on a writable folder, invoke `$vibespec` with “Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`.” Success means both files appear, the HTML opens with that plan rather than the viewer demo, and `node <VibeSpec-skill-dir>/scripts/validate-sot.mjs outputs/meeting-room.sot.json` reports `PASS`. If VibeSpec is not available in the new task, reopen the task after installation or restart the desktop app.
+**First-install acceptance check.** In a new task opened on a writable folder, invoke `$vibespec` with “Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`.” First run `node <VibeSpec-skill-dir>/scripts/doctor.mjs <task-folder> --json`. Success means doctor passes, both files appear, and the installed verifier reports PASS:
+
+```text
+node <VibeSpec-skill-dir>/scripts/verify-host-output.mjs outputs/meeting-room.sot.json outputs/meeting-room.html --host <claude-code|cowork|codex-cli|codex-desktop> --record host-acceptance/<host>.json
+```
+
+This verifier proves that the host-created JSON is structurally valid and exactly matches the SOT embedded in the HTML. Repository CI cannot launch the desktop hosts, so a release is described as host-accepted only after this check has been run on that host. If VibeSpec is not available in the new task, reopen the task after installation or restart the desktop app.
 
 ## Usage
 
@@ -151,7 +159,10 @@ vibespec/
 │       ├── SKILL.md                    # Skill: idea/document → SOT JSON (+ targeted edits)
 │       ├── references/sot-schema.md    # JSON data contract (schema)
 │       ├── references/sot.schema.json  # Machine-readable JSON Schema
+│       ├── references/workflows/       # Mode-specific instructions, loaded only after routing
 │       ├── scripts/
+│       │   ├── doctor.mjs              # Installed path, Node, bundle, and workspace preflight
+│       │   ├── verify-host-output.mjs  # Real-host JSON/HTML acceptance evidence
 │       │   ├── inspect.mjs             # Routing pre-flight (classify, next path, suggested mode)
 │       │   ├── validate-sot.mjs        # Single-file validator (structure, refs, coverage)
 │       │   ├── validate-tree.mjs       # Cross-file checks (scope, digest, boundary, path)
@@ -166,6 +177,7 @@ vibespec/
 │       ├── assets/viewer.html          # HTML viewer (app) — BUILT OUTPUT
 │       ├── src/                        # Viewer source (styles.css, head.html, js/NN-*.js)
 │       ├── build.mjs                   # Inlines src/ into the single-file viewer
+│       ├── package-plugin.mjs          # Minimal runtime bundle (excludes tests/.build/dev files)
 │       └── package.json                # npm run build · check · validate
 ├── demo/                               # Two demo products (ko/en), each a main + an
 │                                       #   approved initiative composed into a product map:
@@ -185,6 +197,7 @@ vibespec/
 cd plugins/vibespec/skills/vibespec
 npm run check       # build + syntax + schema/round-trip + Claude/Codex plugin contracts
 npm run check:all   # check + Chrome/Edge dense-flow layout regression
+npm run package:plugin # write .dist/vibespec minimal runtime bundle
 ```
 
 Validate a generated or edited SOT file with the command below. It enforces the JSON Schema and checks duplicate IDs, IA feature coverage, and KPI, scenario, and user-flow references.

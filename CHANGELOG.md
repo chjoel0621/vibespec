@@ -2,6 +2,24 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [0.15.0] - 2026-08-03
+
+### Added
+
+- Added operations, consumer, and marketplace generation profiles with profile-aware content review and demo coverage.
+- Added an installed-runtime doctor and a host-output acceptance verifier for Claude and Codex installations.
+- Added an allowlist-based production packager that excludes tests, build probes, and development-only sources.
+
+### Changed
+
+- Split the skill into a compact router and mode-specific workflow references that are loaded only when needed.
+- Made skill-directory discovery and Node.js requirements explicit, with a documented reduced mode for hosts without a usable Node runtime.
+- Refined consumer and marketplace demo templates to prioritize real participant actions over generic internal-operations boilerplate.
+
+### Security
+
+- Reduced the installed plugin surface and added regression checks that every packaged runtime dependency is present and executable.
+
 ## [0.14.1] - 2026-07-22
 
 ### Changed

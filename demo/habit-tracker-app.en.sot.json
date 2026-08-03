@@ -17,68 +17,56 @@
     "targets": [
       {
         "name": "Individual building and maintaining daily habits and routines",
-        "role": "Requester and operational user",
-        "needs": "Quickly register needed work and know its status.",
-        "pain": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain."
-      },
-      {
-        "name": "App operator managing habit templates and reminders",
-        "role": "Operations administrator",
-        "needs": "Manage priority and history and review operations metrics.",
-        "pain": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain."
-      },
-      {
-        "name": "System and policy administrator",
-        "role": "Operations and security administrator",
-        "needs": "Manage access, policy, and audit history.",
+        "role": "Individual user",
+        "needs": "Capture personal goals and records quickly and know the next action.",
         "pain": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain."
       }
     ],
     "scenarios": [
       {
-        "text": "An operational user registers required work and checks its status.",
+        "text": "A person sets a goal and reminder preferences.",
         "start": "P1"
       },
       {
-        "text": "An operator processes queued work and handles exceptions.",
+        "text": "A person completes the core action or adds a record and checks progress.",
         "start": "P5"
       },
       {
-        "text": "System and policy administrator reviews policy and access.",
-        "start": "P9"
+        "text": "A person reviews weekly insights and adjusts the next action and reminders.",
+        "start": "P6"
       },
       {
-        "text": "System and policy administrator reviews audit records and operating metrics.",
-        "start": "P10"
+        "text": "A person exports their data or changes sharing boundaries.",
+        "start": "P9"
       }
     ],
     "northStar": "Share of active users completing their planned weekly action",
     "kpis": [
       {
-        "name": "On-time processing rate",
+        "name": "First-week core-action completion",
         "target": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
         "baseline": "Not measured",
-        "method": "Monthly aggregation of state changes against target dates",
+        "method": "Share of new users completing the core action or record within seven days",
         "refs": [
-          "F6"
+          "F5"
         ]
       },
       {
-        "name": "Operations visibility",
-        "target": "100% of key work tracked",
+        "name": "Weekly return rate",
+        "target": "Growing weekly active users",
         "baseline": "Not measured",
-        "method": "Share of records connected to reporting",
+        "method": "Share of users recording, reviewing, or adjusting reminders each week",
         "refs": [
-          "F11"
+          "F8"
         ]
       },
       {
-        "name": "Auditable operations rate",
-        "target": "100% of key changes retained",
+        "name": "User data-control completion",
+        "target": "100% of data requests completed",
         "baseline": "Not measured",
-        "method": "Monthly audit-log and change-history review",
+        "method": "Completion history for export, deletion, and sharing-setting changes",
         "refs": [
-          "F12"
+          "F9"
         ]
       }
     ],
@@ -87,14 +75,14 @@
       "Today's check-in, streak, weekly pattern, and goal-completion lookup",
       "Habit completion, skip logging, reminder adjustment, and weekly reflection handling",
       "Streak, completion rate, time-of-day, and habit-trend reporting",
-      "Habit, target frequency, reminder time, and start-date entry validation and duplicate prevention",
-      "Search, filter, and history management",
-      "Owner, priority, and SLA management",
-      "Approval and policy review",
-      "Exception, rejection, and reprocessing",
-      "Notifications and subscriptions",
-      "External integration and data synchronization",
-      "Role, permission, and audit management"
+      "Habit, target frequency, reminder time, and start-date entry validation and draft saving",
+      "Personal record search, filters, and history",
+      "Progress review and next-action guidance",
+      "Reminder consent, timing, and frequency",
+      "Onboarding, empty states, and return-use guidance",
+      "Export, deletion, and privacy controls",
+      "Optional sharing and integration boundaries",
+      "Personalization, accessibility, and safety settings"
     ],
     "nonGoals": [
       "Operating regulated financial, health, or employment services",
@@ -115,19 +103,19 @@
     "constraints": [
       "Users must be able to export and delete their records.",
       "Sensitive data follows data minimization and explicit consent.",
-      "Permission, policy, and state changes require audit logs."
+      "Reminders, sharing, and external data connections require explicit consent."
     ]
   },
   "requirements": [
     {
       "id": "R1",
-      "title": "Intake and data quality",
+      "title": "Personal setup and start",
       "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
@@ -140,7 +128,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
@@ -150,17 +138,17 @@
               "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Habit, target frequency, reminder time, and start-date entry exception and audit handling",
-              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Habit, target frequency, reminder time, and start-date entry status feedback and recovery",
+              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -169,33 +157,33 @@
         },
         {
           "id": "F2",
-          "title": "Habit, target frequency, reminder time, and start-date entry validation and duplicate prevention",
+          "title": "Habit, target frequency, reminder time, and start-date entry validation and draft saving",
           "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Habit, target frequency, reminder time, and start-date entry validation and duplicate prevention core processing rule",
+              "title": "Habit, target frequency, reminder time, and start-date entry validation and draft saving core processing rule",
               "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Habit, target frequency, reminder time, and start-date entry validation and duplicate prevention exception and audit handling",
-              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Habit, target frequency, reminder time, and start-date entry validation and draft saving status feedback and recovery",
+              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -206,13 +194,13 @@
     },
     {
       "id": "R2",
-      "title": "Records and search",
+      "title": "Daily records and history",
       "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
@@ -225,7 +213,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
@@ -235,17 +223,17 @@
               "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Today's check-in, streak, weekly pattern, and goal-completion lookup exception and audit handling",
-              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Today's check-in, streak, weekly pattern, and goal-completion lookup status feedback and recovery",
+              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -254,33 +242,33 @@
         },
         {
           "id": "F4",
-          "title": "Search, filter, and history management",
+          "title": "Personal record search, filters, and history",
           "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Search, filter, and history management core processing rule",
+              "title": "Personal record search, filters, and history core processing rule",
               "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Search, filter, and history management exception and audit handling",
-              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Personal record search, filters, and history status feedback and recovery",
+              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -291,13 +279,13 @@
     },
     {
       "id": "R3",
-      "title": "Processing and ownership",
+      "title": "Progress review and next action",
       "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
@@ -310,7 +298,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
@@ -320,17 +308,17 @@
               "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Habit completion, skip logging, reminder adjustment, and weekly reflection handling exception and audit handling",
-              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Habit completion, skip logging, reminder adjustment, and weekly reflection handling status feedback and recovery",
+              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -339,33 +327,33 @@
         },
         {
           "id": "F6",
-          "title": "Owner, priority, and SLA management",
+          "title": "Progress review and next-action guidance",
           "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Owner, priority, and SLA management core processing rule",
+              "title": "Progress review and next-action guidance core processing rule",
               "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Owner, priority, and SLA management exception and audit handling",
-              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Progress review and next-action guidance status feedback and recovery",
+              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -376,46 +364,46 @@
     },
     {
       "id": "R4",
-      "title": "Approval and exceptions",
+      "title": "Reminders and return use",
       "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
       "status": "todo",
       "priority": "high",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
       "features": [
         {
           "id": "F7",
-          "title": "Approval and policy review",
+          "title": "Reminder consent, timing, and frequency",
           "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Approval and policy review core processing rule",
+              "title": "Reminder consent, timing, and frequency core processing rule",
               "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Approval and policy review exception and audit handling",
-              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Reminder consent, timing, and frequency status feedback and recovery",
+              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -424,33 +412,33 @@
         },
         {
           "id": "F8",
-          "title": "Exception, rejection, and reprocessing",
+          "title": "Onboarding, empty states, and return-use guidance",
           "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Exception, rejection, and reprocessing core processing rule",
+              "title": "Onboarding, empty states, and return-use guidance core processing rule",
               "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Exception, rejection, and reprocessing exception and audit handling",
-              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Onboarding, empty states, and return-use guidance status feedback and recovery",
+              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -461,46 +449,46 @@
     },
     {
       "id": "R5",
-      "title": "Notifications and integrations",
+      "title": "Privacy and connected data",
       "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
       "status": "todo",
       "priority": "mid",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
       "features": [
         {
           "id": "F9",
-          "title": "Notifications and subscriptions",
+          "title": "Export, deletion, and privacy controls",
           "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Notifications and subscriptions core processing rule",
+              "title": "Export, deletion, and privacy controls core processing rule",
               "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Notifications and subscriptions exception and audit handling",
-              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Export, deletion, and privacy controls status feedback and recovery",
+              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -509,33 +497,33 @@
         },
         {
           "id": "F10",
-          "title": "External integration and data synchronization",
+          "title": "Optional sharing and integration boundaries",
           "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
           "status": "todo",
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "External integration and data synchronization core processing rule",
+              "title": "Optional sharing and integration boundaries core processing rule",
               "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "External integration and data synchronization exception and audit handling",
-              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Optional sharing and integration boundaries status feedback and recovery",
+              "desc": "Connect habit setup, daily check-ins, streaks, reminders, reflection, and pattern insights so routines are visible and actionable. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -546,13 +534,13 @@
     },
     {
       "id": "R6",
-      "title": "Insights and controls",
+      "title": "Personal insights and extension",
       "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
       "status": "todo",
       "priority": "mid",
       "acceptance": [
         {
-          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
           "done": false
         }
       ],
@@ -565,7 +553,7 @@
           "priority": "high",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
@@ -575,17 +563,17 @@
               "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Streak, completion rate, time-of-day, and habit-trend reporting exception and audit handling",
-              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Streak, completion rate, time-of-day, and habit-trend reporting status feedback and recovery",
+              "desc": "When people start a habit, check-ins, reminders, setbacks, and weekly reflection are disconnected, making consistency difficult to sustain. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -594,33 +582,33 @@
         },
         {
           "id": "F12",
-          "title": "Role, permission, and audit management",
+          "title": "Personalization, accessibility, and safety settings",
           "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
           "status": "todo",
           "priority": "mid",
           "acceptance": [
             {
-              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
               "done": false
             }
           ],
           "specs": [
             {
-              "title": "Role, permission, and audit management core processing rule",
+              "title": "Personalization, accessibility, and safety settings core processing rule",
               "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
             },
             {
-              "title": "Role, permission, and audit management exception and audit handling",
-              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. Retain change, failure, and reprocessing conditions with history.",
+              "title": "Personalization, accessibility, and safety settings status feedback and recovery",
+              "desc": "Help people increase weekly completion and consistent streaks for the habits that matter to them. People can understand the outcome and current state, then adjust their settings or next action.",
               "acceptance": [
                 {
-                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "text": "Users can update their settings and records and directly control reminders, sharing, and data use.",
                   "done": false
                 }
               ]
@@ -634,11 +622,11 @@
     "sections": [
       {
         "id": "S1",
-        "title": "Intake and data quality",
+        "title": "Personal setup and start",
         "pages": [
           {
             "id": "P1",
-            "title": "Operations dashboard",
+            "title": "My home",
             "type": "top",
             "refs": [
               "F1",
@@ -652,7 +640,7 @@
           },
           {
             "id": "P2",
-            "title": "Work list",
+            "title": "Record list",
             "type": "page",
             "refs": [
               "F3",
@@ -683,7 +671,7 @@
       },
       {
         "id": "S2",
-        "title": "Records and search",
+        "title": "Daily records and history",
         "pages": [
           {
             "id": "P4",
@@ -702,7 +690,7 @@
           },
           {
             "id": "P5",
-            "title": "Processing workspace",
+            "title": "Today's action",
             "type": "page",
             "refs": [
               "F5",
@@ -719,11 +707,11 @@
       },
       {
         "id": "S3",
-        "title": "Processing and ownership",
+        "title": "Progress review and next action",
         "pages": [
           {
             "id": "P6",
-            "title": "Approval and exception queue",
+            "title": "Weekly review",
             "type": "page",
             "refs": [
               "F7",
@@ -738,7 +726,7 @@
           },
           {
             "id": "P7",
-            "title": "Notifications and integrations",
+            "title": "Reminders and personalization",
             "type": "page",
             "refs": [
               "F9",
@@ -754,11 +742,11 @@
       },
       {
         "id": "S4",
-        "title": "Insights and controls",
+        "title": "Personal insights and extension",
         "pages": [
           {
             "id": "P8",
-            "title": "Operations reports",
+            "title": "Onboarding and return use",
             "type": "page",
             "refs": [
               "F11",
@@ -771,7 +759,7 @@
           },
           {
             "id": "P9",
-            "title": "Policy and access settings",
+            "title": "Data and privacy",
             "type": "page",
             "refs": [
               "F10:1",
@@ -784,7 +772,7 @@
           },
           {
             "id": "P10",
-            "title": "Audit log",
+            "title": "Sharing and integrations",
             "type": "page",
             "refs": [
               "F8:1",
@@ -866,7 +854,7 @@
       {
         "from": "P4",
         "to": "P1",
-        "label": "Refresh operations status"
+        "label": "Refresh my progress"
       }
     ]
   }

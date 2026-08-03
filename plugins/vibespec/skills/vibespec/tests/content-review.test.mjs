@@ -22,3 +22,15 @@ for (const code of ["thin-prd", "empty-non-goals", "thin-feature-description", "
   assert.ok(codes.includes(code), "missing advisory finding " + code);
 }
 console.log("[review] PASS review catches thin scope, vague acceptance, and missing flow semantics");
+
+const consumerWithOperationsLanguage = clone(valid);
+consumerWithOperationsLanguage.requirements[0].features[0].specs[0].title = "Exception and audit handling";
+const consumerResult = reviewSot(consumerWithOperationsLanguage, { profile: "consumer" });
+assert.ok(consumerResult.findings.some(item => item.code === "consumer-operations-language"), "consumer profile must flag operations-default language");
+
+const marketplace = clone(valid);
+marketplace.prd.targets = [{ name: "Buyer", role: "Buyer", needs: "Find an item", pain: "Too much choice" }];
+const marketplaceResult = reviewSot(marketplace, { profile: "marketplace" });
+assert.ok(marketplaceResult.findings.some(item => item.code === "marketplace-needs-multiple-user-groups"), "marketplace profile must require multiple participant groups");
+assert.throws(() => reviewSot(valid, { profile: "unknown" }), /unsupported generation profile/);
+console.log("[review] PASS profile review distinguishes consumer language and marketplace participation");

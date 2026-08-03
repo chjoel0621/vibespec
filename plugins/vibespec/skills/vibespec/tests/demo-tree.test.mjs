@@ -15,6 +15,20 @@ const profileForDemo = name => name.startsWith("job-board-platform.")
   : /^(personal-finance-tracker|habit-tracker-app|meal-planning-grocery-app|workout-progress-tracker)\./.test(name)
     ? "consumer"
     : "operations";
+const publicDemoNames = new Set([
+  "meeting-room-booking.ko.sot.json",
+  "meeting-room-booking.ko.1-2.notif.sot.json",
+  "meeting-room-booking.en.sot.json",
+  "meeting-room-booking.en.1-2.notif.sot.json",
+  "flea-market.ko.sot.json",
+  "flea-market.ko.1-1.escrow.sot.json",
+  "flea-market.ko.1-2.offer.sot.json",
+  "flea-market.en.sot.json",
+  "flea-market.en.1-1.escrow.sot.json",
+  "flea-market.en.1-2.offer.sot.json",
+  "crm.ko.sot.json",
+  "crm.en.sot.json"
+]);
 
 const products = [
   {
@@ -55,8 +69,12 @@ for (const lang of ["ko", "en"]) {
 
 for (const name of readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"))) {
   const findings = reviewSot(load(name), { profile: profileForDemo(name) }).findings;
+  if (publicDemoNames.has(name)) {
+    assert.equal(findings.length, 0, `${name} is public and must pass content review without warnings: ${JSON.stringify(findings)}`);
+    continue;
+  }
   // The catalog predates the semantic IA gate. Keep every established content
-  // warning at zero while the flat legacy demos are migrated incrementally.
+  // warning at zero while the non-public flat demos are migrated incrementally.
   const nonIaFindings = findings.filter(finding => ![
     "flat-ia-for-complex-product", "shallow-ia-for-complex-product", "ceremonial-ia-hierarchy",
     "catch-all-ia-page", "nested-top-ia-page", "requirement-shaped-ia"

@@ -103,6 +103,12 @@ assert.ok(nodeById(m6, "payment/P3"), "the wrapper becomes the initiative's own 
 assert.equal(nodeById(m6, "payment/P1"), null, "the boundary stub itself is not materialized");
 console.log("[map] PASS a boundary nested under a wrapper still grafts at its target");
 
+const surfaced = clone(payment);
+surfaced.ia.sections[0].pages[0].children[0].surface = "drawer";
+const surfacedMap = buildProductMap([doc("main", main), doc("pay", surfaced)]);
+assert.equal(nodeById(surfacedMap, "payment/P2").surface, "drawer");
+console.log("[map] PASS composite nodes preserve optional surface roles");
+
 // CLI: --link <scopeId>=<url> attaches a link to each scope so the rendered map
 // can open the document that defines it. The link value must not be mistaken for
 // an input path (that used to make the CLI try to read "notif=/notif/" as a SOT).

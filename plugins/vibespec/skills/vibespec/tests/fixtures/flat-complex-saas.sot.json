@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Flat Complex SaaS",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "A multi-stage planning workspace for product teams",
+    "goal": "Coordinate planning, review, release, and governance",
+    "whyNow": "Disconnected documents make change impact hard to understand",
+    "category": "Product planning SaaS",
+    "platforms": ["Web"],
+    "problem": "Product teams cannot trace planning changes across delivery stages",
+    "solution": "Keep planning, review, release, and governance in one structured workspace",
+    "alternatives": "Documents and issue trackers",
+    "differentiator": "A connected planning graph with deterministic validation",
+    "targets": [{ "name": "Product team", "role": "Planner", "needs": "Traceable decisions", "pain": "Scattered planning context" }],
+    "scenarios": [{ "text": "A planner creates a plan and moves it through review and release", "start": "P1" }],
+    "northStar": "Approved plans delivered without missing context",
+    "kpis": [{ "name": "Traceable change rate", "target": "95%", "baseline": "40%", "method": "Change receipts", "refs": ["F1"] }],
+    "inScope": ["Planning", "Review", "Release", "Governance"],
+    "nonGoals": ["Source-code implementation"],
+    "assumptions": ["Teams use stable identifiers"],
+    "risks": ["A large plan may become difficult to navigate"],
+    "openQuestions": [],
+    "constraints": ["JSON remains the source of truth"]
+  },
+  "requirements": [
+    { "id": "R1", "title": "Planning", "desc": "Create and organize plans", "status": "todo", "priority": "high", "acceptance": [{ "text": "Plans preserve stable identifiers", "done": false }], "features": [
+      { "id": "F1", "title": "Create plan", "desc": "Create a structured product plan", "status": "todo", "priority": "high", "acceptance": [{ "text": "A complete plan can be saved", "done": false }], "specs": [] },
+      { "id": "F2", "title": "Import plan", "desc": "Import an existing structured plan", "status": "todo", "priority": "high", "acceptance": [{ "text": "A valid plan can be imported", "done": false }], "specs": [] }
+    ] },
+    { "id": "R2", "title": "Review", "desc": "Review proposed changes", "status": "todo", "priority": "high", "acceptance": [{ "text": "Reviewers can inspect every change", "done": false }], "features": [
+      { "id": "F3", "title": "Compare versions", "desc": "Compare planning versions by stable id", "status": "todo", "priority": "high", "acceptance": [{ "text": "Added and removed entities are visible", "done": false }], "specs": [] },
+      { "id": "F4", "title": "Record decision", "desc": "Record an approval or rejection decision", "status": "todo", "priority": "high", "acceptance": [{ "text": "A decision includes its rationale", "done": false }], "specs": [] }
+    ] },
+    { "id": "R3", "title": "Release", "desc": "Prepare an approved planning version", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Approved plans can become a baseline", "done": false }], "features": [
+      { "id": "F5", "title": "Freeze version", "desc": "Freeze an approved planning baseline", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Frozen content cannot be overwritten", "done": false }], "specs": [] },
+      { "id": "F6", "title": "Share change notice", "desc": "Share relevant planning changes with developers", "status": "todo", "priority": "mid", "acceptance": [{ "text": "The notice identifies changed features", "done": false }], "specs": [] }
+    ] },
+    { "id": "R4", "title": "Governance", "desc": "Control workspace access and history", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Workspace changes are attributable", "done": false }], "features": [
+      { "id": "F7", "title": "Manage members", "desc": "Manage workspace member roles", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Only authorized roles can approve", "done": false }], "specs": [] },
+      { "id": "F8", "title": "Inspect history", "desc": "Inspect the planning audit history", "status": "todo", "priority": "mid", "acceptance": [{ "text": "Each change has an actor and time", "done": false }], "specs": [] }
+    ] }
+  ],
+  "ia": { "sections": [
+    { "id": "S1", "title": "Planning", "pages": [
+      { "id": "P1", "title": "Create plan", "type": "top", "refs": ["F1"], "children": [] },
+      { "id": "P2", "title": "Import plan", "type": "page", "refs": ["F2"], "children": [] }
+    ] },
+    { "id": "S2", "title": "Review", "pages": [
+      { "id": "P3", "title": "Compare versions", "type": "top", "refs": ["F3"], "children": [] },
+      { "id": "P4", "title": "Record decision", "type": "page", "refs": ["F4"], "children": [] }
+    ] },
+    { "id": "S3", "title": "Release", "pages": [
+      { "id": "P5", "title": "Freeze version", "type": "top", "refs": ["F5"], "children": [] },
+      { "id": "P6", "title": "Share change notice", "type": "page", "refs": ["F6"], "children": [] }
+    ] },
+    { "id": "S4", "title": "Governance", "pages": [
+      { "id": "P7", "title": "Manage members", "type": "top", "refs": ["F7"], "children": [] },
+      { "id": "P8", "title": "Inspect history", "type": "page", "refs": ["F8"], "children": [] }
+    ] }
+  ] },
+  "flow": { "start": "P1", "transitions": [
+    { "from": "P1", "to": "P2", "ref": "F2" },
+    { "from": "P2", "to": "P3", "ref": "F3" },
+    { "from": "P3", "to": "P4", "ref": "F4" },
+    { "from": "P4", "to": "P5", "ref": "F5" },
+    { "from": "P5", "to": "P6", "ref": "F6" },
+    { "from": "P6", "to": "P7", "ref": "F7" },
+    { "from": "P7", "to": "P8", "ref": "F8" },
+    { "from": "P8", "to": "P1", "ref": "F1" }
+  ] }
+}

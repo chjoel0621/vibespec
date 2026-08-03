@@ -153,7 +153,7 @@ export function diffSot(before, after) {
     if (!pageA.has(id)) { record(changes, id, "removed", { title: page.title }, undefined); continue; }
     const { page: next, parent: nextParent } = pageA.get(id);
     if (parent !== nextParent) record(changes, id, "moved", parent, nextParent);
-    diffScalars(changes, id, page, next, ["title", "type"]);
+    diffScalars(changes, id, page, next, ["title", "type", "surface"]);
     diffStringArray(changes, `${id}.refs`, page.refs, next.refs);
   }
 

@@ -38,7 +38,10 @@ function main(argv) {
   const hostIndex = argv.indexOf("--host");
   const recordIndex = argv.indexOf("--record");
   const host = hostIndex >= 0 ? argv[hostIndex + 1] : null;
-  const excluded = new Set([hostIndex, hostIndex + 1, recordIndex, recordIndex + 1]);
+  const excluded = new Set([
+    ...(hostIndex >= 0 ? [hostIndex, hostIndex + 1] : []),
+    ...(recordIndex >= 0 ? [recordIndex, recordIndex + 1] : [])
+  ]);
   const files = argv.filter((arg, index) => !arg.startsWith("--") && !excluded.has(index));
   if (!host || files.length !== 2) {
     console.error("Usage: node scripts/verify-host-output.mjs <sot.json> <viewer.html> --host <claude-code|cowork|codex-cli|codex-desktop> [--record <evidence.json>] [--json]");

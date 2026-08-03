@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,3 +37,8 @@ assert.equal(extended.features[0].feature.specs[0].title, "Check references");
 assert.throws(() => querySot(sot, [], []), /at least one id or PRD field/);
 assert.throws(() => querySot(sot, ["F1:9"]), /unknown feature spec/);
 console.log("[query] PASS requirement, section, spec, and selected PRD contexts stay bounded");
+
+const cli = spawnSync(process.execPath, [join(here, "..", "scripts", "query-sot.mjs"), join(here, "fixtures", "valid-minimal.sot.json"), "--ids", "P1", "--json"], { encoding: "utf8" });
+assert.equal(cli.status, 0, cli.stderr || "query-sot CLI failed");
+assert.deepEqual(JSON.parse(cli.stdout).pages.map(item => item.page.id), ["P1"]);
+console.log("[query] PASS CLI resolves the source when --ids is used without --prd");

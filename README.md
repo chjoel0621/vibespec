@@ -30,7 +30,7 @@ A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)
 | **PRD** | Overview · Problem/Value · Users · Success Metrics · Scope · Risks/Assumptions (6 sections). Persona cards, scenario → user-flow linking, structured KPIs (target · measurement + feature links). |
 | **Feature Spec** | Requirement → Feature → Sub-feature (status · priority · description · acceptance criteria). The detail panel shows **connections (IA screens · user flow · KPIs)** and a **progress summary** (status breakdown · acceptance-criteria completion); click a chip to jump to that view. |
 | **Tree** | A node canvas of the requirement hierarchy. Click a node to jump to the Feature Spec. |
-| **IA (Information Architecture)** | Section → Page → Action sitemap. Feature-to-screen mapping, missing-coverage warnings, and auto-fill. |
+| **IA (Information Architecture)** | A task-derived Section → Page → Action sitemap with explicit screen, panel, drawer, modal, and mode roles. Feature coverage is checked after navigation and containment are designed. |
 | **User Flow** | A screen-transition graph (start → screen navigation, branches/loops, zoom/pan). Add or remove transitions from a panel; link a trigger to a feature and its label auto-syncs; warnings for unconnected/missing screens. |
 
 ## Installation
@@ -115,7 +115,7 @@ The skill fires automatically on natural-language requests, but if it doesn't, y
 
 - **Trust the history before big changes.** Undo/history can restore any point in time, and Reset returns to the first version. Change things boldly.
 
-- **Use the warnings as a roadmap.** The IA "missing coverage" and user-flow "unconnected" indicators tell you which screens/transitions are missing. Use auto-fill to lay down a skeleton quickly, then refine.
+- **Use the warnings as a roadmap.** The IA review flags missing coverage, flat or ceremonial hierarchy, requirement-shaped navigation, and overloaded screens. The viewer's coverage draft is only a mapping aid; review navigation and task flow before treating it as an IA.
 
 - **Check impact with connections (traceability).** The connection (IA · user flow · KPI) and progress summary in the Feature Spec detail panel let you answer "what breaks if I drop this feature?" before development starts.
 

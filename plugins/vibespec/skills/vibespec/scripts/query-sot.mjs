@@ -8,7 +8,11 @@ async function main(argv) {
   const json = argv.includes("--json");
   const idsIndex = argv.indexOf("--ids");
   const prdIndex = argv.indexOf("--prd");
-  const source = argv.find((arg, index) => !arg.startsWith("--") && index !== idsIndex + 1 && index !== prdIndex + 1);
+  const valueIndexes = new Set([
+    ...(idsIndex >= 0 ? [idsIndex + 1] : []),
+    ...(prdIndex >= 0 ? [prdIndex + 1] : [])
+  ]);
+  const source = argv.find((arg, index) => !arg.startsWith("--") && !valueIndexes.has(index));
   const ids = idsIndex >= 0 && argv[idsIndex + 1] ? argv[idsIndex + 1].split(",").map(id => id.trim()).filter(Boolean) : [];
   const prdFields = prdIndex >= 0 && argv[prdIndex + 1] ? argv[prdIndex + 1].split(",").map(field => field.trim()).filter(Boolean) : [];
   if (!source || (!ids.length && !prdFields.length)) {

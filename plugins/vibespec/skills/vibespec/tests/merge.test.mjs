@@ -65,13 +65,14 @@ const implemented = () => { const p = clone(payment); p.initiative.status = "imp
 // A non-boundary initiative section becomes a NEW main section (renumbered).
 {
   const p = implemented();
-  p.ia.sections.push({ id: "S2", title: "Wallet", pages: [{ id: "P3", title: "Balance", type: "page", refs: [], children: [] }] });
+  p.ia.sections.push({ id: "S2", title: "Wallet", pages: [{ id: "P3", title: "Balance", type: "page", surface: "panel", refs: [], children: [] }] });
   const r = planMerge([doc("main", main), doc("pay", p)], "payment");
   assert.equal(r.ok, true, `merge with a new section must succeed: ${r.error}`);
   const wallet = r.main.ia.sections.find(s => s.title === "Wallet");
   assert.ok(wallet, "a non-boundary initiative section becomes a new main section");
   assert.equal(wallet.id, "S2", "the new section is renumbered into the main space");
   assert.ok(wallet.pages.some(pg => pg.title === "Balance"), "the new section's page folds in");
+  assert.equal(wallet.pages.find(pg => pg.title === "Balance").surface, "panel", "surface roles survive landing into the main plan");
   assert.ok(r.report.addedSections.length === 1, "report lists the added section");
   assert.equal(validateSot(r.main).valid, true, "the merged main with a new section validates");
   console.log("[merge] PASS a new initiative section folds in as a renumbered main section");

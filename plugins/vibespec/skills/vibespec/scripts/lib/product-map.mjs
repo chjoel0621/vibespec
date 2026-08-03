@@ -22,6 +22,7 @@ function compositePage(page, scope, refScope) {
     scope,
     title: page.title,
     type: page.type,
+    ...(page.surface ? { surface: page.surface } : {}),
     refs: (page.refs || []).map(ref => `${refScope || scope}/${ref}`),
     children: []
   };

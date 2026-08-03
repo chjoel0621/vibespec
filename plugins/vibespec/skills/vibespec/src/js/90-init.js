@@ -91,7 +91,7 @@ document.getElementById("stage").addEventListener("click",e=>{
   else if(d.iaUnlink){ const[pid,i]=d.iaUnlink.split("#"); const r=iaFindPage(pid); if(r) r.page.refs.splice(+i,1); commit(); }
   else if(d.mapUnlink){ const[pid,fid]=d.mapUnlink.split("~"); const r=iaFindPage(pid); if(r) r.page.refs=r.page.refs.filter(x=>x!==fid); commit(); }
   else if("iaFillmissing" in d){ iaFillMissing(); commit(); }
-  else if("iaRebuild" in d){ if(window.confirm(t("기능명세서 기준으로 IA를 다시 생성합니다. 지금 IA 구조는 대체됩니다. 계속할까요?","This rebuilds the IA from the Feature Spec and replaces the current IA. Continue?"))){ buildIAFromSpec(); selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; commit(); } }
+  else if("iaRebuild" in d){ if(window.confirm(t("기능 커버리지를 맞춘 초안을 만듭니다. 현재 IA를 대체하며, 이후 내비게이션과 작업 흐름을 반드시 검토해야 합니다. 계속할까요?","This creates a feature-coverage draft and replaces the current IA. You must review navigation and task flow afterward. Continue?"))){ buildIAFromSpec(); selSec=SOT.ia.sections[0]?SOT.ia.sections[0].id:null; selPage=null; commit(); } }
 });
 /* change: status / priority selects + acceptance checkboxes */
 document.getElementById("stage").addEventListener("change",e=>{
@@ -100,6 +100,7 @@ document.getElementById("stage").addEventListener("change",e=>{
   else if(d.priority){ ownerOf(d.priority).priority=e.target.value; commit(); }
   else if(d.acDone){ const[id,i]=d.acDone.split("#"); ownerOf(id).acceptance[+i].done=e.target.checked; commit(); }
   else if(d.iaType){ const r=iaFindPage(d.iaType); if(r) r.page.type=e.target.value; commit(); }
+  else if(d.iaSurface){ const r=iaFindPage(d.iaSurface); if(r){ if(e.target.value) r.page.surface=e.target.value; else delete r.page.surface; } commit(); }
   else if(d.iaLink){ if(e.target.value){ const r=iaFindPage(d.iaLink); if(r) r.page.refs.push(e.target.value); commit(); } }
   else if(d.mapExisting){ if(e.target.value){ const r=iaFindPage(e.target.value); if(r) r.page.refs.push(d.mapExisting); commit(); } }
   else if(d.mapNewin){ if(e.target.value){ const fid=d.mapNewin; let sec; if(e.target.value==="__new"){ sec={id:nid("S"),title:"새 섹션",pages:[]}; SOT.ia.sections.push(sec); } else sec=SOT.ia.sections.find(s=>s.id===e.target.value); if(sec){ const c=specCatalog().find(x=>x.id===fid); const title=c?c.label.split("›").pop().trim():"새 화면"; sec.pages.push({id:nid("P"),title,type:"page",refs:[fid],children:[]}); commit(); } } }

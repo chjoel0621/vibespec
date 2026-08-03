@@ -25,6 +25,10 @@ try {
   assert.equal(embedded.status, 0, embedded.stderr || embedded.stdout);
   const accepted = verifyHostOutput(source, html, "codex-cli");
   assert.equal(accepted.accepted, true);
+  const cliAccepted = spawnSync(process.execPath, [join(skillRoot, "scripts", "verify-host-output.mjs"), source, html, "--host", "codex-desktop", "--json"], { encoding: "utf8" });
+  assert.equal(cliAccepted.status, 0, cliAccepted.stderr || cliAccepted.stdout);
+  assert.equal(JSON.parse(cliAccepted.stdout).accepted, true);
+  console.log("[host-runtime] PASS host verifier CLI accepts two files without an optional --record");
 
   const changed = JSON.parse(readFileSync(source, "utf8"));
   changed.title = "Changed after HTML generation";

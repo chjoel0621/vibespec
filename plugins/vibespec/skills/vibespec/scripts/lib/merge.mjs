@@ -71,7 +71,7 @@ export function planMerge(docs, initiativeId) {
       const target = findMainPage(p.boundary.pageId);
       if (target) { target.children = target.children || []; attachedAt.push({ from: initiativeId, at: `${p.boundary.scopeId}/${p.boundary.pageId}` }); placePages(p.children, target.children); }
     } else {
-      hostArray.push({ id: pageMap[p.id], title: p.title, type: p.type, refs: (p.refs || []).map(mapRef), children: [] });
+      hostArray.push({ id: pageMap[p.id], title: p.title, type: p.type, ...(p.surface ? { surface: p.surface } : {}), refs: (p.refs || []).map(mapRef), children: [] });
       placePages(p.children, hostArray[hostArray.length - 1].children);
     }
   });

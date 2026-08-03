@@ -15,7 +15,7 @@ All notable changes to VibeSpec are documented here. VibeSpec follows semantic v
 - Split the skill into a compact router and mode-specific workflow references that are loaded only when needed.
 - Made skill-directory discovery and Node.js requirements explicit, with a documented reduced mode for hosts without a usable Node runtime.
 - Refined consumer and marketplace demo templates to prioritize real participant actions over generic internal-operations boilerplate.
-- Updated GitHub CI and Pages workflows to Node 24-based action runtimes.
+- Updated checkout and Node setup steps in GitHub CI and Pages workflows to Node 24-based action runtimes.
 
 ### Security
 

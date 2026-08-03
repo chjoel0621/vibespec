@@ -11,7 +11,11 @@ for (const file of files) {
   const sot = JSON.parse(await readFile(file, 'utf8'));
   const features = sot.requirements.flatMap((requirement) => requirement.features ?? []);
   const specs = features.flatMap((feature) => feature.specs ?? []);
-  const pages = sot.ia.sections.flatMap((section) => section.pages ?? []);
+  const walk = (pages, depth = 1) => (pages ?? []).flatMap((page) => [
+    { page, depth },
+    ...walk(page.children, depth + 1)
+  ]);
+  const pages = sot.ia.sections.flatMap((section) => walk(section.pages));
   const checks = {
     requirements: (sot.requirements?.length ?? 0) >= 6,
     features: features.length >= 12,
@@ -19,7 +23,9 @@ for (const file of files) {
     personas: (sot.prd?.targets?.length ?? 0) >= 3,
     scenarios: (sot.prd?.scenarios?.length ?? 0) >= 4,
     kpis: (sot.prd?.kpis?.length ?? 0) >= 3,
-    pages: pages.length >= 8,
+    pages: pages.length > features.length,
+    navigationDepth: Math.max(0, ...pages.map(({ depth }) => depth)) >= 3,
+    surfaceRoles: pages.every(({ page }) => page.surface),
     flows: (sot.flow?.transitions?.length ?? 0) >= 10,
   };
   const missing = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

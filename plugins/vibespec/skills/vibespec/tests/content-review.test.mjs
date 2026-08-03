@@ -33,6 +33,15 @@ const marketplace = clone(valid);
 marketplace.prd.targets = [{ name: "Buyer", role: "Buyer", needs: "Find an item", pain: "Too much choice" }];
 const marketplaceResult = reviewSot(marketplace, { profile: "marketplace" });
 assert.ok(marketplaceResult.findings.some(item => item.code === "marketplace-needs-multiple-user-groups"), "marketplace profile must require multiple participant groups");
+marketplace.initiative = {
+  id: "buyer-offer",
+  path: "1-1",
+  status: "proposed",
+  canonicalization: "sot-c14n-v1",
+  parent: { scopeId: "root", digest: `sha256:${"0".repeat(64)}` }
+};
+const marketplaceInitiativeResult = reviewSot(marketplace, { profile: "marketplace" });
+assert.equal(marketplaceInitiativeResult.findings.some(item => item.code === "marketplace-needs-multiple-user-groups"), false, "a focused marketplace Add-on may target one participant group");
 assert.throws(() => reviewSot(valid, { profile: "unknown" }), /unsupported generation profile/);
 console.log("[review] PASS profile review distinguishes consumer language and marketplace participation");
 

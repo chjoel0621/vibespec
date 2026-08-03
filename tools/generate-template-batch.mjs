@@ -1,12 +1,14 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { deepenSot } from './deepen-sot.mjs';
 import { promisify } from 'node:util';
 
-const vibeRoot = 'C:/VibeSpec';
-const marketingRoot = 'C:/VibeSpec-Marketing';
+const vibeRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const marketingRoot = process.env.VIBESPEC_MARKETING_ROOT || 'C:/VibeSpec-Marketing';
 const execFileAsync = promisify(execFile);
+const sotOnly = process.argv.includes('--sot-only');
 
 const systems = [
   { slug: 'visitor-management', ko: { title: '방문자 관리 시스템', user: '방문을 예약하는 임직원', operator: '리셉션·총무 담당자', entry: '방문 예약과 사전 등록', record: '방문자·호스트·출입 정보 조회', process: '방문 승인과 체크인·체크아웃', report: '방문 현황과 보안 운영 리포트', goal: '방문 등록의 80% 이상을 사전 예약으로 전환하고 현장 등록 시간을 50% 줄인다.', problem: '방문자 정보와 호스트 확인이 메신저·종이 대장에 흩어져 보안과 안내가 지연된다.', solution: '사전 예약, 호스트 승인, QR 체크인·체크아웃, 방문 이력과 운영 대시보드를 연결한다.' }, en: { title: 'Visitor Management System', user: 'Employee host', operator: 'Reception and workplace operator', entry: 'Visitor pre-registration', record: 'Visitor, host, and access lookup', process: 'Visitor approval and check-in/check-out', report: 'Visitor activity and security operations reporting', goal: 'Move 80% of visitor registrations to pre-registration and reduce on-site registration time by 50%.', problem: 'Visitor details and host confirmation are scattered across chat and paper logs, delaying security and reception.', solution: 'Connect pre-registration, host approval, QR check-in and check-out, visit history, and operations reporting.' } },
@@ -214,7 +216,7 @@ const vibeCodingConsumerSystems = [
 const vibeCodingConsumerSlugs = new Set(vibeCodingConsumerSystems.map((system) => system.slug));
 const marketplaceSlugs = new Set(['job-board-platform']);
 const allSystems = [...systems, ...industryCrmSystems, ...coreItSystems, ...coreItSystems2, ...newSystems, ...nextWaveSystems, ...customerSupportExpansionSystems, ...highDemandBusinessSystems, ...keywordSystemTemplates, ...commerceSeoSystems, ...vibeCodingConsumerSystems];
-const requestedSlugs = new Set(process.argv.slice(2));
+const requestedSlugs = new Set(process.argv.slice(2).filter((arg) => arg !== '--sot-only'));
 const selectedSystems = requestedSlugs.size
   ? allSystems.filter((config) => requestedSlugs.has(config.slug))
   : allSystems;
@@ -227,18 +229,22 @@ for (const config of selectedSystems) {
   const profile = marketplaceSlugs.has(config.slug) ? 'marketplace' : vibeCodingConsumerSlugs.has(config.slug) ? 'consumer' : 'operations';
   for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang), { profile }), null, 2) + '\n');
 }
-await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
-const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));
-const batchPath = resolve(marketingRoot, 'content', 'batch-templates.json');
-const existingBatch = JSON.parse(await readFile(batchPath, 'utf8'));
-const recordsBySlug = new Map(records.map((record) => [record.slug, record]));
-const mergedTemplates = requestedSlugs.size
-  ? [
-      ...existingBatch.templates.map((record) => recordsBySlug.get(record.slug) ?? record),
-      ...records.filter((record) => !existingBatch.templates.some((existing) => existing.slug === record.slug))
-    ]
-  : records;
-await writeFile(batchPath, JSON.stringify({ templates: mergedTemplates }, null, 2) + '\n');
-const { stdout } = await execFileAsync(process.execPath, [resolve(marketingRoot, 'scripts', 'regenerate-template-downloads.mjs')]);
-process.stdout.write(stdout);
-console.log(`Generated ${selectedSystems.length * 2} SOT files, updated ${selectedSystems.length} template records, and refreshed download HTML.`);
+if (!sotOnly) {
+  await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
+  const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));
+  const batchPath = resolve(marketingRoot, 'content', 'batch-templates.json');
+  const existingBatch = JSON.parse(await readFile(batchPath, 'utf8'));
+  const recordsBySlug = new Map(records.map((record) => [record.slug, record]));
+  const mergedTemplates = requestedSlugs.size
+    ? [
+        ...existingBatch.templates.map((record) => recordsBySlug.get(record.slug) ?? record),
+        ...records.filter((record) => !existingBatch.templates.some((existing) => existing.slug === record.slug))
+      ]
+    : records;
+  await writeFile(batchPath, JSON.stringify({ templates: mergedTemplates }, null, 2) + '\n');
+  const { stdout } = await execFileAsync(process.execPath, [resolve(marketingRoot, 'scripts', 'regenerate-template-downloads.mjs')]);
+  process.stdout.write(stdout);
+  console.log(`Generated ${selectedSystems.length * 2} SOT files, updated ${selectedSystems.length} template records, and refreshed download HTML.`);
+} else {
+  console.log(`Generated ${selectedSystems.length * 2} SOT files in ${vibeRoot} (SOT-only mode).`);
+}

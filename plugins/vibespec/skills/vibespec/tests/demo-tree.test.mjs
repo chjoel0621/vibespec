@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { validateSot } from "../scripts/validate-sot.mjs";
 import { reviewSot } from "../scripts/lib/content-review.mjs";
 import { validateTree } from "../scripts/lib/tree.mjs";
@@ -9,27 +9,20 @@ import { validateTree } from "../scripts/lib/tree.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../../../../..");
 const demoRoot = join(repoRoot, "demo");
+const { deepenSot } = await import(pathToFileURL(join(repoRoot, "tools", "deepen-sot.mjs")).href);
 const load = name => JSON.parse(readFileSync(join(demoRoot, name), "utf8"));
-const profileForDemo = name => name.startsWith("job-board-platform.")
+const demoFiles = readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"));
+const flattenPages = (pages, depth = 1) => (pages || []).flatMap(page => [
+  { page, depth },
+  ...flattenPages(page.children, depth + 1)
+]);
+const profileForDemo = name => name.startsWith("job-board-platform.") || name.startsWith("flea-market.")
   ? "marketplace"
   : /^(personal-finance-tracker|habit-tracker-app|meal-planning-grocery-app|workout-progress-tracker)\./.test(name)
     ? "consumer"
     : "operations";
-const publicDemoNames = new Set([
-  "meeting-room-booking.ko.sot.json",
-  "meeting-room-booking.ko.1-2.notif.sot.json",
-  "meeting-room-booking.en.sot.json",
-  "meeting-room-booking.en.1-2.notif.sot.json",
-  "flea-market.ko.sot.json",
-  "flea-market.ko.1-1.escrow.sot.json",
-  "flea-market.ko.1-2.offer.sot.json",
-  "flea-market.en.sot.json",
-  "flea-market.en.1-1.escrow.sot.json",
-  "flea-market.en.1-2.offer.sot.json",
-  "crm.ko.sot.json",
-  "crm.en.sot.json"
-]);
-
+const isGeneratedTemplate = name => !["crm.", "flea-market.", "meeting-room-booking."]
+  .some(prefix => name.startsWith(prefix));
 const products = [
   {
     name: "meeting-room-booking",
@@ -67,19 +60,48 @@ for (const lang of ["ko", "en"]) {
   assert.equal(result.valid, true, `${name} must validate: ${JSON.stringify(result.errors)}`);
 }
 
-for (const name of readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"))) {
-  const findings = reviewSot(load(name), { profile: profileForDemo(name) }).findings;
-  if (publicDemoNames.has(name)) {
-    assert.equal(findings.length, 0, `${name} is public and must pass content review without warnings: ${JSON.stringify(findings)}`);
-    continue;
+for (const name of demoFiles) {
+  const sot = load(name);
+  const validation = validateSot(sot);
+  assert.equal(validation.valid, true, `${name} must validate: ${JSON.stringify(validation.errors)}`);
+  const findings = reviewSot(sot, { profile: profileForDemo(name) }).findings;
+  assert.equal(findings.length, 0, `${name} must pass content review without warnings: ${JSON.stringify(findings)}`);
+  const features = (sot.requirements || []).flatMap(requirement => requirement.features || []);
+  const specs = features.flatMap(feature => feature.specs || []);
+  if (isGeneratedTemplate(name) && !sot.initiative && features.length === 12 && specs.length === 24) {
+    const pages = (sot.ia?.sections || []).flatMap(section => flattenPages(section.pages));
+    const pageIds = new Set(pages.map(({ page }) => page.id));
+    assert.ok(pages.length > features.length, `${name} template IA must expose task surfaces beyond its feature count`);
+    assert.ok(Math.max(0, ...pages.map(({ depth }) => depth)) >= 3, `${name} template IA must reach navigation depth 3`);
+    assert.ok(pages.every(({ page }) => page.surface), `${name} template IA must declare every page surface`);
+    assert.ok(Array.from({ length: 10 }, (_, index) => `P${index + 1}`).every(id => pageIds.has(id)), `${name} must retain the original P1-P10 stable ids`);
+    assert.deepEqual(deepenSot(sot, { profile: profileForDemo(name), iaOnly: true }), sot, `${name} task-derived IA refresh must be idempotent`);
   }
-  // The catalog predates the semantic IA gate. Keep every established content
-  // warning at zero while the non-public flat demos are migrated incrementally.
-  const nonIaFindings = findings.filter(finding => ![
-    "flat-ia-for-complex-product", "shallow-ia-for-complex-product", "ceremonial-ia-hierarchy",
-    "catch-all-ia-page", "nested-top-ia-page", "requirement-shaped-ia"
-  ].includes(finding.code));
-  assert.equal(nonIaFindings.length, 0, `${name} must not retain advisory content-review warnings: ${JSON.stringify(nonIaFindings)}`);
+}
+
+const graphShape = sot => ({
+  requirements: (sot.requirements || []).map(requirement => ({
+    id: requirement.id,
+    features: (requirement.features || []).map(feature => ({ id: feature.id, specs: (feature.specs || []).length }))
+  })),
+  ia: (sot.ia?.sections || []).map(section => ({
+    id: section.id,
+    pages: flattenPages(section.pages).map(({ page, depth }) => ({ id: page.id, depth, type: page.type, surface: page.surface, refs: page.refs || [] }))
+  })),
+  flow: {
+    start: sot.flow?.start,
+    transitions: (sot.flow?.transitions || []).map(transition => ({
+      from: transition.from,
+      to: transition.to,
+      trigger: transition.ref || (Object.hasOwn(transition, "label") ? "<label>" : "<none>")
+    }))
+  }
+});
+const demoFileSet = new Set(demoFiles);
+for (const koName of demoFiles.filter(name => name.includes(".ko."))) {
+  const enName = koName.replace(".ko.", ".en.");
+  assert.ok(demoFileSet.has(enName), `${koName} must have an English counterpart`);
+  assert.deepEqual(graphShape(load(koName)), graphShape(load(enName)), `${koName} and ${enName} must share one graph structure`);
 }
 
 console.log("[demo] PASS demo SOTs, content quality, and parent/Add-on trees validate in ko and en");

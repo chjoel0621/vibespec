@@ -634,167 +634,264 @@
     "sections": [
       {
         "id": "S1",
-        "title": "접수와 데이터 품질",
+        "title": "시작과 접수",
         "pages": [
           {
             "id": "P1",
-            "title": "운영 대시보드",
+            "title": "운영 홈",
             "type": "top",
-            "refs": [
-              "F1",
-              "F1:0",
-              "F3",
-              "F4:0",
-              "F7:1",
-              "F11"
-            ],
-            "children": []
-          },
-          {
-            "id": "P2",
-            "title": "업무 목록",
-            "type": "page",
-            "refs": [
-              "F3",
-              "F3:0",
-              "F4",
-              "F1:0",
-              "F4:1",
-              "F8",
-              "F11:0"
-            ],
-            "children": []
-          },
-          {
-            "id": "P3",
-            "title": "등록 화면",
-            "type": "page",
-            "refs": [
-              "F1",
-              "F1:1",
-              "F2",
-              "F5",
-              "F8:0",
-              "F11:1"
-            ],
-            "children": []
+            "surface": "screen",
+            "refs": [],
+            "children": [
+              {
+                "id": "P2",
+                "title": "업무 수집함",
+                "type": "page",
+                "surface": "screen",
+                "refs": [
+                  "F1"
+                ],
+                "children": [
+                  {
+                    "id": "P3",
+                    "title": "새 업무 등록",
+                    "type": "page",
+                    "surface": "modal",
+                    "refs": [
+                      "F1:0",
+                      "F1:1"
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "P11",
+                    "title": "입력 검토",
+                    "type": "page",
+                    "surface": "panel",
+                    "refs": [
+                      "F2",
+                      "F2:0",
+                      "F2:1"
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
       {
         "id": "S2",
-        "title": "업무 기록과 검색",
+        "title": "기록 탐색과 업무 실행",
         "pages": [
           {
             "id": "P4",
-            "title": "상세 기록",
-            "type": "page",
+            "title": "기록 상세",
+            "type": "top",
+            "surface": "screen",
             "refs": [
-              "F3:1",
-              "F4:1",
-              "F11",
-              "F2",
-              "F5:0",
-              "F8:1",
-              "F12"
+              "F3",
+              "F3:0"
             ],
-            "children": []
+            "children": [
+              {
+                "id": "P12",
+                "title": "활동 타임라인",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F3:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P13",
+                "title": "검색과 필터",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F4",
+                  "F4:0",
+                  "F4:1"
+                ],
+                "children": []
+              }
+            ]
           },
           {
             "id": "P5",
             "title": "처리 작업 공간",
             "type": "page",
+            "surface": "screen",
             "refs": [
               "F5",
-              "F5:0",
-              "F6",
-              "F2:0",
-              "F5:1",
-              "F9",
-              "F12:0"
+              "F5:0"
             ],
-            "children": []
+            "children": [
+              {
+                "id": "P14",
+                "title": "처리 예외",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F5:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P15",
+                "title": "담당자와 기한",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F6",
+                  "F6:0",
+                  "F6:1"
+                ],
+                "children": []
+              }
+            ]
           }
         ]
       },
       {
         "id": "S3",
-        "title": "처리와 책임",
+        "title": "검토와 복구",
         "pages": [
           {
             "id": "P6",
-            "title": "승인·예외 큐",
-            "type": "page",
+            "title": "검토 대기열",
+            "type": "top",
+            "surface": "screen",
             "refs": [
               "F7",
-              "F7:0",
-              "F8",
-              "F2:1",
-              "F6",
-              "F9:0",
-              "F12:1"
+              "F7:0"
             ],
-            "children": []
-          },
-          {
-            "id": "P7",
-            "title": "알림·연동",
-            "type": "page",
-            "refs": [
-              "F9",
-              "F9:0",
-              "F10",
-              "F3",
-              "F6:0",
-              "F9:1"
-            ],
-            "children": []
+            "children": [
+              {
+                "id": "P16",
+                "title": "결정 상세",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F7:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P17",
+                "title": "반려와 재처리",
+                "type": "page",
+                "surface": "modal",
+                "refs": [
+                  "F8",
+                  "F8:0",
+                  "F8:1"
+                ],
+                "children": []
+              }
+            ]
           }
         ]
       },
       {
         "id": "S4",
-        "title": "운영 분석과 통제",
+        "title": "알림과 연동",
+        "pages": [
+          {
+            "id": "P7",
+            "title": "알림 센터",
+            "type": "top",
+            "surface": "screen",
+            "refs": [
+              "F9",
+              "F9:0"
+            ],
+            "children": [
+              {
+                "id": "P18",
+                "title": "구독 설정",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F9:1"
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "P19",
+            "title": "외부 연동",
+            "type": "page",
+            "surface": "screen",
+            "refs": [
+              "F10",
+              "F10:0"
+            ],
+            "children": [
+              {
+                "id": "P20",
+                "title": "동기화 실패",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F10:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "분석과 관리",
         "pages": [
           {
             "id": "P8",
             "title": "운영 리포트",
-            "type": "page",
+            "type": "top",
+            "surface": "screen",
             "refs": [
               "F11",
-              "F11:0",
-              "F3:0",
-              "F6:1",
-              "F10"
+              "F11:0"
             ],
-            "children": []
+            "children": [
+              {
+                "id": "P21",
+                "title": "리포트 필터",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F11:1"
+                ],
+                "children": []
+              }
+            ]
           },
           {
             "id": "P9",
-            "title": "정책·권한 설정",
+            "title": "정책과 권한",
             "type": "page",
+            "surface": "screen",
             "refs": [
-              "F10:1",
               "F12",
-              "F3:1",
-              "F7",
-              "F10:0"
+              "F12:0"
             ],
-            "children": []
-          },
-          {
-            "id": "P10",
-            "title": "감사 로그",
-            "type": "page",
-            "refs": [
-              "F8:1",
-              "F12:0",
-              "F12:1",
-              "F4",
-              "F7:0",
-              "F10:1"
-            ],
-            "children": []
+            "children": [
+              {
+                "id": "P10",
+                "title": "감사 이력",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F12:1"
+                ],
+                "children": []
+              }
+            ]
           }
         ]
       }
@@ -806,65 +903,115 @@
       {
         "from": "P1",
         "to": "P2",
-        "ref": "F1"
+        "label": "업무 보기"
       },
       {
         "from": "P2",
         "to": "P3",
-        "ref": "F2"
+        "ref": "F1"
       },
       {
         "from": "P3",
+        "to": "P11",
+        "ref": "F2"
+      },
+      {
+        "from": "P11",
         "to": "P4",
+        "label": "검토 후 열기"
+      },
+      {
+        "from": "P4",
+        "to": "P12",
         "ref": "F3"
       },
       {
         "from": "P4",
-        "to": "P5",
+        "to": "P13",
         "ref": "F4"
       },
       {
-        "from": "P5",
-        "to": "P6",
+        "from": "P13",
+        "to": "P4",
+        "label": "결과 선택"
+      },
+      {
+        "from": "P4",
+        "to": "P5",
         "ref": "F5"
       },
       {
         "from": "P5",
-        "to": "P6",
-        "ref": "F7"
-      },
-      {
-        "from": "P6",
-        "to": "P5",
-        "ref": "F8"
+        "to": "P14",
+        "ref": "F5:1"
       },
       {
         "from": "P5",
-        "to": "P7",
+        "to": "P15",
         "ref": "F6"
       },
       {
-        "from": "P7",
-        "to": "P8",
+        "from": "P15",
+        "to": "P6",
+        "label": "검토 요청"
+      },
+      {
+        "from": "P6",
+        "to": "P16",
+        "ref": "F7"
+      },
+      {
+        "from": "P16",
+        "to": "P17",
+        "ref": "F8"
+      },
+      {
+        "from": "P17",
+        "to": "P5",
+        "label": "다시 처리"
+      },
+      {
+        "from": "P6",
+        "to": "P7",
         "ref": "F9"
       },
       {
-        "from": "P8",
-        "to": "P9",
+        "from": "P7",
+        "to": "P18",
+        "ref": "F9:1"
+      },
+      {
+        "from": "P7",
+        "to": "P19",
         "ref": "F10"
+      },
+      {
+        "from": "P19",
+        "to": "P20",
+        "ref": "F10:1"
+      },
+      {
+        "from": "P5",
+        "to": "P8",
+        "ref": "F11"
+      },
+      {
+        "from": "P8",
+        "to": "P21",
+        "ref": "F11:1"
+      },
+      {
+        "from": "P1",
+        "to": "P9",
+        "ref": "F12"
       },
       {
         "from": "P9",
         "to": "P10",
-        "ref": "F12"
+        "ref": "F12:1"
       },
       {
-        "from": "P10",
-        "to": "P4",
-        "ref": "F11"
-      },
-      {
-        "from": "P4",
+        "from": "P8",
         "to": "P1",
         "label": "운영 현황 갱신"
       }

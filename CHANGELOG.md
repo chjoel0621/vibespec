@@ -2,6 +2,19 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [0.16.1] - 2026-08-03
+
+### Changed
+
+- Migrated all 212 catalog template SOTs from flat feature-shaped IA to task-derived navigation with 21 typed surfaces and depth-three workflows.
+- Made the template generator repository-relative and added reproducible SOT-only and IA-only refresh paths.
+- Applied marketplace participant-group review to product plans while allowing focused Add-ons to target one participant group.
+
+### Fixed
+
+- Removed the legacy IA warning allowlist: all 224 demo SOTs now pass schema and content review without warnings.
+- Expanded demo regression coverage to validate every catalog SOT and enforce template navigation depth and surface roles.
+
 ## [0.15.0] - 2026-08-03
 
 ### Added

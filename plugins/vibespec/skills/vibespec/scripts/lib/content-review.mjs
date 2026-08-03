@@ -128,7 +128,7 @@ export function reviewSot(sot, { profile = "operations" } = {}) {
       }
     }
   }
-  if (profile === "marketplace" && (prd.targets || []).length < 2) {
+  if (profile === "marketplace" && !sot.initiative && (prd.targets || []).length < 2) {
     warn("marketplace-needs-multiple-user-groups", "$.prd.targets", "marketplace plans should name at least two participant groups");
   }
   return { valid: true, findings, summary: { warnings: findings.length } };

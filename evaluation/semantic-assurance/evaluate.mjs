@@ -11,6 +11,7 @@ import { validateSot } from "../../plugins/vibespec/skills/vibespec/scripts/vali
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../..");
 const casesRoot = join(here, "cases");
+const templatesRoot = join(here, "templates");
 const readJson = path => JSON.parse(readFileSync(path, "utf8"));
 const findingKey = finding => `${finding.ruleId}|${[...(finding.subjectRefs || [])].sort().join(",")}`;
 const contentFindingKey = finding => `${finding.code}|${finding.path}`;
@@ -69,6 +70,23 @@ function verifyPinnedCaseFile(caseRoot, descriptor, label) {
   const actual = createHash("sha256").update(bytes).digest("hex").toUpperCase();
   if (actual !== descriptor.fileSha256) throw new Error(`${label} drift: expected ${descriptor.fileSha256}, got ${actual}`);
   return { path, bytes };
+}
+
+function verifyFourWayTemplates() {
+  const hostRun = readJson(join(templatesRoot, "four-way-host-run.template.json"));
+  if (hostRun.contractVersion !== "semantic-host-run-0.1") throw new Error("unsupported four-way host-run template");
+  if (hostRun.clarificationPolicy !== "do-not-answer-preserve-as-decision") {
+    throw new Error("four-way host-run clarification policy drifted");
+  }
+  const promptPath = resolve(repoRoot, hostRun.invocationPrompt?.path || "");
+  const promptHash = createHash("sha256").update(readFileSync(promptPath)).digest("hex").toUpperCase();
+  if (promptHash !== hostRun.invocationPrompt.fileSha256) {
+    throw new Error(`four-way invocation prompt drift: expected ${hostRun.invocationPrompt.fileSha256}, got ${promptHash}`);
+  }
+  const quality = readJson(join(templatesRoot, "generation-quality.template.json"));
+  if (quality.contractVersion !== "semantic-generation-review-0.1") throw new Error("unsupported generation-quality template");
+  const approval = readJson(join(templatesRoot, "baseline-approval.template.json"));
+  if (approval.contractVersion !== "semantic-baseline-approval-0.1") throw new Error("unsupported baseline-approval template");
 }
 
 const coverageFor = sot => ({
@@ -159,9 +177,16 @@ function evaluateReviewerBaseline(manifest, caseRoot, source) {
   if (kpiIds.size !== adjudicatedIds.size || [...kpiIds].some(id => !adjudicatedIds.has(id))) {
     throw new Error(`${manifest.id} adjudication must cover every semantic KPI exactly once`);
   }
+  const concepts = new Set();
   for (const kpi of adjudication.kpis) {
     if (typeof kpi.inventedEvidence !== "boolean") throw new Error(`${manifest.id} ${kpi.id} must adjudicate inventedEvidence`);
     if (!Array.isArray(kpi.evidenceBasis)) throw new Error(`${manifest.id} ${kpi.id} must list evidenceBasis`);
+    if (typeof kpi.baselineConcept !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(kpi.baselineConcept)) {
+      throw new Error(`${manifest.id} ${kpi.id} must declare a stable baselineConcept slug`);
+    }
+    if (concepts.has(kpi.baselineConcept)) throw new Error(`${manifest.id} has duplicate baselineConcept ${kpi.baselineConcept}`);
+    concepts.add(kpi.baselineConcept);
+    if (kpi.verdict !== "pending-human-review") throw new Error(`${manifest.id} ${kpi.id} cannot be approved inside a candidate adjudication`);
   }
   const coverage = coverageFor(applied.after);
   return {
@@ -212,6 +237,7 @@ function parseArgs(argv) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
+  verifyFourWayTemplates();
   const directories = readdirSync(casesRoot, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && (!args.caseId || entry.name === args.caseId))
     .map(entry => entry.name)

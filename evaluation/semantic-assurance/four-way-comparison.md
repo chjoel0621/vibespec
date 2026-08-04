@@ -43,8 +43,17 @@ Score every KPI independently:
 | readiness | Is it ready, at-risk, or blocked after deterministic review? |
 | content quality | Is the KPI templated or mismatched to the domain? |
 
-`ready` alone is not a success. A successful run is ready without invented
-evidence and is materially consistent with the approved reviewer baseline.
+`ready` alone is not a success. A successful run invents no evidence, produces
+the readiness warranted by available facts, and is materially consistent with
+the approved adjudication. A correctly preserved open decision can make
+`blocked` the best result.
+
+Classify readiness calibration independently from the raw readiness value:
+
+- `correct`: ready when evidence is sufficient, or blocked/at-risk when a real
+  unresolved dependency remains;
+- `overconfident`: hides uncertainty or invents evidence to reach ready;
+- `underconfident`: reports blocked despite sufficient declared evidence.
 
 ## Metrics stay separate
 
@@ -52,9 +61,21 @@ Engine metrics apply only to labelled deterministic failures: TP, FP, FN,
 blocker false positives, and finding fingerprint stability.
 
 Generation metrics apply to natural host output: appropriate mode choices,
-invented evidence count, uncertainty preserved as decisions, domain-specific
-KPI count, reviewer edits, and variance across repeated runs. Template reuse is
-a generation-quality observation, not automatically a Semantic Assurance FN.
+invented evidence count, uncertainty preserved as decisions, readiness
+calibration, domain-specific KPI count, reviewer edits, and variance across
+repeated runs. Template reuse is a generation-quality observation, not
+automatically a Semantic Assurance FN.
+
+Host KPI ids are not comparable by position. Reviewers map each generated KPI
+to a stable product concept and record `exact`, `partial`, `split`, `merged`,
+`additional`, or `missing` alignment. The initial concepts are:
+
+- `crm-follow-up-timeliness`
+- `crm-operational-visibility`
+- `crm-auditability`
+- `habit-first-week-value-action`
+- `habit-weekly-return`
+- `habit-data-control-completion`
 
 ## Repetition
 
@@ -69,7 +90,21 @@ and score it with
 [`templates/generation-quality.template.json`](templates/generation-quality.template.json).
 Templates are not evaluation cases and contain no claimed result.
 
+The invocation text is frozen in
+[`templates/four-way-invocation-prompt.txt`](templates/four-way-invocation-prompt.txt).
+Record its hash along with host version, installed plugin commit and bundle hash,
+timestamps, and retry count. During Fresh Generation, do not answer host
+clarification questions; brief gaps must remain open decisions. Interactive
+clarification is a separate experiment.
+
 Use only the frozen brief as product input in a fresh workspace. Ask the host to
 use VibeSpec normally and preserve the final SOT and HTML. Do not expose the
 legacy SOT, reviewer overlay, another host's output, or a prior run until Fresh
 Generation is complete.
+
+Human approval is a separate immutable receipt based on
+[`templates/baseline-approval.template.json`](templates/baseline-approval.template.json).
+It pins the adjudication hash instead of writing that hash into the adjudication
+itself, which would create a self-referential digest. Use
+`approved-with-open-decisions` when the baseline correctly preserves unresolved
+product choices.

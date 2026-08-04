@@ -4,7 +4,9 @@
   "reviewer": null,
   "kpis": [
     {
-      "id": "K1",
+      "runKpiId": "K1",
+      "baselineConcept": "REQUIRED_STABLE_CONCEPT",
+      "alignment": "exact-or-partial-or-split-or-merged-or-additional-or-missing",
       "domainSpecific": null,
       "modeFitness": "correct-or-incorrect-or-undecidable",
       "evidenceFidelity": "supported-or-partial-or-unsupported",
@@ -15,6 +17,7 @@
       "reviewedFieldChanges": null,
       "requiredProductDecisions": null,
       "readiness": "ready-or-at-risk-or-blocked",
+      "readinessCalibration": "correct-or-overconfident-or-underconfident",
       "contentQualityNotes": []
     }
   ],
@@ -23,6 +26,11 @@
     "inventedEvidenceCount": null,
     "preservedAmbiguityCount": null,
     "domainSpecificKpiCount": null,
-    "reviewedFieldChanges": null
+    "reviewedFieldChanges": null,
+    "readinessCalibration": {
+      "correct": null,
+      "overconfident": null,
+      "underconfident": null
+    }
   }
 }

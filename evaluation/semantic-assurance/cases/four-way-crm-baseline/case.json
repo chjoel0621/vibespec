@@ -15,7 +15,7 @@
   },
   "overlay": {
     "plan": { "path": "overlay.plan.json", "fileSha256": "CEFD8A4FAB025EBEDAC5381D31B68C8F0BB02B16260669760A3DB5287AEC22F4" },
-    "adjudication": { "path": "adjudication.json", "fileSha256": "481E0D4B7DFB7A4E5449D3E8162234C1FD4FA74721492ECCA826531A76D4E9DB" },
+    "adjudication": { "path": "adjudication.json", "fileSha256": "350B5FCFC2C1060ECD833F930BD60498C16B9543D5B0685F55FE786089B21BF1" },
     "resultDigest": "sha256:0438d7c09bee23f27f6e973a3e5bbdf8d4e2040c2b947daab66bdbdf54b9bcf2"
   },
   "expected": {

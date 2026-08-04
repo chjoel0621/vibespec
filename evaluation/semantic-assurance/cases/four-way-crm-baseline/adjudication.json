@@ -10,6 +10,8 @@
   "kpis": [
     {
       "id": "K1",
+      "baselineConcept": "crm-follow-up-timeliness",
+      "verdict": "pending-human-review",
       "legacyName": "기한 내 처리 비율",
       "expectedMode": "event-ratio",
       "evidenceBasis": ["follow-up task owner", "due time", "status", "status-change time", "F6", "P15"],
@@ -19,8 +21,12 @@
     },
     {
       "id": "K2",
+      "baselineConcept": "crm-operational-visibility",
+      "verdict": "pending-human-review",
       "legacyName": "운영 가시성",
-      "expectedMode": "manual",
+      "modeAssessment": "undecidable-until-decision",
+      "currentlyAcceptableMode": "manual",
+      "possibleModes": ["manual", "event-ratio", "external"],
       "evidenceBasis": ["report and source records can be linked"],
       "inventedEvidence": false,
       "ambiguityHandling": "The exact population and successful-link condition remain open.",
@@ -28,12 +34,16 @@
     },
     {
       "id": "K3",
+      "baselineConcept": "crm-auditability",
+      "verdict": "pending-human-review",
       "legacyName": "감사 가능 운영 비율",
-      "expectedMode": "manual",
+      "modeAssessment": "human-choice-required",
+      "currentlyAcceptableMode": "manual",
+      "possibleModes": ["manual", "event-ratio"],
       "evidenceBasis": ["audit logs record core administrative changes", "F12"],
       "inventedEvidence": false,
       "ambiguityHandling": "A monthly RevOps reconciliation is declared without inventing an observed result.",
-      "requiredHumanDecision": null
+      "requiredHumanDecision": "Choose whether this remains a monthly manual control, becomes a specifically named reconciliation KPI, or gains a defined event-ratio population."
     }
   ],
   "deliberatelyNotAssessed": [

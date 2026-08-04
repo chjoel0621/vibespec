@@ -1,0 +1,42 @@
+{
+  "kind": "vibespec-change-plan-v2",
+  "baseDigest": "sha256:d3b06ebb1fd4b46bf3a61b13c42b726bca2f04022584eaf1b4751b089f283efa",
+  "operations": [
+    {
+      "op": "addFeature",
+      "requirementId": "R2",
+      "feature": {
+        "id": "F9",
+        "title": "QR 체크인",
+        "desc": "예약자는 예약 시작 전후 허용 시간 안에 회의실 QR을 스캔해 실제 사용을 확인한다.",
+        "status": "todo",
+        "priority": "high",
+        "acceptance": [{ "text": "유효한 예약과 회의실 QR이 일치하면 체크인이 기록되고 중복 스캔은 같은 체크인으로 처리된다.", "done": false }],
+        "specs": [{ "title": "체크인 검증", "desc": "예약·회의실·허용 시간과 중복 여부를 검증한다.", "acceptance": [] }]
+      }
+    },
+    {
+      "op": "addPage",
+      "sectionId": "S2",
+      "parentId": "P10",
+      "page": { "id": "P18", "title": "QR 체크인", "type": "action", "refs": ["F9", "F9:0"], "children": [] }
+    },
+    { "op": "addTransition", "transition": { "from": "P10", "to": "P18", "ref": "F9" } },
+    {
+      "op": "updateSemanticEvent",
+      "id": "E2",
+      "changes": { "producers": [{ "type": "feature", "ref": "F9" }], "surfaceRefs": ["P18"] }
+    },
+    {
+      "op": "updateSemanticDecision",
+      "id": "D1",
+      "changes": { "status": "decided", "resolution": "MVP는 회의실 QR 스캔 체크인을 사용한다." }
+    }
+  ],
+  "expected": {
+    "touchedIds": ["F9", "P10", "P18", "E2", "D1"],
+    "addedIds": ["F9", "P18"],
+    "removedIds": [],
+    "touchedPaths": ["F9", "P18", "flow.P10→P18[ref:F9]", "E2.producers", "E2.surfaceRefs", "D1.status", "D1.resolution"]
+  }
+}

@@ -66,6 +66,9 @@ console.log("[semantic] PASS manual and external measurements do not require UI 
 const system = enableSemantic(valid,
   { mode: "event-count", eventRef: "E1", window: "calendar-day" },
   [{ id: "E1", type: "system", name: "Validation completed", producers: [{ type: "system-task", name: "Validation runner", description: "Records completion after the validator exits" }] }]);
+system.prd.kpis[0].name = "Daily validation completions";
+system.prd.kpis[0].target = "At least 10 per day";
+system.prd.kpis[0].method = "Count validation completion events";
 assert.equal(validateSot(system).valid, true);
 assert.equal(reviewSemantic(system).readiness.measurement, "ready");
 console.log("[semantic] PASS system events need no screen");
@@ -77,11 +80,22 @@ const multiProducer = enableSemantic(valid,
     producers: [{ type: "feature", ref: "F1" }, { type: "system-task", name: "CLI wrapper", description: "Starts validation on behalf of the user" }],
     surfaceRefs: ["P1"]
   }]);
+multiProducer.prd.kpis[0].name = "Daily validation requests";
+multiProducer.prd.kpis[0].target = "At least 10 per day";
+multiProducer.prd.kpis[0].method = "Count validation request events";
 assert.equal(validateSot(multiProducer).valid, true);
 assert.equal(reviewSemantic(multiProducer).readiness.measurement, "ready");
 assert.equal(normalizeForMigration(multiProducer).prd.kpis[0].id, "K1");
 assert.equal(normalizeForMigration(multiProducer).prd.kpis[0].measurement.eventRef, "E1");
 console.log("[semantic] PASS multiple producers and semantic viewer round-trip");
+
+const normalizedCount = clone(multiProducer);
+normalizedCount.prd.kpis[0].name = "Exports per active household per week";
+normalizedCount.prd.kpis[0].method = "Weekly exports / active households";
+assert.ok(reviewSemantic(normalizedCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"));
+normalizedCount.prd.kpis[0].measurement = { mode: "external", source: "Product analytics", metric: "exports_per_active_household", refresh: "weekly" };
+assert.ok(!reviewSemantic(normalizedCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"));
+console.log("[semantic] PASS normalized metrics cannot masquerade as raw event counts");
 
 const noShow = enableSemantic(valid,
   {

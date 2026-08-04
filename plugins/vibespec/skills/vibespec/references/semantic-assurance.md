@@ -41,6 +41,9 @@ For an event ratio, numerator and denominator must use the same
 `populationEventRef`. Exclusions are event references, not free-form formula
 tokens. Semantic 0.1 verifies that declared evidence exists; it does not verify
 join keys, grace periods, analytics SQL, or the resulting numeric value.
+An entity-normalized metric such as “exports per active household” is not an
+event count: it needs an `event-ratio` population denominator or an `external`
+aggregate that owns that denominator.
 
 ## Event producers
 
@@ -85,4 +88,3 @@ not create a new issue while changed evidence does stale the old fingerprint.
 
 The open-source plugin does not store approvals, waivers, comments, or audit
 history. Those belong to an optional governance ledger/SaaS layer.
-

@@ -16,6 +16,7 @@ const pageEntries = sot => {
   return entries;
 };
 const baseFeatureRef = ref => String(ref || "").split(":")[0];
+const NORMALIZED_METRIC_PATTERN = /(?:\b(?:percentage|rate|ratio)\b|%|\bper\s+(?:active\s+)?(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|\/\s*(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|(?:비율|백분율|율\b)|(?:사용자|계정|가구|직원|회원|고객|테넌트|예약)\s*당)/i;
 
 function reportScope(sot) {
   return sot.initiative?.id || "root";
@@ -105,6 +106,16 @@ export function reviewSemantic(sot) {
         evidence: [kpi]
       });
       continue;
+    }
+    if (kpi.measurement.mode === "event-count"
+      && NORMALIZED_METRIC_PATTERN.test([kpi.name, kpi.target, kpi.method].filter(Boolean).join(" "))) {
+      push({
+        ruleId: "normalized-metric-denominator-required",
+        summary: message(`${subject}은 개체당 비율 지표지만 event-count에는 분모가 없습니다. event-ratio나 외부 집계 정의를 사용하세요.`, `${subject} is normalized per entity, but event-count declares no denominator. Use event-ratio or an external aggregate.`),
+        subjectRefs: [subject],
+        evidenceRefs: measurementEventRefs(kpi),
+        evidence: [kpi]
+      });
     }
     if (kpi.measurement.mode === "event-ratio"
       && kpi.measurement.numerator?.populationEventRef !== kpi.measurement.denominator?.populationEventRef) {

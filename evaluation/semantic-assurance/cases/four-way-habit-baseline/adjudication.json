@@ -1,0 +1,47 @@
+{
+  "contractVersion": "semantic-generation-review-0.1",
+  "status": "candidate-needs-human-approval",
+  "reviewer": "codex-assisted",
+  "principle": "Use only facts present in the frozen brief; preserve uncertainty instead of inventing evidence.",
+  "reviewedFieldChanges": [
+    "Removed unsupported numeric targets and replaced them with a post-baseline decision.",
+    "Replaced ambiguous legacy baseline labels with an explicit unmeasured state.",
+    "Corrected the weekly-return KPI feature references from F8 to the actual F5/F7 interactions."
+  ],
+  "kpis": [
+    {
+      "id": "K1",
+      "legacyName": "첫 주 핵심 행동 완료율",
+      "expectedMode": "event-ratio",
+      "evidenceBasis": ["habit creation", "completion and skip records", "first-week core action is undecided"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "The numerator event intentionally has no producer until the core action is decided.",
+      "requiredHumanDecision": "Choose the single first-week behavior that demonstrates initial value."
+    },
+    {
+      "id": "K2",
+      "legacyName": "주간 재방문율",
+      "expectedMode": "event-ratio",
+      "evidenceBasis": ["completion records", "reminder adjustment", "F5", "F7", "P5", "P6"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "The legacy F8 KPI reference is corrected to F5 and F7; an eligible user-week starts when an active habit exists and no observed retention is claimed.",
+      "requiredHumanDecision": null
+    },
+    {
+      "id": "K3",
+      "legacyName": "사용자 데이터 제어 완료율",
+      "expectedMode": "event-ratio",
+      "evidenceBasis": ["export", "deletion", "privacy controls", "F9"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "A request-to-completion ratio is declared, but the legacy IA maps the data-control screen to F10 rather than F9.",
+      "requiredHumanDecision": "Correct the IA and flow ownership for F9 before treating interaction evidence as trustworthy."
+    }
+  ],
+  "sourceDefects": [
+    "The legacy data-control feature F9 is attached to start/revisit pages, while the page titled data control references F10."
+  ],
+  "deliberatelyNotAssessed": [
+    "Whether the legacy KPI names are the best product metrics",
+    "Numeric targets and baselines not supported by the reconstructed brief"
+  ]
+}

@@ -20,7 +20,7 @@ The sprint ends on evidence, not elapsed time:
 These are internal release gates, not public accuracy claims. Small samples are
 reported with raw counts rather than percentages alone.
 
-## Two case lanes
+## Case lanes
 
 - `natural`: preserve an AI or human-authored output exactly. Record the host,
   plugin version, prompt/brief, artifact hash, advisory findings, and human
@@ -32,6 +32,10 @@ reported with raw counts rather than percentages alone.
   `not-assessed`, and compare its KPI vocabulary with other domains. Legacy
   KPIs without measurements are observed but do not count toward the 30-KPI
   assessed exit gate.
+- `reviewer-baseline-candidate`: apply a narrow `change-plan-v2` overlay to a
+  pinned legacy SOT and preserve reviewer reasoning separately. Candidate KPIs,
+  modes, and findings are reported separately and do not count toward exit
+  criteria until a human approves the adjudication record.
 
 Every case has a `case.json`, an immutable source digest, and expected finding
 keys. Controlled mutations additionally carry Before and Resolved change plans.
@@ -54,6 +58,11 @@ reproducible inputs.
 The current legacy comparison and its interpretation are recorded in
 [existing-case-comparison.md](existing-case-comparison.md). Comparison-only
 documents do not increase the assessed case or KPI exit-gate counts.
+
+The next same-brief experiment and its scoring rules are defined in
+[four-way-comparison.md](four-way-comparison.md). CRM and habit tracker baseline
+candidates are intentionally blocked on unresolved product decisions; a green
+semantic report is not manufactured for the sake of the experiment.
 
 ## Human evaluation record
 

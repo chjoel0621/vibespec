@@ -1,0 +1,29 @@
+{
+  "contractVersion": "semantic-host-run-0.1",
+  "experimentId": "crm-or-habit-fresh-generation",
+  "runId": "host-run-01",
+  "artifactRole": "fresh-generation",
+  "host": "claude-code-or-codex",
+  "model": null,
+  "pluginVersion": "0.17.0",
+  "language": "ko",
+  "brief": {
+    "path": "path/to/brief.md",
+    "fileSha256": "PIN_BEFORE_RUNNING"
+  },
+  "isolation": {
+    "freshWorkspace": true,
+    "legacySotProvided": false,
+    "priorRunOutputsVisible": false
+  },
+  "artifact": {
+    "path": "path/to/generated.sot.json",
+    "digest": "PIN_AFTER_RUNNING",
+    "fileSha256": "PIN_AFTER_RUNNING"
+  },
+  "review": {
+    "path": "generation-quality.json",
+    "reviewer": null,
+    "reviewedAt": null
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "kind": "vibespec-change-plan-v2",
+  "baseDigest": "sha256:315c42df1f7dc02f62215c6378eebd645be65db61224e6d63c4b8108cb6133ea",
+  "operations": [
+    { "op": "enableSemantic", "contractVersion": "semantic-0.1" },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "기한 내 처리 비율" },
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "운영 가시성" },
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "정의와 초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "감사 가능 운영 비율" },
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "기한 내 처리 비율" },
+      "id": "K1",
+      "measurement": {
+        "mode": "event-ratio",
+        "numerator": { "populationEventRef": "E1", "eventRef": "E2" },
+        "denominator": { "populationEventRef": "E1" },
+        "window": "calendar-month"
+      }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "운영 가시성" },
+      "id": "K2",
+      "measurement": {
+        "mode": "manual",
+        "process": "RevOps가 등록 기록과 리포트 연결 표본을 검토한다.",
+        "frequency": "monthly"
+      }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "감사 가능 운영 비율" },
+      "id": "K3",
+      "measurement": {
+        "mode": "manual",
+        "process": "RevOps가 핵심 관리자 변경과 감사 로그 기록을 대조한다.",
+        "frequency": "monthly"
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E1",
+        "type": "system",
+        "name": "SLA 관리 대상 후속조치 등록",
+        "producers": [{ "type": "feature", "ref": "F6" }]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E2",
+        "type": "user",
+        "name": "기한 내 후속조치 완료",
+        "producers": [{ "type": "feature", "ref": "F6" }],
+        "surfaceRefs": ["P15"]
+      }
+    },
+    {
+      "op": "addSemanticDecision",
+      "decision": {
+        "id": "D1",
+        "question": "운영 가시성의 모집단과 연결 완료 조건을 어떤 기록으로 정의할 것인가?",
+        "status": "open",
+        "impacts": [{ "effect": "blocks-measurement", "refs": ["K2"] }]
+      }
+    }
+  ],
+  "expected": {
+    "touchedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "addedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "removedIds": [],
+    "touchedPaths": [
+      "semantic.contractVersion",
+      "prd.kpis[기한 내 처리 비율]",
+      "K1",
+      "prd.kpis[운영 가시성]",
+      "K2",
+      "prd.kpis[감사 가능 운영 비율]",
+      "K3",
+      "E1",
+      "E2",
+      "D1"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "contractVersion": "semantic-generation-review-0.1",
+  "status": "pending-human-review",
+  "reviewer": null,
+  "kpis": [
+    {
+      "id": "K1",
+      "domainSpecific": null,
+      "modeFitness": "correct-or-incorrect-or-undecidable",
+      "evidenceFidelity": "supported-or-partial-or-unsupported",
+      "inventedEvidence": null,
+      "ambiguityPreserved": null,
+      "productionEvidence": "valid-or-invalid-or-not-applicable",
+      "interactionEvidence": "valid-or-invalid-or-not-applicable",
+      "reviewedFieldChanges": null,
+      "requiredProductDecisions": null,
+      "readiness": "ready-or-at-risk-or-blocked",
+      "contentQualityNotes": []
+    }
+  ],
+  "summary": {
+    "appropriateModeCount": null,
+    "inventedEvidenceCount": null,
+    "preservedAmbiguityCount": null,
+    "domainSpecificKpiCount": null,
+    "reviewedFieldChanges": null
+  }
+}

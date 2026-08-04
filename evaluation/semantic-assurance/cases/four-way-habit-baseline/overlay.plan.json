@@ -1,0 +1,154 @@
+{
+  "kind": "vibespec-change-plan-v2",
+  "baseDigest": "sha256:277db3ea88f0c6b92ee88dd57464b1862b57d5835eae3dce75145a2c1a48d604",
+  "operations": [
+    { "op": "enableSemantic", "contractVersion": "semantic-0.1" },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "첫 주 핵심 행동 완료율" },
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "핵심 행동 결정과 초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "주간 재방문율" },
+      "changes": { "refs": ["F5", "F7"], "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "updatePrdItem",
+      "field": "kpis",
+      "match": { "name": "사용자 데이터 제어 완료율" },
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "첫 주 핵심 행동 완료율" },
+      "id": "K1",
+      "measurement": {
+        "mode": "event-ratio",
+        "numerator": { "populationEventRef": "E1", "eventRef": "E2" },
+        "denominator": { "populationEventRef": "E1" },
+        "window": "habit-created-at plus 7 days"
+      }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "주간 재방문율" },
+      "id": "K2",
+      "measurement": {
+        "mode": "event-ratio",
+        "numerator": { "populationEventRef": "E3", "eventRef": "E4" },
+        "denominator": { "populationEventRef": "E3" },
+        "window": "calendar-week"
+      }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "사용자 데이터 제어 완료율" },
+      "id": "K3",
+      "measurement": {
+        "mode": "event-ratio",
+        "numerator": { "populationEventRef": "E5", "eventRef": "E6" },
+        "denominator": { "populationEventRef": "E5" },
+        "window": "request-created-at plus 7 days"
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E1",
+        "type": "user",
+        "name": "첫 습관 생성",
+        "producers": [{ "type": "feature", "ref": "F1" }],
+        "surfaceRefs": ["P2", "P3"]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E2",
+        "type": "user",
+        "name": "첫 주 핵심 행동 완료",
+        "producers": []
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E3",
+        "type": "system",
+        "name": "활성 습관 보유 사용자 주간 집계 대상 등록",
+        "producers": [{ "type": "system-task", "name": "주간 코호트 집계", "description": "활성 습관을 가진 사용자를 주간 모집단으로 기록한다." }]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E4",
+        "type": "user",
+        "name": "주간 기록 또는 알림 조정",
+        "producers": [{ "type": "feature", "ref": "F5" }, { "type": "feature", "ref": "F7" }],
+        "surfaceRefs": ["P5", "P6"]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E5",
+        "type": "user",
+        "name": "사용자 데이터 제어 요청",
+        "producers": [{ "type": "feature", "ref": "F9" }]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E6",
+        "type": "system",
+        "name": "사용자 데이터 제어 요청 완료",
+        "producers": [{ "type": "feature", "ref": "F9" }]
+      }
+    },
+    {
+      "op": "addSemanticDecision",
+      "decision": {
+        "id": "D1",
+        "question": "첫 주에 초기 가치를 증명하는 단일 핵심 행동은 무엇인가?",
+        "status": "open",
+        "impacts": [{ "effect": "blocks-measurement", "refs": ["K1", "E2"] }]
+      }
+    },
+    {
+      "op": "addSemanticDecision",
+      "decision": {
+        "id": "D2",
+        "question": "사용자 데이터 제어 기능 F9를 어떤 IA 화면과 플로우에 연결할 것인가?",
+        "status": "open",
+        "impacts": [{ "effect": "blocks-measurement", "refs": ["K3", "E5"] }]
+      }
+    }
+  ],
+  "expected": {
+    "touchedIds": ["K1", "K2", "K3", "E1", "E2", "E3", "E4", "E5", "E6", "D1", "D2"],
+    "addedIds": ["K1", "K2", "K3", "E1", "E2", "E3", "E4", "E5", "E6", "D1", "D2"],
+    "removedIds": [],
+    "touchedPaths": [
+      "semantic.contractVersion",
+      "prd.kpis[첫 주 핵심 행동 완료율]",
+      "K1",
+      "prd.kpis[주간 재방문율]",
+      "K2",
+      "prd.kpis[사용자 데이터 제어 완료율]",
+      "K3",
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "D1",
+      "D2"
+    ]
+  }
+}

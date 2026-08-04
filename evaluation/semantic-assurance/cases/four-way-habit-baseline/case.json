@@ -1,0 +1,30 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "four-way-habit-baseline",
+  "title": "Habit tracker reviewer baseline candidate",
+  "lane": "reviewer-baseline-candidate",
+  "source": {
+    "path": "demo/habit-tracker-app.ko.sot.json",
+    "digest": "sha256:277db3ea88f0c6b92ee88dd57464b1862b57d5835eae3dce75145a2c1a48d604",
+    "fileSha256": "66AFF548886C8EF70827179CAC1CF6A02A5A1F8E47CA8531C65259C2986127E2"
+  },
+  "brief": {
+    "path": "brief.md",
+    "fileSha256": "1166AE065258763001A4A1B064C3DB0E91BB08185829F0EF93F672E2B873B47E",
+    "provenance": "reconstructed-from-legacy-sot"
+  },
+  "overlay": {
+    "plan": { "path": "overlay.plan.json", "fileSha256": "32268BE1ECC57BEAF9D04CF005BDE28DC119A30BF6AD172A5D5B2A104CB6DE5D" },
+    "adjudication": { "path": "adjudication.json", "fileSha256": "CC8326AEBC358EB443B34C50EA82813E94ACC4FCD38C84B6D358EFF37AFB4BB4" },
+    "resultDigest": "sha256:c831667a5e10d2032d66b112740aab8e592fe2145a1808aa965aeff0d0a4e13b"
+  },
+  "expected": {
+    "assessment": "failed",
+    "measurementReadiness": "blocked",
+    "findings": [
+      { "ruleId": "measurement-event-producer-required", "subjectRefs": ["E2"] },
+      { "ruleId": "open-decision-blocks-measurement", "subjectRefs": ["D1", "E2", "K1"] },
+      { "ruleId": "open-decision-blocks-measurement", "subjectRefs": ["D2", "E5", "K3"] }
+    ]
+  }
+}

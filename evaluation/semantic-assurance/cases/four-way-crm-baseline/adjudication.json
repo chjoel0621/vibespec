@@ -1,0 +1,43 @@
+{
+  "contractVersion": "semantic-generation-review-0.1",
+  "status": "candidate-needs-human-approval",
+  "reviewer": "codex-assisted",
+  "principle": "Use only facts present in the frozen brief; preserve uncertainty instead of inventing evidence.",
+  "reviewedFieldChanges": [
+    "Removed unsupported numeric targets and replaced them with a post-baseline decision.",
+    "Replaced ambiguous legacy baseline labels with an explicit unmeasured state."
+  ],
+  "kpis": [
+    {
+      "id": "K1",
+      "legacyName": "기한 내 처리 비율",
+      "expectedMode": "event-ratio",
+      "evidenceBasis": ["follow-up task owner", "due time", "status", "status-change time", "F6", "P15"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "The population is an SLA-managed follow-up task; no numeric baseline is claimed.",
+      "requiredHumanDecision": null
+    },
+    {
+      "id": "K2",
+      "legacyName": "운영 가시성",
+      "expectedMode": "manual",
+      "evidenceBasis": ["report and source records can be linked"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "The exact population and successful-link condition remain open.",
+      "requiredHumanDecision": "Define the eligible record population and what counts as linked to a report."
+    },
+    {
+      "id": "K3",
+      "legacyName": "감사 가능 운영 비율",
+      "expectedMode": "manual",
+      "evidenceBasis": ["audit logs record core administrative changes", "F12"],
+      "inventedEvidence": false,
+      "ambiguityHandling": "A monthly RevOps reconciliation is declared without inventing an observed result.",
+      "requiredHumanDecision": null
+    }
+  ],
+  "deliberatelyNotAssessed": [
+    "Whether the legacy KPI names are the best product metrics",
+    "Numeric targets and baselines not supported by the reconstructed brief"
+  ]
+}

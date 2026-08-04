@@ -1,0 +1,35 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "meeting-room-no-show",
+  "title": "회의실 노쇼율 측정 가능성",
+  "lane": "controlled-mutation",
+  "source": {
+    "path": "demo/meeting-room-booking.ko.sot.json",
+    "digest": "sha256:1cdbffe4936ee7871527a814b6f8dfc2cc63d8b5fa5be311b4742d1dc8140ed6"
+  },
+  "stages": {
+    "before": {
+      "plan": "before.plan.json",
+      "expected": {
+        "assessment": "failed",
+        "measurementReadiness": "blocked",
+        "findings": [
+          { "ruleId": "measurement-event-producer-required", "subjectRefs": ["E2"] },
+          { "ruleId": "open-decision-blocks-measurement", "subjectRefs": ["D1", "E2", "K2"] }
+        ]
+      }
+    },
+    "resolved": {
+      "plan": "resolved.plan.json",
+      "expected": {
+        "assessment": "passed",
+        "measurementReadiness": "ready",
+        "findings": []
+      }
+    }
+  },
+  "coverage": {
+    "measurementModes": ["event-ratio", "external"],
+    "labelledFailureTypes": ["missing-event-producer", "open-decision-blocks-measurement"]
+  }
+}

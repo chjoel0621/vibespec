@@ -1,0 +1,29 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "weekchef-claude-en",
+  "title": "WeekChef English Claude Code host output",
+  "lane": "natural",
+  "source": {
+    "path": "demo/semantic/weekchef.en.sot.json",
+    "digest": "sha256:be84d8b688c3ad649179f29243f3addf6b6b101d3e5bfc463c11d0695f021db9",
+    "fileSha256": "ABAA2A4D0AB4A4F10725C1BB6CD1810BD4D62679B074FA4AE12E71ED57252152"
+  },
+  "hostEvidence": {
+    "host": "claude-code",
+    "pluginVersion": "0.17.0",
+    "language": "en",
+    "preserveExactOutput": true
+  },
+  "expected": {
+    "assessment": "passed",
+    "measurementReadiness": "ready",
+    "findings": []
+  },
+  "contentReview": {
+    "profile": "consumer",
+    "findings": [
+      { "code": "feature-without-flow-trigger", "path": "$.requirements[R1].features[F1]" },
+      { "code": "feature-without-flow-trigger", "path": "$.requirements[R3].features[F5]" }
+    ]
+  }
+}

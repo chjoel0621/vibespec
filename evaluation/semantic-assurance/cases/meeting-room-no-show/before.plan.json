@@ -1,0 +1,69 @@
+{
+  "kind": "vibespec-change-plan-v2",
+  "baseDigest": "sha256:1cdbffe4936ee7871527a814b6f8dfc2cc63d8b5fa5be311b4742d1dc8140ed6",
+  "operations": [
+    { "op": "enableSemantic", "contractVersion": "semantic-0.1" },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "예약 완료까지 평균 탭 수" },
+      "id": "K1",
+      "measurement": { "mode": "external", "source": "제품 분석 로그", "metric": "average_taps_per_completed_booking", "refresh": "daily" }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "월간 노쇼율" },
+      "id": "K2",
+      "measurement": {
+        "mode": "event-ratio",
+        "numerator": { "populationEventRef": "E1", "absenceOfEventRef": "E2" },
+        "denominator": { "populationEventRef": "E1" },
+        "window": "calendar-month"
+      }
+    },
+    {
+      "op": "enableKpiMeasurement",
+      "match": { "name": "주간 활성 예약자 비율(WAU/직원)" },
+      "id": "K3",
+      "measurement": { "mode": "external", "source": "제품 분석 로그와 사내 계정 디렉터리", "metric": "weekly_active_bookers_over_eligible_employees", "refresh": "weekly" }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": {
+        "id": "E1",
+        "type": "system",
+        "name": "예약 시작 시각 도달",
+        "producers": [{ "type": "system-task", "name": "예약 스케줄러", "description": "유효한 예약이 시작 시각에 도달하면 모집단 이벤트를 기록한다." }]
+      }
+    },
+    {
+      "op": "addSemanticEvent",
+      "event": { "id": "E2", "type": "user", "name": "회의실 체크인 완료", "producers": [] }
+    },
+    {
+      "op": "addSemanticDecision",
+      "decision": {
+        "id": "D1",
+        "question": "MVP 체크인은 QR과 NFC 중 어떤 방식으로 제공할 것인가?",
+        "status": "open",
+        "impacts": [{ "effect": "blocks-measurement", "refs": ["K2", "E2"] }]
+      }
+    }
+  ],
+  "expected": {
+    "touchedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "addedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "removedIds": [],
+    "touchedPaths": [
+      "semantic.contractVersion",
+      "prd.kpis[예약 완료까지 평균 탭 수]",
+      "K1",
+      "prd.kpis[월간 노쇼율]",
+      "K2",
+      "prd.kpis[주간 활성 예약자 비율(WAU/직원)]",
+      "K3",
+      "E1",
+      "E2",
+      "D1"
+    ]
+  }
+}

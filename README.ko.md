@@ -16,6 +16,8 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 
 **[Semantic Assurance dogfood — 위크셰프](https://chjoel0621.github.io/vibespec/weekchef/)**는 패키징된 VibeSpec 0.17.0을 실제 Claude Code에서 실행해 만든 결과입니다. 제공되지 않은 KPI baseline은 `미측정`으로 남기고, 두 지표 모두 모집단·결과 이벤트를 구조화해 의미 검토를 통과합니다.
 
+**[Before → Finding → Resolved 평가 사례](evaluation/semantic-assurance/cases/meeting-room-no-show/README.md)**는 구조적으로 유효한 회의실 기획이 왜 노쇼율을 아직 측정할 수 없는지, QR 체크인 결정·기능·화면·flow·이벤트를 연결한 뒤 어떻게 `measurement: ready`가 되는지 재현합니다.
+
 ## 핵심 개념
 
 - **HTML = 앱(뷰어/편집기)** · **JSON = 데이터(SOT)** — 둘을 분리했습니다.

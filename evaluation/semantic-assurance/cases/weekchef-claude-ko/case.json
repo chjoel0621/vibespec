@@ -1,0 +1,23 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "weekchef-claude-ko",
+  "title": "WeekChef Korean Claude Code host output",
+  "lane": "natural",
+  "source": {
+    "path": "demo/semantic/weekchef.ko.sot.json",
+    "digest": "sha256:52907a833d518f473eda65004bd2ac3810477e659c9fde7f6195b3aa5cff5593",
+    "fileSha256": "7FCD01D2F31419853CD79C2C8D6509FE308878A323C212E8E96B237B6CF5CC41"
+  },
+  "hostEvidence": {
+    "host": "claude-code",
+    "pluginVersion": "0.17.0",
+    "language": "ko",
+    "preserveExactOutput": true
+  },
+  "expected": {
+    "assessment": "passed",
+    "measurementReadiness": "ready",
+    "findings": []
+  },
+  "contentReview": { "profile": "consumer", "findings": [] }
+}

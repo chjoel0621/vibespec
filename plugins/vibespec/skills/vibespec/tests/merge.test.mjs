@@ -62,6 +62,47 @@ const implemented = () => { const p = clone(payment); p.initiative.status = "imp
   console.log("[merge] PASS every non-inScope lean-PRD field surfaces for review with renumbered refs");
 }
 
+// Semantic planning remains human-reviewed on land, but every K/E/D and linked
+// F/P reference is rewritten into the product-plan id space before surfacing.
+{
+  const semanticMain = clone(main);
+  if (!semanticMain.prd.kpis.length) semanticMain.prd.kpis.push({ name: "Main KPI", target: "100", baseline: "0", method: "survey", refs: ["F1"] });
+  semanticMain.prd.kpis.forEach((kpi, index) => {
+    kpi.id = `K${index + 1}`;
+    kpi.measurement = { mode: "survey", instrument: "Main survey", window: "calendar-quarter" };
+  });
+  semanticMain.semantic = {
+    contractVersion: "semantic-0.1",
+    events: [{ id: "E1", type: "system", name: "Main event", producers: [{ type: "system-task", name: "Main task", description: "Produces the main event" }] }],
+    decisions: [{ id: "D1", question: "Main decision", status: "decided", resolution: "Keep", impacts: [{ effect: "requires-follow-up", refs: ["K1"] }] }]
+  };
+  assert.equal(validateSot(semanticMain).valid, true, JSON.stringify(validateSot(semanticMain).errors));
+  const p = implemented();
+  p.initiative.parent.digest = sotDigest(semanticMain);
+  p.prd.kpis = [{
+    id: "K1", name: "Pay success", target: "98%", baseline: "-", method: "event ratio", refs: ["F1"],
+    measurement: { mode: "event-count", eventRef: "E1", window: "calendar-day" }
+  }];
+  p.semantic = {
+    contractVersion: "semantic-0.1",
+    events: [{ id: "E1", type: "user", name: "Payment completed", producers: [{ type: "feature", ref: "F1" }], surfaceRefs: ["P2"] }],
+    decisions: [{ id: "D1", question: "Count retries?", status: "open", impacts: [{ effect: "blocks-measurement", refs: ["K1", "E1", "F1", "P2"] }] }]
+  };
+  assert.equal(validateSot(p).valid, true, JSON.stringify(validateSot(p).errors));
+  const r = planMerge([doc("main", semanticMain), doc("pay", p)], "payment");
+  assert.equal(r.ok, true, `semantic merge must succeed: ${r.error}`);
+  assert.deepEqual(r.report.addedSemanticIds, ["K1→K2", "E1→E2", "D1→D2"]);
+  assert.equal(r.report.manualPrdReview.kpis[0].id, "K2");
+  assert.equal(r.report.manualPrdReview.kpis[0].measurement.eventRef, "E2");
+  assert.equal(r.report.manualPrdReview.kpis[0].refs[0], "F2");
+  assert.equal(r.report.manualSemanticReview.events[0].id, "E2");
+  assert.equal(r.report.manualSemanticReview.events[0].producers[0].ref, "F2");
+  assert.equal(r.report.manualSemanticReview.events[0].surfaceRefs[0], "P3");
+  assert.deepEqual(r.report.manualSemanticReview.decisions[0].impacts[0].refs, ["K2", "E2", "F2", "P3"]);
+  assert.equal(r.main.semantic.events.some(event => event.id === "E2"), false, "semantic review data must not auto-merge into the main");
+  console.log("[merge] PASS semantic K/E/D and F/P references are renumbered for manual review");
+}
+
 // A non-boundary initiative section becomes a NEW main section (renumbered).
 {
   const p = implemented();

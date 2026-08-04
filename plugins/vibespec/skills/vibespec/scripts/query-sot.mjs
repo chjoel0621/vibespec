@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Usage: node scripts/query-sot.mjs <sot.json> [--ids R1,F5,F5:0,S2,P8] [--prd problem,kpis] [--json]
+// Usage: node scripts/query-sot.mjs <sot.json> [--ids R1,F5,F5:0,S2,P8,K1,E1,D1] [--prd problem,kpis] [--json]
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { querySot } from "./lib/sot-query.mjs";
@@ -16,7 +16,7 @@ async function main(argv) {
   const ids = idsIndex >= 0 && argv[idsIndex + 1] ? argv[idsIndex + 1].split(",").map(id => id.trim()).filter(Boolean) : [];
   const prdFields = prdIndex >= 0 && argv[prdIndex + 1] ? argv[prdIndex + 1].split(",").map(field => field.trim()).filter(Boolean) : [];
   if (!source || (!ids.length && !prdFields.length)) {
-    console.error("Usage: node scripts/query-sot.mjs <sot.json> [--ids R1,F5,F5:0,S2,P8] [--prd problem,kpis] [--json]");
+    console.error("Usage: node scripts/query-sot.mjs <sot.json> [--ids R1,F5,F5:0,S2,P8,K1,E1,D1] [--prd problem,kpis] [--json]");
     process.exitCode = 2;
     return;
   }

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { reviewSemantic } from "../scripts/lib/semantic-engine.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const skillRoot = join(here, "..");
@@ -32,7 +33,32 @@ try {
   const embedded = JSON.parse(html.slice(start + marker.length, end));
   assert.deepEqual(embedded, source, "viewer must embed the exact source SOT, not a separately generated copy");
   assert.ok(html.includes("\\u003c/script>"), "script-closing text must be escaped inside embedded JSON");
+  const reportMarker = '<script type="application/json" id="embedded-semantic-report">';
+  const reportStart = html.indexOf(reportMarker);
+  const reportEnd = html.indexOf("</script>", reportStart);
+  assert.equal(html.slice(reportStart + reportMarker.length, reportEnd), "", "legacy SOT must not receive an implied semantic report");
   console.log("[embed] PASS deterministic JSON-to-HTML embedding");
+
+  const semanticPath = join(tempDir, "semantic.sot.json");
+  const semanticOutputPath = join(tempDir, "semantic.html");
+  const semantic = JSON.parse(JSON.stringify(source));
+  semantic.prd.kpis[0].id = "K1";
+  semantic.prd.kpis[0].measurement = { mode: "event-count", eventRef: "E1", window: "calendar-day" };
+  semantic.semantic = {
+    contractVersion: "semantic-0.1",
+    events: [{ id: "E1", type: "user", name: "Validation requested", producers: [] }],
+    decisions: []
+  };
+  writeFileSync(semanticPath, JSON.stringify(semantic, null, 2));
+  const semanticResult = spawnSync(process.execPath, [join(skillRoot, "scripts", "embed-sot.mjs"), viewerPath, semanticPath, semanticOutputPath], { encoding: "utf8" });
+  assert.equal(semanticResult.status, 0, semanticResult.stderr || semanticResult.stdout);
+  const semanticHtml = readFileSync(semanticOutputPath, "utf8");
+  const semanticReportStart = semanticHtml.indexOf(reportMarker);
+  const semanticReportEnd = semanticHtml.indexOf("</script>", semanticReportStart);
+  const embeddedReport = JSON.parse(semanticHtml.slice(semanticReportStart + reportMarker.length, semanticReportEnd));
+  assert.deepEqual(embeddedReport, reviewSemantic(semantic), "embedded report must come from the shared semantic engine");
+  assert.equal(embeddedReport.readiness.measurement, "blocked", "missing event evidence must stay blocked in the HTML report");
+  console.log("[embed] PASS semantic SOT embeds the shared derived report without mutating the SOT");
 } finally {
   rmSync(tempDir, { recursive: true, force: true });
 }

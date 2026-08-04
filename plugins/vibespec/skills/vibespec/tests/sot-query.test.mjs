@@ -8,6 +8,7 @@ import { sotDigest } from "../scripts/lib/c14n.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sot = JSON.parse(readFileSync(join(here, "fixtures", "valid-minimal.sot.json"), "utf8"));
+const clone = value => JSON.parse(JSON.stringify(value));
 const byFeature = querySot(sot, ["F1"]);
 assert.equal(byFeature.kind, "vibespec-edit-context-v2");
 assert.equal(byFeature.baseDigest, sotDigest(sot));
@@ -42,3 +43,24 @@ const cli = spawnSync(process.execPath, [join(here, "..", "scripts", "query-sot.
 assert.equal(cli.status, 0, cli.stderr || "query-sot CLI failed");
 assert.deepEqual(JSON.parse(cli.stdout).pages.map(item => item.page.id), ["P1"]);
 console.log("[query] PASS CLI resolves the source when --ids is used without --prd");
+
+const semanticSot = clone(sot);
+semanticSot.prd.kpis[0].id = "K1";
+semanticSot.prd.kpis[0].measurement = { mode: "event-count", eventRef: "E1", window: "calendar-day" };
+semanticSot.semantic = {
+  contractVersion: "semantic-0.1",
+  events: [
+    { id: "E1", type: "user", name: "Validation requested", producers: [{ type: "feature", ref: "F1" }], surfaceRefs: ["P1"] },
+    { id: "E2", type: "system", name: "Unrelated cleanup", producers: [{ type: "system-task", name: "Cleanup", description: "Removes temporary files" }] }
+  ],
+  decisions: [{ id: "D1", question: "Keep validation synchronous?", status: "open", impacts: [{ effect: "blocks-measurement", refs: ["K1", "E1"] }] }]
+};
+for (const selector of ["K1", "E1", "D1", "F1"]) {
+  const context = querySot(semanticSot, [selector]);
+  assert.deepEqual(context.semantic.kpis.map(item => item.id), ["K1"]);
+  assert.deepEqual(context.semantic.events.map(item => item.id), ["E1"]);
+  assert.deepEqual(context.semantic.decisions.map(item => item.id), ["D1"]);
+  assert.deepEqual(context.features.map(item => item.feature.id), ["F1"]);
+  assert.equal(context.semantic.events.some(item => item.id === "E2"), false, "bounded semantic query must not include unrelated evidence");
+}
+console.log("[query] PASS K/E/D selectors return one bounded semantic graph closure");

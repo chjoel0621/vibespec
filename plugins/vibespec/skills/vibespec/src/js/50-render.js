@@ -16,6 +16,9 @@ function renderInitiativeBand(){
 /* ============================ RENDER DISPATCH ============================ */
 function render(){
   renderInitiativeBand();
+  const semanticTab=document.getElementById("semanticTab");
+  if(semanticTab) semanticTab.hidden=!(SOT&&SOT.semantic);
+  if(VIEW==="semantic" && !(SOT&&SOT.semantic)) VIEW="prd";
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
   const el = document.getElementById("stage");
   el.className = "wrap " + VIEW;
@@ -23,6 +26,7 @@ function render(){
   else if(VIEW==="spec") el.innerHTML = renderSpec();
   else if(VIEW==="tree"){ el.innerHTML = renderTree(); layoutTree(); }
   else if(VIEW==="ia") el.innerHTML = renderIA();
+  else if(VIEW==="semantic") el.innerHTML = renderSemanticReview();
   else { try{ el.innerHTML = renderFlow(); layoutFlow(); }catch(err){ el.innerHTML='<div style="padding:40px;color:#c0392b;font-weight:600">유저플로우 렌더 오류: '+esc(String(err&&err.stack||err))+'</div>'; } }
   if(RO) roHarden();
 }

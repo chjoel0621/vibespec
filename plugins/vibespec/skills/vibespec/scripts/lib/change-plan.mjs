@@ -18,8 +18,10 @@ const PRD_STRING_LIST_FIELDS = new Set(["platforms", "inScope", "nonGoals", "ass
 const PRD_OBJECT_LISTS = {
   targets: { key: "name", keys: new Set(["name", "role", "needs", "pain"]) },
   scenarios: { key: "text", keys: new Set(["text", "start"]) },
-  kpis: { key: "name", keys: new Set(["name", "target", "baseline", "method", "refs"]) }
+  kpis: { key: "name", keys: new Set(["name", "target", "baseline", "method", "refs", "measurement"]) }
 };
+const SEMANTIC_EVENT_KEYS = new Set(["type", "name", "producers", "surfaceRefs"]);
+const SEMANTIC_DECISION_KEYS = new Set(["question", "status", "resolution", "impacts"]);
 const INITIATIVE_IDENTITY_FIELDS = new Set(["category", "platforms", "northStar", "differentiator", "alternatives"]);
 const V1_OPERATIONS = new Set(["updateFeature", "addFeature", "removeFeature", "updatePage", "addPage", "removePage", "addTransition", "removeTransition"]);
 const fail = message => { throw new Error(message); };
@@ -30,8 +32,8 @@ function requireObject(value, label) {
   return value;
 }
 function idSet(value, field) {
-  if (!Array.isArray(value) || value.some(id => typeof id !== "string" || !/^[RFSP][1-9]\d*$/.test(id))) {
-    fail("expected." + field + " must be an array of stable R#/F#/S#/P# ids");
+  if (!Array.isArray(value) || value.some(id => typeof id !== "string" || !/^[RFSPKED][1-9]\d*$/.test(id))) {
+    fail("expected." + field + " must be an array of stable R#/F#/S#/P#/K#/E#/D# ids");
   }
   if (new Set(value).size !== value.length) fail("expected." + field + " must not contain duplicates");
   return new Set(value);
@@ -117,7 +119,7 @@ function prdItemIndex(list, field, match) {
     if (found.length !== 1) fail("PRD " + field + " match must identify exactly one item");
     return found[0];
   }
-  const key = PRD_OBJECT_LISTS[field].key;
+  const key = field === "kpis" && isObject(match) && typeof match.id === "string" ? "id" : PRD_OBJECT_LISTS[field].key;
   if (!isObject(match) || typeof match[key] !== "string" || !match[key]) fail("PRD " + field + ".match must contain " + key);
   const found = list.reduce((all, item, index) => item && item[key] === match[key] ? [...all, index] : all, []);
   if (found.length !== 1) fail("PRD " + field + " match must identify exactly one item");
@@ -132,6 +134,13 @@ function assertUniquePrdItem(list, field, item, exceptIndex = -1) {
   const key = PRD_OBJECT_LISTS[field].key;
   if (!isObject(item) || typeof item[key] !== "string" || !item[key]) fail("PRD " + field + " item must contain " + key);
   if (list.some((value, index) => index !== exceptIndex && value && value[key] === item[key])) fail("PRD " + field + " " + key + " must be unique");
+  if (field === "kpis" && item.id && list.some((value, index) => index !== exceptIndex && value?.id === item.id)) fail("PRD kpis id must be unique");
+}
+function semanticEntry(sot, field, id) {
+  const list = sot.semantic?.[field];
+  if (!Array.isArray(list)) fail("semantic contract must be enabled before editing " + field);
+  const index = list.findIndex(item => item.id === id);
+  return index < 0 ? null : { list, index, item: list[index] };
 }
 function pageHasDescendant(page, id) {
   return (page.children || []).some(child => child.id === id || pageHasDescendant(child, id));
@@ -156,6 +165,80 @@ function applyOperation(sot, operation, kind) {
   if (op.op === "updateDocument") {
     requireV2(kind, op.op);
     assignAllowed(sot, op.changes, DOCUMENT_KEYS, "updateDocument");
+    return;
+  }
+  if (op.op === "enableSemantic") {
+    requireV2(kind, op.op);
+    if (Object.hasOwn(sot, "semantic")) fail("enableSemantic: semantic contract is already present");
+    if (op.contractVersion !== "semantic-0.1") fail('enableSemantic.contractVersion must equal "semantic-0.1"');
+    sot.semantic = { contractVersion: op.contractVersion, events: [], decisions: [] };
+    return;
+  }
+  if (op.op === "enableKpiMeasurement") {
+    requireV2(kind, op.op);
+    if (!sot.semantic) fail("enableKpiMeasurement requires an enabled semantic contract");
+    const list = listForPrd(sot, "kpis");
+    const index = prdItemIndex(list, "kpis", op.match);
+    const kpi = list[index];
+    if (kpi.id !== undefined || kpi.measurement !== undefined) fail("enableKpiMeasurement: KPI is already semantic-enabled");
+    if (typeof op.id !== "string" || !/^K[1-9]\d*$/.test(op.id)) fail("enableKpiMeasurement.id must be a stable K# id");
+    if (list.some(item => item.id === op.id)) fail("enableKpiMeasurement: duplicate KPI id " + op.id);
+    kpi.id = op.id;
+    kpi.measurement = clone(requireObject(op.measurement, "enableKpiMeasurement.measurement"));
+    return;
+  }
+  if (op.op === "updateKpiMeasurement") {
+    requireV2(kind, op.op);
+    const list = listForPrd(sot, "kpis");
+    const index = prdItemIndex(list, "kpis", { id: op.id });
+    requireExactBefore(list[index].measurement, op.before, "updateKpiMeasurement");
+    list[index].measurement = clone(requireObject(op.measurement, "updateKpiMeasurement.measurement"));
+    return;
+  }
+  if (op.op === "addSemanticEvent") {
+    requireV2(kind, op.op);
+    const event = requireObject(op.event, "addSemanticEvent.event");
+    if (!/^E[1-9]\d*$/.test(event.id || "")) fail("addSemanticEvent.event.id must be a stable E# id");
+    if (semanticEntry(sot, "events", event.id)) fail("addSemanticEvent: duplicate event id " + event.id);
+    sot.semantic.events.push(clone(event));
+    return;
+  }
+  if (op.op === "updateSemanticEvent") {
+    requireV2(kind, op.op);
+    const entry = semanticEntry(sot, "events", op.id);
+    if (!entry) fail("updateSemanticEvent: unknown event " + op.id);
+    assignAllowed(entry.item, op.changes, SEMANTIC_EVENT_KEYS, "updateSemanticEvent");
+    return;
+  }
+  if (op.op === "removeSemanticEvent") {
+    requireV2(kind, op.op);
+    const entry = semanticEntry(sot, "events", op.id);
+    if (!entry) fail("removeSemanticEvent: unknown event " + op.id);
+    requireExactBefore(entry.item, op.before, "removeSemanticEvent");
+    entry.list.splice(entry.index, 1);
+    return;
+  }
+  if (op.op === "addSemanticDecision") {
+    requireV2(kind, op.op);
+    const decision = requireObject(op.decision, "addSemanticDecision.decision");
+    if (!/^D[1-9]\d*$/.test(decision.id || "")) fail("addSemanticDecision.decision.id must be a stable D# id");
+    if (semanticEntry(sot, "decisions", decision.id)) fail("addSemanticDecision: duplicate decision id " + decision.id);
+    sot.semantic.decisions.push(clone(decision));
+    return;
+  }
+  if (op.op === "updateSemanticDecision") {
+    requireV2(kind, op.op);
+    const entry = semanticEntry(sot, "decisions", op.id);
+    if (!entry) fail("updateSemanticDecision: unknown decision " + op.id);
+    assignAllowed(entry.item, op.changes, SEMANTIC_DECISION_KEYS, "updateSemanticDecision");
+    return;
+  }
+  if (op.op === "removeSemanticDecision") {
+    requireV2(kind, op.op);
+    const entry = semanticEntry(sot, "decisions", op.id);
+    if (!entry) fail("removeSemanticDecision: unknown decision " + op.id);
+    requireExactBefore(entry.item, op.before, "removeSemanticDecision");
+    entry.list.splice(entry.index, 1);
     return;
   }
   if (op.op === "updatePrdText") {
@@ -397,7 +480,7 @@ function applyOperation(sot, operation, kind) {
 function changedIds(report) {
   const ids = new Set();
   for (const change of report.changes) {
-    for (const match of change.path.matchAll(/(?:^|[^A-Z0-9])([RFSP][1-9]\d*)/g)) ids.add(match[1]);
+    for (const match of change.path.matchAll(/(?:^|[^A-Z0-9])([RFSPKED][1-9]\d*)/g)) ids.add(match[1]);
   }
   return ids;
 }
@@ -408,7 +491,7 @@ function idsByType(report, type) {
   return new Set(report.changes
     .filter(change => change.type === type)
     .map(change => {
-      const match = change.path.match(/^([RFSP][1-9]\d*)$/);
+      const match = change.path.match(/^([RFSPKED][1-9]\d*)$/);
       return match ? match[1] : null;
     })
     .filter(Boolean));

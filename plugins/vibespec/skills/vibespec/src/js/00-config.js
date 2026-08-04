@@ -5,8 +5,8 @@ const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 // only so a one-time migration can offer the user a download before removing it.
 const LEGACY_SOT_KEY="sot-proto-v3-flow";
 const LANG_KEY="vibespec-lang";
-const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
-const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
+const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우",semantic:"의미 검토"};
+const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow",semantic:"Semantic Review"};
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
 const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
 const SURFACE = {screen:"화면", panel:"패널", drawer:"드로어", modal:"모달", mode:"모드"};

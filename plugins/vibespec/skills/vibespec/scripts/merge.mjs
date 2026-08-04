@@ -27,6 +27,7 @@ export function printPlan(r) {
   if (rep.addedPages.length) console.log(`  페이지: ${rep.addedPages.join(", ")}`);
   if (rep.addedRequirements.length) console.log(`  요구사항: ${rep.addedRequirements.join(", ")}`);
   if (rep.addedFeatures.length) console.log(`  기능: ${rep.addedFeatures.join(", ")}`);
+  if (rep.addedSemanticIds.length) console.log(`  의미 ID 재번호: ${rep.addedSemanticIds.join(", ")}`);
   if (rep.attachedAt.length) console.log(`  접점: ${rep.attachedAt.map(a => a.at).join(", ")}`);
   if (rep.mergedInScope.length) console.log(`  제품 기획 inScope에 추가됨: ${rep.mergedInScope.map(s => JSON.stringify(s)).join(", ")}`);
   const keys = Object.keys(rep.manualPrdReview);
@@ -34,6 +35,10 @@ export function printPlan(r) {
     console.log(`  ⚠ PRD 수동 검토 필요(자동 병합 안 됨 — 제품 기획에 사람이 반영): ${keys.join(", ")}`);
     console.log(`    ${JSON.stringify(rep.manualPrdReview)}`);
     if (rep.manualPrdReview.kpis || rep.manualPrdReview.scenarios) console.log("    (kpi refs·scenario start는 제품 기획 id로 재번호되어 있음)");
+  }
+  if (rep.manualSemanticReview) {
+    console.log("  ⚠ 측정 이벤트·결정 수동 검토 필요(자동 병합 안 됨 — 재번호된 참조를 제품 기획에 사람이 반영)");
+    console.log(`    ${JSON.stringify(rep.manualSemanticReview)}`);
   }
   if (r.staleSiblings.length) console.log(`\n⚠ 머지 후 stale이 되는 제품 기획 추가 기획: ${r.staleSiblings.join(", ")} — rebase로 갱신하세요.`);
 }

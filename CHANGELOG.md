@@ -2,6 +2,20 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [0.17.0] - 2026-08-04
+
+### Added
+
+- Added optional Semantic Assurance 0.1 for stable KPI, event, and decision identities and typed measurement evidence.
+- Added the shared `review-semantic` engine/CLI with deterministic findings, readiness, and evidence-sensitive fingerprints.
+- Added a read-only Semantic Review viewer tab whose embedded verdict becomes stale immediately after SOT edits.
+- Added K/E/D query, diff, impact, typed change-plan, and Add-on landing/remap support.
+
+### Changed
+
+- New product plans and Add-ons enable Semantic Assurance by default; existing SOTs remain valid and are never upgraded implicitly.
+- Drafts may retain blocked human decisions, but only structurally valid plans with ready measurement evidence may be described as approval or developer-handoff ready.
+
 ## [0.16.1] - 2026-08-03
 
 ### Changed

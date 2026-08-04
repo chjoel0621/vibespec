@@ -31,6 +31,7 @@ ${css}
 </style>
 ${head}
 <script type="application/json" id="embedded-sot"></script>
+<script type="application/json" id="embedded-semantic-report"></script>
 <script>
 ${app}
 </script>

@@ -122,7 +122,7 @@ async function readConnectedFile(){
 }
 function applyLoadedSot(text,label,replaceHistory){
   try{
-    SOT=normalize(JSON.parse(text)); resetSelections();
+    SOT=normalize(JSON.parse(text)); clearSemanticReport(); resetSelections();
     if(replaceHistory){ HISTORY=[]; HPTR=-1; }
     pushHistory(label||t("파일 다시 불러오기","File reload")); markViewerSaved(); render(); return true;
   }catch(_){

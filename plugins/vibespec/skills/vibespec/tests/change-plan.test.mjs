@@ -182,6 +182,45 @@ assert.throws(() => applyChangePlan(initiative, planForV2(initiative, [{ op: "ad
 })), /boundaries are parent-owned/);
 console.log("[plan] PASS boundaries are excluded from single-file plans");
 
+const enableSemantic = planForV2(valid, [
+  { op: "enableSemantic", contractVersion: "semantic-0.1" },
+  { op: "enableKpiMeasurement", match: { name: "Validation pass rate" }, id: "K1", measurement: { mode: "survey", instrument: "Release survey", window: "calendar-quarter" } }
+], {
+  touchedIds: ["K1"], addedIds: ["K1"], removedIds: [],
+  touchedPaths: ["K1", "prd.kpis[Validation pass rate]", "semantic.contractVersion"]
+});
+const semanticEnabled = applyChangePlan(valid, enableSemantic).after;
+assert.equal(semanticEnabled.prd.kpis[0].id, "K1");
+assert.equal(semanticEnabled.semantic.contractVersion, "semantic-0.1");
+assert.throws(() => applyChangePlan(semanticEnabled, planForV2(semanticEnabled, [{ op: "enableSemantic", contractVersion: "semantic-0.1" }], {
+  touchedIds: [], addedIds: [], removedIds: [], touchedPaths: []
+})), /already present/);
+
+const addEvent = planForV2(semanticEnabled, [
+  { op: "addSemanticEvent", event: { id: "E1", type: "user", name: "Validation requested", producers: [{ type: "feature", ref: "F1" }], surfaceRefs: ["P1"] } },
+  { op: "updateKpiMeasurement", id: "K1", before: semanticEnabled.prd.kpis[0].measurement, measurement: { mode: "event-count", eventRef: "E1", window: "calendar-day" } }
+], {
+  touchedIds: ["K1", "E1"], addedIds: ["E1"], removedIds: [], touchedPaths: ["K1.measurement", "E1"]
+});
+const withEvent = applyChangePlan(semanticEnabled, addEvent).after;
+assert.equal(withEvent.semantic.events[0].id, "E1");
+
+const addDecision = planForV2(withEvent, [
+  { op: "addSemanticDecision", decision: { id: "D1", question: "Keep validation synchronous?", status: "open", impacts: [{ effect: "blocks-measurement", refs: ["K1", "E1"] }] } }
+], { touchedIds: ["D1"], addedIds: ["D1"], removedIds: [], touchedPaths: ["D1"] });
+const withDecision = applyChangePlan(withEvent, addDecision).after;
+assert.equal(withDecision.semantic.decisions[0].status, "open");
+
+const removeEvent = planForV2(withEvent, [
+  { op: "updateKpiMeasurement", id: "K1", before: withEvent.prd.kpis[0].measurement, measurement: { mode: "survey", instrument: "Release survey", window: "calendar-quarter" } },
+  { op: "removeSemanticEvent", id: "E1", before: withEvent.semantic.events[0] }
+], { touchedIds: ["K1", "E1"], addedIds: [], removedIds: ["E1"], touchedPaths: ["K1.measurement", "E1"] });
+assert.equal(applyChangePlan(withEvent, removeEvent).after.semantic.events.length, 0);
+assert.throws(() => applyChangePlan(withEvent, planForV2(withEvent, [
+  { op: "removeSemanticEvent", id: "E1", before: withEvent.semantic.events[0] }
+], { touchedIds: ["E1"], addedIds: [], removedIds: ["E1"], touchedPaths: ["E1"] })), /invalid SOT/);
+console.log("[plan] PASS semantic contract, K/E/D, and measurement edits use typed change-plan operations");
+
 const workspace = mkdtempSync(join(tmpdir(), "vibespec-plan-"));
 try {
   const sotPath = join(workspace, "main.sot.json");

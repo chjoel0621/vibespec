@@ -7,6 +7,7 @@
 // and because the main changed, every remaining initiative on it is now stale
 // (report — never silently rewritten; that's rebase's job).
 import { validateTree } from "./tree.mjs";
+import { remapSemanticContent } from "./semantic-reference-registry.mjs";
 
 const isObject = v => v !== null && typeof v === "object" && !Array.isArray(v);
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -47,10 +48,14 @@ export function planMerge(docs, initiativeId) {
 
   const M = clone(mainDoc.sot);
   let nextP = maxNum(M, "P") + 1, nextF = maxNum(M, "F") + 1, nextR = maxNum(M, "R") + 1, nextS = maxNum(M, "S") + 1;
+  let nextK = maxNum(M, "K") + 1, nextE = maxNum(M, "E") + 1, nextD = maxNum(M, "D") + 1;
 
   // Pass 1: assign new main ids to the initiative's own nodes; record boundary resolutions.
-  const reqMap = {}, featMap = {}, pageMap = {}, secMap = {}, pageResolve = {};
+  const reqMap = {}, featMap = {}, pageMap = {}, secMap = {}, pageResolve = {}, kpiMap = {}, eventMap = {}, decisionMap = {};
   for (const r of I.requirements || []) { reqMap[r.id] = `R${nextR++}`; for (const f of r.features || []) featMap[f.id] = `F${nextF++}`; }
+  for (const kpi of I.prd?.kpis || []) if (kpi.id) kpiMap[kpi.id] = `K${nextK++}`;
+  for (const event of I.semantic?.events || []) eventMap[event.id] = `E${nextE++}`;
+  for (const decision of I.semantic?.decisions || []) decisionMap[decision.id] = `D${nextD++}`;
   const assignPages = pages => (pages || []).forEach(p => {
     if (isObject(p.boundary)) pageResolve[p.id] = p.boundary.pageId; else pageMap[p.id] = `P${nextP++}`;
     assignPages(p.children);
@@ -117,8 +122,13 @@ export function planMerge(docs, initiativeId) {
   const manualPrdReview = {};
   for (const f of ["problem", "solution", "goal", "oneLiner"]) if (P[f]) manualPrdReview[f] = P[f];
   for (const f of ["nonGoals", "targets", "assumptions", "risks", "openQuestions", "constraints"]) if ((P[f] || []).length) manualPrdReview[f] = P[f];
-  if ((P.kpis || []).length) manualPrdReview.kpis = P.kpis.map(k => ({ ...k, refs: (k.refs || []).map(mapRef) }));      // refs → new main F#/F#:idx
+  const semanticReview = remapSemanticContent(I, {
+    requirements: reqMap, features: featMap, sections: secMap,
+    pages: { ...pageResolve, ...pageMap }, kpis: kpiMap, events: eventMap, decisions: decisionMap
+  });
+  if ((P.kpis || []).length) manualPrdReview.kpis = semanticReview.kpis;
   if ((P.scenarios || []).length) manualPrdReview.scenarios = P.scenarios.map(s => (s.start ? { ...s, start: mapPage(s.start) } : { ...s })); // start → new main P#
+  const manualSemanticReview = semanticReview.semantic;
 
   const landed = clone(I); landed.initiative.status = "landed";
 
@@ -133,9 +143,15 @@ export function planMerge(docs, initiativeId) {
     addedFeatures: Object.entries(featMap).map(([o, n]) => `${o}→${n}`),
     addedPages: Object.entries(pageMap).map(([o, n]) => `${o}→${n}`),
     addedSections: Object.entries(secMap).map(([o, n]) => `${o}→${n}`),
+    addedSemanticIds: [
+      ...Object.entries(kpiMap).map(([o, n]) => `${o}→${n}`),
+      ...Object.entries(eventMap).map(([o, n]) => `${o}→${n}`),
+      ...Object.entries(decisionMap).map(([o, n]) => `${o}→${n}`)
+    ],
     attachedAt,
     mergedInScope: (P.inScope || []).slice(),          // what auto-merged into the main
     manualPrdReview,                                    // everything else the reviewer must fold in by hand
+    manualSemanticReview,
     staleSiblings
   };
   return { ok: true, main: M, mainName: mainDoc.name, landed, landedName: initDoc.name, report, staleSiblings };

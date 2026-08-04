@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { semanticIdIndex, semanticNamespaces, semanticReferences } from "./lib/semantic-reference-registry.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sotSchema = JSON.parse(readFileSync(join(here, "..", "references", "sot.schema.json"), "utf8"));
@@ -248,6 +249,29 @@ export function validateSot(sot) {
         if (!featureRefs.has(ref)) error(`${path}.refs[${ri}]`, `unknown feature ref ${ref}`);
       });
     });
+  }
+
+  if (isObject(sot.semantic)) {
+    const semanticIds = new Map();
+    const stableEntityIds = new Set([...requirementIds, ...featureRefs, ...sectionIds, ...pageIds]);
+    for (const [index, kpi] of (prd?.kpis || []).entries()) {
+      if (!semanticNamespaces.KPI.pattern.test(kpi?.id || "")) {
+        error(`$.prd.kpis[${index}].id`, "semantic-enabled SOT requires a stable KPI id such as K1");
+      }
+    }
+    for (const entry of semanticIdIndex(sot)) {
+      if (semanticIds.has(entry.id)) error(entry.path, `duplicate semantic id ${entry.id}`);
+      else { semanticIds.set(entry.id, entry); stableEntityIds.add(entry.id); }
+    }
+    for (const reference of semanticReferences(sot)) {
+      const base = reference.ref.split(":")[0];
+      const exists = reference.target === "EVENT" ? semanticIds.get(reference.ref)?.namespace === "EVENT"
+        : reference.target === "FEATURE" ? featureIds.has(base)
+          : reference.target === "PAGE" ? pageIds.has(reference.ref)
+            : reference.target === "DYNAMIC" ? stableEntityIds.has(reference.ref)
+              : true;
+      if (!exists) error(reference.path, `unknown ${reference.target.toLowerCase()} ref ${reference.ref}`);
+    }
   }
 
   const flow = sot.flow;

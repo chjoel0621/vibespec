@@ -8,6 +8,7 @@
 // inserting one in the middle reports the shifted tail as modified. Producers
 // (viewer, skill) only append, which keeps positional diffs honest.
 import { stableStringify, sotDigest } from "./c14n.mjs";
+import { measurementEventRefs } from "./semantic-reference-registry.mjs";
 
 const same = (a, b) => stableStringify(a) === stableStringify(b);
 const scalar = v => (v === undefined ? undefined : v);
@@ -95,15 +96,32 @@ export function diffSot(before, after) {
   }
   for (const [key, keyOf, fields] of [
     ["targets", t => t.name, ["role", "needs", "pain"]],
-    ["kpis", k => k.name, ["target", "baseline", "method"]]
+    ["kpis", k => k.id || k.name, ["name", "target", "baseline", "method", "measurement"]]
   ]) {
     const b = byKey(prdBefore[key], keyOf), a = byKey(prdAfter[key], keyOf);
-    for (const [name, item] of a) if (!b.has(name)) record(changes, `prd.${key}[${name}]`, "added", undefined, item);
+    const itemPath = (name, item) => key === "kpis" && item?.id ? item.id : `prd.${key}[${name}]`;
+    for (const [name, item] of a) if (!b.has(name)) record(changes, itemPath(name, item), "added", undefined, item);
     for (const [name, item] of b) {
-      if (!a.has(name)) { record(changes, `prd.${key}[${name}]`, "removed", item, undefined); continue; }
+      if (!a.has(name)) { record(changes, itemPath(name, item), "removed", item, undefined); continue; }
       const next = a.get(name);
-      diffScalars(changes, `prd.${key}[${name}]`, item, next, fields);
-      if (key === "kpis") diffStringArray(changes, `prd.${key}[${name}].refs`, item.refs, next.refs);
+      const path = itemPath(name, next);
+      diffScalars(changes, path, item, next, fields);
+      if (key === "kpis") diffStringArray(changes, `${path}.refs`, item.refs, next.refs);
+    }
+  }
+
+  if (!same(scalar(before.semantic?.contractVersion), scalar(after.semantic?.contractVersion))) {
+    record(changes, "semantic.contractVersion", "modified", before.semantic?.contractVersion, after.semantic?.contractVersion);
+  }
+  for (const [field, fields] of [
+    ["events", ["type", "name", "producers", "surfaceRefs"]],
+    ["decisions", ["question", "status", "resolution", "impacts"]]
+  ]) {
+    const b = byKey(before.semantic?.[field], item => item.id), a = byKey(after.semantic?.[field], item => item.id);
+    for (const [id, item] of a) if (!b.has(id)) record(changes, id, "added", undefined, item);
+    for (const [id, item] of b) {
+      if (!a.has(id)) { record(changes, id, "removed", item, undefined); continue; }
+      diffScalars(changes, id, item, a.get(id), fields);
     }
   }
   const scnB = prdBefore.scenarios ?? [], scnA = prdAfter.scenarios ?? [];
@@ -181,7 +199,7 @@ export function diffSot(before, after) {
     for (const t of remaining) record(changes, `flow.${key}[${transitionTrigger(t)}]`, "added", undefined, t);
   }
 
-  const removedIds = changes.filter(c => c.type === "removed" && /^[RFSP][0-9]/.test(c.path)).map(c => c.path);
+  const removedIds = changes.filter(c => c.type === "removed" && /^[RFSPKED][0-9]/.test(c.path)).map(c => c.path);
   return { changes, removedIds };
 }
 
@@ -211,19 +229,41 @@ function expandEntity(id, sot) {
 export function impactFor(entityIds, sot) {
   const pages = flattenPages(sot);
   const transitions = sot.flow?.transitions ?? [];
+  const events = sot.semantic?.events ?? [];
+  const decisions = sot.semantic?.decisions ?? [];
+  const kpis = sot.prd?.kpis ?? [];
   const report = {};
   for (const id of entityIds) {
-    const impact = { pages: [], transitions: [], kpis: [], scenarios: [] };
+    const impact = { pages: [], transitions: [], kpis: [], scenarios: [], events: [], decisions: [] };
     if (/^P[0-9]/.test(id)) {
       impact.transitions = transitions.filter(t => t.from === id || t.to === id).map(transitionKey);
       impact.scenarios = (sot.prd?.scenarios ?? []).flatMap((s, i) => (s.start === id ? [`prd.scenarios[${i}]`] : []));
+      impact.events = events.filter(event => (event.surfaceRefs || []).includes(id)).map(event => event.id);
+    } else if (/^K[0-9]/.test(id)) {
+      const kpi = kpis.find(item => item.id === id);
+      impact.events = kpi ? measurementEventRefs(kpi) : [];
+      impact.decisions = decisions.filter(decision => (decision.impacts || []).some(item => (item.refs || []).includes(id))).map(decision => decision.id);
+    } else if (/^E[0-9]/.test(id)) {
+      const event = events.find(item => item.id === id);
+      const featureIds = new Set((event?.producers || []).filter(item => item.type === "feature").map(item => item.ref));
+      for (const [pid, { page }] of pages) if ((page.refs || []).some(ref => featureIds.has(ref))) impact.pages.push(pid);
+      impact.transitions = transitions.filter(t => t.ref && featureIds.has(t.ref)).map(transitionKey);
+      impact.kpis = kpis.filter(kpi => measurementEventRefs(kpi).includes(id)).map(kpi => kpi.id || kpi.name);
+      impact.decisions = decisions.filter(decision => (decision.impacts || []).some(item => (item.refs || []).includes(id))).map(decision => decision.id);
+    } else if (/^D[0-9]/.test(id)) {
+      const decision = decisions.find(item => item.id === id);
+      impact.kpis = (decision?.impacts || []).flatMap(item => item.refs || []).filter(ref => /^K[0-9]/.test(ref));
+      impact.events = (decision?.impacts || []).flatMap(item => item.refs || []).filter(ref => /^E[0-9]/.test(ref));
     } else {
       const subtree = expandEntity(id, sot);
       for (const [pid, { page }] of pages) if ((page.refs ?? []).some(ref => subtree.has(ref))) impact.pages.push(pid);
       impact.transitions = transitions.filter(t => t.ref && subtree.has(t.ref)).map(transitionKey);
-      impact.kpis = (sot.prd?.kpis ?? []).filter(k => (k.refs ?? []).some(ref => subtree.has(ref))).map(k => k.name);
+      impact.kpis = kpis.filter(k => (k.refs ?? []).some(ref => subtree.has(ref))).map(k => k.id || k.name);
+      impact.events = events.filter(event => (event.producers || []).some(producer => producer.type === "feature" && subtree.has(producer.ref))).map(event => event.id);
+      const semanticTargets = new Set([id, ...impact.events, ...impact.kpis]);
+      impact.decisions = decisions.filter(decision => (decision.impacts || []).some(item => (item.refs || []).some(ref => semanticTargets.has(ref)))).map(decision => decision.id);
     }
-    if (impact.pages.length || impact.transitions.length || impact.kpis.length || impact.scenarios.length) report[id] = impact;
+    if (Object.values(impact).some(values => values.length)) report[id] = impact;
   }
   return report;
 }
@@ -231,7 +271,7 @@ export function impactFor(entityIds, sot) {
 function mergeImpact(primary, secondary) {
   const merged = {};
   for (const id of new Set([...Object.keys(primary), ...Object.keys(secondary)])) {
-    merged[id] = Object.fromEntries(["pages", "transitions", "kpis", "scenarios"].map(key => [
+    merged[id] = Object.fromEntries(["pages", "transitions", "kpis", "scenarios", "events", "decisions"].map(key => [
       key,
       [...new Set([...(primary[id]?.[key] ?? []), ...(secondary[id]?.[key] ?? [])])]
     ]));
@@ -241,7 +281,7 @@ function mergeImpact(primary, secondary) {
 
 export function diffReport(before, after) {
   const { changes, removedIds } = diffSot(before, after);
-  const changedEntities = [...new Set(changes.map(c => c.path.split(".")[0].split(":")[0]).filter(p => /^[RFP][0-9]/.test(p)))];
+  const changedEntities = [...new Set(changes.map(c => c.path.split(".")[0].split(":")[0]).filter(p => /^[RFPKED][0-9]/.test(p)))];
   return {
     changes,
     removedIds,

@@ -4,7 +4,7 @@
 
 > 바이브 코딩처럼, **기획도 바이브로.**
 > 제품 아이디어나 기획 문서를 넣으면 하나의 **SOT(Single Source of Truth, JSON)** 로 정리하고,
-> **PRD · 기능명세서 · IA(정보구조) · 유저플로우**를 한 화면에서 보고 편집하는 기획 도구입니다.
+> **PRD · 기능명세서 · IA(정보구조) · 유저플로우**를 한 화면에서 보고 편집하고, KPI 측정 근거까지 검토하는 기획 도구입니다.
 
 VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있는 듀얼 포맷 **플러그인 마켓플레이스**입니다. 아이디어를 설명하거나 사업계획서·PRD 초안 같은 문서를 첨부하면, AI가 스키마에 맞는 SOT JSON을 생성하고 전용 HTML 뷰어로 열어 바로 편집할 수 있습니다.
 
@@ -20,7 +20,7 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 - 모든 화면이 **하나의 SOT**만 읽고 씁니다. 한 곳에서 고치면 나머지 뷰가 전부 동기화됩니다.
 - 뷰어(앱)는 한 번만 공유하고, 이후에는 **JSON 파일만 주고받으면** 같은 화면을 봅니다.
 
-## 5개 뷰
+## 뷰
 
 | 뷰 | 내용 |
 | --- | --- |
@@ -29,6 +29,7 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 | **트리** | 요구사항 계층 노드 캔버스. 노드 클릭 시 기능명세서로 이동 |
 | **IA (정보구조도)** | 섹션 → 페이지 → 행동 사이트맵. 기능↔화면 매핑, 누락 경고·자동 채우기 |
 | **유저플로우** | 화면 전환 그래프 (시작 → 화면 이동, 분기·루프, 줌/이동). 패널에서 전환 추가·삭제, 트리거를 기능에 연결하면 라벨 자동 동기화, 미연결·누락 경고 |
+| **의미 검토** | 새 의미 계약 문서에서 KPI → 측정 방식 → 이벤트/증거 → 기능·화면 관계를 읽기 전용 파생 보고서로 검토. 기존 SOT는 명시적으로 활성화하기 전까지 그대로 유효하며 추가 탭도 표시하지 않음 |
 
 ## 설치
 
@@ -80,7 +81,7 @@ node <VibeSpec-스킬-디렉터리>/scripts/verify-host-output.mjs outputs/meeti
 
 ## 사용
 
-"내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 열면 바로 5개 뷰가 표시되고, 편집·저장·불러오기가 됩니다.
+"내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 새 기획은 각 KPI의 측정 방식도 선언하고 HTML에 파생된 의미 검토 보고서를 포함합니다. 차단 항목이 있는 결과는 정직한 초안으로 전달할 수 있지만 승인 가능·개발 전달 준비 완료로 표시하지 않습니다.
 
 **기존 기획 수정하기:** `*.sot.json`을 첨부하고 "F3 이름 바꾸고 수용 기준 하나 추가해줘"처럼 요청하세요. 스킬이 기존 id를 전부 보존한 채 최소한만 고치고, 검증을 통과시킨 뒤 무엇이 바뀌었는지·어디에 영향이 가는지(화면·전환·KPI)·어느 섹션이 바이트 단위로 그대로인지 리포트합니다.
 
@@ -219,6 +220,7 @@ node scripts/workspace.mjs path/to/product-folder                    # workspace
 node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # 필요한 수정 문맥만 조회
 node scripts/apply-change-plan.mjs main.sot.json history/change-plans/edit.plan.json  # 드라이런; --apply --receipt history/change-plans/edit.receipt.json으로 기록
 node scripts/review-sot.mjs main.sot.json                            # 내용 품질 경고 검토
+node scripts/review-semantic.mjs main.sot.json --json                # KPI 측정 근거 준비도 검토
 node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # 구버전 승격 드라이런; --apply로 기록
 ```
 

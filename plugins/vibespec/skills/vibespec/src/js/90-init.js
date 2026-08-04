@@ -5,7 +5,7 @@ document.getElementById("sotBtn").addEventListener("click",()=>{
   const w=window.open("","_blank","width=520,height=640");
   w.document.write("<title>SOT (Single Source of Truth)</title><pre style='font:12px/1.5 ui-monospace,Menlo,monospace;padding:16px;white-space:pre-wrap'>"+esc(JSON.stringify(SOT,null,2))+"</pre>");
 });
-document.getElementById("prodTitle").addEventListener("input",e=>{ if(MAP) return; SOT.title=e.currentTarget.firstChild.textContent.trim(); });
+document.getElementById("prodTitle").addEventListener("input",e=>{ if(MAP) return; SOT.title=e.currentTarget.firstChild.textContent.trim(); invalidateSemanticReport(); });
 
 /* delegated edits (contenteditable) */
 document.getElementById("stage").addEventListener("input",e=>{
@@ -25,6 +25,7 @@ document.getElementById("stage").addEventListener("input",e=>{
   else if(t.dataset.persona){ const[i,f]=t.dataset.persona.split("#"); SOT.prd.targets[+i][f]=v; }
   else if(t.dataset.scnText!==undefined){ SOT.prd.scenarios[+t.dataset.scnText].text=v; }
   else if(t.dataset.kpi){ const[i,f]=t.dataset.kpi.split("#"); SOT.prd.kpis[+i][f]=v; }
+  invalidateSemanticReport();
   if(VIEW==="tree") layoutTree();
   else if(VIEW==="flow") layoutFlow();
 });
@@ -135,6 +136,7 @@ document.getElementById("fileInput").addEventListener("change",e=>{
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
+try{ const report=document.getElementById("embedded-semantic-report"); if(report&&report.textContent.trim()) SEMANTIC_REPORT=JSON.parse(report.textContent); }catch(e){}
 if(!MAP){
   if(!SOT.title) SOT.title="제품";
   (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();

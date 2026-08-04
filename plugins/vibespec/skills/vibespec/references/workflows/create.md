@@ -13,6 +13,16 @@ PRD는 다음 여섯 영역을 채운다.
 5. 범위: `inScope`, `nonGoals`
 6. 리스크: `assumptions`, `risks`, `openQuestions`, `constraints`
 
+## 의미 계약과 KPI 근거
+
+신규 제품 기획은 최상위 `semantic.contractVersion: "semantic-0.1"`을 기본으로 사용한다. 각 KPI에 안정 ID `K1..`과 실제 측정 방식 하나를 둔다. 상세 계약은 `references/semantic-assurance.md`를 따른다.
+
+- 이벤트로 세는 KPI만 `event-count` 또는 `event-ratio`와 `E1..` 이벤트를 만든다.
+- 설문·수기 운영·외부 분석원이 맞는 KPI를 억지로 UI 이벤트로 바꾸지 않고 각각 `survey`, `manual`, `external`을 쓴다.
+- 사용자 이벤트는 생산 기능과 실제 IA/flow 표면을 연결한다. 시스템·외부·수기 이벤트에 화면을 억지로 만들지 않는다.
+- `D1..`은 KPI 측정이나 구현을 실제로 막는 미결정만 구조화한다. `openQuestions` 전체를 기계적으로 복사하지 않는다.
+- 요구에 없는 기능이나 결정을 검토 통과 목적으로 발명하지 않는다. 증거가 없으면 blocked 초안으로 정직하게 남긴다.
+
 요구사항은 requirement → feature → spec 3계층이다. `R1..`, 전체에서 유일한 `F1..`, 상세기능 참조 `F#:index`를 사용한다. 요청 복잡도에 맞는 최소 충분 범위를 만들며 작은 앱에 임의의 개수 목표를 강제하지 않는다.
 
 ## 프로파일
@@ -48,4 +58,4 @@ IA는 requirement나 feature 목록을 화면으로 복사하는 표가 아니�
 - `from/to`는 실제 IA `P#`; 기능 ID는 `ref`에만 둔다.
 - `source/target`, `fromPage/toPage`, `action`, `name` 같은 대체 필드는 쓰지 않는다.
 
-저장·검증·HTML 생성은 `common.md` 절차를 따른다. 두 파일의 절대 경로와 HTML을 바로 열 수 있다는 사용법을 안내한다.
+저장·검증·의미 검토·HTML 생성은 `common.md` 절차를 따른다. 두 파일의 절대 경로와 HTML을 바로 열 수 있다는 사용법, 의미 검토 준비도를 안내한다.

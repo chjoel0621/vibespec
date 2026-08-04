@@ -3,11 +3,11 @@
 **🌐 언어 / Language: English (current) · [한국어](./README.ko.md)**
 
 > Like vibe coding — but for **product planning.**
-> Drop in a product idea or a planning document, and VibeSpec organizes it into a single **SOT (Single Source of Truth, JSON)**, then lets you view and edit the **PRD · Feature Spec · IA (Information Architecture) · User Flow** all in one screen.
+> Drop in a product idea or a planning document, and VibeSpec organizes it into a single **SOT (Single Source of Truth, JSON)**, then lets you view and edit the **PRD · Feature Spec · IA (Information Architecture) · User Flow** and review whether KPI measurement has enough evidence.
 
-**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOTs with PRDs, feature specs, information architecture, and user flows. Official site: [vbspec.com](https://vbspec.com/).
+**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOTs with PRDs, feature specs, information architecture, user flows, and optional semantic assurance for KPI evidence. Official site: [vbspec.com](https://vbspec.com/).
 
-**VibeSpec은 Claude와 Codex용 무료 오픈소스 AI 제품 기획 플러그인입니다.** 제품 아이디어를 PRD·기능 명세·IA·유저 플로우가 연결된 수정 가능한 SOT로 만듭니다. 공식 사이트: [vbspec.com/ko](https://vbspec.com/ko/).
+**VibeSpec은 Claude와 Codex용 무료 오픈소스 AI 제품 기획 플러그인입니다.** 제품 아이디어를 PRD·기능 명세·IA·유저 플로우가 연결된 수정 가능한 SOT로 만들고 KPI 측정 근거의 설계 완전성을 검토합니다. 공식 사이트: [vbspec.com/ko](https://vbspec.com/ko/).
 
 VibeSpec is a dual-format **plugin marketplace** for Claude Cowork / Claude Code and OpenAI Codex. Describe an idea or attach a document (business plan, PRD draft, meeting notes), and the AI generates a schema-compliant SOT JSON that opens in a dedicated HTML viewer for immediate editing.
 
@@ -23,7 +23,7 @@ A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)
 - Every view reads and writes **one SOT**. Fix something in one place and the rest sync automatically.
 - Share the viewer (app) once; after that, **just exchange the JSON file** to see the same thing.
 
-## Five views
+## Views
 
 | View | What it shows |
 | --- | --- |
@@ -32,6 +32,7 @@ A **[second demo — Neighborly](https://chjoel0621.github.io/vibespec/flea/en/)
 | **Tree** | A node canvas of the requirement hierarchy. Click a node to jump to the Feature Spec. |
 | **IA (Information Architecture)** | A task-derived Section → Page → Action sitemap with explicit screen, panel, drawer, modal, and mode roles. Feature coverage is checked after navigation and containment are designed. |
 | **User Flow** | A screen-transition graph (start → screen navigation, branches/loops, zoom/pan). Add or remove transitions from a panel; link a trigger to a feature and its label auto-syncs; warnings for unconnected/missing screens. |
+| **Semantic Review** | For new semantic-enabled plans, a read-only derived report that checks KPI → measurement → event/evidence → feature/screen relationships. Existing SOTs remain valid and show no extra tab until explicitly enabled. |
 
 ## Installation
 
@@ -83,7 +84,7 @@ This verifier proves that the host-created JSON is structurally valid and exactl
 
 ## Usage
 
-Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. Open it and all five views appear immediately — edit, save, and load right there.
+Ask something like "turn my product idea into a planning tool" or attach a business plan, and the skill produces a viewer HTML with the SOT JSON embedded. New plans also declare how each KPI will be measured; the HTML includes a derived Semantic Review report. A blocked report may be delivered as an honest draft, but it is not labeled ready for approval or developer handoff.
 
 **Updating an existing plan:** attach your `*.sot.json` with a request like "rename F3 and add an acceptance criterion." The skill applies a minimal edit — every existing id stays stable — then validates the result and reports exactly what changed, what it touches (screens, transitions, KPIs), and which sections are untouched byte-for-byte.
 
@@ -224,6 +225,7 @@ node scripts/workspace.mjs path/to/product-folder                    # workspace
 node scripts/query-sot.mjs main.sot.json --ids F3,P8 --json          # bounded edit context
 node scripts/apply-change-plan.mjs main.sot.json history/change-plans/edit.plan.json  # dry-run; add --apply --receipt history/change-plans/edit.receipt.json to write
 node scripts/review-sot.mjs main.sot.json                            # advisory content-quality review
+node scripts/review-semantic.mjs main.sot.json --json                # KPI measurement-evidence readiness
 node scripts/migrate-sot.mjs old.sot.json --out main.sot.json       # dry-run legacy upgrade; add --apply to write
 ```
 

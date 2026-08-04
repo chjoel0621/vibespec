@@ -54,6 +54,12 @@ jobs:
           validate_product demo/flea-market 1-1.escrow
           node $S/scripts/validate-sot.mjs demo/crm.ko.sot.json
           node $S/scripts/validate-sot.mjs demo/crm.en.sot.json
+          for lang in ko en; do
+            W=demo/semantic/weekchef.$lang.sot.json
+            node $S/scripts/validate-sot.mjs "$W"
+            node $S/scripts/review-sot.mjs "$W" --profile consumer
+            node $S/scripts/review-semantic.mjs "$W"
+          done
           # Flea is the workspace demo: it also carries a proposed increment (offer).
           node $S/scripts/validate-sot.mjs demo/flea-market.ko.1-2.offer.sot.json
           node $S/scripts/validate-sot.mjs demo/flea-market.en.1-2.offer.sot.json
@@ -82,6 +88,12 @@ jobs:
           mkdir -p _site/crm/en
           node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.ko.sot.json _site/crm/index.html
           node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.en.sot.json _site/crm/en/index.html
+          # WeekChef is real Claude Code dogfood output from the packaged 0.17.0
+          # plugin. Keep its independently generated ko/en plans as separate
+          # host examples; both must pass semantic readiness before deployment.
+          mkdir -p _site/weekchef/en
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/semantic/weekchef.ko.sot.json _site/weekchef/index.html
+          node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/semantic/weekchef.en.sot.json _site/weekchef/en/index.html
           # Flea is the workspace demo: escrow (approved) + offer (proposed). The
           # release map excludes the proposed offer; the workspace map includes it,
           # so the two pages show the difference side by side. Same inputs, two modes.
@@ -114,8 +126,12 @@ jobs:
           }
           verify_product "" notif
           verify_product flea escrow
-          for f in crm/index.html crm/en/index.html; do
+          for f in crm/index.html crm/en/index.html weekchef/index.html weekchef/en/index.html; do
             grep -q 'class="demo-nav"' "_site/$f" || { echo "no nav strip: _site/$f"; exit 1; }
+          done
+          for f in weekchef/index.html weekchef/en/index.html; do
+            grep -q 'embedded-semantic-report">{' "_site/$f" || { echo "semantic report missing: _site/$f"; exit 1; }
+            grep -q '"measurement":"ready"' "_site/$f" || { echo "semantic readiness missing: _site/$f"; exit 1; }
           done
           # Flea's extra workspace pages carry the nav strip too.
           for f in flea/workspace/ flea/en/workspace/; do

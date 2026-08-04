@@ -93,9 +93,22 @@ const normalizedCount = clone(multiProducer);
 normalizedCount.prd.kpis[0].name = "Exports per active household per week";
 normalizedCount.prd.kpis[0].method = "Weekly exports / active households";
 assert.ok(reviewSemantic(normalizedCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"));
+for (const name of ["노쇼율", "전환율", "이탈률", "재방문율", "오류율", "성공률", "사용자당 예약 수"]) {
+  const koreanNormalizedCount = clone(multiProducer);
+  koreanNormalizedCount.lang = "ko";
+  koreanNormalizedCount.prd.kpis[0].name = name;
+  assert.ok(
+    reviewSemantic(koreanNormalizedCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"),
+    `${name} must not be accepted as an event-count without a denominator`
+  );
+}
+const rawKoreanCount = clone(multiProducer);
+rawKoreanCount.lang = "ko";
+rawKoreanCount.prd.kpis[0].name = "월간 예약 건수";
+assert.ok(!reviewSemantic(rawKoreanCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"));
 normalizedCount.prd.kpis[0].measurement = { mode: "external", source: "Product analytics", metric: "exports_per_active_household", refresh: "weekly" };
 assert.ok(!reviewSemantic(normalizedCount).findings.some(item => item.ruleId === "normalized-metric-denominator-required"));
-console.log("[semantic] PASS normalized metrics cannot masquerade as raw event counts");
+console.log("[semantic] PASS English and Korean normalized metrics cannot masquerade as raw event counts");
 
 const noShow = enableSemantic(valid,
   {

@@ -40,7 +40,7 @@ node "<VIBESPEC_SKILL_DIR>/scripts/review-semantic.mjs" "<sot 절대경로>" --j
 node "<VIBESPEC_SKILL_DIR>/scripts/embed-sot.mjs" "<VIBESPEC_SKILL_DIR>/assets/viewer.html" "<sot 절대경로>" "<html 절대경로>"
 ```
 
-validate가 FAIL이면 PASS까지 고친다. review는 advisory지만 모호한 수용 기준·빈 범위·프로파일 어휘 경고를 검토한다. `review-semantic`은 `semantic`이 있는 문서에서 KPI → 측정 방식 → 이벤트/증거 → 기능·화면 관계를 검사한다. 의미 계약이 없는 기존 문서는 `not-assessed`이며 자동 승격하지 않는다.
+validate가 FAIL이면 PASS까지 고친다. review는 advisory지만 모호한 수용 기준·빈 범위·프로파일 어휘 경고를 검토한다. `review-semantic`은 `semantic`이 있는 문서에서 KPI → 측정 방식 → 이벤트/증거 → 생산 기능과 사용자 상호작용 근거를 검사한다. 사용자 이벤트의 상호작용 근거는 IA 또는 flow 중 하나이며, 자연어 `inScope`를 기계적으로 판정하지 않는다. 의미 계약이 없는 기존 문서는 `not-assessed`이며 자동 승격하지 않는다.
 
 의미 검토가 blocked여도 구조적으로 유효한 **초안** JSON/HTML은 만들 수 있다. 이때 차단 finding과 필요한 사람 결정을 최종 응답에 명시하고 승인 가능·개발 전달 준비 완료라고 부르지 않는다. 근거가 문서에 이미 있으면 고쳐서 재검토하되, QR/NFC 선택처럼 사용자가 결정해야 하는 사실을 AI가 임의로 확정하지 않는다. 승인 또는 개발 전달 준비 완료 조건은 validate PASS와 semantic measurement `ready`다. HTML은 JSON을 다시 작성하지 않고 반드시 embed 명령으로 만든다. `embed-sot`은 같은 공유 엔진의 파생 보고서를 HTML에 봉인하며, 뷰어 편집 후에는 결과를 stale로 표시한다.
 

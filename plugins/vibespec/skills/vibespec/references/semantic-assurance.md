@@ -4,6 +4,13 @@ Semantic Assurance checks whether a structurally valid plan declares enough
 evidence to measure its KPIs. It does not calculate KPI values, validate SQL,
 or replace human product judgment.
 
+The measurement chain checked by semantic 0.1 is KPI -> structured measurement
+-> declared production evidence -> user interaction evidence when the event is
+user-produced. A user event needs a feature producer and either an IA page or an
+existing flow trigger. Semantic 0.1 does not require both IA and flow evidence,
+and it does not claim to prove a complete KPI -> event -> feature -> page -> flow
+chain.
+
 ## Compatibility
 
 - `schemaVersion` keeps its current meaning: `1.0` is a product plan and `1.1`
@@ -44,6 +51,15 @@ join keys, grace periods, analytics SQL, or the resulting numeric value.
 An entity-normalized metric such as “exports per active household” is not an
 event count: it needs an `event-ratio` population denominator or an `external`
 aggregate that owns that denominator.
+
+## Scope boundary
+
+Semantic 0.1 validates references inside the current SOT scope. It does not
+infer whether a producer feature is included in MVP from the natural-language
+`inScope` and `nonGoals` arrays. Therefore “measurement blocked by product
+scope” is not a semantic 0.1 guarantee. Deterministic scope-blocking rules are
+deferred until scope membership has machine-addressable references; open
+decisions can still declare `blocks-measurement` explicitly today.
 
 ## Event producers
 

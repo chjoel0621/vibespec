@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "1.0",
+  "lang": "en",
+  "title": "WeekChef — Weekly Meal Planner",
+  "semantic": {
+    "contractVersion": "semantic-0.1",
+    "events": [
+      {
+        "id": "E1",
+        "type": "user",
+        "name": "weekly_plan_started",
+        "producers": [{ "type": "feature", "ref": "F1" }],
+        "surfaceRefs": ["P1"]
+      },
+      {
+        "id": "E2",
+        "type": "user",
+        "name": "weekly_plan_filled_five_or_more",
+        "producers": [{ "type": "feature", "ref": "F1" }],
+        "surfaceRefs": ["P1"]
+      },
+      {
+        "id": "E3",
+        "type": "user",
+        "name": "shopping_list_generated",
+        "producers": [{ "type": "feature", "ref": "F4" }],
+        "surfaceRefs": ["P5"]
+      }
+    ],
+    "decisions": []
+  },
+  "prd": {
+    "oneLiner": "Plan the week's meals in minutes and walk out with a ready shopping list.",
+    "goal": "Help a busy home cook lock in a weekly meal plan and the exact ingredients to buy in one short sitting.",
+    "whyNow": "Grocery costs and takeout fatigue are pushing home cooks back to planning, but existing notes apps and spreadsheets are too slow for a weekly ritual.",
+    "category": "Consumer / Lifestyle",
+    "platforms": ["Web"],
+    "problem": "Home cooks want a repeatable weekly meal plan, but current tools (notes, spreadsheets, recipe apps) either force too much data entry or lose the connection between planned meals and what to buy, so the plan collapses mid-week and takeout wins.",
+    "solution": "A 7-day meal grid where the cook drags saved recipes into breakfast/lunch/dinner slots, then taps once to generate a consolidated shopping list grouped for a single store run.",
+    "alternatives": "Paper notes, Notion/spreadsheet templates, general recipe apps without a weekly grid, delivery meal-kit subscriptions.",
+    "differentiator": "Fastest path from empty week to shopping list; recipes and grid live in one place, so swapping a meal instantly updates what needs to be bought.",
+    "targets": [
+      {
+        "name": "Busy home cook",
+        "role": "Primary meal planner for a 1–4 person household",
+        "needs": "A short Sunday ritual that yields the week's meals and a shopping list they can trust.",
+        "pain": "Runs out of time to plan; forgets ingredients; ends up ordering takeout mid-week."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "On Sunday evening, Amy opens WeekChef, drags 5 saved recipes into the weekly grid, then generates a grouped shopping list she uses at the grocery store the next morning.",
+        "start": "P1"
+      },
+      {
+        "text": "On Wednesday, Amy swaps Thursday's planned dinner for a lighter recipe from her library; the shopping list updates so she only needs to grab two extra items."
+      }
+    ],
+    "northStar": "Weekly plans that survive the week (5+ planned slots and a generated shopping list every week).",
+    "kpis": [
+      {
+        "id": "K1",
+        "name": "Weekly plan completion rate",
+        "target": "≥ 60% of started weekly plans reach 5+ filled slots by end of week",
+        "baseline": "Unknown — measure after launch",
+        "method": "Ratio of weeks where the user filled 5+ meal slots to weeks where the user started a plan, over trailing 4 weeks.",
+        "refs": ["F1"],
+        "measurement": {
+          "mode": "event-ratio",
+          "numerator": { "populationEventRef": "E1", "eventRef": "E2" },
+          "denominator": { "populationEventRef": "E1" },
+          "window": "trailing 4 calendar weeks per user"
+        }
+      },
+      {
+        "id": "K2",
+        "name": "Plan-to-shopping conversion",
+        "target": "≥ 70% of weeks with a started plan also generate a shopping list",
+        "baseline": "Unknown — measure after launch",
+        "method": "Ratio of weeks where the user started a weekly plan to weeks where the user generated a shopping list from that plan, over trailing 4 calendar weeks.",
+        "refs": ["F4"],
+        "measurement": {
+          "mode": "event-ratio",
+          "numerator": { "populationEventRef": "E1", "eventRef": "E3" },
+          "denominator": { "populationEventRef": "E1" },
+          "window": "trailing 4 calendar weeks per user"
+        }
+      }
+    ],
+    "inScope": [
+      "Single-user weekly meal grid (breakfast, lunch, dinner)",
+      "Personal recipe library (create, edit, delete)",
+      "One-tap shopping list generation from the current week's plan",
+      "Web (responsive) only for v1"
+    ],
+    "nonGoals": [
+      "Household/shared multi-user plans",
+      "Nutrition tracking or calorie targets",
+      "Grocery delivery integrations",
+      "Native mobile apps"
+    ],
+    "assumptions": [
+      "Users are willing to enter a small starter set of personal recipes",
+      "A weekly cadence (not daily) matches the planning ritual"
+    ],
+    "risks": [
+      "Recipe entry friction discourages first-time users before value shows",
+      "Shopping list quality depends on ingredient normalization"
+    ],
+    "openQuestions": [
+      "Should we seed the library with a small starter recipe pack for empty accounts?"
+    ],
+    "constraints": [
+      "Solo builder; ship a minimum useful v1 within a small time budget"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Plan the week",
+      "desc": "Cook can lay out breakfast, lunch, and dinner across a 7-day grid and swap items quickly.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        { "text": "User can view a 7-day grid with breakfast/lunch/dinner slots.", "done": false },
+        { "text": "User can add or replace a meal in any slot from their recipe library.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Weekly meal grid",
+          "desc": "7 days × 3 meal slots; supports viewing, filling, clearing, and swapping meals.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "Grid shows the current week with all empty and filled slots.", "done": false },
+            { "text": "Clearing a slot leaves it empty and removes its ingredients from the shopping list.", "done": false }
+          ],
+          "specs": []
+        },
+        {
+          "id": "F2",
+          "title": "Assign recipe to slot",
+          "desc": "Pick a recipe from the library and drop it into a specific slot; replace if the slot is already filled.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "Selecting a recipe from the library fills the target slot.", "done": false },
+            { "text": "Assigning to a filled slot replaces the previous recipe without confirmation.", "done": false }
+          ],
+          "specs": []
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Manage recipes",
+      "desc": "Cook can maintain a small personal library of recipes with ingredients used by the planner.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        { "text": "User can create, edit, and delete a recipe with a title and ingredient list.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Recipe library CRUD",
+          "desc": "List, create, edit, and delete personal recipes with title and structured ingredients.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "New recipes appear in the library immediately after saving.", "done": false },
+            { "text": "Deleting a recipe removes it from the library and unlinks it from any planned slots.", "done": false }
+          ],
+          "specs": []
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Shop for the week",
+      "desc": "Cook can produce a consolidated shopping list from the current weekly plan and check items off while shopping.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        { "text": "User can generate a shopping list from the current weekly plan in one action.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F4",
+          "title": "Generate weekly shopping list",
+          "desc": "Aggregate ingredients across all filled slots for the current week into a single de-duplicated list.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "Generated list de-duplicates identical ingredients across recipes.", "done": false },
+            { "text": "Re-generating after plan changes reflects the current plan.", "done": false }
+          ],
+          "specs": []
+        },
+        {
+          "id": "F5",
+          "title": "Check off shopping items",
+          "desc": "Cook can tick items on the generated list to track shopping progress.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            { "text": "Checked state persists for the current shopping list within the session.", "done": false }
+          ],
+          "specs": []
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Plan & shop",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Weekly plan",
+            "type": "top",
+            "surface": "screen",
+            "refs": ["F1"],
+            "children": [
+              {
+                "id": "P2",
+                "title": "Assign recipe",
+                "type": "action",
+                "surface": "drawer",
+                "refs": ["F2"],
+                "children": []
+              },
+              {
+                "id": "P5",
+                "title": "Shopping list",
+                "type": "page",
+                "surface": "screen",
+                "refs": ["F4", "F5"],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Recipes",
+        "pages": [
+          {
+            "id": "P3",
+            "title": "Recipe library",
+            "type": "top",
+            "surface": "screen",
+            "refs": ["F3"],
+            "children": [
+              {
+                "id": "P4",
+                "title": "Recipe editor",
+                "type": "page",
+                "surface": "screen",
+                "refs": ["F3"],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "ref": "F2" },
+      { "from": "P2", "to": "P1", "label": "Save assignment" },
+      { "from": "P1", "to": "P3", "label": "Browse recipes" },
+      { "from": "P3", "to": "P4", "ref": "F3" },
+      { "from": "P4", "to": "P3", "label": "Save recipe" },
+      { "from": "P1", "to": "P5", "ref": "F4" },
+      { "from": "P5", "to": "P1", "label": "Back to plan" }
+    ]
+  }
+}

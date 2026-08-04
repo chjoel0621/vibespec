@@ -9,6 +9,7 @@ All notable changes to VibeSpec are documented here. VibeSpec follows semantic v
 - Added optional Semantic Assurance 0.1 for stable KPI, event, and decision identities and typed measurement evidence.
 - Added the shared `review-semantic` engine/CLI with deterministic findings, readiness, and evidence-sensitive fingerprints.
 - Added a blocker for entity-normalized KPIs that are incorrectly declared as raw event counts without a denominator.
+- Covered Korean `율`/`률` and `사용자당`-style normalized KPI names without relying on ASCII word boundaries.
 - Added a read-only Semantic Review viewer tab whose embedded verdict becomes stale immediately after SOT edits.
 - Added K/E/D query, diff, impact, typed change-plan, and Add-on landing/remap support.
 

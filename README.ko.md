@@ -14,6 +14,8 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 
 **[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래)는 **작업공간 데모**입니다. 승인된 안전결제(에스크로) 추가 기획 *와* 제안 단계인 가격 제안 증분을 함께 담고 있어, 합쳐진 두 화면을 비교할 수 있습니다 — **[통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)**(출시할 것만) vs **[검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)**(제안 중인 작업까지 포함). 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
 
+**[Semantic Assurance dogfood — 위크셰프](https://chjoel0621.github.io/vibespec/weekchef/)**는 패키징된 VibeSpec 0.17.0을 실제 Claude Code에서 실행해 만든 결과입니다. 제공되지 않은 KPI baseline은 `미측정`으로 남기고, 두 지표 모두 모집단·결과 이벤트를 구조화해 의미 검토를 통과합니다.
+
 ## 핵심 개념
 
 - **HTML = 앱(뷰어/편집기)** · **JSON = 데이터(SOT)** — 둘을 분리했습니다.

@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { validateSot } from "../scripts/validate-sot.mjs";
 import { reviewSot } from "../scripts/lib/content-review.mjs";
+import { reviewSemantic } from "../scripts/lib/semantic-engine.mjs";
 import { validateTree } from "../scripts/lib/tree.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -58,6 +59,26 @@ for (const lang of ["ko", "en"]) {
   const name = `crm.${lang}.sot.json`;
   const result = validateSot(load(name));
   assert.equal(result.valid, true, `${name} must validate: ${JSON.stringify(result.errors)}`);
+}
+
+for (const lang of ["ko", "en"]) {
+  const name = join("semantic", `weekchef.${lang}.sot.json`);
+  const sot = load(name);
+  const validation = validateSot(sot);
+  assert.equal(validation.valid, true, `${name} must validate: ${JSON.stringify(validation.errors)}`);
+  const contentFindings = reviewSot(sot, { profile: "consumer" }).findings;
+  if (lang === "ko") assert.equal(contentFindings.length, 0, `${name} must pass consumer content review`);
+  else assert.deepEqual(
+    contentFindings.map(item => [item.code, item.path]),
+    [
+      ["feature-without-flow-trigger", "$.requirements[R1].features[F1]"],
+      ["feature-without-flow-trigger", "$.requirements[R3].features[F5]"]
+    ],
+    `${name} preserves the actual host-output advisory findings`
+  );
+  const semantic = reviewSemantic(sot);
+  assert.equal(semantic.readiness.measurement, "ready", `${name} must be measurement-ready: ${JSON.stringify(semantic.findings)}`);
+  assert.ok((sot.prd.kpis || []).every(kpi => /미측정|Unknown/.test(kpi.baseline || "")), `${name} must not invent baseline evidence`);
 }
 
 for (const name of demoFiles) {

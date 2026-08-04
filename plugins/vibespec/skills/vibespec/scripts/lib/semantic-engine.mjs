@@ -16,7 +16,7 @@ const pageEntries = sot => {
   return entries;
 };
 const baseFeatureRef = ref => String(ref || "").split(":")[0];
-const NORMALIZED_METRIC_PATTERN = /(?:\b(?:percentage|rate|ratio)\b|%|\bper\s+(?:active\s+)?(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|\/\s*(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|(?:비율|백분율|율\b)|(?:사용자|계정|가구|직원|회원|고객|테넌트|예약)\s*당)/i;
+const NORMALIZED_METRIC_PATTERN = /(?:\b(?:percentage|rate|ratio)\b|%|\bper\s+(?:active\s+)?(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|\/\s*(?:user|account|household|employee|member|customer|tenant|booking|reservation)\b|[가-힣]+(?:율|률)(?=$|[\s%(),/])|(?:사용자|계정|가구|직원|회원|고객|테넌트|예약)\s*당)/i;
 
 function reportScope(sot) {
   return sot.initiative?.id || "root";

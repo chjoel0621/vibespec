@@ -1,0 +1,408 @@
+{
+  "schemaVersion": "1.0",
+  "title": "위크셰프",
+  "lang": "ko",
+  "semantic": {
+    "contractVersion": "semantic-0.1",
+    "events": [
+      {
+        "id": "E1",
+        "type": "user",
+        "name": "식단 항목 저장",
+        "producers": [
+          { "type": "feature", "ref": "F1:0" }
+        ],
+        "surfaceRefs": ["P2"]
+      },
+      {
+        "id": "E2",
+        "type": "user",
+        "name": "조리 완료 체크",
+        "producers": [
+          { "type": "feature", "ref": "F2:0" }
+        ],
+        "surfaceRefs": ["P2"]
+      },
+      {
+        "id": "E3",
+        "type": "user",
+        "name": "장보기 목록 생성",
+        "producers": [
+          { "type": "feature", "ref": "F3:0" }
+        ],
+        "surfaceRefs": ["P4"]
+      },
+      {
+        "id": "E4",
+        "type": "user",
+        "name": "장보기 항목 체크",
+        "producers": [
+          { "type": "feature", "ref": "F3:1" }
+        ],
+        "surfaceRefs": ["P4"]
+      }
+    ],
+    "decisions": []
+  },
+  "prd": {
+    "oneLiner": "한 주 식단을 5분 안에 짜고 장보기 목록까지 자동으로 정리해 주는 주간 식단 플래너.",
+    "goal": "매주 식단·장보기 계획에 드는 결정 피로를 줄이고, 계획한 요일 식단을 실제로 완주하도록 돕는다.",
+    "whyNow": "1인 가구·맞벌이 가정에서 주간 식단 계획이 짧게 시작됐다가 장보기·재료 관리로 이어지지 않아 무너지는 흐름이 반복 관찰된다.",
+    "category": "라이프스타일 · 푸드테크",
+    "platforms": ["iOS", "Android"],
+    "problem": "무엇을 먹을지 매일 새로 결정해야 하고, 주간 식단을 세워도 장보기·남은 재료 관리로 이어지지 않아 계획이 무너진다.",
+    "solution": "요일별 식단 편집, 자동 장보기 목록 생성, 남은 재료 기록을 하나의 주간 루프로 이어 다음 주 계획에 반영한다.",
+    "alternatives": "노션·엑셀·메모장 수기 관리, 배달 앱 즉흥 주문, 레시피 앱 즐겨찾기.",
+    "differentiator": "식단 → 장보기 → 남은 재료 → 다음 주 식단이 하나의 주간 루프로 이어져, 계획을 한 번 세우면 다음 주 계획이 반은 준비된다.",
+    "targets": [
+      {
+        "name": "1인 자취인 지우",
+        "role": "직장인 자취 1인 가구",
+        "needs": "평일 저녁 메뉴를 미리 정해두고 마트에서 헤매지 않으며 재료 낭비를 줄이고 싶다.",
+        "pain": "매일 저녁 뭐 먹을지 결정 피로, 재료를 자주 남기거나 버림."
+      },
+      {
+        "name": "맞벌이 부모 현우",
+        "role": "미취학 자녀를 둔 맞벌이 부모",
+        "needs": "가족 식단을 주간 단위로 한 번에 짜고 장보기도 한 번에 끝내고 싶다.",
+        "pain": "주중에 반복되는 소량 장보기, 재료 관리와 메뉴 결정의 이중 부담."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "일요일 저녁, 지우가 다음 주 5일 저녁 식단을 5분 안에 짜고 마트에서 자동 생성된 장보기 목록을 하나씩 체크하며 담는다.",
+        "start": "P2"
+      },
+      {
+        "text": "현우가 토요일에 이번 주에 다 못 쓴 재료를 기록하고, 다음 주 계획 화면에서 그 재료를 활용한 메뉴를 우선 배치한다.",
+        "start": "P5"
+      }
+    ],
+    "northStar": "주간 식단 완주율 (계획한 요일 식단 중 실제 완주 체크된 비율)",
+    "kpis": [
+      {
+        "id": "K1",
+        "name": "주간 식단 완주율",
+        "target": "출시 후 4주간 데이터로 baseline을 잡은 뒤, 다음 분기에 상승 목표를 재설정한다.",
+        "baseline": "미측정 — 출시 후 측정",
+        "method": "이벤트 비율. 분자: 조리 완료 체크(E2), 분모: 식단 항목 저장(E1). 주간 단위 집계.",
+        "refs": ["F1:0", "F2:0"],
+        "measurement": {
+          "mode": "event-ratio",
+          "numerator": {
+            "populationEventRef": "E1",
+            "eventRef": "E2"
+          },
+          "denominator": {
+            "populationEventRef": "E1"
+          },
+          "window": "월요일 0시 ~ 일요일 24시 (주 단위, KST)"
+        }
+      },
+      {
+        "id": "K2",
+        "name": "장보기 목록 사용률",
+        "target": "출시 후 4주간 데이터로 baseline을 잡은 뒤, 다음 분기에 상승 목표를 재설정한다.",
+        "baseline": "미측정 — 출시 후 측정",
+        "method": "이벤트 비율. 분자: 장보기 항목 체크(E4), 분모: 장보기 목록 생성(E3). 목록 생성일 기준 7일 창.",
+        "refs": ["F3:0", "F3:1"],
+        "measurement": {
+          "mode": "event-ratio",
+          "numerator": {
+            "populationEventRef": "E3",
+            "eventRef": "E4"
+          },
+          "denominator": {
+            "populationEventRef": "E3"
+          },
+          "window": "장보기 목록 생성 시각으로부터 7일 (KST)"
+        }
+      }
+    ],
+    "inScope": [
+      "요일별(7일) 식단 편집",
+      "메뉴 카탈로그 탐색 및 요일에 추가",
+      "자동 장보기 목록 생성 및 항목 체크",
+      "요일별 조리 완료 체크와 주간 완주 요약",
+      "남은 재료 수기 기록과 다음 주 추천 반영"
+    ],
+    "nonGoals": [
+      "배달·마트 결제 연동",
+      "영양소 자동 분석과 다이어트 코칭",
+      "소셜 공유·커뮤니티 기능",
+      "냉장고 카메라·바코드 등 자동 재고 인식"
+    ],
+    "assumptions": [
+      "사용자가 주 1회, 5~10분 정도 계획 시간을 확보할 의사가 있다.",
+      "초기 메뉴 카탈로그 씨드 데이터로 첫 주 계획을 시작할 수 있다."
+    ],
+    "risks": [
+      "계획을 세워도 실제 조리·완주가 낮으면 재방문 동기가 약해진다.",
+      "남은 재료 수기 입력이 번거로우면 다음 주 반영 루프가 끊긴다."
+    ],
+    "openQuestions": [
+      "초기 메뉴 카탈로그의 씨드 규모와 출처를 어디까지 자체 큐레이션할지.",
+      "장보기·완주 체크 리마인드 알림의 기본 시점과 빈도."
+    ],
+    "constraints": [
+      "초기 릴리스는 iOS·Android 모바일만 지원한다."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "주간 식단 계획",
+      "desc": "사용자가 한 주(7일) 식단을 편집하고, 계획한 식단의 조리 완료 여부를 기록한다.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        { "text": "사용자가 요일 카드에 메뉴를 추가·변경·삭제할 수 있다.", "done": false },
+        { "text": "사용자가 요일별로 조리 완료를 체크할 수 있고, 주간 완주 요약이 자동 갱신된다.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "요일별 식단 편집",
+          "desc": "요일 카드에 메뉴를 배치하고 변경한다.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "각 요일 카드에 메뉴를 추가·변경·삭제할 수 있다.", "done": false }
+          ],
+          "specs": [
+            {
+              "title": "요일 카드에 메뉴 배치",
+              "desc": "메뉴 고르기 패널에서 선택한 메뉴를 요일 카드에 저장한다.",
+              "acceptance": [
+                { "text": "저장 시 해당 요일에 메뉴가 즉시 표시된다.", "done": false }
+              ]
+            },
+            {
+              "title": "요일 메뉴 변경·삭제",
+              "desc": "요일 카드에서 메뉴를 다른 메뉴로 교체하거나 비운다.",
+              "acceptance": [
+                { "text": "삭제 시 해당 요일이 빈 상태로 되돌아간다.", "done": false }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "조리 완료 체크",
+          "desc": "계획된 요일 식단을 실제로 조리·섭취했는지 기록한다.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "요일별 완주 체크가 저장되고 주간 완주 요약에 반영된다.", "done": false }
+          ],
+          "specs": [
+            {
+              "title": "요일별 완주 체크",
+              "desc": "요일 카드에서 한 번의 탭으로 완주 여부를 토글한다.",
+              "acceptance": [
+                { "text": "체크 상태가 즉시 저장되고 취소도 가능하다.", "done": false }
+              ]
+            },
+            {
+              "title": "주간 완주 요약",
+              "desc": "현재 주의 완주 비율을 홈에서 확인한다.",
+              "acceptance": [
+                { "text": "완주 체크가 바뀌면 요약 수치가 실시간으로 반영된다.", "done": false }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "장보기 자동화",
+      "desc": "주간 식단에 필요한 재료를 하나의 장보기 목록으로 자동 정리하고, 마트에서 항목 체크로 사용한다.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        { "text": "주간 식단에서 한 번의 액션으로 장보기 목록이 생성된다.", "done": false },
+        { "text": "생성된 목록의 각 항목을 체크하며 장을 볼 수 있다.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "장보기 목록",
+          "desc": "주간 식단 기반 장보기 목록을 만들고 사용한다.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            { "text": "주간 식단으로부터 장보기 목록을 생성해 항목별로 체크할 수 있다.", "done": false }
+          ],
+          "specs": [
+            {
+              "title": "장보기 목록 자동 생성",
+              "desc": "현재 주 식단에서 필요한 재료를 합산해 목록으로 생성한다.",
+              "acceptance": [
+                { "text": "동일 재료는 한 줄로 합산된다.", "done": false }
+              ]
+            },
+            {
+              "title": "장보기 항목 체크",
+              "desc": "장보기 화면에서 항목을 체크하며 담은 재료를 표시한다.",
+              "acceptance": [
+                { "text": "체크한 항목은 시각적으로 구분되어 표시된다.", "done": false }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "남은 재료 순환",
+      "desc": "이번 주에 다 쓰지 못한 재료를 기록하고, 다음 주 식단 계획에 반영한다.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        { "text": "사용자가 남은 재료 목록을 편집할 수 있다.", "done": false },
+        { "text": "다음 주 계획 화면에서 남은 재료를 활용한 메뉴가 우선 표시된다.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F4",
+          "title": "남은 재료 기록·활용",
+          "desc": "남은 재료를 기록하고 다음 주 추천에 반영한다.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            { "text": "기록한 남은 재료가 다음 주 계획 화면의 추천 우선순위에 반영된다.", "done": false }
+          ],
+          "specs": [
+            {
+              "title": "남은 재료 입력",
+              "desc": "이름과 대략적인 잔량으로 남은 재료를 추가한다.",
+              "acceptance": [
+                { "text": "추가한 재료가 목록에 즉시 나타난다.", "done": false }
+              ]
+            },
+            {
+              "title": "다음 주 추천 반영",
+              "desc": "다음 주 계획 화면에서 남은 재료를 활용한 메뉴가 우선 표시된다.",
+              "acceptance": [
+                { "text": "남은 재료 태그가 붙은 메뉴가 상단에 정렬된다.", "done": false }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "메뉴 카탈로그",
+      "desc": "요일에 배치할 메뉴를 카탈로그에서 탐색·검색한다.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        { "text": "카테고리와 검색으로 메뉴를 찾을 수 있다.", "done": false }
+      ],
+      "features": [
+        {
+          "id": "F5",
+          "title": "메뉴 탐색",
+          "desc": "메뉴 고르기 패널에서 카탈로그를 탐색한다.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            { "text": "카테고리 필터와 키워드 검색으로 메뉴를 찾아 요일에 추가할 수 있다.", "done": false }
+          ],
+          "specs": [
+            {
+              "title": "카테고리 목록",
+              "desc": "한식·양식·간편식 등 카테고리로 메뉴를 훑는다.",
+              "acceptance": [
+                { "text": "카테고리 선택 시 해당 메뉴만 표시된다.", "done": false }
+              ]
+            },
+            {
+              "title": "메뉴 검색",
+              "desc": "키워드로 메뉴를 검색한다.",
+              "acceptance": [
+                { "text": "부분 일치 검색이 지원된다.", "done": false }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "이번 주",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "홈",
+            "type": "top",
+            "refs": ["F2:1"],
+            "children": [
+              {
+                "id": "P2",
+                "title": "주간 계획",
+                "type": "page",
+                "refs": ["F1", "F1:0", "F1:1", "F2", "F2:0"],
+                "children": [
+                  {
+                    "id": "P3",
+                    "title": "메뉴 고르기",
+                    "type": "action",
+                    "surface": "panel",
+                    "refs": ["F5", "F5:0", "F5:1"],
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "장보기",
+        "pages": [
+          {
+            "id": "P4",
+            "title": "장보기 목록",
+            "type": "top",
+            "refs": ["F3", "F3:0", "F3:1"],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "재료",
+        "pages": [
+          {
+            "id": "P5",
+            "title": "남은 재료",
+            "type": "top",
+            "refs": ["F4", "F4:0", "F4:1"],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      { "from": "P1", "to": "P2", "label": "이번 주 계획 열기" },
+      { "from": "P2", "to": "P3", "ref": "F1:0" },
+      { "from": "P3", "to": "P3", "ref": "F5:1" },
+      { "from": "P3", "to": "P2", "label": "메뉴 선택 완료" },
+      { "from": "P2", "to": "P4", "ref": "F3:0" },
+      { "from": "P4", "to": "P2", "label": "장본 후 계획으로" },
+      { "from": "P2", "to": "P1", "ref": "F2:0" },
+      { "from": "P1", "to": "P5", "label": "재료 관리 열기" },
+      { "from": "P5", "to": "P2", "ref": "F4:1" }
+    ]
+  }
+}

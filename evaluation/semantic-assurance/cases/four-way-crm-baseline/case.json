@@ -1,0 +1,28 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "four-way-crm-baseline",
+  "title": "CRM reviewer baseline candidate",
+  "lane": "reviewer-baseline-candidate",
+  "source": {
+    "path": "demo/crm.ko.sot.json",
+    "digest": "sha256:315c42df1f7dc02f62215c6378eebd645be65db61224e6d63c4b8108cb6133ea",
+    "fileSha256": "DFC9794CF37F5F60E69C7F3627578BEBA3A5BEB835890F071E6A2A5ADAF8EAA5"
+  },
+  "brief": {
+    "path": "brief.md",
+    "fileSha256": "165FFFF3907279BAF5711844EF438E4BFB6C0BA02A17312A4F07BB0E0E50E7CB",
+    "provenance": "reconstructed-from-legacy-sot"
+  },
+  "overlay": {
+    "plan": { "path": "overlay.plan.json", "fileSha256": "CEFD8A4FAB025EBEDAC5381D31B68C8F0BB02B16260669760A3DB5287AEC22F4" },
+    "adjudication": { "path": "adjudication.json", "fileSha256": "481E0D4B7DFB7A4E5449D3E8162234C1FD4FA74721492ECCA826531A76D4E9DB" },
+    "resultDigest": "sha256:0438d7c09bee23f27f6e973a3e5bbdf8d4e2040c2b947daab66bdbdf54b9bcf2"
+  },
+  "expected": {
+    "assessment": "failed",
+    "measurementReadiness": "blocked",
+    "findings": [
+      { "ruleId": "open-decision-blocks-measurement", "subjectRefs": ["D1", "K2"] }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-crm-operations",
+  "title": "Legacy CRM operations template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/crm.ko.sot.json",
+    "digest": "sha256:315c42df1f7dc02f62215c6378eebd645be65db61224e6d63c4b8108cb6133ea",
+    "fileSha256": "DFC9794CF37F5F60E69C7F3627578BEBA3A5BEB835890F071E6A2A5ADAF8EAA5"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "operations", "findings": [] },
+  "comparison": { "cohort": "operations-template", "kpiSignatureFields": ["name", "method"] }
+}

@@ -33,8 +33,9 @@ function assertStage(caseId, name, sot, expected) {
   if (report.assessment.status !== expected.assessment) {
     throw new Error(`${caseId} ${name} assessment: expected ${expected.assessment}, got ${report.assessment.status}`);
   }
-  if (report.readiness.measurement !== expected.measurementReadiness) {
-    throw new Error(`${caseId} ${name} readiness: expected ${expected.measurementReadiness}, got ${report.readiness.measurement}`);
+  const actualReadiness = report.readiness.measurement ?? null;
+  if (actualReadiness !== expected.measurementReadiness) {
+    throw new Error(`${caseId} ${name} readiness: expected ${expected.measurementReadiness}, got ${actualReadiness}`);
   }
   if (comparison.falsePositive.length || comparison.falseNegative.length) {
     throw new Error(`${caseId} ${name} finding mismatch: ${JSON.stringify(comparison)}`);
@@ -60,9 +61,23 @@ function sourceFor(manifest) {
 }
 
 const coverageFor = sot => ({
-  kpis: (sot.prd?.kpis || []).length,
+  sourceKpis: (sot.prd?.kpis || []).length,
+  kpis: (sot.prd?.kpis || []).filter(kpi => kpi.measurement).length,
   measurementModes: [...new Set((sot.prd?.kpis || []).map(kpi => kpi.measurement?.mode).filter(Boolean))].sort()
 });
+
+function comparisonFor(manifest, source) {
+  const fields = manifest.comparison?.kpiSignatureFields;
+  if (!Array.isArray(fields) || !fields.length) return null;
+  const values = (source.prd?.kpis || []).map(kpi => Object.fromEntries(fields.map(field => [field, kpi[field] ?? null])));
+  const material = JSON.stringify(values);
+  return {
+    cohort: manifest.comparison.cohort,
+    signature: createHash("sha256").update(material).digest("hex").slice(0, 12),
+    fields,
+    values
+  };
+}
 
 function evaluateControlled(manifest, caseRoot, source) {
   const beforePlan = readJson(join(caseRoot, manifest.stages.before.plan));
@@ -100,6 +115,7 @@ function evaluateNatural(manifest, source) {
     manifest,
     artifacts: { observed: source },
     stages: { observed: { ...observed, contentReview: content } },
+    comparison: comparisonFor(manifest, source),
     metrics: {
       labelledFailures: observed.comparison.truePositive.length,
       truePositive: observed.comparison.truePositive.length,
@@ -115,7 +131,7 @@ export function evaluateCase(caseDirectory) {
   const manifest = readJson(join(caseRoot, "case.json"));
   const source = sourceFor(manifest);
   if (manifest.lane === "controlled-mutation") return evaluateControlled(manifest, caseRoot, source);
-  if (manifest.lane === "natural") return evaluateNatural(manifest, source);
+  if (["natural", "legacy-comparison"].includes(manifest.lane)) return evaluateNatural(manifest, source);
   throw new Error(`${manifest.id} has unsupported lane ${manifest.lane}`);
 }
 
@@ -151,16 +167,35 @@ function main() {
     }
   }
 
-  const aggregate = { cases: results.length, kpis: 0, labelledFailures: 0, truePositive: 0, falsePositive: 0, falseNegative: 0, measurementModes: [] };
+  const aggregate = {
+    cases: results.length,
+    assessedCases: results.filter(result => result.manifest.lane !== "legacy-comparison").length,
+    comparisonCases: results.filter(result => result.manifest.lane === "legacy-comparison").length,
+    sourceKpis: 0,
+    kpis: 0,
+    labelledFailures: 0,
+    truePositive: 0,
+    falsePositive: 0,
+    falseNegative: 0,
+    measurementModes: []
+  };
   const measurementModes = new Set();
   for (const result of results) {
-    for (const key of ["kpis", "labelledFailures", "truePositive", "falsePositive", "falseNegative"]) aggregate[key] += result.metrics[key];
+    for (const key of ["sourceKpis", "kpis", "labelledFailures", "truePositive", "falsePositive", "falseNegative"]) aggregate[key] += result.metrics[key];
     result.metrics.measurementModes.forEach(mode => measurementModes.add(mode));
   }
   aggregate.measurementModes = [...measurementModes].sort();
+  const comparisonGroups = new Map();
+  for (const result of results.filter(result => result.comparison)) {
+    const key = result.comparison.signature;
+    if (!comparisonGroups.has(key)) comparisonGroups.set(key, { ...result.comparison, cases: [] });
+    comparisonGroups.get(key).cases.push(result.manifest.id);
+  }
+  const duplicateKpiGroups = [...comparisonGroups.values()].filter(group => group.cases.length > 1);
   const output = {
     contractVersion: "semantic-evaluation-0.1",
     aggregate,
+    duplicateKpiGroups,
     cases: results.map(result => ({
       id: result.manifest.id,
       lane: result.manifest.lane,
@@ -171,10 +206,12 @@ function main() {
   if (args.json) console.log(JSON.stringify(output, null, 2));
   else {
     for (const result of results) {
-      const readiness = Object.entries(result.stages).map(([name, stage]) => `${name}=${stage.report.readiness.measurement}`).join(", ");
+      const readiness = Object.entries(result.stages).map(([name, stage]) =>
+        `${name}=${stage.report.readiness.measurement ?? stage.report.assessment.status}`).join(", ");
       console.log(`[evaluation] PASS ${result.manifest.id}: ${readiness}, TP=${result.metrics.truePositive}, FP=0, FN=0`);
     }
-    console.log(`[evaluation] ${aggregate.cases} case(s), ${aggregate.kpis} KPI(s), modes=${aggregate.measurementModes.join(",")}, ${aggregate.labelledFailures} labelled failure(s), TP=${aggregate.truePositive}, FP=${aggregate.falsePositive}, FN=${aggregate.falseNegative}`);
+    for (const group of duplicateKpiGroups) console.log(`[comparison] duplicate KPI signature ${group.signature}: ${group.cases.join(", ")}`);
+    console.log(`[evaluation] ${aggregate.assessedCases} assessed + ${aggregate.comparisonCases} legacy comparison case(s), ${aggregate.sourceKpis} observed KPI(s), ${aggregate.kpis} assessed KPI(s), modes=${aggregate.measurementModes.join(",")}, ${aggregate.labelledFailures} labelled failure(s), TP=${aggregate.truePositive}, FP=${aggregate.falsePositive}, FN=${aggregate.falseNegative}`);
   }
 }
 

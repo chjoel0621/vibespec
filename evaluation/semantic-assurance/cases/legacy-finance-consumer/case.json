@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-finance-consumer",
+  "title": "Legacy personal finance consumer template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/personal-finance-tracker.ko.sot.json",
+    "digest": "sha256:0d053ea9fe0aa9c6463b812ebbe722a8b2388879bc0de292574036dc8312eab3",
+    "fileSha256": "8820F2AA3228E9204B76E307238D7FDDA5580F9865F620BE4ACAC3B39139DC9E"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "consumer", "findings": [] },
+  "comparison": { "cohort": "consumer-template", "kpiSignatureFields": ["name", "method"] }
+}

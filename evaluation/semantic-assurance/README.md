@@ -28,6 +28,10 @@ reported with raw counts rather than percentages alone.
 - `controlled-mutation`: begin with a known source and apply explicit change
   plans that create and then resolve one labelled failure. This lane measures
   deterministic detection and regression safety.
+- `legacy-comparison`: preserve a pre-semantic SOT, verify that it remains
+  `not-assessed`, and compare its KPI vocabulary with other domains. Legacy
+  KPIs without measurements are observed but do not count toward the 30-KPI
+  assessed exit gate.
 
 Every case has a `case.json`, an immutable source digest, and expected finding
 keys. Controlled mutations additionally carry Before and Resolved change plans.
@@ -46,6 +50,10 @@ node evaluation/semantic-assurance/evaluate.mjs --case meeting-room-no-show --wr
 `--write` materializes the derived Before/Resolved SOTs and reports for review.
 Those files are disposable evidence; the source SOT and change plans are the
 reproducible inputs.
+
+The current legacy comparison and its interpretation are recorded in
+[existing-case-comparison.md](existing-case-comparison.md). Comparison-only
+documents do not increase the assessed case or KPI exit-gate counts.
 
 ## Human evaluation record
 

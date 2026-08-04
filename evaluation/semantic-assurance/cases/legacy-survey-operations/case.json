@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-survey-operations",
+  "title": "Legacy survey and feedback operations template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/survey-feedback-management.ko.sot.json",
+    "digest": "sha256:0a5940b5e415937e075236dd6c24cd15b1c79f89306520b28d54cf3177d31b9c",
+    "fileSha256": "DA05A10B19506709B2D6AFBA2A18F077FC650BA84225AA0F06DE628692341522"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "operations", "findings": [] },
+  "comparison": { "cohort": "operations-template", "kpiSignatureFields": ["name", "method"] }
+}

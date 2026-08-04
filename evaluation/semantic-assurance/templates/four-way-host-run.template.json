@@ -4,9 +4,20 @@
   "runId": "host-run-01",
   "artifactRole": "fresh-generation",
   "host": "claude-code-or-codex",
+  "hostVersion": null,
   "model": null,
   "pluginVersion": "0.17.0",
+  "pluginCommit": "PIN_INSTALLED_SOURCE_COMMIT",
+  "pluginBundleSha256": "PIN_INSTALLED_BUNDLE",
   "language": "ko",
+  "invocationPrompt": {
+    "path": "evaluation/semantic-assurance/templates/four-way-invocation-prompt.txt",
+    "fileSha256": "EA87455C1D16E6FC8FA8A9D79B39A1438364818FEC8538CF6B9307269E298305"
+  },
+  "clarificationPolicy": "do-not-answer-preserve-as-decision",
+  "startedAt": null,
+  "completedAt": null,
+  "retryCount": 0,
   "brief": {
     "path": "path/to/brief.md",
     "fileSha256": "PIN_BEFORE_RUNNING"
@@ -14,7 +25,8 @@
   "isolation": {
     "freshWorkspace": true,
     "legacySotProvided": false,
-    "priorRunOutputsVisible": false
+    "priorRunOutputsVisible": false,
+    "clarificationAnswersProvided": false
   },
   "artifact": {
     "path": "path/to/generated.sot.json",

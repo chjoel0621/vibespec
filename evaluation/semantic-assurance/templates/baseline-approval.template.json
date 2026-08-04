@@ -1,0 +1,22 @@
+{
+  "contractVersion": "semantic-baseline-approval-0.1",
+  "status": "approved-with-open-decisions",
+  "reviewer": {
+    "type": "human",
+    "name": "REQUIRED"
+  },
+  "approvedAt": "REQUIRED_ISO_8601_TIMESTAMP",
+  "approvedArtifacts": {
+    "briefSha256": "PIN_APPROVED_BRIEF",
+    "planSha256": "PIN_APPROVED_PLAN",
+    "adjudicationSha256": "PIN_APPROVED_ADJUDICATION",
+    "resultDigest": "PIN_APPROVED_RESULT"
+  },
+  "kpis": [
+    {
+      "baselineConcept": "REQUIRED_STABLE_CONCEPT",
+      "verdict": "accepted-or-accepted-as-blocked-or-revise-before-approval",
+      "blockingDecisionRefs": []
+    }
+  ]
+}

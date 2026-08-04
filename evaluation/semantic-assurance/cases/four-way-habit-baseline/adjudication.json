@@ -11,6 +11,8 @@
   "kpis": [
     {
       "id": "K1",
+      "baselineConcept": "habit-first-week-value-action",
+      "verdict": "pending-human-review",
       "legacyName": "첫 주 핵심 행동 완료율",
       "expectedMode": "event-ratio",
       "evidenceBasis": ["habit creation", "completion and skip records", "first-week core action is undecided"],
@@ -20,15 +22,24 @@
     },
     {
       "id": "K2",
+      "baselineConcept": "habit-weekly-return",
+      "verdict": "pending-human-review",
       "legacyName": "주간 재방문율",
       "expectedMode": "event-ratio",
+      "possibleNumeratorPolicies": [
+        "all-valid-product-interactions",
+        "habit-execution-only",
+        "authenticated-session-return"
+      ],
       "evidenceBasis": ["completion records", "reminder adjustment", "F5", "F7", "P5", "P6"],
       "inventedEvidence": false,
       "ambiguityHandling": "The legacy F8 KPI reference is corrected to F5 and F7; an eligible user-week starts when an active habit exists and no observed retention is claimed.",
-      "requiredHumanDecision": null
+      "requiredHumanDecision": "Choose which interactions qualify as a weekly return and document why reminder adjustment is included or excluded."
     },
     {
       "id": "K3",
+      "baselineConcept": "habit-data-control-completion",
+      "verdict": "pending-human-review",
       "legacyName": "사용자 데이터 제어 완료율",
       "expectedMode": "event-ratio",
       "evidenceBasis": ["export", "deletion", "privacy controls", "F9"],

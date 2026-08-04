@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-incident-operations",
+  "title": "Legacy incident operations template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/incident-management.ko.sot.json",
+    "digest": "sha256:adf8b5ea1c56dfe9e50a095815cfd341cca67a664354e2aec28cd092b034c5b8",
+    "fileSha256": "D95E14D6866AEA423DB2ABB50A8180DEFF8C8033BC4343B51305B993F4D28095"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "operations", "findings": [] },
+  "comparison": { "cohort": "operations-template", "kpiSignatureFields": ["name", "method"] }
+}

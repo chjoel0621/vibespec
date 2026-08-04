@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-habit-consumer",
+  "title": "Legacy habit tracker consumer template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/habit-tracker-app.ko.sot.json",
+    "digest": "sha256:277db3ea88f0c6b92ee88dd57464b1862b57d5835eae3dce75145a2c1a48d604",
+    "fileSha256": "66AFF548886C8EF70827179CAC1CF6A02A5A1F8E47CA8531C65259C2986127E2"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "consumer", "findings": [] },
+  "comparison": { "cohort": "consumer-template", "kpiSignatureFields": ["name", "method"] }
+}

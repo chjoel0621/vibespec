@@ -1,0 +1,14 @@
+{
+  "contractVersion": "semantic-evaluation-0.1",
+  "id": "legacy-workout-consumer",
+  "title": "Legacy workout consumer template",
+  "lane": "legacy-comparison",
+  "source": {
+    "path": "demo/workout-progress-tracker.ko.sot.json",
+    "digest": "sha256:9858890f3af8bf1b313d294fd8dcd8803b718f0d154b53e527d5380a176b5d99",
+    "fileSha256": "BD1B072B6D08A15AAC3157A6D06C045B49D1285038270711BB693DBDE1603A37"
+  },
+  "expected": { "assessment": "not-assessed", "measurementReadiness": null, "findings": [] },
+  "contentReview": { "profile": "consumer", "findings": [] },
+  "comparison": { "cohort": "consumer-template", "kpiSignatureFields": ["name", "method"] }
+}

@@ -22,6 +22,7 @@ const PRODUCTS = [
   { sub: "", title: { ko: "회의실 예약", en: "Meeting booking" }, pages: [["main", ""], ["init", "notif/"], ["map", "map/"]] },
   { sub: "flea", title: { ko: "동네장터", en: "Neighborly" }, pages: [["main", ""], ["init", "escrow/"], ["release", "map/"], ["workspace", "workspace/"]] },
   { sub: "crm", title: { ko: "CRM", en: "CRM" }, pages: [["main", ""]] },
+  { sub: "weekchef", title: { ko: "위크셰프", en: "WeekChef" }, pages: [["main", ""]] },
 ];
 
 const productRoot = (base, sub, lang) => `${base}${sub ? `/${sub}` : ""}${lang === "en" ? "/en" : ""}`;

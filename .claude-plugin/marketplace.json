@@ -2,12 +2,12 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vibespec",
   "owner": { "name": "YH" },
-  "description": "VibeSpec — AI product planning plugin for Claude and Codex. Turn product ideas into validated, editable SOTs with PRDs, feature specs, IA, user flows, and a self-contained HTML viewer.",
+  "description": "VibeSpec — AI product planning plugin for Claude and Codex. Turn product ideas into validated, editable SOTs with PRDs, feature specs, IA, user flows, semantic KPI review, and a self-contained HTML viewer.",
   "plugins": [
     {
       "name": "vibespec",
       "source": "./plugins/vibespec",
-      "description": "VibeSpec — turn an idea/planning doc into SOT JSON and edit PRD, Feature Spec, IA, and User Flow in an HTML viewer (KO/EN). 아이디어/기획 문서를 SOT JSON으로 생성하고 PRD·기능명세서·IA·유저플로우를 HTML 뷰어로 편집. 한/영 지원."
+      "description": "VibeSpec — turn an idea/planning doc into SOT JSON, review KPI evidence, and edit PRD, Feature Spec, IA, and User Flow in an HTML viewer (KO/EN). 아이디어/기획 문서를 SOT JSON으로 만들고 KPI 근거를 검토하며 PRD·기능명세서·IA·유저플로우를 편집. 한/영 지원."
     }
   ]
 }

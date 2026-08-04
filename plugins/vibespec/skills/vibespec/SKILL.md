@@ -1,7 +1,7 @@
 ---
 name: vibespec
 description: >-
-  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 SOT(JSON)와 HTML 뷰어를 생성하고, ID 기반 안전 수정, 제품 기획 위 증분 추가 기획, 제품 검토 버전을 처리한다. Turn a product idea or planning document into a SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, and User Flow; apply ID-addressed safe edits, create incremental initiatives, and build navigable product workspaces. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, 기능 추가 기획, 결제/검색 기능 얹어줘, 제품 작업공간(통합·검토 버전), 사업계획서로 기획, make a planning tool, generate a PRD/spec, update my SOT, add a feature initiative on top of an existing product. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
+  제품 아이디어나 기획 문서로 PRD·기능명세서·IA·유저플로우가 담긴 SOT(JSON)와 HTML 뷰어를 생성하고, KPI 측정 근거의 의미 검토, ID 기반 안전 수정, 제품 기획 위 증분 추가 기획, 제품 검토 버전을 처리한다. Turn a product idea or planning document into a SOT (JSON) plus an HTML viewer with PRD, Feature Spec, IA, User Flow, and semantic review of KPI evidence; apply ID-addressed safe edits, create incremental initiatives, and build navigable product workspaces. 트리거/triggers: 기획도구·기획서·PRD·기능명세·IA·유저플로우 만들어줘, SOT 생성·수정, KPI 측정 가능성 검토, 기능 추가 기획, 결제/검색 기능 얹어줘, 제품 작업공간(통합·검토 버전), 사업계획서로 기획, make a planning tool, generate a PRD/spec, review KPI evidence, update my SOT, add a feature initiative on top of an existing product. 기획 문서나 기존 .sot.json을 첨부하며 요청할 때도 사용.
 ---
 
 # VibeSpec
@@ -51,5 +51,6 @@ description: >-
 - 기존 SOT를 수정할 때 전체 JSON을 재생성하지 않는다. query + change-plan-v2 + dry-run/apply 경로를 사용한다.
 - ID는 안정 식별자다. 삭제한 ID를 재사용하지 않는다.
 - 구조 검증은 PASS까지 고치고, 내용 리뷰 경고는 해소하거나 의도적 예외를 사용자에게 설명한다.
+- `semantic`이 있는 SOT는 의미 검토를 실행한다. 측정 준비도가 blocked이면 초안은 전달할 수 있지만 승인 가능·개발 전달 준비 완료라고 표현하지 않는다. 사람의 결정을 AI가 임의로 확정해 차단을 숨기지 않는다.
 - 산출물 JSON과 HTML은 같은 SOT에서 결정적으로 만든다.
 - `--apply`는 사용자가 요청한 쓰기 작업에서만 실행하고, 드라이런 결과와 영향 범위를 먼저 확인한다.

@@ -367,6 +367,35 @@
   .tr-head .mini:hover{color:#c0392b;border-color:#f0d4d0}
   .fep-empty{color:var(--muted);font-style:italic;padding:6px 0;font-size:12px}
 
+  /* ============ SEMANTIC ASSURANCE (derived, read-only) ============ */
+  .wrap.semantic{max-width:980px}
+  .semantic-view{padding:26px 4px 48px}
+  .sem-title{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .sem-title h1{margin:0 0 6px;font-size:22px;letter-spacing:0}
+  .sem-title p{margin:0;color:var(--sub);font-size:13px;line-height:1.6}
+  .sem-contract{flex:0 0 auto;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--muted);font:11px ui-monospace,Menlo,monospace}
+  .sem-notice{margin:18px 0;padding:11px 13px;border-left:3px solid #d3a11d;background:#fff8e8;color:#6f560e;font-size:12.5px;line-height:1.6}
+  .sem-notice.stale{border-color:#b96332;background:#fff4ed;color:#75401f}
+  .sem-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:20px 0 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .sem-summary>div{padding:14px 16px}
+  .sem-summary>div+div{border-left:1px solid var(--line)}
+  .sem-summary small{display:block;margin-bottom:5px;color:var(--muted);font-size:11.5px}
+  .sem-summary b{font-size:15px}
+  .sem-summary.ready b{color:#277447}
+  .sem-summary.blocked b{color:#a63d35}
+  .sem-summary.at-risk b,.sem-summary.stale b{color:#8a6510}
+  .semantic-view h2{margin:26px 0 9px;font-size:14px;letter-spacing:0}
+  .sem-measures,.sem-findings{border-top:1px solid var(--line)}
+  .sem-measure{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line2);font-size:12.5px}
+  .sem-measure code{color:var(--sub);font-size:11.5px}
+  .sem-finding{padding:12px 4px;border-bottom:1px solid var(--line2);font-size:13px;line-height:1.55}
+  .sem-finding.error{border-left:3px solid #c85a52;padding-left:12px}
+  .sem-finding.warning{border-left:3px solid #d3a11d;padding-left:12px}
+  .sem-find-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:5px}
+  .sem-find-head code,.sem-finding small{color:var(--muted);font-size:11px}
+  .sem-empty{padding:18px 4px;color:var(--muted);font-size:12.5px}
+  @media(max-width:640px){.sem-summary{grid-template-columns:1fr}.sem-summary>div+div{border-left:0;border-top:1px solid var(--line2)}.sem-measure{grid-template-columns:42px minmax(0,1fr)}.sem-measure code{grid-column:2}}
+
   /* ============ SPEC DIRECTORY (3-pane + detail) ============ */
   .dir{display:flex;height:calc(100vh - 92px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
   .dir-col{display:flex;flex-direction:column;min-width:0}
@@ -455,6 +484,7 @@
       <button class="tab" role="tab" data-view="tree" data-i18n="트리|Tree">트리</button>
       <button class="tab" role="tab" data-view="ia">IA</button>
       <button class="tab" role="tab" data-view="flow" data-i18n="유저플로우|User Flow">유저플로우</button>
+      <button class="tab" id="semanticTab" role="tab" data-view="semantic" data-i18n="의미 검토|Semantic Review" hidden>의미 검토</button>
     </div>
     <button class="topbtn" id="langBtn" title="Language">EN</button>
     <button class="topbtn" id="undoBtn" data-i18n-title="실행 취소 (Ctrl+Z)|Undo (Ctrl+Z)" title="실행 취소 (Ctrl+Z)">↩</button>
@@ -492,6 +522,7 @@
 <div class="sot-flash" id="flash"><b>SOT 갱신됨</b> · 모든 뷰 동기화 완료</div>
 
 <script type="application/json" id="embedded-sot"></script>
+<script type="application/json" id="embedded-semantic-report"></script>
 <script>
 /* ==== 00-config.js ==== */
 const PRIO = {high:{c:"high",t:"높음",e:"High"}, mid:{c:"mid",t:"보통",e:"Mid"}, low:{c:"low",t:"낮음",e:"Low"}};
@@ -501,8 +532,8 @@ const esc = s => (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 // only so a one-time migration can offer the user a download before removing it.
 const LEGACY_SOT_KEY="sot-proto-v3-flow";
 const LANG_KEY="vibespec-lang";
-const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우"};
-const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow"};
+const VIEWNAME={prd:"PRD",spec:"기능명세서",tree:"트리",ia:"IA",flow:"유저플로우",semantic:"의미 검토"};
+const VIEWNAME_EN={prd:"PRD",spec:"Feature Spec",tree:"Tree",ia:"IA",flow:"User Flow",semantic:"Semantic Review"};
 const PTYPE = {top:"섹션 최상위", page:"페이지", action:"행동"};
 const PTYPE_EN = {top:"Section top", page:"Page", action:"Action"};
 const SURFACE = {screen:"화면", panel:"패널", drawer:"드로어", modal:"모달", mode:"모드"};
@@ -706,7 +737,15 @@ function normalize(s){
   delete pd.background; delete pd.roles;
   ["oneLiner","goal","whyNow","problem","solution","alternatives","differentiator","northStar","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
   ["targets","scenarios","kpis","inScope","nonGoals","assumptions","risks","openQuestions","constraints","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
-  pd.kpis = pd.kpis.map(k=> typeof k==="string" ? {name:k,target:"",baseline:"",method:"",refs:[]} : {name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]});
+  pd.kpis = pd.kpis.map(k=>{
+    if(typeof k==="string") return {name:k,target:"",baseline:"",method:"",refs:[]};
+    const next={name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]};
+    // Semantic Assurance is opt-in. Preserve fields that already exist, but
+    // never inject ids/measurement into a legacy SOT during load/save.
+    if(k.id!==undefined) next.id=k.id;
+    if(k.measurement!==undefined) next.measurement=k.measurement;
+    return next;
+  });
   pd.scenarios = pd.scenarios.map(x=> typeof x==="string" ? {text:x,start:""} : {text:x.text||"",start:x.start||""});
   pd.targets = pd.targets.map(t=> typeof t==="string" ? {name:t,role:"",needs:"",pain:""} : {name:t.name||"",role:t.role||"",needs:t.needs||"",pain:t.pain||""});
   if(!s.title) s.title=pd.oneLiner||"Untitled VibeSpec";
@@ -741,7 +780,10 @@ function flowTransition(from,to,ref="",label=""){
   return transition;
 }
 let SOT = normalize(structuredClone(SEED));
-const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow"]);
+let SEMANTIC_REPORT=null, SEMANTIC_REPORT_STALE=false;
+function invalidateSemanticReport(){ if(SEMANTIC_REPORT) SEMANTIC_REPORT_STALE=true; }
+function clearSemanticReport(){ SEMANTIC_REPORT=null; SEMANTIC_REPORT_STALE=false; }
+const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow", "semantic"]);
 const requestedView = typeof window!=="undefined" && typeof URLSearchParams!=="undefined" ? new URLSearchParams(window.location.search).get("view") : null;
 let VIEW = DEEP_LINK_VIEWS.has(requestedView) ? requestedView : "prd";
 function syncViewInUrl(){
@@ -758,7 +800,7 @@ let selSec, selPage;
 let idc = 100;
 const nid = p => p + (++idc);
 /* ---- mutation helpers: every edit funnels through here, then render() ---- */
-function commit(){ normalize(SOT); render(); flash(); pushHistory(); }
+function commit(){ normalize(SOT); invalidateSemanticReport(); render(); flash(); pushHistory(); }
 function flash(){ const f=document.getElementById("flash"); f.classList.add("show"); clearTimeout(flash._t); flash._t=setTimeout(()=>f.classList.remove("show"),1200); }
 function find(id){ return SOT.requirements.find(r=>r.id===id); }
 function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x=>x.id===fid); if(f) return {r,f}; } return {}; }
@@ -933,7 +975,7 @@ async function readConnectedFile(){
 }
 function applyLoadedSot(text,label,replaceHistory){
   try{
-    SOT=normalize(JSON.parse(text)); resetSelections();
+    SOT=normalize(JSON.parse(text)); clearSemanticReport(); resetSelections();
     if(replaceHistory){ HISTORY=[]; HPTR=-1; }
     pushHistory(label||t("파일 다시 불러오기","File reload")); markViewerSaved(); render(); return true;
   }catch(_){
@@ -1061,6 +1103,9 @@ function renderInitiativeBand(){
 /* ============================ RENDER DISPATCH ============================ */
 function render(){
   renderInitiativeBand();
+  const semanticTab=document.getElementById("semanticTab");
+  if(semanticTab) semanticTab.hidden=!(SOT&&SOT.semantic);
+  if(VIEW==="semantic" && !(SOT&&SOT.semantic)) VIEW="prd";
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===VIEW));
   const el = document.getElementById("stage");
   el.className = "wrap " + VIEW;
@@ -1068,6 +1113,7 @@ function render(){
   else if(VIEW==="spec") el.innerHTML = renderSpec();
   else if(VIEW==="tree"){ el.innerHTML = renderTree(); layoutTree(); }
   else if(VIEW==="ia") el.innerHTML = renderIA();
+  else if(VIEW==="semantic") el.innerHTML = renderSemanticReview();
   else { try{ el.innerHTML = renderFlow(); layoutFlow(); }catch(err){ el.innerHTML='<div style="padding:40px;color:#c0392b;font-weight:600">유저플로우 렌더 오류: '+esc(String(err&&err.stack||err))+'</div>'; } }
   if(RO) roHarden();
 }
@@ -1179,6 +1225,36 @@ function renderPRD(){
     <div class="kv">${doctype}</div>
     ${notice}
     ${body}
+  </div>`;
+}
+
+
+/* ==== 56-semantic.js ==== */
+/* ---- derived Semantic Assurance report (read-only) ---- */
+function semanticStatusLabel(value){
+  const labels={ready:["준비됨","Ready"],"at-risk":["주의 필요","At risk"],blocked:["차단됨","Blocked"],passed:["통과","Passed"],failed:["실패","Failed"],unknown:["판정 불가","Unknown"],"not-assessed":["미검토","Not assessed"]};
+  const item=labels[value]||[value||"-",value||"-"]; return t(item[0],item[1]);
+}
+function renderSemanticReview(){
+  const report=SEMANTIC_REPORT;
+  const stale=SEMANTIC_REPORT_STALE;
+  const kpis=(SOT.prd&&SOT.prd.kpis)||[];
+  const measurementRows=kpis.map(k=>{
+    const m=k.measurement||{};
+    return `<div class="sem-measure"><b>${esc(k.id||"-")}</b><span>${esc(k.name||"")}</span><code>${esc(m.mode||t("측정 정의 없음","No measurement"))}</code></div>`;
+  }).join("");
+  if(!report){
+    return `<div class="semantic-view"><h1>${t("의미 검토","Semantic Review")}</h1><div class="sem-notice">${t("이 HTML에는 의미 검토 결과가 포함되어 있지 않습니다. review-semantic을 실행한 뒤 HTML을 다시 생성하세요.","This HTML has no semantic report. Run review-semantic and rebuild the HTML.")}</div><div class="sem-measures">${measurementRows}</div></div>`;
+  }
+  const assessment=report.assessment&&report.assessment.status;
+  const readiness=report.readiness&&report.readiness.measurement;
+  const findings=(report.findings||[]).map(f=>`<div class="sem-finding ${esc(f.severity||"warning")}"><div class="sem-find-head"><code>${esc(f.ruleId)}</code><span>${semanticStatusLabel(f.assessment)}</span></div><div>${esc(f.summary)}</div><small>${esc((f.subjectRefs||[]).join(" · "))}</small></div>`).join("")||`<div class="sem-empty">${t("측정 근거 관계에서 발견된 문제가 없습니다.","No measurement-evidence issues were found.")}</div>`;
+  return `<div class="semantic-view">
+    <div class="sem-title"><div><h1>${t("의미 검토","Semantic Review")}</h1><p>${t("KPI 측정 근거의 설계 완전성을 검토합니다. 실제 분석 결과나 SQL 정확성을 보증하지 않습니다.","Checks the design completeness of KPI measurement evidence, not analytics results or SQL correctness.")}</p></div><span class="sem-contract">${esc(report.semanticContractVersion||"")}</span></div>
+    ${stale?`<div class="sem-notice stale">${t("SOT가 수정되어 이 결과는 오래되었습니다. 저장 후 review-semantic을 다시 실행하고 HTML을 재생성하세요.","The SOT changed, so this report is stale. Save, rerun review-semantic, and rebuild the HTML.")}</div>`:""}
+    <div class="sem-summary ${stale?"stale":esc(readiness||"not-assessed")}"><div><small>${t("판정","Assessment")}</small><b>${stale?t("재검토 필요","Review required"):semanticStatusLabel(assessment)}</b></div><div><small>${t("측정 준비도","Measurement readiness")}</small><b>${stale?"-":semanticStatusLabel(readiness)}</b></div><div><small>${t("발견","Findings")}</small><b>${report.findings.length}</b></div></div>
+    <h2>${t("KPI 측정 방식","KPI measurements")}</h2><div class="sem-measures">${measurementRows}</div>
+    <h2>${t("발견 사항","Findings")}</h2><div class="sem-findings">${findings}</div>
   </div>`;
 }
 
@@ -1921,7 +1997,7 @@ document.getElementById("sotBtn").addEventListener("click",()=>{
   const w=window.open("","_blank","width=520,height=640");
   w.document.write("<title>SOT (Single Source of Truth)</title><pre style='font:12px/1.5 ui-monospace,Menlo,monospace;padding:16px;white-space:pre-wrap'>"+esc(JSON.stringify(SOT,null,2))+"</pre>");
 });
-document.getElementById("prodTitle").addEventListener("input",e=>{ if(MAP) return; SOT.title=e.currentTarget.firstChild.textContent.trim(); });
+document.getElementById("prodTitle").addEventListener("input",e=>{ if(MAP) return; SOT.title=e.currentTarget.firstChild.textContent.trim(); invalidateSemanticReport(); });
 
 /* delegated edits (contenteditable) */
 document.getElementById("stage").addEventListener("input",e=>{
@@ -1941,6 +2017,7 @@ document.getElementById("stage").addEventListener("input",e=>{
   else if(t.dataset.persona){ const[i,f]=t.dataset.persona.split("#"); SOT.prd.targets[+i][f]=v; }
   else if(t.dataset.scnText!==undefined){ SOT.prd.scenarios[+t.dataset.scnText].text=v; }
   else if(t.dataset.kpi){ const[i,f]=t.dataset.kpi.split("#"); SOT.prd.kpis[+i][f]=v; }
+  invalidateSemanticReport();
   if(VIEW==="tree") layoutTree();
   else if(VIEW==="flow") layoutFlow();
 });
@@ -2051,6 +2128,7 @@ document.getElementById("fileInput").addEventListener("change",e=>{
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
+try{ const report=document.getElementById("embedded-semantic-report"); if(report&&report.textContent.trim()) SEMANTIC_REPORT=JSON.parse(report.textContent); }catch(e){}
 if(!MAP){
   if(!SOT.title) SOT.title="제품";
   (function(){ const pt=document.getElementById("prodTitle"); if(pt&&pt.firstChild) pt.firstChild.textContent=SOT.title; })();

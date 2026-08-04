@@ -25,7 +25,9 @@ try {
     "skills/vibespec/SKILL.md",
     "skills/vibespec/assets/viewer.html",
     "skills/vibespec/references/workflows/common.md",
+    "skills/vibespec/references/semantic-assurance.md",
     "skills/vibespec/scripts/doctor.mjs",
+    "skills/vibespec/scripts/review-semantic.mjs",
     "skills/vibespec/src/js/00-config.js",
     "skills/vibespec/src/js/05-c14n.js",
     "skills/vibespec/src/js/20-state.js"
@@ -40,6 +42,7 @@ try {
   cpSync(join(here, "fixtures", "tree", "main.sot.json"), join(product, "main.sot.json"));
   run(join(skill, "scripts", "doctor.mjs"), [product, "--json"], product);
   run(join(skill, "scripts", "validate-sot.mjs"), [join(product, "main.sot.json")], product);
+  run(join(skill, "scripts", "review-semantic.mjs"), [join(product, "main.sot.json"), "--json"], product);
   run(join(skill, "scripts", "workspace.mjs"), [product], product);
   run(join(skill, "scripts", "migrate-sot.mjs"), [join(product, "main.sot.json"), "--out", join(product, "migrated.sot.json")], product);
   console.log("[package] PASS minimal bundle excludes development files and retains every runtime dependency");

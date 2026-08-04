@@ -1,6 +1,6 @@
 # VibeSpec
 
-**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOT JSON with a PRD, feature spec, information architecture, and user flow, plus a self-contained HTML viewer.
+**VibeSpec is a free, open-source AI product-planning plugin for Claude and Codex.** It turns product ideas into editable SOT JSON with a PRD, feature spec, information architecture, user flow, and semantic assurance for KPI evidence, plus a self-contained HTML viewer.
 
 VibeSpec is a dual-format plugin: Claude reads `.claude-plugin/`, OpenAI Codex reads `.codex-plugin/`, and both share the same skill, schema, scripts, and viewer.
 
@@ -15,5 +15,6 @@ VibeSpec is a dual-format plugin: Claude reads `.claude-plugin/`, OpenAI Codex r
 
 - **HTML = viewer/editor** · **JSON = SOT data**
 - Skill: idea or document → validated SOT JSON with viewer
+- Semantic Assurance: KPI measurement evidence → derived readiness report (legacy SOTs remain opt-in)
 - Schema: `skills/vibespec/references/sot-schema.md`
 - Full installation, usage, and release notes: [repository README](https://github.com/chjoel0621/vibespec#readme)

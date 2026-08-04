@@ -151,7 +151,15 @@ function normalize(s){
   delete pd.background; delete pd.roles;
   ["oneLiner","goal","whyNow","problem","solution","alternatives","differentiator","northStar","category"].forEach(k=>{ if(pd[k]==null) pd[k]=""; });
   ["targets","scenarios","kpis","inScope","nonGoals","assumptions","risks","openQuestions","constraints","platforms"].forEach(k=>{ if(!Array.isArray(pd[k])) pd[k]=[]; });
-  pd.kpis = pd.kpis.map(k=> typeof k==="string" ? {name:k,target:"",baseline:"",method:"",refs:[]} : {name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]});
+  pd.kpis = pd.kpis.map(k=>{
+    if(typeof k==="string") return {name:k,target:"",baseline:"",method:"",refs:[]};
+    const next={name:k.name||"",target:k.target||"",baseline:k.baseline||"",method:k.method||"",refs:Array.isArray(k.refs)?k.refs:[]};
+    // Semantic Assurance is opt-in. Preserve fields that already exist, but
+    // never inject ids/measurement into a legacy SOT during load/save.
+    if(k.id!==undefined) next.id=k.id;
+    if(k.measurement!==undefined) next.measurement=k.measurement;
+    return next;
+  });
   pd.scenarios = pd.scenarios.map(x=> typeof x==="string" ? {text:x,start:""} : {text:x.text||"",start:x.start||""});
   pd.targets = pd.targets.map(t=> typeof t==="string" ? {name:t,role:"",needs:"",pain:""} : {name:t.name||"",role:t.role||"",needs:t.needs||"",pain:t.pain||""});
   if(!s.title) s.title=pd.oneLiner||"Untitled VibeSpec";
@@ -186,7 +194,10 @@ function flowTransition(from,to,ref="",label=""){
   return transition;
 }
 let SOT = normalize(structuredClone(SEED));
-const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow"]);
+let SEMANTIC_REPORT=null, SEMANTIC_REPORT_STALE=false;
+function invalidateSemanticReport(){ if(SEMANTIC_REPORT) SEMANTIC_REPORT_STALE=true; }
+function clearSemanticReport(){ SEMANTIC_REPORT=null; SEMANTIC_REPORT_STALE=false; }
+const DEEP_LINK_VIEWS = new Set(["prd", "spec", "tree", "ia", "flow", "semantic"]);
 const requestedView = typeof window!=="undefined" && typeof URLSearchParams!=="undefined" ? new URLSearchParams(window.location.search).get("view") : null;
 let VIEW = DEEP_LINK_VIEWS.has(requestedView) ? requestedView : "prd";
 function syncViewInUrl(){
@@ -203,7 +214,7 @@ let selSec, selPage;
 let idc = 100;
 const nid = p => p + (++idc);
 /* ---- mutation helpers: every edit funnels through here, then render() ---- */
-function commit(){ normalize(SOT); render(); flash(); pushHistory(); }
+function commit(){ normalize(SOT); invalidateSemanticReport(); render(); flash(); pushHistory(); }
 function flash(){ const f=document.getElementById("flash"); f.classList.add("show"); clearTimeout(flash._t); flash._t=setTimeout(()=>f.classList.remove("show"),1200); }
 function find(id){ return SOT.requirements.find(r=>r.id===id); }
 function findF(fid){ for(const r of SOT.requirements){ const f=r.features.find(x=>x.id===fid); if(f) return {r,f}; } return {}; }

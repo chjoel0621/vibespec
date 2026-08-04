@@ -1,6 +1,7 @@
 // Return a bounded edit context for stable feature/page ids. This lets an
 // agent plan a narrow operation without loading and reserializing the full SOT.
 import { sotDigest } from "./c14n.mjs";
+import { semanticGraphClosure } from "./semantic-reference-registry.mjs";
 
 const clone = value => JSON.parse(JSON.stringify(value));
 const pageWalk = (pages, fn, parents = []) => (pages || []).forEach(page => {
@@ -29,9 +30,9 @@ function refsFeature(page, featureId) {
 }
 
 export function querySot(sot, ids = [], prdFields = []) {
-  const idPattern = /^(?:R[1-9]\d*|F[1-9]\d*(?::\d+)?|S[1-9]\d*|P[1-9]\d*)$/;
+  const idPattern = /^(?:R[1-9]\d*|F[1-9]\d*(?::\d+)?|S[1-9]\d*|P[1-9]\d*|K[1-9]\d*|E[1-9]\d*|D[1-9]\d*)$/;
   if (!Array.isArray(ids) || ids.some(id => typeof id !== "string" || !idPattern.test(id))) {
-    throw new Error("ids must contain only stable R#/F#/F#:index/S#/P# selectors");
+    throw new Error("ids must contain only stable R#/F#/F#:index/S#/P#/K#/E#/D# selectors");
   }
   if (!Array.isArray(prdFields) || prdFields.some(field => typeof field !== "string" || !Object.hasOwn(sot.prd || {}, field))) {
     throw new Error("prdFields must name fields present in prd");
@@ -47,6 +48,21 @@ export function querySot(sot, ids = [], prdFields = []) {
   const featureContexts = [];
   const pageContexts = [];
 
+  for (const id of requirements) {
+    const entry = (sot.requirements || []).find(requirement => requirement.id === id);
+    if (!entry) throw new Error("unknown requirement " + id);
+    (entry.features || []).forEach(feature => features.add(feature.id));
+  }
+  for (const id of sections) {
+    const entry = (sot.ia?.sections || []).find(section => section.id === id);
+    if (!entry) throw new Error("unknown section " + id);
+    pageWalk(entry.pages, page => pages.add(page.id));
+  }
+  const semantic = semanticGraphClosure(sot, [...requested, ...requirements, ...sections, ...features, ...pages]);
+  semantic.requirementIds.forEach(id => requirements.add(id));
+  semantic.sectionIds.forEach(id => sections.add(id));
+  semantic.featureRefs.forEach(id => features.add(id.split(":")[0]));
+  semantic.pageIds.forEach(id => pages.add(id));
   for (const id of requirements) {
     const entry = (sot.requirements || []).find(requirement => requirement.id === id);
     if (!entry) throw new Error("unknown requirement " + id);
@@ -115,6 +131,12 @@ export function querySot(sot, ids = [], prdFields = []) {
       pageSet.has(transition.from) || pageSet.has(transition.to) || (transition.ref && featureSet.has(transition.ref.split(":")[0]))
     ).map(clone),
     kpis: (sot.prd?.kpis || []).filter(kpi => (kpi.refs || []).some(ref => featureSet.has(ref.split(":")[0]))).map(clone),
-    scenarios: (sot.prd?.scenarios || []).filter(scenario => pageSet.has(scenario.start)).map(clone)
+    scenarios: (sot.prd?.scenarios || []).filter(scenario => pageSet.has(scenario.start)).map(clone),
+    ...(sot.semantic ? { semantic: {
+      contractVersion: sot.semantic.contractVersion,
+      kpis: (sot.prd?.kpis || []).filter(kpi => semantic.kpiIds.includes(kpi.id)).map(clone),
+      events: (sot.semantic.events || []).filter(event => semantic.eventIds.includes(event.id)).map(clone),
+      decisions: (sot.semantic.decisions || []).filter(decision => semantic.decisionIds.includes(decision.id)).map(clone)
+    } } : {})
   };
 }

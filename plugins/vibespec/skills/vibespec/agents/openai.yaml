@@ -1,8 +1,8 @@
 interface:
   display_name: "VibeSpec"
-  short_description: "Create validated PRD, IA, specs, and user flows"
+  short_description: "Create and semantically review product plans"
   brand_color: "#7957F2"
-  default_prompt: "Use $vibespec to turn my product idea into a validated SOT JSON and editable HTML viewer."
+  default_prompt: "Use $vibespec to turn my product idea into a validated SOT JSON, semantic KPI review, and editable HTML viewer."
 
 policy:
   allow_implicit_invocation: true

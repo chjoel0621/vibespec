@@ -363,6 +363,35 @@
   .tr-head .mini:hover{color:#c0392b;border-color:#f0d4d0}
   .fep-empty{color:var(--muted);font-style:italic;padding:6px 0;font-size:12px}
 
+  /* ============ SEMANTIC ASSURANCE (derived, read-only) ============ */
+  .wrap.semantic{max-width:980px}
+  .semantic-view{padding:26px 4px 48px}
+  .sem-title{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .sem-title h1{margin:0 0 6px;font-size:22px;letter-spacing:0}
+  .sem-title p{margin:0;color:var(--sub);font-size:13px;line-height:1.6}
+  .sem-contract{flex:0 0 auto;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--muted);font:11px ui-monospace,Menlo,monospace}
+  .sem-notice{margin:18px 0;padding:11px 13px;border-left:3px solid #d3a11d;background:#fff8e8;color:#6f560e;font-size:12.5px;line-height:1.6}
+  .sem-notice.stale{border-color:#b96332;background:#fff4ed;color:#75401f}
+  .sem-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:20px 0 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .sem-summary>div{padding:14px 16px}
+  .sem-summary>div+div{border-left:1px solid var(--line)}
+  .sem-summary small{display:block;margin-bottom:5px;color:var(--muted);font-size:11.5px}
+  .sem-summary b{font-size:15px}
+  .sem-summary.ready b{color:#277447}
+  .sem-summary.blocked b{color:#a63d35}
+  .sem-summary.at-risk b,.sem-summary.stale b{color:#8a6510}
+  .semantic-view h2{margin:26px 0 9px;font-size:14px;letter-spacing:0}
+  .sem-measures,.sem-findings{border-top:1px solid var(--line)}
+  .sem-measure{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line2);font-size:12.5px}
+  .sem-measure code{color:var(--sub);font-size:11.5px}
+  .sem-finding{padding:12px 4px;border-bottom:1px solid var(--line2);font-size:13px;line-height:1.55}
+  .sem-finding.error{border-left:3px solid #c85a52;padding-left:12px}
+  .sem-finding.warning{border-left:3px solid #d3a11d;padding-left:12px}
+  .sem-find-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:5px}
+  .sem-find-head code,.sem-finding small{color:var(--muted);font-size:11px}
+  .sem-empty{padding:18px 4px;color:var(--muted);font-size:12.5px}
+  @media(max-width:640px){.sem-summary{grid-template-columns:1fr}.sem-summary>div+div{border-left:0;border-top:1px solid var(--line2)}.sem-measure{grid-template-columns:42px minmax(0,1fr)}.sem-measure code{grid-column:2}}
+
   /* ============ SPEC DIRECTORY (3-pane + detail) ============ */
   .dir{display:flex;height:calc(100vh - 92px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
   .dir-col{display:flex;flex-direction:column;min-width:0}

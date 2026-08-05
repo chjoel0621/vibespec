@@ -60,6 +60,22 @@ jobs:
             node $S/scripts/review-sot.mjs "$W" --profile consumer
             node $S/scripts/review-semantic.mjs "$W"
           done
+          # Rebuild the CRM review candidate from its source + tracked change plan.
+          # It must remain structurally valid but semantically blocked by one open
+          # decision so the live demo can exercise answer saving and AI handoff.
+          for lang in ko en; do
+            C="$RUNNER_TEMP/crm-review.$lang.sot.json"
+            cp "demo/crm.$lang.sot.json" "$C"
+            node $S/scripts/apply-change-plan.mjs "$C" "demo/semantic/crm-review.$lang.plan.json" --apply
+            node $S/scripts/validate-sot.mjs "$C"
+            if node $S/scripts/review-semantic.mjs "$C"; then
+              echo "CRM review demo must keep its open decision: $lang"
+              exit 1
+            elif [ "$?" -ne 1 ]; then
+              echo "CRM review demo failed unexpectedly: $lang"
+              exit 1
+            fi
+          done
           # Flea is the workspace demo: it also carries a proposed increment (offer).
           node $S/scripts/validate-sot.mjs demo/flea-market.ko.1-2.offer.sot.json
           node $S/scripts/validate-sot.mjs demo/flea-market.en.1-2.offer.sot.json
@@ -85,9 +101,17 @@ jobs:
             node $S/scripts/product-map.mjs $pre.en.sot.json $pre.en.$infix.sot.json --html "$dir/en/map/index.html"
           }
           stage_product demo/meeting-room-booking "" 1-2.notif notif
-          mkdir -p _site/crm/en
+          mkdir -p _site/crm/en _site/crm/review _site/crm/en/review
           node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.ko.sot.json _site/crm/index.html
           node $S/scripts/embed-sot.mjs $S/assets/viewer.html demo/crm.en.sot.json _site/crm/en/index.html
+          for lang in ko en; do
+            C="$RUNNER_TEMP/crm-review.$lang.sot.json"
+            cp "demo/crm.$lang.sot.json" "$C"
+            node $S/scripts/apply-change-plan.mjs "$C" "demo/semantic/crm-review.$lang.plan.json" --apply
+            OUT=_site/crm/review/index.html
+            [ "$lang" = en ] && OUT=_site/crm/en/review/index.html
+            node $S/scripts/embed-sot.mjs $S/assets/viewer.html "$C" "$OUT"
+          done
           # WeekChef is real Claude Code dogfood output from the packaged 0.17.0
           # plugin. Keep its independently generated ko/en plans as separate
           # host examples; both must pass semantic readiness before deployment.
@@ -126,12 +150,17 @@ jobs:
           }
           verify_product "" notif
           verify_product flea escrow
-          for f in crm/index.html crm/en/index.html weekchef/index.html weekchef/en/index.html; do
+          for f in crm/index.html crm/en/index.html crm/review/index.html crm/en/review/index.html weekchef/index.html weekchef/en/index.html; do
             grep -q 'class="demo-nav"' "_site/$f" || { echo "no nav strip: _site/$f"; exit 1; }
           done
           for f in weekchef/index.html weekchef/en/index.html; do
             grep -q 'embedded-semantic-report">{' "_site/$f" || { echo "semantic report missing: _site/$f"; exit 1; }
             grep -q '"measurement":"ready"' "_site/$f" || { echo "semantic readiness missing: _site/$f"; exit 1; }
+          done
+          for f in crm/review/index.html crm/en/review/index.html; do
+            grep -q 'embedded-semantic-report">{' "_site/$f" || { echo "semantic report missing: _site/$f"; exit 1; }
+            grep -q '"measurement":"blocked"' "_site/$f" || { echo "CRM review must be blocked: _site/$f"; exit 1; }
+            grep -q 'data-sem-saveanswer' "_site/$f" || { echo "CRM review answer UI missing: _site/$f"; exit 1; }
           done
           # Flea's extra workspace pages carry the nav strip too.
           for f in flea/workspace/ flea/en/workspace/; do

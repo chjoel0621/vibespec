@@ -16,7 +16,7 @@
 
 삭제는 `removedIds`와 `touchedPaths`에 명시되지 않으면 적용하지 않는다. 큰 개편은 작은 계획으로 나누고 삭제·추가·영향 반경을 먼저 제시한다.
 
-적용 뒤 validate-sot, review-sot, `semantic`이 있으면 review-semantic, 필요하면 validate-tree를 실행하고 HTML을 다시 만든다. 의미 검토 보고서는 편집 전 결과를 재사용하지 않는다.
+적용 뒤 validate-sot, review-sot, `semantic`이 있으면 review-semantic, 필요하면 validate-tree를 실행하고 HTML을 다시 만든다. KPI 측정 가능성 점검 보고서는 편집 전 결과를 재사용하지 않는다.
 
 ## 복구와 마이그레이션
 

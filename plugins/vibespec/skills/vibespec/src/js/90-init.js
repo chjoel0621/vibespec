@@ -51,7 +51,9 @@ document.getElementById("stage").addEventListener("click",e=>{
     return;
   }
   const d=b.dataset;
-  if("clearIdentity" in d){ ["category","northStar","differentiator","alternatives"].forEach(k=>SOT.prd[k]=""); SOT.prd.platforms=[]; commit(); }
+  if(d.semSaveanswer){ const decision=(SOT.semantic&&SOT.semantic.decisions||[]).find(item=>item.id===d.semSaveanswer); const answer=document.querySelector(`[data-sem-answer="${d.semSaveanswer}"]`); if(!decision||!answer) return; const value=answer.value.trim(); const error=answer.closest(".sem-decision-action").querySelector(".sem-answer-error"); if(!value){ answer.classList.add("invalid"); error.hidden=false; answer.focus(); return; } decision.resolution=value; decision.status="open"; commit(); }
+  else if(d.semCopyprompt){ const prompt=document.querySelector(`[data-sem-prompt="${d.semCopyprompt}"]`); if(!prompt) return; const status=b.parentElement.querySelector(".sem-copy-status"); const mark=()=>{ if(status) status.textContent=t("복사했습니다.","Copied."); }; const fallback=()=>{ prompt.focus(); prompt.select(); document.execCommand("copy"); prompt.setSelectionRange(0,0); mark(); }; if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(prompt.value).then(mark).catch(fallback); else fallback(); }
+  else if("clearIdentity" in d){ ["category","northStar","differentiator","alternatives"].forEach(k=>SOT.prd[k]=""); SOT.prd.platforms=[]; commit(); }
   else if(d.prdAdd){ (SOT.prd[d.prdAdd]=SOT.prd[d.prdAdd]||[]).push("새 항목"); commit(); }
   else if(d.prdDel){ const[k,i]=d.prdDel.split("#"); SOT.prd[k].splice(+i,1); commit(); }
   else if("personaAdd" in d){ SOT.prd.targets.push({name:"새 페르소나",role:"",needs:"",pain:""}); commit(); }
@@ -133,7 +135,7 @@ document.getElementById("locationBtn").addEventListener("click",()=>{closeFileMe
 document.getElementById("fileInput").addEventListener("change",e=>{
   loadFallbackFile(e.target.files[0]); e.target.value="";
 });
-document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
+document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.isContentEditable||t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT")) return; if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?redo():undo(); } });
 let _loaded=false;
 try{ const emb=document.getElementById("embedded-sot"); if(emb&&emb.textContent.trim()){ const payload=JSON.parse(emb.textContent); if(payload&&payload.kind==="vibespec-product-map"){ MAP=payload; RO=true; } else { SOT=normalize(payload); _loaded=true; } } }catch(e){}
 try{ const report=document.getElementById("embedded-semantic-report"); if(report&&report.textContent.trim()) SEMANTIC_REPORT=JSON.parse(report.textContent); }catch(e){}

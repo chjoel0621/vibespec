@@ -36,6 +36,18 @@ renumbered with all references when an Add-on is landed into the product plan.
 Flow transitions do not gain a new id in semantic-0.1. User-event flow evidence
 is derived from the existing transition feature `ref`.
 
+## Decision lifecycle
+
+- Writing an answer records `resolution` but does not by itself close the
+  decision. A draft answer remains `status: "open"`.
+- `status: "decided"` requires a non-empty `resolution` and means the answer
+  has been applied to the impacted KPI, event, feature, page, or flow through a
+  reviewed SOT edit.
+- After application, run structural validation and Semantic Assurance again.
+  The viewer must not turn an answer into `decided` merely to hide a blocker.
+- D# values are stable machine references. User-facing surfaces lead with the
+  decision question and keep the id as secondary metadata.
+
 ## Measurement modes
 
 - `event-count`: count one declared event in a window.

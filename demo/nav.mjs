@@ -11,19 +11,20 @@ import { pathToFileURL } from "node:url";
 // differ only by what they include — the integrated release vs the review that
 // also shows proposed work — so they read as "버전" (version), not "지도" (map).
 const L = {
-  ko: { main: "제품 기획", init: "추가 기획", map: "통합 버전", release: "통합 버전", workspace: "검토 버전", other: "EN" },
-  en: { main: "Product plan", init: "Add-on", map: "Integrated", release: "Integrated", workspace: "Review", other: "한국어" },
+  ko: { main: "제품 기획", init: "추가 기획", map: "통합 버전", release: "통합 버전", workspace: "검토 버전", semantic: "측정 점검", other: "EN" },
+  en: { main: "Product plan", init: "Add-on", map: "Integrated", release: "Integrated", workspace: "Review", semantic: "Measurement check", other: "한국어" },
 };
 // Each product declares its pages as [labelKey, urlSlug]. The meeting-room demo
 // shows the basics (main · initiative · map); the flea demo is the workspace
 // demo — it splits the release map from the workspace map (which also shows the
 // proposed increment). sub "" is the site root; a non-empty sub nests (/flea/).
-const PRODUCTS = [
+export const PRODUCTS = [
   { sub: "", title: { ko: "회의실 예약", en: "Meeting booking" }, pages: [["main", ""], ["init", "notif/"], ["map", "map/"]] },
   { sub: "flea", title: { ko: "동네장터", en: "Neighborly" }, pages: [["main", ""], ["init", "escrow/"], ["release", "map/"], ["workspace", "workspace/"]] },
-  { sub: "crm", title: { ko: "CRM", en: "CRM" }, pages: [["main", ""]] },
+  { sub: "crm", title: { ko: "CRM", en: "CRM" }, pages: [["main", ""], ["semantic", "review/?view=semantic"]] },
   { sub: "weekchef", title: { ko: "위크셰프", en: "WeekChef" }, pages: [["main", ""]] },
 ];
+export const pageFileSlug = slug => slug.split("?")[0];
 
 const productRoot = (base, sub, lang) => `${base}${sub ? `/${sub}` : ""}${lang === "en" ? "/en" : ""}`;
 const siteDir = (site, sub, lang) => `${site}${sub ? `/${sub}` : ""}${lang === "en" ? "/en" : ""}`;
@@ -57,7 +58,8 @@ function main([base, site]) {
     for (const lang of ["ko", "en"]) {
       const dir = siteDir(site, product.sub, lang);
       for (const [key, slug] of product.pages) {
-        inject(`${dir}/${slug}index.html`, base, product, lang, key);
+        const fileSlug = pageFileSlug(slug);
+        inject(`${dir}/${fileSlug}index.html`, base, product, lang, key);
         count++;
       }
     }

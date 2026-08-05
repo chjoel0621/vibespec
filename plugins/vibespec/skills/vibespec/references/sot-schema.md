@@ -6,7 +6,9 @@
 
 **버전.** 일반 제품 SOT는 `1.0`이다. 특정 제품 기획 위에 얹히는 **추가 기획 SOT**는 `1.1`이며, 최상위 `initiative` 메타와 페이지 `boundary`(제품 기획 접점 표시)를 쓸 수 있다. 이 둘은 1.1에서만 허용된다 — 1.0 파일에 넣으면 검증 실패. 뷰어는 1.0·1.1을 모두 열고, **1.1을 저장할 때 1.0으로 낮추지 않는다**(schemaVersion은 `initiative` 존재 여부에서 도출).
 
-선택적 의미 검증 계약은 `schemaVersion`을 늘리지 않고 최상위 `semantic.contractVersion: "semantic-0.1"`로 활성화한다. `semantic`이 없는 기존 문서는 유효하며 의미 검토에서 `not-assessed`다. 뷰어는 기존 문서에 `semantic`·KPI id·measurement를 자동 삽입하지 않는다. 상세 계약은 `references/semantic-assurance.md`를 따른다.
+선택적 의미 검증 계약은 `schemaVersion`을 늘리지 않고 최상위 `semantic.contractVersion: "semantic-0.1"`로 활성화한다. `semantic`이 없는 기존 문서는 유효하며 KPI 측정 가능성 점검에서 `not-assessed`다. 뷰어는 기존 문서에 `semantic`·KPI id·measurement를 자동 삽입하지 않는다. 상세 계약은 `references/semantic-assurance.md`를 따른다.
+
+`semantic.decisions[].status`가 `decided`이면 비어 있지 않은 `resolution`이 필수다. 답변 초안만 저장한 결정은 `open`으로 유지하며, 영향 대상에 답변을 실제 반영하고 재검증하기 전에는 `decided`로 승격하지 않는다.
 
 ## 지원 버전과 마이그레이션
 

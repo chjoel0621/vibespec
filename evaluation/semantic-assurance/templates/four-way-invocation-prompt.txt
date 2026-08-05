@@ -1,3 +1,3 @@
-Use the installed VibeSpec plugin to create a new product-plan SOT and HTML from the attached frozen brief.
-Do not use prior files or infer unsupported facts.
-Preserve unresolved product choices as open decisions.
+설치된 VibeSpec 플러그인을 사용해 첨부된 동결 브리프로 새로운 제품 기획 SOT와 HTML을 생성하세요.
+이전 파일을 사용하거나 근거 없는 사실을 추론하지 마세요.
+해결되지 않은 제품 선택은 열린 결정으로 남기세요.

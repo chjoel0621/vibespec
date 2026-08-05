@@ -1,11 +1,11 @@
 {
   "contractVersion": "semantic-generation-review-0.1",
   "status": "candidate-needs-human-approval",
-  "reviewer": "codex-assisted",
-  "principle": "Use only facts present in the frozen brief; preserve uncertainty instead of inventing evidence.",
+  "reviewer": "Codex 보조 작성",
+  "principle": "동결 브리프에 있는 사실만 사용하고, 근거를 만들어내지 않으며 불확실성을 그대로 보존한다.",
   "reviewedFieldChanges": [
-    "Removed unsupported numeric targets and replaced them with a post-baseline decision.",
-    "Replaced ambiguous legacy baseline labels with an explicit unmeasured state."
+    "근거 없는 수치 목표를 제거하고 기준선 측정 후 결정하도록 바꿨다.",
+    "모호한 레거시 기준선 표현을 명시적인 미측정 상태로 바꿨다."
   ],
   "kpis": [
     {
@@ -14,9 +14,9 @@
       "verdict": "pending-human-review",
       "legacyName": "기한 내 처리 비율",
       "expectedMode": "event-ratio",
-      "evidenceBasis": ["follow-up task owner", "due time", "status", "status-change time", "F6", "P15"],
+      "evidenceBasis": ["후속 작업 담당자", "기한", "상태", "상태 변경 시각", "F6", "P15"],
       "inventedEvidence": false,
-      "ambiguityHandling": "The population is an SLA-managed follow-up task; no numeric baseline is claimed.",
+      "ambiguityHandling": "모집단은 SLA 관리 대상 후속 작업이며, 근거 없는 수치 기준선은 제시하지 않는다.",
       "requiredHumanDecision": null
     },
     {
@@ -27,10 +27,10 @@
       "modeAssessment": "undecidable-until-decision",
       "currentlyAcceptableMode": "manual",
       "possibleModes": ["manual", "event-ratio", "external"],
-      "evidenceBasis": ["report and source records can be linked"],
+      "evidenceBasis": ["리포트와 원본 기록을 연결할 수 있음"],
       "inventedEvidence": false,
-      "ambiguityHandling": "The exact population and successful-link condition remain open.",
-      "requiredHumanDecision": "Define the eligible record population and what counts as linked to a report."
+      "ambiguityHandling": "정확한 모집단과 연결 성공 조건은 열린 상태로 둔다.",
+      "requiredHumanDecision": "측정 대상 기록의 모집단과 리포트 연결 완료 조건을 정의해야 한다."
     },
     {
       "id": "K3",
@@ -40,14 +40,14 @@
       "modeAssessment": "human-choice-required",
       "currentlyAcceptableMode": "manual",
       "possibleModes": ["manual", "event-ratio"],
-      "evidenceBasis": ["audit logs record core administrative changes", "F12"],
+      "evidenceBasis": ["감사 로그가 핵심 관리자 변경을 기록함", "F12"],
       "inventedEvidence": false,
-      "ambiguityHandling": "A monthly RevOps reconciliation is declared without inventing an observed result.",
-      "requiredHumanDecision": "Choose whether this remains a monthly manual control, becomes a specifically named reconciliation KPI, or gains a defined event-ratio population."
+      "ambiguityHandling": "실제 측정 결과를 만들어내지 않고 월간 RevOps 대조 절차만 선언한다.",
+      "requiredHumanDecision": "월간 수동 통제로 유지할지, 구체적인 대조 KPI로 이름을 바꿀지, 모집단을 정의한 event-ratio로 전환할지 결정해야 한다."
     }
   ],
   "deliberatelyNotAssessed": [
-    "Whether the legacy KPI names are the best product metrics",
-    "Numeric targets and baselines not supported by the reconstructed brief"
+    "레거시 KPI 이름이 최선의 제품 지표인지 여부",
+    "재구성 브리프가 뒷받침하지 않는 수치 목표와 기준선"
   ]
 }

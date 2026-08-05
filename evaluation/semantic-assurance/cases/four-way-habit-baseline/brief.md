@@ -1,34 +1,33 @@
-# Habit tracker semantic comparison brief
+# 습관 관리 의미 비교 브리프
 
-## Provenance
+## 출처
 
-This is a reconstructed evaluation brief, not the original prompt that created
-`demo/habit-tracker-app.ko.sot.json`. It contains only product facts explicitly
-present in that legacy SOT. Legacy KPI wording, semantic ids, and proposed
-measurement answers are intentionally omitted from the generation input.
+이 문서는 `demo/habit-tracker-app.ko.sot.json`을 만들 때 사용한 원래 요청문이
+아니라, 평가를 위해 재구성한 브리프다. 레거시 SOT에 명시된 제품 사실만
+포함한다. 기존 KPI 문구, 의미 ID, 제안된 측정 답안은 생성 입력에서
+의도적으로 제외한다.
 
-## Product
+## 제품
 
-Plan a web habit and routine tracker for an individual user. The product should
-connect habit setup, daily check-ins, streaks, reminders, weekly reflection, and
-pattern insights so the user can see progress and choose a next action.
+개인 사용자를 위한 웹 기반 습관·루틴 관리 도구를 기획한다. 습관 설정,
+일일 체크인, 연속 기록, 알림, 주간 회고, 패턴 인사이트를 연결해 사용자가
+진행 상황을 보고 다음 행동을 선택할 수 있어야 한다.
 
-The MVP must support:
+MVP는 다음을 지원해야 한다.
 
-- habit frequency, reminder time, and start-date setup;
-- completion and skip records;
-- streak, weekly completion, time-of-day, and per-habit trend views;
-- reminder consent, schedule, pause, and frequency controls;
-- weekly reflection and next-action adjustment;
-- export, deletion, privacy controls, and optional sharing.
+- 습관 빈도, 알림 시간, 시작일 설정
+- 완료와 건너뛰기 기록
+- 연속 기록, 주간 완료, 시간대, 습관별 추세 조회
+- 알림 동의, 일정, 일시중지, 빈도 제어
+- 주간 회고와 다음 행동 조정
+- 내보내기, 삭제, 개인정보 제어, 선택적 공유
 
-Known measurement facts:
+현재 확인된 측정 사실은 다음과 같다.
 
-- habit creation, completion, skip, reminder adjustment, export, and deletion
-  can be represented as product interactions;
-- the product has not decided which behavior is the single "first-week core
-  action" that proves initial value;
-- no production baseline, retention result, or research result is available.
+- 습관 생성, 완료, 건너뛰기, 알림 조정, 내보내기, 삭제는 제품
+  상호작용으로 표현할 수 있다.
+- 초기 가치를 증명하는 단일한 "첫 주 핵심 행동"은 아직 결정되지 않았다.
+- 운영 기준선, 유지율 결과, 조사 결과는 아직 없다.
 
-Do not invent baseline values, survey findings, event availability, or a core
-action decision. Preserve the core-action choice as an explicit open decision.
+기준값, 설문 결과, 이벤트 가용성, 핵심 행동 결정을 만들어내지 않는다.
+핵심 행동 선택은 명시적인 열린 결정으로 남긴다.

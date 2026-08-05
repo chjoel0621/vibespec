@@ -7,19 +7,19 @@
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "기한 내 처리 비율" },
-      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "운영 가시성" },
-      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "정의와 초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "정의와 초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "감사 가능 운영 비율" },
-      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "enableKpiMeasurement",
@@ -29,7 +29,7 @@
         "mode": "event-ratio",
         "numerator": { "populationEventRef": "E1", "eventRef": "E2" },
         "denominator": { "populationEventRef": "E1" },
-        "window": "calendar-month"
+        "window": "월 단위"
       }
     },
     {
@@ -39,7 +39,7 @@
       "measurement": {
         "mode": "manual",
         "process": "RevOps가 등록 기록과 리포트 연결 표본을 검토한다.",
-        "frequency": "monthly"
+        "frequency": "월 1회"
       }
     },
     {
@@ -49,7 +49,7 @@
       "measurement": {
         "mode": "manual",
         "process": "RevOps가 핵심 관리자 변경과 감사 로그 기록을 대조한다.",
-        "frequency": "monthly"
+        "frequency": "월 1회"
       }
     },
     {

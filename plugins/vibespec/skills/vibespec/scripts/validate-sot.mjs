@@ -263,6 +263,11 @@ export function validateSot(sot) {
       if (semanticIds.has(entry.id)) error(entry.path, `duplicate semantic id ${entry.id}`);
       else { semanticIds.set(entry.id, entry); stableEntityIds.add(entry.id); }
     }
+    for (const [index, decision] of (sot.semantic.decisions || []).entries()) {
+      if (decision.status === "decided" && !(typeof decision.resolution === "string" && decision.resolution.trim())) {
+        error(`$.semantic.decisions[${index}].resolution`, "decided decision requires a non-empty resolution");
+      }
+    }
     for (const reference of semanticReferences(sot)) {
       const base = reference.ref.split(":")[0];
       const exists = reference.target === "EVENT" ? semanticIds.get(reference.ref)?.namespace === "EVENT"

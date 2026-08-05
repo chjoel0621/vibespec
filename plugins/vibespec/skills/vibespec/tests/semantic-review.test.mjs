@@ -139,6 +139,15 @@ englishNoShow.lang = "en";
 assert.match(reviewSemantic(englishNoShow).findings[0].summary, /[A-Za-z]/, "English SOT findings must be readable in English");
 console.log("[semantic] PASS no-show KPI is blocked without check-in production evidence and a resolved decision");
 
+const decidedWithoutResolution = clone(noShow);
+decidedWithoutResolution.semantic.decisions[0].status = "decided";
+assert.equal(validateSot(decidedWithoutResolution).valid, false, "decided decision must record its resolution");
+assert.ok(reviewSemantic(decidedWithoutResolution).findings.some(item => item.ruleId === "decision-resolution-required"));
+decidedWithoutResolution.semantic.decisions[0].resolution = "MVP uses QR check-in.";
+assert.equal(validateSot(decidedWithoutResolution).valid, true, JSON.stringify(validateSot(decidedWithoutResolution).errors));
+assert.equal(reviewSemantic(decidedWithoutResolution).findings.some(item => item.ruleId === "decision-resolution-required"), false);
+console.log("[semantic] PASS a decision cannot close without a recorded resolution");
+
 const unknownEvent = enableSemantic(valid, { mode: "event-count", eventRef: "E9", window: "calendar-day" });
 assert.equal(validateSot(unknownEvent).valid, false);
 assert.ok(reviewSemantic(unknownEvent).findings.some(item => item.ruleId === "semantic-reference-exists"));

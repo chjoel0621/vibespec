@@ -1,37 +1,34 @@
-# CRM semantic comparison brief
+# CRM 의미 비교 브리프
 
-## Provenance
+## 출처
 
-This is a reconstructed evaluation brief, not the original prompt that created
-`demo/crm.ko.sot.json`. It contains only product facts explicitly present in
-that legacy SOT. Legacy KPI wording, semantic ids, and proposed measurement
-answers are intentionally omitted from the generation input.
+이 문서는 `demo/crm.ko.sot.json`을 만들 때 사용한 원래 요청문이 아니라,
+평가를 위해 재구성한 브리프다. 레거시 SOT에 명시된 제품 사실만 포함한다.
+기존 KPI 문구, 의미 ID, 제안된 측정 답안은 생성 입력에서 의도적으로 제외한다.
 
-## Product
+## 제품
 
-Plan a web-first CRM for a 10-100 person B2B SaaS sales organization. Sales
-representatives and RevOps need one connected workflow for leads, accounts,
-contacts, opportunities, activities, follow-up tasks, pipeline reporting, and
-role-based administration.
+10~100명 규모의 B2B SaaS 영업 조직을 위한 웹 우선 CRM을 기획한다. 영업
+담당자와 RevOps는 리드, 고객사, 연락처, 영업 기회, 활동, 후속 작업,
+파이프라인 리포트, 역할 기반 관리를 하나의 연결된 흐름에서 처리해야 한다.
 
-The MVP must support:
+MVP는 다음을 지원해야 한다.
 
-- manual lead entry and CSV import;
-- duplicate detection, validation, assignment, and an auditable status history;
-- opportunity stage, amount, expected close date, probability, and next action;
-- calls, email, meetings, notes, tasks, due dates, reminders, and owner queues;
-- dashboards for pipeline, activities, tasks, and lead performance;
-- OAuth-based email/calendar integration with disconnect and audit paths;
-- role-based access, team structure, required fields, and audit logs.
+- 리드 수동 등록과 CSV 가져오기
+- 중복 감지, 유효성 검증, 담당자 배정, 감사 가능한 상태 이력
+- 영업 기회 단계, 금액, 예상 종료일, 확률, 다음 행동 관리
+- 콜, 이메일, 미팅, 메모, 작업, 기한, 리마인더, 담당자별 업무 큐
+- 파이프라인, 활동, 작업, 리드 성과 대시보드
+- 연결 해제와 감사 경로를 포함한 OAuth 기반 이메일·캘린더 연동
+- 역할 기반 접근, 팀 구조, 필수 필드, 감사 로그
 
-Known measurement facts:
+현재 확인된 측정 사실은 다음과 같다.
 
-- managed follow-up tasks have an owner, due time, status, and status-change time;
-- audit logs record core administrative changes;
-- report and source records can be linked, but the exact eligible population
-  and successful-link condition have not been decided;
-- no production baseline or observed result is available yet.
+- SLA 관리 대상 후속 작업에는 담당자, 기한, 상태, 상태 변경 시각이 있다.
+- 감사 로그는 핵심 관리자 변경을 기록한다.
+- 리포트와 원본 기록은 연결할 수 있지만, 정확한 측정 모집단과 연결 완료
+  조건은 아직 결정되지 않았다.
+- 운영 기준선이나 실제 측정 결과는 아직 없다.
 
-Do not invent baseline values, customer research, event availability, or an
-external system that is not named above. Preserve undecided measurement details
-as an explicit open decision.
+위에 명시되지 않은 기준값, 고객 조사, 이벤트 가용성, 외부 시스템을
+만들어내지 않는다. 결정되지 않은 측정 세부사항은 열린 결정으로 남긴다.

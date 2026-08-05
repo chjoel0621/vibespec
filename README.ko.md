@@ -8,13 +8,18 @@
 
 VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있는 듀얼 포맷 **플러그인 마켓플레이스**입니다. 아이디어를 설명하거나 사업계획서·PRD 초안 같은 문서를 첨부하면, AI가 스키마에 맞는 SOT JSON을 생성하고 전용 HTML 뷰어로 열어 바로 편집할 수 있습니다.
 
-**🕹️ [라이브 데모](https://chjoel0621.github.io/vibespec/)** — "내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면 데모와 같은 HTML을 산출합니다. 설치 없이 브라우저에서 바로 뷰어를 체험해 보세요. 샘플 제품(회의실 예약 앱)이 열리고 모든 항목을 편집할 수 있습니다. Chrome·Edge에서는 SOT 파일을 연결하면 저장이 그 파일에 바로 반영되며, 다른 브라우저에서는 SOT JSON을 다운로드합니다. [영어 데모](https://chjoel0621.github.io/vibespec/en/)도 있습니다.
+## 라이브 데모
 
-데모는 서로 연결된 세 페이지로 되어 있습니다. 오른쪽 아래 이동 바로 옮겨 다닐 수 있습니다 — **[제품 기획](https://chjoel0621.github.io/vibespec/)**, 그 위에 얹은 **[추가 기획](https://chjoel0621.github.io/vibespec/notif/)**(알림 증분), 둘을 합성한 **[통합 버전](https://chjoel0621.github.io/vibespec/map/)**. 합성 버전에서는 아무 노드나 누르면 그 노드를 정의한 문서가 열립니다.
+Pages는 `main`이 배포될 때마다 현재 뷰어와 추적 중인 SOT·change-plan으로 데모를 다시 만듭니다. 설치 없이 브라우저에서 바로 열 수 있으며, Chrome·Edge에서는 SOT 파일을 연결해 같은 파일에 저장할 수 있습니다.
 
-**[두 번째 데모 — 동네장터](https://chjoel0621.github.io/vibespec/flea/)**(위치 기반 중고거래)는 **작업공간 데모**입니다. 승인된 안전결제(에스크로) 추가 기획 *와* 제안 단계인 가격 제안 증분을 함께 담고 있어, 합쳐진 두 화면을 비교할 수 있습니다 — **[통합 버전](https://chjoel0621.github.io/vibespec/flea/map/)**(출시할 것만) vs **[검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/)**(제안 중인 작업까지 포함). 같은 이동 바로 두 데모 사이를 오갈 수 있습니다.
+| 확인할 경험 | 라이브 데모 |
+| --- | --- |
+| 기본 편집과 문서 연결 | **회의실 예약:** [제품 기획](https://chjoel0621.github.io/vibespec/) · [추가 기획](https://chjoel0621.github.io/vibespec/notif/) · [통합 버전](https://chjoel0621.github.io/vibespec/map/) · [English](https://chjoel0621.github.io/vibespec/en/) |
+| 진행 중인 제안과 출시 범위 비교 | **동네장터:** [제품 기획](https://chjoel0621.github.io/vibespec/flea/) · [검토 버전](https://chjoel0621.github.io/vibespec/flea/workspace/) · [통합 버전](https://chjoel0621.github.io/vibespec/flea/map/) |
+| 측정 기준을 결정하고 AI에 수정 요청 | **CRM:** [KPI 측정 점검](https://chjoel0621.github.io/vibespec/crm/review/?view=semantic) · [English](https://chjoel0621.github.io/vibespec/crm/en/review/?view=semantic) |
+| 근거가 완성된 KPI 측정 사례 | **위크셰프:** [KPI 측정 점검](https://chjoel0621.github.io/vibespec/weekchef/?view=semantic) · [English](https://chjoel0621.github.io/vibespec/weekchef/en/?view=semantic) |
 
-**[Semantic Assurance dogfood — 위크셰프](https://chjoel0621.github.io/vibespec/weekchef/)**는 패키징된 VibeSpec 0.17.0을 실제 Claude Code에서 실행해 만든 결과입니다. 제공되지 않은 KPI baseline은 `미측정`으로 남기고, 두 지표 모두 모집단·결과 이벤트를 구조화해 의미 검토를 통과합니다.
+CRM 데모는 일부러 열린 제품 결정을 남겨 둡니다. 답변을 저장하면 결정이 조용히 완료되지 않고, 최신 SOT를 Claude나 Codex에 첨부해 실제 기획에 반영하도록 요청하는 단계별 가이드와 복사용 요청 문구가 나타납니다. 위크셰프는 패키징된 VibeSpec 0.17.0을 실제 Claude Code에서 실행해 만든 통과 사례입니다.
 
 **[Before → Finding → Resolved 평가 사례](evaluation/semantic-assurance/cases/meeting-room-no-show/README.md)**는 구조적으로 유효한 회의실 기획이 왜 노쇼율을 아직 측정할 수 없는지, QR 체크인 결정·기능·화면·flow·이벤트를 연결한 뒤 어떻게 `measurement: ready`가 되는지 재현합니다.
 
@@ -33,7 +38,7 @@ VibeSpec은 Claude Cowork / Claude Code와 OpenAI Codex에서 함께 쓸 수 있
 | **트리** | 요구사항 계층 노드 캔버스. 노드 클릭 시 기능명세서로 이동 |
 | **IA (정보구조도)** | 섹션 → 페이지 → 행동 사이트맵. 기능↔화면 매핑, 누락 경고·자동 채우기 |
 | **유저플로우** | 화면 전환 그래프 (시작 → 화면 이동, 분기·루프, 줌/이동). 패널에서 전환 추가·삭제, 트리거를 기능에 연결하면 라벨 자동 동기화, 미연결·누락 경고 |
-| **의미 검토** | 새 의미 계약 문서에서 KPI → 측정 방식 → 이벤트/증거 → 기능·화면 관계를 읽기 전용 파생 보고서로 검토. 기존 SOT는 명시적으로 활성화하기 전까지 그대로 유효하며 추가 탭도 표시하지 않음 |
+| **KPI 측정 점검** | 새 의미 계약 문서에서 KPI → 측정 방식 → 이벤트/근거 → 기능·화면 관계를 점검. 영향받는 KPI, 필요한 결정과 다음 단계를 사용자 언어로 안내하고, 결정 답변을 저장한 뒤 SOT와 함께 AI에 전달할 요청 문구를 제공. 기존 SOT는 명시적으로 활성화하기 전까지 그대로 유효하며 추가 탭도 표시하지 않음 |
 
 ## 설치
 
@@ -85,7 +90,9 @@ node <VibeSpec-스킬-디렉터리>/scripts/verify-host-output.mjs outputs/meeti
 
 ## 사용
 
-"내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 새 기획은 각 KPI의 측정 방식도 선언하고 HTML에 파생된 의미 검토 보고서를 포함합니다. 차단 항목이 있는 결과는 정직한 초안으로 전달할 수 있지만 승인 가능·개발 전달 준비 완료로 표시하지 않습니다.
+"내 제품 아이디어로 기획도구 만들어줘" 또는 사업계획서를 첨부해 요청하면, 스킬이 SOT JSON을 담은 뷰어 HTML을 산출합니다. 새 기획은 각 KPI의 측정 방식도 선언하고 HTML에 파생된 KPI 측정 점검 보고서를 포함합니다. 결정 또는 보완이 필요한 결과는 정직한 초안으로 전달할 수 있지만 승인 가능·개발 전달 준비 완료로 표시하지 않습니다.
+
+**측정 결정을 반영하기:** KPI 측정 점검에서 질문에 답하고 `답변 저장`을 누르세요. 답변은 SOT에 기록되지만 결정은 열린 상태로 유지됩니다. 상단 `저장`으로 JSON을 저장한 뒤 화면에 나타난 요청 문구와 함께 Claude 또는 Codex에 첨부하면, VibeSpec이 관련 KPI·이벤트·기능·화면·플로우만 변경 계획으로 수정하고 구조·내용·측정 점검을 다시 실행합니다. 검사를 통과한 경우에만 결정을 완료 상태로 바꾸고 최신 JSON과 HTML을 만듭니다.
 
 **기존 기획 수정하기:** `*.sot.json`을 첨부하고 "F3 이름 바꾸고 수용 기준 하나 추가해줘"처럼 요청하세요. 스킬이 기존 id를 전부 보존한 채 최소한만 고치고, 검증을 통과시킨 뒤 무엇이 바뀌었는지·어디에 영향이 가는지(화면·전환·KPI)·어느 섹션이 바이트 단위로 그대로인지 리포트합니다.
 
@@ -108,7 +115,7 @@ node <VibeSpec-스킬-디렉터리>/scripts/verify-host-output.mjs outputs/meeti
 
 ## 활용 팁
 
-- **팀 협업은 JSON 파일만 공유하세요.** 뷰어(HTML)는 앱이라 한 번만 나눠 가지면 됩니다. 이후에는 저장한 `*.sot.json` 파일만 주고받으면, 상대가 같은 뷰어에서 파일 연결로 열어 **똑같은 5개 뷰**를 봅니다. 무거운 문서를 계속 복사할 필요가 없습니다.
+- **팀 협업은 JSON 파일만 공유하세요.** 뷰어(HTML)는 앱이라 한 번만 나눠 가지면 됩니다. 이후에는 저장한 `*.sot.json` 파일만 주고받으면, 상대가 같은 뷰어에서 파일 연결로 열어 **같은 기획과 점검 결과**를 봅니다. 무거운 문서를 계속 복사할 필요가 없습니다.
 
 - **수정은 기능명세서에서 한 번만.** 모든 뷰가 하나의 SOT를 읽고 쓰기 때문에, 기능 이름을 바꾸면 유저플로우 라벨·KPI 연결·IA 매핑이 전부 자동으로 따라옵니다. 같은 내용을 여러 곳에 다시 쓰지 마세요.
 
@@ -131,7 +138,7 @@ node <VibeSpec-스킬-디렉터리>/scripts/verify-host-output.mjs outputs/meeti
 데이터가 순수 `*.sot.json` 파일이라, 이 파일을 Git에 넣으면 별도 도구 없이 **이력·브랜치·리뷰·되돌리기**를 Git이 다 해줍니다.
 
 - **저장이 Git 친화 파일을 만듭니다.** Chrome·Edge에서는 처음 한 번 **파일 → 파일 연결**로 SOT를 고른 뒤 **저장**하면 그 파일에 표준 JSON을 바로 씁니다. **다른 이름으로 저장**은 `booking-v2.sot.json`처럼 새 버전 파일을 만들고 이후 저장 대상도 새 파일로 바꿉니다. 다른 브라우저에서는 같은 표준 JSON을 다운로드합니다. 키 정렬·pretty-print·`schemaVersion` 덕분에 실제로 바뀐 곳만 diff에 남습니다.
-- **권장 흐름.** 뷰어에서 편집 → **저장** → 저장소의 `*.sot.json` 교체 → 커밋 / PR. 동료는 pull 후 같은 뷰어로 열어 **똑같은 5개 뷰**를 봅니다.
+- **권장 흐름.** 뷰어에서 편집 → **저장** → 저장소의 `*.sot.json` 교체 → 커밋 / PR. 동료는 pull 후 같은 뷰어로 열어 **같은 기획과 점검 결과**를 봅니다.
 - **`.gitattributes`.** SOT를 텍스트·일관된 줄바꿈으로 다루도록 추가하세요:
 
   ```

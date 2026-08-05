@@ -1,12 +1,12 @@
 {
   "contractVersion": "semantic-generation-review-0.1",
   "status": "candidate-needs-human-approval",
-  "reviewer": "codex-assisted",
-  "principle": "Use only facts present in the frozen brief; preserve uncertainty instead of inventing evidence.",
+  "reviewer": "Codex 보조 작성",
+  "principle": "동결 브리프에 있는 사실만 사용하고, 근거를 만들어내지 않으며 불확실성을 그대로 보존한다.",
   "reviewedFieldChanges": [
-    "Removed unsupported numeric targets and replaced them with a post-baseline decision.",
-    "Replaced ambiguous legacy baseline labels with an explicit unmeasured state.",
-    "Corrected the weekly-return KPI feature references from F8 to the actual F5/F7 interactions."
+    "근거 없는 수치 목표를 제거하고 기준선 측정 후 결정하도록 바꿨다.",
+    "모호한 레거시 기준선 표현을 명시적인 미측정 상태로 바꿨다.",
+    "주간 재방문 KPI의 기능 참조를 F8에서 실제 상호작용인 F5/F7로 교정했다."
   ],
   "kpis": [
     {
@@ -15,10 +15,10 @@
       "verdict": "pending-human-review",
       "legacyName": "첫 주 핵심 행동 완료율",
       "expectedMode": "event-ratio",
-      "evidenceBasis": ["habit creation", "completion and skip records", "first-week core action is undecided"],
+      "evidenceBasis": ["습관 생성", "완료와 건너뛰기 기록", "첫 주 핵심 행동 미결정"],
       "inventedEvidence": false,
-      "ambiguityHandling": "The numerator event intentionally has no producer until the core action is decided.",
-      "requiredHumanDecision": "Choose the single first-week behavior that demonstrates initial value."
+      "ambiguityHandling": "핵심 행동이 결정될 때까지 분자 이벤트의 생산 근거를 의도적으로 비워 둔다.",
+      "requiredHumanDecision": "초기 가치를 증명하는 단일한 첫 주 행동을 결정해야 한다."
     },
     {
       "id": "K2",
@@ -31,10 +31,10 @@
         "habit-execution-only",
         "authenticated-session-return"
       ],
-      "evidenceBasis": ["completion records", "reminder adjustment", "F5", "F7", "P5", "P6"],
+      "evidenceBasis": ["완료 기록", "알림 조정", "F5", "F7", "P5", "P6"],
       "inventedEvidence": false,
-      "ambiguityHandling": "The legacy F8 KPI reference is corrected to F5 and F7; an eligible user-week starts when an active habit exists and no observed retention is claimed.",
-      "requiredHumanDecision": "Choose which interactions qualify as a weekly return and document why reminder adjustment is included or excluded."
+      "ambiguityHandling": "레거시 F8 KPI 참조를 F5와 F7로 교정한다. 활성 습관이 있을 때 사용자 주간 모집단이 시작되며, 실제 유지율을 주장하지 않는다.",
+      "requiredHumanDecision": "주간 재방문으로 인정할 상호작용을 선택하고 알림 조정을 포함하거나 제외하는 이유를 기록해야 한다."
     },
     {
       "id": "K3",
@@ -42,17 +42,17 @@
       "verdict": "pending-human-review",
       "legacyName": "사용자 데이터 제어 완료율",
       "expectedMode": "event-ratio",
-      "evidenceBasis": ["export", "deletion", "privacy controls", "F9"],
+      "evidenceBasis": ["내보내기", "삭제", "개인정보 제어", "F9"],
       "inventedEvidence": false,
-      "ambiguityHandling": "A request-to-completion ratio is declared, but the legacy IA maps the data-control screen to F10 rather than F9.",
-      "requiredHumanDecision": "Correct the IA and flow ownership for F9 before treating interaction evidence as trustworthy."
+      "ambiguityHandling": "요청 대비 완료 비율을 선언하지만, 레거시 IA는 데이터 제어 화면을 F9가 아닌 F10에 연결하고 있다.",
+      "requiredHumanDecision": "상호작용 근거를 신뢰하기 전에 F9의 IA와 플로우 소유권을 교정해야 한다."
     }
   ],
   "sourceDefects": [
-    "The legacy data-control feature F9 is attached to start/revisit pages, while the page titled data control references F10."
+    "레거시 데이터 제어 기능 F9는 시작·재방문 화면에 연결되어 있고, 데이터 제어라는 제목의 화면은 F10을 참조한다."
   ],
   "deliberatelyNotAssessed": [
-    "Whether the legacy KPI names are the best product metrics",
-    "Numeric targets and baselines not supported by the reconstructed brief"
+    "레거시 KPI 이름이 최선의 제품 지표인지 여부",
+    "재구성 브리프가 뒷받침하지 않는 수치 목표와 기준선"
   ]
 }

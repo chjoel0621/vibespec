@@ -2,6 +2,25 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [0.17.1] - 2026-08-05
+
+### Added
+
+- Added an actionable KPI Measurement Check that identifies the affected KPI, explains unresolved decisions in user language, and separates active from completed decisions.
+- Added editable decision answers with an in-view AI handoff guide and copy-ready request for applying the answer through a scoped change plan.
+- Added Korean and English live CRM review demos rebuilt from tracked source SOTs and change plans on every Pages deployment.
+
+### Changed
+
+- Renamed the user-facing Semantic Review to KPI Measurement Check and clarified that version 0.17 checks measurement readiness rather than all product-planning quality.
+- Replaced raw internal modes and status labels with plain-language measurement descriptions and next actions.
+- Updated the Korean and English READMEs around the current live demos and decision-resolution workflow.
+
+### Fixed
+
+- Prevented a saved natural-language answer from silently closing a decision before affected planning fields are updated and the checks are rerun.
+- Rejected `decided` decisions without a non-empty recorded resolution.
+
 ## [0.17.0] - 2026-08-04
 
 ### Added

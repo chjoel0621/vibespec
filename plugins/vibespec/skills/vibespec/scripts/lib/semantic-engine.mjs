@@ -203,6 +203,16 @@ export function reviewSemantic(sot) {
   }
 
   for (const decision of decisions.values()) {
+    if (decision.status === "decided" && !(typeof decision.resolution === "string" && decision.resolution.trim())) {
+      push({
+        ruleId: "decision-resolution-required",
+        summary: message(`${decision.id}은 결정 완료 상태지만 확정 내용이 없습니다.`, `${decision.id} is marked decided but has no resolution.`),
+        subjectRefs: [decision.id],
+        evidenceRefs: [decision.id],
+        evidence: [decision]
+      });
+      continue;
+    }
     if (decision.status !== "open") continue;
     for (const impact of decision.impacts || []) {
       if (impact.effect !== "blocks-measurement") continue;

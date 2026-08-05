@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { validateSot } from "../scripts/validate-sot.mjs";
+import { applyChangePlan } from "../scripts/lib/change-plan.mjs";
 import { reviewSot } from "../scripts/lib/content-review.mjs";
 import { reviewSemantic } from "../scripts/lib/semantic-engine.mjs";
 import { validateTree } from "../scripts/lib/tree.mjs";
@@ -11,6 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../../../../..");
 const demoRoot = join(repoRoot, "demo");
 const { deepenSot } = await import(pathToFileURL(join(repoRoot, "tools", "deepen-sot.mjs")).href);
+const { navHtml, pageFileSlug, PRODUCTS } = await import(pathToFileURL(join(demoRoot, "nav.mjs")).href);
 const load = name => JSON.parse(readFileSync(join(demoRoot, name), "utf8"));
 const demoFiles = readdirSync(demoRoot).filter(name => name.endsWith(".sot.json"));
 const flattenPages = (pages, depth = 1) => (pages || []).flatMap(page => [
@@ -61,6 +63,15 @@ for (const lang of ["ko", "en"]) {
   assert.equal(result.valid, true, `${name} must validate: ${JSON.stringify(result.errors)}`);
 }
 
+const crmDemo = PRODUCTS.find(product => product.sub === "crm");
+assert.ok(crmDemo, "CRM live demo must be registered in demo navigation");
+for (const lang of ["ko", "en"]) {
+  const html = navHtml("/vibespec", crmDemo, lang, "semantic");
+  assert.ok(html.includes(`${lang === "en" ? "/vibespec/crm/en" : "/vibespec/crm"}/review/?view=semantic`), `CRM ${lang} nav must open Measurement Check directly`);
+  assert.ok(html.includes('class="on"'), `CRM ${lang} Measurement Check nav item must show its active state`);
+}
+assert.equal(pageFileSlug("review/?view=semantic"), "review/", "demo staging must strip the query before resolving the output file");
+
 for (const lang of ["ko", "en"]) {
   const name = join("semantic", `weekchef.${lang}.sot.json`);
   const sot = load(name);
@@ -79,6 +90,22 @@ for (const lang of ["ko", "en"]) {
   const semantic = reviewSemantic(sot);
   assert.equal(semantic.readiness.measurement, "ready", `${name} must be measurement-ready: ${JSON.stringify(semantic.findings)}`);
   assert.ok((sot.prd.kpis || []).every(kpi => /미측정|Unknown/.test(kpi.baseline || "")), `${name} must not invent baseline evidence`);
+}
+
+for (const lang of ["ko", "en"]) {
+  const source = load(`crm.${lang}.sot.json`);
+  const plan = load(join("semantic", `crm-review.${lang}.plan.json`));
+  const { after } = applyChangePlan(source, plan);
+  const validation = validateSot(after);
+  assert.equal(validation.valid, true, `crm-review/${lang} must remain structurally valid`);
+  const semantic = reviewSemantic(after);
+  assert.equal(semantic.assessment.status, "failed", `crm-review/${lang} must require action`);
+  assert.equal(semantic.readiness.measurement, "blocked", `crm-review/${lang} must not claim measurement readiness`);
+  assert.deepEqual(
+    semantic.findings.map(finding => [finding.ruleId, finding.subjectRefs]),
+    [["open-decision-blocks-measurement", ["D1", "K2"]]],
+    `crm-review/${lang} must keep one explainable open decision`
+  );
 }
 
 for (const name of demoFiles) {
@@ -125,4 +152,4 @@ for (const koName of demoFiles.filter(name => name.includes(".ko."))) {
   assert.deepEqual(graphShape(load(koName)), graphShape(load(enName)), `${koName} and ${enName} must share one graph structure`);
 }
 
-console.log("[demo] PASS demo SOTs, content quality, and parent/Add-on trees validate in ko and en");
+console.log("[demo] PASS demo SOTs, live semantic review plans, content quality, and parent/Add-on trees validate in ko and en");

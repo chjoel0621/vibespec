@@ -60,4 +60,4 @@ IA는 requirement나 feature 목록을 화면으로 복사하는 표가 아니�
 - `from/to`는 실제 IA `P#`; 기능 ID는 `ref`에만 둔다.
 - `source/target`, `fromPage/toPage`, `action`, `name` 같은 대체 필드는 쓰지 않는다.
 
-저장·검증·의미 검토·HTML 생성은 `common.md` 절차를 따른다. 두 파일의 절대 경로와 HTML을 바로 열 수 있다는 사용법, 의미 검토 준비도를 안내한다.
+저장·검증·KPI 측정 가능성 점검·HTML 생성은 `common.md` 절차를 따른다. 두 파일의 절대 경로와 HTML을 바로 열 수 있다는 사용법, 측정 가능 여부와 확인할 항목을 안내한다.

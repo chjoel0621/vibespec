@@ -7,19 +7,19 @@
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "첫 주 핵심 행동 완료율" },
-      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "핵심 행동 결정과 초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "핵심 행동 결정과 초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "주간 재방문율" },
-      "changes": { "refs": ["F5", "F7"], "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "refs": ["F5", "F7"], "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "updatePrdItem",
       "field": "kpis",
       "match": { "name": "사용자 데이터 제어 완료율" },
-      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 baseline 수집 후 목표 확정" }
+      "changes": { "baseline": "미측정 — 운영 데이터 없음", "target": "초기 4주 기준선 수집 후 목표 확정" }
     },
     {
       "op": "enableKpiMeasurement",
@@ -29,7 +29,7 @@
         "mode": "event-ratio",
         "numerator": { "populationEventRef": "E1", "eventRef": "E2" },
         "denominator": { "populationEventRef": "E1" },
-        "window": "habit-created-at plus 7 days"
+        "window": "습관 생성 시점부터 7일"
       }
     },
     {
@@ -40,7 +40,7 @@
         "mode": "event-ratio",
         "numerator": { "populationEventRef": "E3", "eventRef": "E4" },
         "denominator": { "populationEventRef": "E3" },
-        "window": "calendar-week"
+        "window": "주 단위"
       }
     },
     {
@@ -51,7 +51,7 @@
         "mode": "event-ratio",
         "numerator": { "populationEventRef": "E5", "eventRef": "E6" },
         "denominator": { "populationEventRef": "E5" },
-        "window": "request-created-at plus 7 days"
+        "window": "요청 생성 시점부터 7일"
       }
     },
     {

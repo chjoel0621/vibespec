@@ -10,13 +10,13 @@
   },
   "brief": {
     "path": "brief.md",
-    "fileSha256": "165FFFF3907279BAF5711844EF438E4BFB6C0BA02A17312A4F07BB0E0E50E7CB",
+    "fileSha256": "16E1CFB0D9831D2D8EA9954522D9E16BBA74D4D437E255D3B6453BE6A58CB36D",
     "provenance": "reconstructed-from-legacy-sot"
   },
   "overlay": {
-    "plan": { "path": "overlay.plan.json", "fileSha256": "CEFD8A4FAB025EBEDAC5381D31B68C8F0BB02B16260669760A3DB5287AEC22F4" },
-    "adjudication": { "path": "adjudication.json", "fileSha256": "350B5FCFC2C1060ECD833F930BD60498C16B9543D5B0685F55FE786089B21BF1" },
-    "resultDigest": "sha256:0438d7c09bee23f27f6e973a3e5bbdf8d4e2040c2b947daab66bdbdf54b9bcf2"
+    "plan": { "path": "overlay.plan.json", "fileSha256": "CE563928B643BECDA518D87540365FDBB7D7B3812F60D1347130EA8B5E16B55E" },
+    "adjudication": { "path": "adjudication.json", "fileSha256": "86B08F92F265C224AF914EE2DFF94BD265160A0C0805B6C18B0F2655E1D4B6C4" },
+    "resultDigest": "sha256:302150778409b0298e6bb812a3999f1db82a413d152fac617af94db008ead4cb"
   },
   "expected": {
     "assessment": "failed",

@@ -42,6 +42,8 @@ node "<VIBESPEC_SKILL_DIR>/scripts/embed-sot.mjs" "<VIBESPEC_SKILL_DIR>/assets/v
 
 validate가 FAIL이면 PASS까지 고친다. review는 advisory지만 모호한 수용 기준·빈 범위·프로파일 어휘 경고를 검토한다. `review-semantic`은 `semantic`이 있는 문서에서 KPI → 측정 방식 → 이벤트/증거 → 생산 기능과 사용자 상호작용 근거를 검사한다. 사용자 이벤트의 상호작용 근거는 IA 또는 flow 중 하나이며, 자연어 `inScope`를 기계적으로 판정하지 않는다. 의미 계약이 없는 기존 문서는 `not-assessed`이며 자동 승격하지 않는다.
 
-의미 검토가 blocked여도 구조적으로 유효한 **초안** JSON/HTML은 만들 수 있다. 이때 차단 finding과 필요한 사람 결정을 최종 응답에 명시하고 승인 가능·개발 전달 준비 완료라고 부르지 않는다. 근거가 문서에 이미 있으면 고쳐서 재검토하되, QR/NFC 선택처럼 사용자가 결정해야 하는 사실을 AI가 임의로 확정하지 않는다. 승인 또는 개발 전달 준비 완료 조건은 validate PASS와 semantic measurement `ready`다. HTML은 JSON을 다시 작성하지 않고 반드시 embed 명령으로 만든다. `embed-sot`은 같은 공유 엔진의 파생 보고서를 HTML에 봉인하며, 뷰어 편집 후에는 결과를 stale로 표시한다.
+KPI 측정 가능성 점검이 blocked여도 구조적으로 유효한 **초안** JSON/HTML은 만들 수 있다. 이때 확인할 항목과 필요한 사람 결정을 최종 응답에 명시하고 승인 가능·개발 전달 준비 완료라고 부르지 않는다. 근거가 문서에 이미 있으면 고쳐서 재점검하되, QR/NFC 선택처럼 사용자가 결정해야 하는 사실을 AI가 임의로 확정하지 않는다. 승인 또는 개발 전달 준비 완료 조건은 validate PASS와 semantic measurement `ready`다. HTML은 JSON을 다시 작성하지 않고 반드시 embed 명령으로 만든다. `embed-sot`은 같은 공유 엔진의 파생 보고서를 HTML에 봉인하며, 뷰어 편집 후에는 결과를 stale로 표시한다.
+
+사용자가 HTML에서 결정 답변을 저장하면 `resolution` 초안만 기록하고 결정은 `open`으로 유지한다. 답변을 영향받는 KPI·이벤트·기능·화면·플로우에 실제 반영하는 change-plan을 검토·적용한 뒤에만 `status: "decided"`로 바꾸고, 구조 검증과 KPI 측정 가능성 점검을 다시 실행한다. 답변 기록만으로 차단을 해제하지 않는다.
 
 기본 신규/단일 수정 산출물은 `outputs/<제품명>.sot.json`과 `outputs/<제품명>.html` 두 개다. 적용된 change plan은 `history/change-plans/`에 둔다.

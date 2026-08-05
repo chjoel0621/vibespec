@@ -12,7 +12,7 @@
   "language": "ko",
   "invocationPrompt": {
     "path": "evaluation/semantic-assurance/templates/four-way-invocation-prompt.txt",
-    "fileSha256": "EA87455C1D16E6FC8FA8A9D79B39A1438364818FEC8538CF6B9307269E298305"
+    "fileSha256": "271ED374DB737E17C07CFC4B15D561F249E94E6E4E67560B971227E878976E89"
   },
   "clarificationPolicy": "do-not-answer-preserve-as-decision",
   "startedAt": null,

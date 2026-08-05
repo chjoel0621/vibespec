@@ -1,0 +1,22 @@
+{
+  "kind": "vibespec-change-plan-v2",
+  "baseDigest": "sha256:f93f6283321a248d02b0424155544e3118e48665e5dce995eb770684d326acff",
+  "operations": [
+    { "op": "enableSemantic", "contractVersion": "semantic-0.1" },
+    { "op": "updatePrdItem", "field": "kpis", "match": { "name": "On-time processing rate" }, "changes": { "baseline": "Not measured — no operational data", "target": "Set the target after collecting an initial four-week baseline" } },
+    { "op": "updatePrdItem", "field": "kpis", "match": { "name": "Operations visibility" }, "changes": { "baseline": "Not measured — no operational data", "target": "Define the measure and set the target after collecting an initial four-week baseline" } },
+    { "op": "updatePrdItem", "field": "kpis", "match": { "name": "Auditable operations rate" }, "changes": { "baseline": "Not measured — no operational data", "target": "Set the target after collecting an initial four-week baseline" } },
+    { "op": "enableKpiMeasurement", "match": { "name": "On-time processing rate" }, "id": "K1", "measurement": { "mode": "event-ratio", "numerator": { "populationEventRef": "E1", "eventRef": "E2" }, "denominator": { "populationEventRef": "E1" }, "window": "calendar month" } },
+    { "op": "enableKpiMeasurement", "match": { "name": "Operations visibility" }, "id": "K2", "measurement": { "mode": "manual", "process": "RevOps reviews a sample of source records and their report links.", "frequency": "monthly" } },
+    { "op": "enableKpiMeasurement", "match": { "name": "Auditable operations rate" }, "id": "K3", "measurement": { "mode": "manual", "process": "RevOps compares key administrative changes with their audit-log records.", "frequency": "monthly" } },
+    { "op": "addSemanticEvent", "event": { "id": "E1", "type": "system", "name": "SLA-managed follow-up registered", "producers": [{ "type": "feature", "ref": "F6" }] } },
+    { "op": "addSemanticEvent", "event": { "id": "E2", "type": "user", "name": "Follow-up completed on time", "producers": [{ "type": "feature", "ref": "F6" }], "surfaceRefs": ["P15"] } },
+    { "op": "addSemanticDecision", "decision": { "id": "D1", "question": "Which records define the Operations visibility population, and what counts as a completed report link?", "status": "open", "impacts": [{ "effect": "blocks-measurement", "refs": ["K2"] }] } }
+  ],
+  "expected": {
+    "touchedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "addedIds": ["K1", "K2", "K3", "E1", "E2", "D1"],
+    "removedIds": [],
+    "touchedPaths": ["semantic.contractVersion", "prd.kpis[On-time processing rate]", "K1", "prd.kpis[Operations visibility]", "K2", "prd.kpis[Auditable operations rate]", "K3", "E1", "E2", "D1"]
+  }
+}

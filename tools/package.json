@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "check:paths": "node check-path-leaks.mjs ..",
+    "check:docs": "node check-doc-links.mjs ..",
     "capture": "node capture-template-screenshots.mjs"
   },
   "devDependencies": {

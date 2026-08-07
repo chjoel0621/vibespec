@@ -20,7 +20,7 @@ VibeSpec runs as a plugin for Claude Cowork, Claude Code, and OpenAI Codex.
 
 Full mode requires Node.js 18 or later, read access to the installed VibeSpec skill directory, and write access to the task folder. It produces validated JSON and a self-contained HTML viewer and supports safe edits, rebase, maps, and merge. Claude Code and filesystem-enabled Codex tasks normally provide these capabilities.
 
-A Cowork task without Node.js or shell access can use reduced mode. VibeSpec creates the JSON and supplies the unchanged viewer, and the user loads the JSON in that viewer. In this environment VibeSpec cannot claim validated embedded HTML or apply deterministic tree edits.
+A Cowork task without Node.js or shell access can use reduced mode after the user accepts that limitation. VibeSpec provides the SOT JSON. If the host can read and copy the installed `assets/viewer.html`, VibeSpec also supplies that unchanged viewer for the user to load the JSON into; without asset access, only the JSON can be provided. Reduced mode cannot claim validated embedded HTML or apply deterministic tree edits.
 
 The `/plugin` slash commands below are for the Claude Code terminal only. They do not work in Cowork or Codex.
 
@@ -62,23 +62,15 @@ In the ChatGPT desktop app, open **Codex -> Plugins**, choose the `vibespec` mar
 
 ## First request
 
-Open a new task on a writable folder. Run the installed doctor first:
+After installation, open a new task or session on a writable folder and invoke VibeSpec naturally or explicitly: use `$vibespec` in Codex, `/vibespec:vibespec` in Claude Code, or select **VibeSpec** in Cowork.
 
-```text
-node <VibeSpec-skill-dir>/scripts/doctor.mjs <task-folder> --json
-```
-
-Then invoke VibeSpec with:
+In full mode, the loaded skill determines its own installed path and runs its doctor/preflight before using scripts. You do not need to know or guess `<VibeSpec-skill-dir>`. Then request:
 
 > Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`.
 
-Full-mode acceptance requires the doctor to pass, both output files to exist, and the installed verifier to report PASS:
+This two-file request is a full-mode example. In reduced mode, VibeSpec may provide JSON only; it includes the unchanged viewer only when the host can read and copy the installed viewer asset.
 
-```text
-node <VibeSpec-skill-dir>/scripts/verify-host-output.mjs outputs/meeting-room.sot.json outputs/meeting-room.html --host <claude-code|cowork|codex-cli|codex-desktop> --record host-acceptance/<host>.json
-```
-
-If VibeSpec is unavailable in the new task, reopen the task after installation or restart the desktop app. See [Getting started](docs/getting-started.md) for manual invocation and acceptance details.
+If VibeSpec is unavailable in the new task, reopen the task after installation or restart the desktop app. Host verification is an optional development and acceptance step after the host or loaded skill reports its installed path; see [Getting started](docs/getting-started.md) for those details.
 
 ## Live demos
 

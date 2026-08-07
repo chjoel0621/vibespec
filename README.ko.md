@@ -20,7 +20,7 @@ VibeSpec은 Claude Cowork, Claude Code, OpenAI Codex용 플러그인으로 실�
 
 전체 모드에는 Node.js 18 이상, 설치된 VibeSpec 스킬 디렉터리 읽기 권한, 작업 폴더 쓰기 권한이 필요합니다. 검증된 JSON과 자기완결 HTML 뷰어를 생성하며 안전 수정, 재기준, 지도, 병합을 지원합니다. Claude Code와 파일시스템을 사용할 수 있는 Codex 작업은 보통 이 조건을 충족합니다.
 
-Node.js나 셸에 접근할 수 없는 Cowork 작업은 축소 모드를 사용할 수 있습니다. VibeSpec이 JSON과 수정하지 않은 뷰어를 제공하면 사용자가 뷰어에서 JSON을 불러옵니다. 이 환경에서는 검증된 SOT 내장 HTML을 보장하거나 결정적 트리 수정을 적용할 수 없습니다.
+Node.js나 셸에 접근할 수 없는 Cowork 작업은 사용자가 제약을 수락한 뒤 축소 모드를 사용할 수 있습니다. VibeSpec은 SOT JSON을 제공합니다. 호스트가 설치된 `assets/viewer.html`을 읽어 복사할 수 있을 때만 사용자가 JSON을 불러올 수정하지 않은 뷰어도 함께 제공합니다. `assets/viewer.html`에 접근할 수 없으면 JSON만 제공할 수 있습니다. 축소 모드에서는 검증된 SOT 내장 HTML을 보장하거나 결정적 트리 수정을 적용할 수 없습니다.
 
 아래 `/plugin` 슬래시 명령은 Claude Code 터미널 전용입니다. Cowork나 Codex에서는 동작하지 않습니다.
 
@@ -62,23 +62,15 @@ ChatGPT 데스크톱 앱에서 **Codex -> Plugins**를 열고 `vibespec` 마켓�
 
 ## 첫 요청
 
-쓰기 가능한 폴더에서 새 작업을 엽니다. 먼저 설치된 doctor를 실행합니다.
+설치 후 쓰기 가능한 폴더에서 새 작업이나 세션을 열고 VibeSpec을 자연어 또는 명시적으로 호출합니다. Codex에서는 `$vibespec`, Claude Code에서는 `/vibespec:vibespec`을 사용하고, Cowork에서는 **VibeSpec**을 선택합니다.
 
-```text
-node <VibeSpec-skill-dir>/scripts/doctor.mjs <task-folder> --json
-```
-
-그다음 VibeSpec에 다음과 같이 요청합니다.
+전체 모드에서는 로드된 스킬이 설치된 자신의 경로를 확인하고 스크립트를 사용하기 전에 doctor/preflight를 실행합니다. 사용자가 `<VibeSpec-skill-dir>`를 알거나 추측할 필요가 없습니다. 그다음 다음과 같이 요청합니다.
 
 > 간결한 회의실 예약 기획을 만들고 `outputs/meeting-room.sot.json`과 `outputs/meeting-room.html`을 모두 저장하세요.
 
-전체 모드 설치 확인은 doctor가 통과하고, 두 출력 파일이 존재하며, 설치된 verifier가 PASS를 보고해야 완료됩니다.
+두 파일을 요청하는 이 예시는 전체 모드용입니다. 축소 모드에서는 JSON만 제공될 수 있으며, 호스트가 설치된 `assets/viewer.html`을 읽어 복사할 수 있을 때만 수정하지 않은 뷰어를 함께 제공합니다.
 
-```text
-node <VibeSpec-skill-dir>/scripts/verify-host-output.mjs outputs/meeting-room.sot.json outputs/meeting-room.html --host <claude-code|cowork|codex-cli|codex-desktop> --record host-acceptance/<host>.json
-```
-
-새 작업에서 VibeSpec을 사용할 수 없다면 설치 후 작업을 다시 열거나 데스크톱 앱을 재시작하세요. 직접 호출과 설치 확인 세부 정보는 [시작하기](docs/getting-started.md)를 참고하세요.
+새 작업에서 VibeSpec을 사용할 수 없다면 설치 후 작업을 다시 열거나 데스크톱 앱을 재시작하세요. 호스트 검증은 호스트나 로드된 스킬이 설치 경로를 알려준 뒤 수행하는 선택적 개발·수용 확인 단계입니다. 자세한 내용은 [시작하기](docs/getting-started.md)를 참고하세요.
 
 ## 라이브 데모
 

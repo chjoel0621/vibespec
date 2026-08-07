@@ -41,6 +41,13 @@ test('ignores URI-scheme and protocol-relative Markdown links', () => {
   );
 });
 
+test('does not pair a reference label with a later image target', () => {
+  assert.deepEqual(
+    extractRelativeMarkdownLinks('[reference][id] ![preview](missing.png)'),
+    []
+  );
+});
+
 test('ignores links inside backtick and tilde fenced code blocks', () => {
   const markdown = [
     '````markdown',

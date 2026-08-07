@@ -135,6 +135,25 @@ function destinationAt(markdown, start) {
   return undefined;
 }
 
+function labelEndAt(markdown, start) {
+  let index = start + 1;
+  let depth = 1;
+
+  while (index < markdown.length) {
+    if (markdown[index] === '\\') {
+      index += 2;
+      continue;
+    }
+    if (markdown[index] === '[') depth += 1;
+    if (markdown[index] === ']') {
+      depth -= 1;
+      if (depth === 0) return index;
+    }
+    index += 1;
+  }
+  return -1;
+}
+
 export function extractRelativeMarkdownLinks(markdown) {
   const source = maskInlineCode(withoutFencedCode(markdown));
   const links = [];
@@ -144,8 +163,11 @@ export function extractRelativeMarkdownLinks(markdown) {
       index += 1;
       continue;
     }
-    const labelEnd = source.indexOf('](', index + 1);
-    if (labelEnd === -1) break;
+    const labelEnd = labelEndAt(source, index);
+    if (labelEnd === -1 || source[labelEnd + 1] !== '(') {
+      index = labelEnd === -1 ? index + 1 : labelEnd + 1;
+      continue;
+    }
     const parsed = destinationAt(source, labelEnd + 2);
     if (!parsed) {
       index = labelEnd + 2;

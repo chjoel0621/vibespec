@@ -3,10 +3,10 @@ import { execFile } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deepenSot } from './deepen-sot.mjs';
+import { resolveMarketingRoot } from './lib/marketing-runtime.mjs';
 import { promisify } from 'node:util';
 
 const vibeRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const marketingRoot = process.env.VIBESPEC_MARKETING_ROOT || 'C:/VibeSpec-Marketing';
 const execFileAsync = promisify(execFile);
 const sotOnly = process.argv.includes('--sot-only');
 
@@ -216,35 +216,43 @@ const vibeCodingConsumerSystems = [
 const vibeCodingConsumerSlugs = new Set(vibeCodingConsumerSystems.map((system) => system.slug));
 const marketplaceSlugs = new Set(['job-board-platform']);
 const allSystems = [...systems, ...industryCrmSystems, ...coreItSystems, ...coreItSystems2, ...newSystems, ...nextWaveSystems, ...customerSupportExpansionSystems, ...highDemandBusinessSystems, ...keywordSystemTemplates, ...commerceSeoSystems, ...vibeCodingConsumerSystems];
-const requestedSlugs = new Set(process.argv.slice(2).filter((arg) => arg !== '--sot-only'));
-const selectedSystems = requestedSlugs.size
-  ? allSystems.filter((config) => requestedSlugs.has(config.slug))
-  : allSystems;
-if (requestedSlugs.size && selectedSystems.length !== requestedSlugs.size) {
-  const found = new Set(selectedSystems.map((config) => config.slug));
-  throw new Error(`Unknown template slug: ${[...requestedSlugs].filter((slug) => !found.has(slug)).join(', ')}`);
+async function main() {
+  const requestedSlugs = new Set(process.argv.slice(2).filter((arg) => arg !== '--sot-only'));
+  const selectedSystems = requestedSlugs.size
+    ? allSystems.filter((config) => requestedSlugs.has(config.slug))
+    : allSystems;
+  if (requestedSlugs.size && selectedSystems.length !== requestedSlugs.size) {
+    const found = new Set(selectedSystems.map((config) => config.slug));
+    throw new Error(`Unknown template slug: ${[...requestedSlugs].filter((slug) => !found.has(slug)).join(', ')}`);
+  }
+
+  const marketingRoot = sotOnly ? undefined : resolveMarketingRoot();
+  for (const config of selectedSystems) {
+    const profile = marketplaceSlugs.has(config.slug) ? 'marketplace' : vibeCodingConsumerSlugs.has(config.slug) ? 'consumer' : 'operations';
+    for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang), { profile }), null, 2) + '\n');
+  }
+  if (marketingRoot) {
+    await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
+    const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));
+    const batchPath = resolve(marketingRoot, 'content', 'batch-templates.json');
+    const existingBatch = JSON.parse(await readFile(batchPath, 'utf8'));
+    const recordsBySlug = new Map(records.map((record) => [record.slug, record]));
+    const mergedTemplates = requestedSlugs.size
+      ? [
+          ...existingBatch.templates.map((record) => recordsBySlug.get(record.slug) ?? record),
+          ...records.filter((record) => !existingBatch.templates.some((existing) => existing.slug === record.slug))
+        ]
+      : records;
+    await writeFile(batchPath, JSON.stringify({ templates: mergedTemplates }, null, 2) + '\n');
+    const { stdout } = await execFileAsync(process.execPath, [resolve(marketingRoot, 'scripts', 'regenerate-template-downloads.mjs')]);
+    process.stdout.write(stdout);
+    console.log(`Generated ${selectedSystems.length * 2} SOT files, updated ${selectedSystems.length} template records, and refreshed download HTML.`);
+  } else {
+    console.log(`Generated ${selectedSystems.length * 2} SOT files in ${vibeRoot} (SOT-only mode).`);
+  }
 }
 
-for (const config of selectedSystems) {
-  const profile = marketplaceSlugs.has(config.slug) ? 'marketplace' : vibeCodingConsumerSlugs.has(config.slug) ? 'consumer' : 'operations';
-  for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang), { profile }), null, 2) + '\n');
-}
-if (!sotOnly) {
-  await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
-  const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));
-  const batchPath = resolve(marketingRoot, 'content', 'batch-templates.json');
-  const existingBatch = JSON.parse(await readFile(batchPath, 'utf8'));
-  const recordsBySlug = new Map(records.map((record) => [record.slug, record]));
-  const mergedTemplates = requestedSlugs.size
-    ? [
-        ...existingBatch.templates.map((record) => recordsBySlug.get(record.slug) ?? record),
-        ...records.filter((record) => !existingBatch.templates.some((existing) => existing.slug === record.slug))
-      ]
-    : records;
-  await writeFile(batchPath, JSON.stringify({ templates: mergedTemplates }, null, 2) + '\n');
-  const { stdout } = await execFileAsync(process.execPath, [resolve(marketingRoot, 'scripts', 'regenerate-template-downloads.mjs')]);
-  process.stdout.write(stdout);
-  console.log(`Generated ${selectedSystems.length * 2} SOT files, updated ${selectedSystems.length} template records, and refreshed download HTML.`);
-} else {
-  console.log(`Generated ${selectedSystems.length * 2} SOT files in ${vibeRoot} (SOT-only mode).`);
-}
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
+});

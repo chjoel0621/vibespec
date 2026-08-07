@@ -49,7 +49,8 @@ try {
   // without relying on the plugin's original working tree.
   const output = readFileSync(join(product, "output", "workspace.html"), "utf8");
   assert.match(output, /vibespec-product-map/);
-  assert.doesNotMatch(output, /C:\\VibeSpec/i);
+  const sourceCheckout = ['C:', 'VibeSpec'].join('\\');
+  assert.equal(output.toLowerCase().includes(sourceCheckout.toLowerCase()), false);
   console.log("[installed] PASS cached plugin bundle executes outside the source checkout");
 } finally {
   try { rmSync(work, { recursive: true, force: true }); } catch {}

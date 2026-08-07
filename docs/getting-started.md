@@ -6,7 +6,7 @@ VibeSpec is a plugin for Claude Cowork, Claude Code, and OpenAI Codex. It turns 
 
 Full mode requires Node.js 18 or later, read access to the installed VibeSpec skill directory, and write access to the task folder. It produces validated JSON and a self-contained HTML viewer and supports safe edits, rebase, maps, and merge. Claude Code and filesystem-enabled Codex tasks normally provide these capabilities.
 
-A Cowork task without Node.js or shell access can use reduced mode. VibeSpec creates the JSON and supplies the unchanged viewer, and the user loads the JSON in that viewer. In this environment VibeSpec cannot claim validated embedded HTML or apply deterministic tree edits.
+A Cowork task without Node.js or shell access can use reduced mode after the user accepts that limitation. VibeSpec provides the SOT JSON. If the host can read and copy the installed `assets/viewer.html`, VibeSpec also supplies that unchanged viewer for the user to load the JSON into; without asset access, only the JSON can be provided. In this environment VibeSpec cannot claim validated embedded HTML or apply deterministic tree edits.
 
 The `/plugin` slash commands below are for the Claude Code terminal only. They do not work in Cowork or Codex.
 
@@ -39,22 +39,24 @@ Clone the repository and register its repository-local marketplace:
 
 ```text
 git clone https://github.com/chjoel0621/vibespec.git
-codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
+codex plugin marketplace add "<absolute-path-to-the-cloned-vibespec-repo>"
 ```
+
+Replace the quoted placeholder with the absolute path to the cloned repository.
 
 In the ChatGPT desktop app, open **Codex -> Plugins**, choose the `vibespec` marketplace, install VibeSpec, and start a new task. In Codex CLI, run `codex`, open `/plugins`, choose the `vibespec` marketplace, install VibeSpec, and start a new session. Invoke the skill naturally or explicitly with `$vibespec`.
 
 ## First-install acceptance
 
-Open a new task on a writable folder. Invoke `$vibespec` with a request such as: "Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`."
+Open a new task on a writable folder. Select **VibeSpec** in Cowork, invoke `/vibespec:vibespec` in Claude Code, or invoke `$vibespec` in Codex. Then request: "Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`." In reduced mode, VibeSpec may provide only the JSON and includes the unchanged viewer only when the host can access the installed viewer asset.
 
-First run the installed doctor:
+The loaded skill owns discovery of its installed path and runs doctor/preflight before it uses repository scripts. Do not guess or hard-code `<VibeSpec-skill-dir>`. For optional host acceptance after the host or loaded skill reports that path, run:
 
 ```text
 node <VibeSpec-skill-dir>/scripts/doctor.mjs <task-folder> --json
 ```
 
-Full-mode acceptance requires the doctor to pass, both output files to exist, and the installed verifier to report PASS:
+Full-mode acceptance requires doctor/preflight to pass, both output files to exist, and the installed verifier to report PASS:
 
 ```text
 node <VibeSpec-skill-dir>/scripts/verify-host-output.mjs outputs/meeting-room.sot.json outputs/meeting-room.html --host <claude-code|cowork|codex-cli|codex-desktop> --record host-acceptance/<host>.json

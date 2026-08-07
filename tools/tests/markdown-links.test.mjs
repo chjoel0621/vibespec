@@ -57,6 +57,25 @@ test('ignores links inside backtick and tilde fenced code blocks', () => {
   assert.deepEqual(extractRelativeMarkdownLinks(markdown), ['docs/kept.md']);
 });
 
+test('ignores links inside inline code spans', () => {
+  const markdown = [
+    '`[Ignored](docs/ignored.md)`',
+    '``[Also ignored](docs/also-ignored.md)``',
+    '[Kept](docs/kept.md)'
+  ].join(' ');
+
+  assert.deepEqual(extractRelativeMarkdownLinks(markdown), ['docs/kept.md']);
+});
+
+test('extracts balanced-parenthesis and angle-bracket destinations', () => {
+  assert.deepEqual(
+    extractRelativeMarkdownLinks(
+      '[Balanced](docs/guide_(draft).md) [Spaced](<docs/guide draft.md>)'
+    ),
+    ['docs/guide_(draft).md', 'docs/guide draft.md']
+  );
+});
+
 test('validates an existing target', async () => {
   const root = await createFixture({
     'README.md': '[Guide](docs/guide.md)',
@@ -80,6 +99,24 @@ test('validates a GitHub-style heading anchor', async () => {
   const root = await createFixture({
     'README.md': '[Install](docs/guide.md#install-configure)',
     'docs/guide.md': '# Install & Configure!\n'
+  });
+
+  assert.deepEqual(await validateMarkdownFiles(root, ['README.md']), []);
+});
+
+test('validates GitHub duplicate heading suffix anchors', async () => {
+  const root = await createFixture({
+    'README.md': '[Second](docs/guide.md#install-1) [Third](docs/guide.md#install-2)',
+    'docs/guide.md': '# Install\n## Install\n### Install\n'
+  });
+
+  assert.deepEqual(await validateMarkdownFiles(root, ['README.md']), []);
+});
+
+test('validates an angle-bracket target containing spaces', async () => {
+  const root = await createFixture({
+    'README.md': '[Guide](<docs/guide draft.md>)',
+    'docs/guide draft.md': '# Guide\n'
   });
 
   assert.deepEqual(await validateMarkdownFiles(root, ['README.md']), []);

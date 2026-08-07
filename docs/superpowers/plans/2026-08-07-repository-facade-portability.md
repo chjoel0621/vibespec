@@ -708,7 +708,9 @@ git commit -m "ci: enforce repository publication checks"
 - [ ] **Step 7: Push and open the Phase A PR**
 
 ```powershell
-git push -u origin codex/repository-facade-history-sanitization
+$Branch = git branch --show-current
+if (-not $Branch) { throw 'A named current branch is required before push.' }
+git push -u origin $Branch
 $PrBody = Join-Path ([IO.Path]::GetTempPath()) 'vibespec-phase-a-pr.md'
 @'
 ## Summary
@@ -729,7 +731,7 @@ $PrBody = Join-Path ([IO.Path]::GetTempPath()) 'vibespec-phase-a-pr.md'
 
 Design: `docs/superpowers/specs/2026-08-07-repository-facade-history-sanitization-design.md`
 '@ | Set-Content -Encoding utf8 $PrBody
-gh pr create --base main --head codex/repository-facade-history-sanitization --title "docs: clarify installation and prevent local path leaks" --body-file $PrBody
+gh pr create --base main --head $Branch --title "docs: clarify installation and prevent local path leaks" --body-file $PrBody
 ```
 
 - [ ] **Step 8: Merge only after remote checks pass**

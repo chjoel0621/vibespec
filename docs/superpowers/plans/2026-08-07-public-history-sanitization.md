@@ -245,13 +245,13 @@ The expression uses `[char]62` to build the `==>` delimiter without confusing Po
 ```powershell
 Push-Location $Mirror
 try {
-  & $FilterRepo --force --replace-text (Join-Path $AuditRoot 'replacements.txt') --prune-empty always --prune-degenerate always
+  & $FilterRepo --force --replace-text (Join-Path $AuditRoot 'replacements.txt') --prune-empty auto --prune-degenerate auto
 } finally {
   Pop-Location
 }
 ```
 
-Expected: exit `0`. Re-add `origin` if `git-filter-repo` removed it:
+Expected: exit `0`. The `auto` pruning policy removes commits made empty by replacement while preserving commits that were already empty; the commit-map and parent-count checks below remain mandatory. Re-add `origin` if `git-filter-repo` removed it:
 
 ```powershell
 if (-not (git -C $Mirror remote)) { git -C $Mirror remote add origin $RepoUrl }

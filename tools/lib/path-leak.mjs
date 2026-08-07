@@ -5,13 +5,20 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 const PATH_SEGMENT = "[^<>{}\\s/\\\\|\\[\\]\\^$;,'\"!?]+";
+const WINDOWS_SEPARATOR = '(?:\\\\+|/)';
 const RULES = [
-  ['windows-user-home', new RegExp('[A-Za-z]:[\\\\/]Users[\\\\/]' + PATH_SEGMENT + '(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')],
+  ['windows-user-home', new RegExp('[A-Za-z]:' + WINDOWS_SEPARATOR + 'Users' + WINDOWS_SEPARATOR + PATH_SEGMENT + '(?:' + WINDOWS_SEPARATOR + PATH_SEGMENT + ')*', 'gi')],
   ['mac-user-home', new RegExp('/Users/' + PATH_SEGMENT + '(?:/' + PATH_SEGMENT + ')*', 'g')],
   ['linux-user-home', new RegExp('/home/' + PATH_SEGMENT + '(?:/' + PATH_SEGMENT + ')*', 'g')],
-  ['known-vibespec-root', new RegExp('[A-Za-z]:[\\\\/]VibeSpec(?:-Marketing)?(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')],
-  ['windows-personal-segment', new RegExp('[A-Za-z]:[\\\\/]' + PATH_SEGMENT + '(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')]
+  ['known-marketing-root', new RegExp('[A-Za-z]:' + WINDOWS_SEPARATOR + 'VibeSpec-Marketing(?:' + WINDOWS_SEPARATOR + PATH_SEGMENT + ')*', 'gi')],
+  ['known-vibespec-root', new RegExp('[A-Za-z]:' + WINDOWS_SEPARATOR + 'VibeSpec(?:' + WINDOWS_SEPARATOR + PATH_SEGMENT + ')*', 'gi')],
+  ['windows-personal-segment', new RegExp('[A-Za-z]:' + WINDOWS_SEPARATOR + PATH_SEGMENT + '(?:' + WINDOWS_SEPARATOR + PATH_SEGMENT + ')*', 'gi')]
 ];
+
+const NEUTRAL_TOKENS = new Map([
+  ['known-vibespec-root', '<repo-root>'],
+  ['known-marketing-root', '<marketing-root>']
+]);
 
 export function findPathLeaks(file, text) {
   const findings = [];
@@ -19,7 +26,7 @@ export function findPathLeaks(file, text) {
   for (const [rule, pattern] of RULES) {
     for (const match of text.matchAll(pattern)) {
       if (rule === 'windows-personal-segment' &&
-          !/(?:OneDrive|AppData|WindowsApps)/.test(match[0])) {
+          !/(?:OneDrive|AppData|WindowsApps)/i.test(match[0])) {
         continue;
       }
       const start = match.index;
@@ -54,8 +61,6 @@ export async function scanTrackedFiles(repoRoot) {
 }
 
 export function formatPathLeak(finding) {
-  const redacted = finding.match
-    .replace(/([A-Za-z]:[\\/]Users[\\/])[^\\/]+/gi, '$1<user>')
-    .replace(/(\/(?:Users|home)\/)[^/]+/gi, '$1<user>');
-  return `${finding.file}:${finding.line}:${finding.column} [${finding.rule}] ${redacted}`;
+  const token = NEUTRAL_TOKENS.get(finding.rule) ?? '<local-path>';
+  return `${finding.file}:${finding.line}:${finding.column} [${finding.rule}] ${token}`;
 }

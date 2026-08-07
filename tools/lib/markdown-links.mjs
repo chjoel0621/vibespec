@@ -25,16 +25,155 @@ function withoutFencedCode(markdown) {
   }).join('');
 }
 
+function maskInlineCode(markdown) {
+  let result = '';
+  let index = 0;
+
+  while (index < markdown.length) {
+    if (markdown[index] !== '`') {
+      result += markdown[index];
+      index += 1;
+      continue;
+    }
+
+    let markerLength = 1;
+    while (markdown[index + markerLength] === '`') markerLength += 1;
+    const marker = '`'.repeat(markerLength);
+    let closing = markdown.indexOf(marker, index + markerLength);
+    while (closing !== -1 && (markdown[closing - 1] === '`' || markdown[closing + markerLength] === '`')) {
+      closing = markdown.indexOf(marker, closing + markerLength);
+    }
+
+    if (closing === -1) {
+      result += marker;
+      index += markerLength;
+      continue;
+    }
+
+    const end = closing + markerLength;
+    result += markdown.slice(index, end).replace(/[^\r\n]/g, ' ');
+    index = end;
+  }
+
+  return result;
+}
+
+function unescapeDestination(destination) {
+  return destination.replace(/\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g, '$1');
+}
+
+function titleEnd(markdown, index) {
+  while (/\s/.test(markdown[index] ?? '')) index += 1;
+  if (markdown[index] === ')') return index;
+
+  const opener = markdown[index];
+  const closer = opener === '(' ? ')' : opener;
+  if (!['"', "'", '('].includes(opener)) return -1;
+  index += 1;
+  while (index < markdown.length) {
+    if (markdown[index] === '\\') {
+      index += 2;
+      continue;
+    }
+    if (markdown[index] === closer) {
+      index += 1;
+      while (/\s/.test(markdown[index] ?? '')) index += 1;
+      return markdown[index] === ')' ? index : -1;
+    }
+    index += 1;
+  }
+  return -1;
+}
+
+function destinationAt(markdown, start) {
+  let index = start;
+  while (markdown[index] === ' ' || markdown[index] === '\t') index += 1;
+
+  if (markdown[index] === '<') {
+    const destinationStart = ++index;
+    while (index < markdown.length && markdown[index] !== '>' && !/[\r\n]/.test(markdown[index])) {
+      if (markdown[index] === '\\') index += 1;
+      index += 1;
+    }
+    if (markdown[index] !== '>') return undefined;
+    const destination = unescapeDestination(markdown.slice(destinationStart, index));
+    const end = titleEnd(markdown, index + 1);
+    return end === -1 ? undefined : { destination, end };
+  }
+
+  const destinationStart = index;
+  let depth = 0;
+  while (index < markdown.length) {
+    const character = markdown[index];
+    if (character === '\\') {
+      index += 2;
+      continue;
+    }
+    if (character === '(') {
+      depth += 1;
+      index += 1;
+      continue;
+    }
+    if (character === ')') {
+      if (depth === 0) {
+        return {
+          destination: unescapeDestination(markdown.slice(destinationStart, index)),
+          end: index
+        };
+      }
+      depth -= 1;
+      index += 1;
+      continue;
+    }
+    if (/\s/.test(character) && depth === 0) {
+      const destination = unescapeDestination(markdown.slice(destinationStart, index));
+      const end = titleEnd(markdown, index);
+      return end === -1 ? undefined : { destination, end };
+    }
+    index += 1;
+  }
+  return undefined;
+}
+
 export function extractRelativeMarkdownLinks(markdown) {
+  const source = maskInlineCode(withoutFencedCode(markdown));
   const links = [];
-  for (const match of withoutFencedCode(markdown).matchAll(/(?<!\!)\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) {
-    if (!external.test(match[1])) links.push(match[1]);
+  let index = 0;
+  while (index < source.length) {
+    if (source[index] !== '[' || source[index - 1] === '!') {
+      index += 1;
+      continue;
+    }
+    const labelEnd = source.indexOf('](', index + 1);
+    if (labelEnd === -1) break;
+    const parsed = destinationAt(source, labelEnd + 2);
+    if (!parsed) {
+      index = labelEnd + 2;
+      continue;
+    }
+    if (parsed.destination && !external.test(parsed.destination)) links.push(parsed.destination);
+    index = parsed.end + 1;
   }
   return links;
 }
 
 function githubAnchor(heading) {
-  return heading.trim().toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, '-');
+  return heading.replace(/\s+#+\s*$/, '').trim().toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, '-');
+}
+
+function githubAnchors(markdown) {
+  const anchors = new Set();
+  for (const match of withoutFencedCode(markdown).matchAll(/^#{1,6}\s+(.+)$/gm)) {
+    const base = githubAnchor(match[1]);
+    let anchor = base;
+    let suffix = 0;
+    while (anchors.has(anchor)) {
+      suffix += 1;
+      anchor = `${base}-${suffix}`;
+    }
+    anchors.add(anchor);
+  }
+  return anchors;
 }
 
 export async function validateMarkdownFiles(repoRoot, files = []) {
@@ -53,10 +192,7 @@ export async function validateMarkdownFiles(repoRoot, files = []) {
 
       if (anchor && target.toLowerCase().endsWith('.md')) {
         const targetText = await readFile(target, 'utf8');
-        const anchors = new Set(
-          [...withoutFencedCode(targetText).matchAll(/^#{1,6}\s+(.+)$/gm)]
-            .map((match) => githubAnchor(match[1]))
-        );
+        const anchors = githubAnchors(targetText);
         if (!anchors.has(anchor.toLowerCase())) {
           errors.push({ file, target: link, reason: 'missing-anchor' });
         }

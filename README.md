@@ -55,8 +55,10 @@ Clone the repository and register its repository-local marketplace:
 
 ```text
 git clone https://github.com/chjoel0621/vibespec.git
-codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
+codex plugin marketplace add "<absolute-path-to-the-cloned-vibespec-repo>"
 ```
+
+Replace the quoted placeholder with the absolute path to the cloned repository.
 
 In the ChatGPT desktop app, open **Codex -> Plugins**, choose the `vibespec` marketplace, install VibeSpec, and start a new task. In Codex CLI, run `codex`, open `/plugins`, choose the `vibespec` marketplace, install VibeSpec, and start a new session. Invoke the skill naturally or explicitly with `$vibespec`.
 

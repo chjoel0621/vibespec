@@ -26,6 +26,39 @@ test('detects Windows, macOS, Linux, and known local roots', () => {
   }
 });
 
+test('detects case variants and escaped Windows separators', () => {
+  const slash = '\\';
+  const escapedSlash = slash.repeat(2);
+  const samples = [
+    {
+      text: ['c:', 'uSeRs', 'fixture-user', 'work', 'file.json'].join(slash),
+      rule: 'windows-user-home'
+    },
+    {
+      text: ['D:', 'USERS', 'fixture-user', 'work', 'file.json'].join(escapedSlash),
+      rule: 'windows-user-home'
+    },
+    {
+      text: ['e:', 'vIbEsPeC', 'tools', 'file.mjs'].join(escapedSlash),
+      rule: 'known-vibespec-root'
+    },
+    {
+      text: ['F:', 'vibespec-MARKETING', 'content', 'file.json'].join(escapedSlash),
+      rule: 'known-marketing-root'
+    },
+    {
+      text: ['g:', 'work', 'aPpDaTa', 'cache'].join(escapedSlash),
+      rule: 'windows-personal-segment'
+    }
+  ];
+
+  for (const sample of samples) {
+    const findings = findPathLeaks('sample.txt', sample.text);
+    assert.equal(findings.length, 1, sample.text);
+    assert.equal(findings[0].rule, sample.rule, sample.text);
+  }
+});
+
 test('allows placeholders and public repository URLs', () => {
   const safe = [
     '<repo-root>/plugins/vibespec',
@@ -52,37 +85,23 @@ test('scans tracked files and ignores untracked files', async () => {
   assert.deepEqual(await scanTrackedFiles(repoRoot), []);
 });
 
-test('redacts personal usernames when formatting findings', () => {
-  const finding = findPathLeaks(
-    'README.md',
-    path('C:', 'Users', 'fixture-user', 'work', 'file.json')
-  )[0];
+test('formats findings without publishing any offending path content', () => {
+  const base = { file: 'README.md', line: 3, column: 9, match: 'do-not-publish-this-value' };
+  const expectedTokens = new Map([
+    ['windows-user-home', '<local-path>'],
+    ['mac-user-home', '<local-path>'],
+    ['linux-user-home', '<local-path>'],
+    ['known-vibespec-root', '<repo-root>'],
+    ['known-marketing-root', '<marketing-root>'],
+    ['windows-personal-segment', '<local-path>']
+  ]);
 
-  const formatted = formatPathLeak(finding);
-  assert.match(formatted, /<user>/);
-  assert.doesNotMatch(formatted, /fixture-user/);
-});
-
-test('redacts every Windows user home on a line with multiple paths', () => {
-  const findings = findPathLeaks(
-    'README.md',
-    path('C:', 'Users', 'alice', 'a') + '; ' + path('C:', 'Users', 'bob', 'b')
-  );
-
-  assert.equal(findings.length, 2);
-  const formatted = findings.map(formatPathLeak).join('\n');
-  assert.doesNotMatch(formatted, /alice|bob/);
-  assert.equal((formatted.match(/<user>/g) ?? []).length, 2);
-
-  const combined = formatPathLeak({
-    file: 'README.md',
-    line: 1,
-    column: 1,
-    rule: 'windows-user-home',
-    match: path('C:', 'Users', 'alice', 'a') + '; ' + path('C:', 'Users', 'bob', 'b')
-  });
-  assert.doesNotMatch(combined, /alice|bob/);
-  assert.equal((combined.match(/<user>/g) ?? []).length, 2);
+  for (const [rule, token] of expectedTokens) {
+    assert.equal(
+      formatPathLeak({ ...base, rule }),
+      `README.md:3:9 [${rule}] ${token}`
+    );
+  }
 });
 
 test('detects a Windows path before a shell pipe and ignores regex syntax', () => {

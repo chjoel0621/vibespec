@@ -55,8 +55,10 @@ Claude Code 터미널 입력창에서 다음 명령을 순서대로 실행합니
 
 ```text
 git clone https://github.com/chjoel0621/vibespec.git
-codex plugin marketplace add <absolute-path-to-the-cloned-vibespec-repo>
+codex plugin marketplace add "<absolute-path-to-the-cloned-vibespec-repo>"
 ```
+
+따옴표로 감싼 자리표시자를 복제한 저장소의 절대 경로로 바꾸세요.
 
 ChatGPT 데스크톱 앱에서 **Codex -> Plugins**를 열고 `vibespec` 마켓플레이스를 선택해 VibeSpec을 설치한 뒤 새 작업을 시작합니다. Codex CLI에서는 `codex`를 실행하고 `/plugins`를 열어 `vibespec` 마켓플레이스에서 VibeSpec을 설치한 뒤 새 세션을 시작합니다. 자연어로 요청하거나 `$vibespec`으로 직접 호출할 수 있습니다.
 

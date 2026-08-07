@@ -3,10 +3,10 @@ import { execFile } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deepenSot } from './deepen-sot.mjs';
+import { resolveMarketingRoot } from './lib/marketing-runtime.mjs';
 import { promisify } from 'node:util';
 
 const vibeRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const marketingRoot = process.env.VIBESPEC_MARKETING_ROOT || 'C:/VibeSpec-Marketing';
 const execFileAsync = promisify(execFile);
 const sotOnly = process.argv.includes('--sot-only');
 
@@ -230,6 +230,7 @@ for (const config of selectedSystems) {
   for (const lang of ['ko', 'en']) await writeFile(resolve(vibeRoot, 'demo', `${config.slug}.${lang}.sot.json`), JSON.stringify(deepenSot(sot(config, lang), { profile }), null, 2) + '\n');
 }
 if (!sotOnly) {
+  const marketingRoot = resolveMarketingRoot();
   await mkdir(resolve(marketingRoot, 'content'), { recursive: true });
   const records = selectedSystems.map((config) => ({ slug: config.slug, published: '2026-08-03', locales: { ko: locale(config, 'ko'), en: locale(config, 'en') } }));
   const batchPath = resolve(marketingRoot, 'content', 'batch-templates.json');

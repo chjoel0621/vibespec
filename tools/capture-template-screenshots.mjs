@@ -1,11 +1,10 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createRequire } from 'node:module';
+import { loadChromium, resolveMarketingRoot } from './lib/marketing-runtime.mjs';
 
-const require = createRequire(import.meta.url);
-const { chromium } = require('C:/Users/chjoe/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright');
-const marketingRoot = 'C:/VibeSpec-Marketing';
+const marketingRoot = resolveMarketingRoot();
+const chromium = await loadChromium();
 const source = JSON.parse(await readFile(resolve(marketingRoot, 'content', 'templates.json'), 'utf8'));
 const batch = JSON.parse(await readFile(resolve(marketingRoot, 'content', 'batch-templates.json'), 'utf8'));
 const requestedSlugs = new Set(process.argv.slice(2));

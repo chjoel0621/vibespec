@@ -1,10 +1,28 @@
 import { access, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-const external = /^(?:https?:|mailto:|#)/i;
+const external = /^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i;
 
 function withoutFencedCode(markdown) {
-  return markdown.replace(/```[\s\S]*?```/g, '');
+  const lines = markdown.split(/(?<=\n)/);
+  let fence;
+
+  return lines.filter((line) => {
+    const content = line.replace(/\r?\n$/, '');
+    if (fence) {
+      const closing = new RegExp(`^ {0,3}${fence.marker}{${fence.length},}[ \\t]*$`);
+      if (closing.test(content)) fence = undefined;
+      return false;
+    }
+
+    const opening = content.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (opening) {
+      fence = { marker: opening[1][0], length: opening[1].length };
+      return false;
+    }
+
+    return true;
+  }).join('');
 }
 
 export function extractRelativeMarkdownLinks(markdown) {

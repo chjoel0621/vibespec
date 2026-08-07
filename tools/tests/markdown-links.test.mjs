@@ -32,6 +32,31 @@ test('ignores external Markdown links', () => {
   );
 });
 
+test('ignores URI-scheme and protocol-relative Markdown links', () => {
+  assert.deepEqual(
+    extractRelativeMarkdownLinks(
+      '[FTP](ftp://example.com) [Tel](tel:+821012345678) [Data](data:text/plain,hello) [CDN](//cdn.example.com/file.md)'
+    ),
+    []
+  );
+});
+
+test('ignores links inside backtick and tilde fenced code blocks', () => {
+  const markdown = [
+    '````markdown',
+    '[Four backticks](docs/four-backticks.md)',
+    '```',
+    '[Still four backticks](docs/still-four-backticks.md)',
+    '`````',
+    '~~~markdown',
+    '[Tilde](docs/tilde.md)',
+    '~~~~',
+    '[Kept](docs/kept.md)'
+  ].join('\n');
+
+  assert.deepEqual(extractRelativeMarkdownLinks(markdown), ['docs/kept.md']);
+});
+
 test('validates an existing target', async () => {
   const root = await createFixture({
     'README.md': '[Guide](docs/guide.md)',

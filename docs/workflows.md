@@ -28,10 +28,12 @@ Each initiative records the digest of the parent plan it was created against. Bo
 
 When a parent changes, inspect and validate the tree, then rebase affected initiatives from root to leaf:
 
+In the examples below, `<VIBESPEC_SKILL_DIR>` means the absolute path to the installed VibeSpec skill directory, which contains `SKILL.md` and `scripts/`.
+
 ```text
-node scripts/inspect.mjs path/to/product-folder
-node scripts/validate-tree.mjs path/to/product-folder
-node scripts/rebase.mjs path/to/product-folder
+node <VIBESPEC_SKILL_DIR>/scripts/inspect.mjs path/to/product-folder
+node <VIBESPEC_SKILL_DIR>/scripts/validate-tree.mjs path/to/product-folder
+node <VIBESPEC_SKILL_DIR>/scripts/rebase.mjs path/to/product-folder
 ```
 
 The rebase command is a dry run unless `--apply` is added.
@@ -41,8 +43,8 @@ The rebase command is a dry run unless `--apply` is added.
 Keep `main.sot.json` at the product root and initiatives under `initiatives/`. The workspace builder creates a self-contained `workspace.html` for reviewing proposed, approved, and implemented initiatives. It also creates a release map where proposed work remains excluded.
 
 ```text
-node scripts/workspace.mjs path/to/product-folder
-node scripts/product-map.mjs path/to/product-folder --html map.html
+node <VIBESPEC_SKILL_DIR>/scripts/workspace.mjs path/to/product-folder
+node <VIBESPEC_SKILL_DIR>/scripts/product-map.mjs path/to/product-folder --html map.html
 ```
 
 The read-only product map composes the main plan with active initiatives. Composite IDs preserve provenance, and selecting a node opens the source plan that defines it. Proposed and dropped initiatives are listed as excluded.
@@ -52,7 +54,7 @@ The read-only product map composes the main plan with active initiatives. Compos
 After an initiative is implemented and the product tree validates, preview landing that initiative into the main plan:
 
 ```text
-node scripts/merge.mjs path/to/product-folder --only <id>
+node <VIBESPEC_SKILL_DIR>/scripts/merge.mjs path/to/product-folder --only <id>
 ```
 
 The merge command is a dry run unless `--apply` is added. Revalidate the tree and regenerate review or integrated views after applying it.

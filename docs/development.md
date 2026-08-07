@@ -90,19 +90,18 @@ The path audit scans tracked files. The documentation check validates relative M
 
 ## Optional marketing tools
 
-The `tools/` package is separate from the plugin runtime. Install its locked development dependency only when using the screenshot helper:
+The `tools/` package is separate from the plugin runtime. Run every command in this section from the repository root. Install its locked development dependency only when using the screenshot helper:
 
 ```text
-cd tools
-npm install
-npm test
+npm --prefix tools install
+npm --prefix tools test
 ```
 
 Screenshot capture requires a local Chrome installation and an explicit marketing repository root:
 
 ```powershell
 $env:VIBESPEC_MARKETING_ROOT = '<marketing-root>'
-npm run capture -- [template-slug ...]
+npm --prefix tools run capture -- [template-slug ...]
 ```
 
 Batch template generation can be run directly:

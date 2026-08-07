@@ -62,3 +62,37 @@ test('redacts personal usernames when formatting findings', () => {
   assert.match(formatted, /<user>/);
   assert.doesNotMatch(formatted, /fixture-user/);
 });
+
+test('redacts every Windows user home on a line with multiple paths', () => {
+  const findings = findPathLeaks(
+    'README.md',
+    path('C:', 'Users', 'alice', 'a') + '; ' + path('C:', 'Users', 'bob', 'b')
+  );
+
+  assert.equal(findings.length, 2);
+  const formatted = findings.map(formatPathLeak).join('\n');
+  assert.doesNotMatch(formatted, /alice|bob/);
+  assert.equal((formatted.match(/<user>/g) ?? []).length, 2);
+
+  const combined = formatPathLeak({
+    file: 'README.md',
+    line: 1,
+    column: 1,
+    rule: 'windows-user-home',
+    match: path('C:', 'Users', 'alice', 'a') + '; ' + path('C:', 'Users', 'bob', 'b')
+  });
+  assert.doesNotMatch(combined, /alice|bob/);
+  assert.equal((combined.match(/<user>/g) ?? []).length, 2);
+});
+
+test('detects a Windows path before a shell pipe and ignores regex syntax', () => {
+  const shellCommand = path('C:', 'Users', 'alice', 'script.ps1') + ' | Select-Object Name';
+  const findings = findPathLeaks('script.ps1', shellCommand);
+
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].match, path('C:', 'Users', 'alice', 'script.ps1'));
+  assert.deepEqual(
+    findPathLeaks('plan.md', '/Users/[^/]+/|/home/[^/]+/|[A-Za-z]:[/\\]VibeSpec)'),
+    []
+  );
+});

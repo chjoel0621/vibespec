@@ -4,12 +4,13 @@ import { resolve } from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
+const PATH_SEGMENT = "[^<>{}\\s/\\\\|\\[\\]\\^$;,'\"!?]+";
 const RULES = [
-  ['windows-user-home', /[A-Za-z]:[\\/]Users[\\/][^<>{}\s\\/]+[\\/][^\r\n]*/g],
-  ['mac-user-home', /\/Users\/[^<>{}\s/]+\/[^\r\n]*/g],
-  ['linux-user-home', /\/home\/[^<>{}\s/]+\/[^\r\n]*/g],
-  ['known-vibespec-root', /[A-Za-z]:[\\/]VibeSpec(?:-Marketing)?(?=[\\/\s'"`]|$)[^\r\n]*/g],
-  ['windows-personal-segment', /[A-Za-z]:[\\/][^\r\n]*(?:OneDrive|AppData|WindowsApps)[^\r\n]*/g]
+  ['windows-user-home', new RegExp('[A-Za-z]:[\\\\/]Users[\\\\/]' + PATH_SEGMENT + '(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')],
+  ['mac-user-home', new RegExp('/Users/' + PATH_SEGMENT + '(?:/' + PATH_SEGMENT + ')*', 'g')],
+  ['linux-user-home', new RegExp('/home/' + PATH_SEGMENT + '(?:/' + PATH_SEGMENT + ')*', 'g')],
+  ['known-vibespec-root', new RegExp('[A-Za-z]:[\\\\/]VibeSpec(?:-Marketing)?(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')],
+  ['windows-personal-segment', new RegExp('[A-Za-z]:[\\\\/]' + PATH_SEGMENT + '(?:[\\\\/]' + PATH_SEGMENT + ')*', 'g')]
 ];
 
 export function findPathLeaks(file, text) {
@@ -17,7 +18,10 @@ export function findPathLeaks(file, text) {
   const matchedRanges = [];
   for (const [rule, pattern] of RULES) {
     for (const match of text.matchAll(pattern)) {
-      if (match[0].includes('|')) continue;
+      if (rule === 'windows-personal-segment' &&
+          !/(?:OneDrive|AppData|WindowsApps)/.test(match[0])) {
+        continue;
+      }
       const start = match.index;
       const end = start + match[0].length;
       if (matchedRanges.some(([rangeStart, rangeEnd]) => start < rangeEnd && end > rangeStart)) {
@@ -51,7 +55,7 @@ export async function scanTrackedFiles(repoRoot) {
 
 export function formatPathLeak(finding) {
   const redacted = finding.match
-    .replace(/([A-Za-z]:[\\/]Users[\\/])[^\\/]+/i, '$1<user>')
-    .replace(/(\/(?:Users|home)\/)[^/]+/, '$1<user>');
+    .replace(/([A-Za-z]:[\\/]Users[\\/])[^\\/]+/gi, '$1<user>')
+    .replace(/(\/(?:Users|home)\/)[^/]+/gi, '$1<user>');
   return `${finding.file}:${finding.line}:${finding.column} [${finding.rule}] ${redacted}`;
 }

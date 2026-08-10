@@ -1,0 +1,22 @@
+{
+  "kind": "vibespec-host-acceptance",
+  "contractVersion": "host-acceptance-v1",
+  "pluginVersion": "0.17.2",
+  "pluginDigest": "c1492fb8750f961f31bc2ab6d83db4a35a4cb91f6c98a123db28e5f70e2994bb",
+  "host": "claude-code",
+  "hostFamily": "claude",
+  "accepted": true,
+  "checkedAt": "2026-08-10T02:03:49.744Z",
+  "artifacts": {
+    "sot": {
+      "file": "meeting-room.sot.json",
+      "sha256": "86523482a597278e398c27a526f49d835ee5075a660d09935045334d0a35c9a5"
+    },
+    "html": {
+      "file": "meeting-room.html",
+      "sha256": "e3a549285f367863a15576af45aa93049264dbce71eaf2e985a39e9b2bbc1167"
+    }
+  },
+  "title": "RoomBook",
+  "schemaVersion": "1.0"
+}

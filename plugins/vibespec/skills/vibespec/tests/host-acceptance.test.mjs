@@ -65,7 +65,8 @@ try {
   console.log("[host-acceptance] PASS release gate rejects evidence from different runtime bytes");
 
   const privateDir = join(tempDir, "private", `v${pluginVersion}`);
-  writeEvidence(privateDir, "claude-code", { ...claude, title: "C:\\Users\\someone\\meeting-room.sot.json" });
+  const privatePath = ["C:", "Users", "someone", "meeting-room.sot.json"].join("\\");
+  writeEvidence(privateDir, "claude-code", { ...claude, title: privatePath });
   writeEvidence(privateDir, "codex-desktop", codex);
   assert.throws(() => checkHostAcceptance(privateDir, pluginVersion), /absolute local path/i);
   console.log("[host-acceptance] PASS release gate rejects private or non-contract path fields");

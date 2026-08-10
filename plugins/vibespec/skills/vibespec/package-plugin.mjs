@@ -2,24 +2,10 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { basename, dirname, join, parse, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { runtimeBundleEntries } from "./scripts/lib/runtime-bundle.mjs";
 
 const skillRoot = dirname(fileURLToPath(import.meta.url));
 const pluginRoot = resolve(skillRoot, "..", "..");
-
-const entries = [
-  [".claude-plugin/plugin.json"],
-  [".codex-plugin/plugin.json"],
-  ["LICENSE"],
-  ["README.md"],
-  ["skills/vibespec/SKILL.md"],
-  ["skills/vibespec/agents"],
-  ["skills/vibespec/assets/viewer.html"],
-  ["skills/vibespec/references"],
-  ["skills/vibespec/scripts"],
-  ["skills/vibespec/src/js/00-config.js"],
-  ["skills/vibespec/src/js/05-c14n.js"],
-  ["skills/vibespec/src/js/20-state.js"]
-];
 
 function safeOutput(path) {
   const output = resolve(path);
@@ -35,7 +21,7 @@ export function packagePlugin(outputPath = join(skillRoot, ".dist", "vibespec"))
   const output = safeOutput(outputPath);
   if (existsSync(output)) rmSync(output, { recursive: true, force: true });
   mkdirSync(output, { recursive: true });
-  for (const [relative] of entries) {
+  for (const relative of runtimeBundleEntries) {
     const source = join(pluginRoot, relative);
     if (!existsSync(source)) throw new Error(`missing runtime bundle entry ${source}`);
     const destination = join(output, relative);

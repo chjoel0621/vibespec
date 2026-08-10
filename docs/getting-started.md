@@ -50,7 +50,7 @@ In the ChatGPT desktop app, open **Codex -> Plugins**, choose the `vibespec` mar
 
 Open a new task on a writable folder. Select **VibeSpec** in Cowork, invoke `/vibespec:vibespec` in Claude Code, or invoke `$vibespec` in Codex. Then request: "Create a compact meeting-room booking plan and save both `outputs/meeting-room.sot.json` and `outputs/meeting-room.html`." In reduced mode, VibeSpec may provide only the JSON and includes the unchanged viewer only when the host can access the installed viewer asset.
 
-The loaded skill owns discovery of its installed path and runs doctor/preflight before it uses repository scripts. Do not guess or hard-code `<VibeSpec-skill-dir>`. For optional host acceptance after the host or loaded skill reports that path, run:
+The loaded skill owns discovery of its installed path and runs doctor/preflight before it uses repository scripts. Do not guess or hard-code `<VibeSpec-skill-dir>`. For host acceptance after the host or loaded skill reports that path, run:
 
 ```text
 node <VibeSpec-skill-dir>/scripts/doctor.mjs <task-folder> --json
@@ -62,7 +62,7 @@ Full-mode acceptance requires doctor/preflight to pass, both output files to exi
 node <VibeSpec-skill-dir>/scripts/verify-host-output.mjs outputs/meeting-room.sot.json outputs/meeting-room.html --host <claude-code|cowork|codex-cli|codex-desktop> --record host-acceptance/<host>.json
 ```
 
-The verifier checks that the host-created JSON is structurally valid and exactly matches the SOT embedded in the HTML. Repository CI cannot launch desktop hosts, so a release is described as host-accepted only after this check has run on that host. If VibeSpec is unavailable in a new task, reopen the task after installation or restart the desktop app.
+The verifier checks that the host-created JSON is structurally valid and exactly matches the SOT embedded in the HTML. It writes a portable record with artifact hashes instead of local paths. Repository CI cannot launch desktop hosts, so each release requires one Claude-family and one Codex-family record produced by real full-mode sessions. Maintainers should follow [Releasing VibeSpec](releasing.md). If VibeSpec is unavailable in a new task, reopen the task after installation or restart the desktop app.
 
 ## Manual invocation
 

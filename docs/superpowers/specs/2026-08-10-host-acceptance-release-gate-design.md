@@ -27,7 +27,7 @@ acceptance/hosts/vX.Y.Z/<host>.json
 Each record contains only portable facts:
 
 - evidence contract version
-- plugin version
+- plugin version and deterministic runtime-bundle SHA-256
 - host and host family
 - acceptance result and timestamp
 - artifact basenames and SHA-256 digests
@@ -43,7 +43,7 @@ A new `check-host-acceptance.mjs` command will:
 
 1. Read the expected release version.
 2. Load all JSON records from `acceptance/hosts/vX.Y.Z/`.
-3. Reject malformed records, unknown hosts, absolute paths, failed records, and version mismatches.
+3. Reject malformed records, unknown hosts, absolute paths, failed records, version mismatches, and runtime-bundle digest mismatches.
 4. Require at least one Claude-family and one Codex-family record.
 5. Print a concise release-readiness summary.
 

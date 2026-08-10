@@ -104,6 +104,7 @@ VibeSpec does not generate or deploy the product's implementation code. It produ
 - [Live demos](docs/live-demos.md)
 - [Architecture and data boundaries](docs/architecture.md)
 - [Development and testing](docs/development.md)
+- [Release acceptance](docs/releasing.md)
 - [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
 ## License

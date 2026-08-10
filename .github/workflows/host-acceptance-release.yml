@@ -1,0 +1,30 @@
+name: Host acceptance release gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the v prefix (for example, 0.17.2)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/vibespec/skills/vibespec
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Verify Claude and Codex acceptance evidence
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: node scripts/check-host-acceptance.mjs --version "$RELEASE_VERSION"

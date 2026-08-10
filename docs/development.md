@@ -56,6 +56,8 @@ npm run package:plugin
 - `npm run check:all` adds the Chrome or Edge browser-flow suite.
 - `npm run package:plugin` writes the minimal runtime bundle to `.dist/vibespec`.
 
+Real Claude/Codex sessions are not launched by normal CI. Before tagging a release, generate the two required portable host records and run `npm run check:host-acceptance`. Follow [Releasing VibeSpec](releasing.md) for the full procedure.
+
 ## Validate plans and trees
 
 Validate a generated or edited SOT:

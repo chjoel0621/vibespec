@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { packagePlugin } from "../package-plugin.mjs";
+import { runtimeBundleDigest } from "../scripts/lib/runtime-bundle.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const temp = mkdtempSync(join(tmpdir(), "vibespec-package-"));
@@ -19,6 +20,7 @@ function run(script, args, cwd) {
 try {
   packagePlugin(bundle);
   const skill = join(bundle, "skills", "vibespec");
+  const sourcePlugin = join(skillRootFromHere(), "..", "..");
   for (const path of [
     ".codex-plugin/plugin.json",
     ".claude-plugin/plugin.json",
@@ -36,16 +38,30 @@ try {
     assert.equal(existsSync(join(bundle, path)), false, `development artifact leaked into bundle: ${path}`);
   }
   assert.deepEqual(readdirSync(join(skill, "src", "js")).sort(), ["00-config.js", "05-c14n.js", "20-state.js"]);
+  assert.equal(runtimeBundleDigest(bundle), runtimeBundleDigest(sourcePlugin), "packaged runtime digest must match the source release candidate");
+  const digestBeforeLineEndingChange = runtimeBundleDigest(bundle);
+  const bundledReadme = join(bundle, "README.md");
+  writeFileSync(bundledReadme, readFileSync(bundledReadme, "utf8").replace(/\r?\n/g, "\r\n"));
+  assert.equal(runtimeBundleDigest(bundle), digestBeforeLineEndingChange, "runtime digest must ignore platform line-ending conversion");
 
   const product = join(temp, "product");
   mkdirSync(product, { recursive: true });
   cpSync(join(here, "fixtures", "tree", "main.sot.json"), join(product, "main.sot.json"));
   run(join(skill, "scripts", "doctor.mjs"), [product, "--json"], product);
   run(join(skill, "scripts", "validate-sot.mjs"), [join(product, "main.sot.json")], product);
+  const viewer = join(product, "main.html");
+  run(join(skill, "scripts", "embed-sot.mjs"), [join(skill, "assets", "viewer.html"), join(product, "main.sot.json"), viewer], product);
+  const accepted = JSON.parse(run(join(skill, "scripts", "verify-host-output.mjs"), [join(product, "main.sot.json"), viewer, "--host", "codex-cli", "--json"], product));
+  assert.equal(accepted.hostFamily, "codex");
+  assert.match(accepted.artifacts.sot.sha256, /^[a-f0-9]{64}$/);
   run(join(skill, "scripts", "review-semantic.mjs"), [join(product, "main.sot.json"), "--json"], product);
   run(join(skill, "scripts", "workspace.mjs"), [product], product);
   run(join(skill, "scripts", "migrate-sot.mjs"), [join(product, "main.sot.json"), "--out", join(product, "migrated.sot.json")], product);
   console.log("[package] PASS minimal bundle excludes development files and retains every runtime dependency");
 } finally {
   rmSync(temp, { recursive: true, force: true });
+}
+
+function skillRootFromHere() {
+  return join(here, "..");
 }

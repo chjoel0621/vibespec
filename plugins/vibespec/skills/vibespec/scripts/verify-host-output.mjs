@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { basename, dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { stableStringify } from "./lib/c14n.mjs";
+import { HOST_ACCEPTANCE_CONTRACT, hostFamily, sha256File, validateHostEvidence } from "./lib/host-acceptance.mjs";
+import { runtimeBundleDigest } from "./lib/runtime-bundle.mjs";
 import { validateSot } from "./validate-sot.mjs";
 
-const hosts = new Set(["claude-code", "cowork", "codex-cli", "codex-desktop"]);
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const pluginRoot = resolve(scriptDir, "../../..");
+const pluginVersion = JSON.parse(readFileSync(join(pluginRoot, ".claude-plugin", "plugin.json"), "utf8")).version;
 
-export function verifyHostOutput(sotPath, htmlPath, host) {
-  if (!hosts.has(host)) throw new Error(`unsupported host ${JSON.stringify(host)}`);
+export function verifyHostOutput(sotPath, htmlPath, host, options = {}) {
+  const family = hostFamily(host);
   const sotFile = resolve(sotPath);
   const htmlFile = resolve(htmlPath);
   if (!existsSync(sotFile)) throw new Error(`missing SOT: ${sotFile}`);
@@ -21,16 +25,22 @@ export function verifyHostOutput(sotPath, htmlPath, host) {
   if (!match) throw new Error("HTML has no embedded-sot payload");
   const embedded = JSON.parse(match[1]);
   if (stableStringify(embedded) !== stableStringify(sot)) throw new Error("HTML embedded SOT differs from the JSON file");
-  return {
+  return validateHostEvidence({
     kind: "vibespec-host-acceptance",
+    contractVersion: HOST_ACCEPTANCE_CONTRACT,
+    pluginVersion,
+    pluginDigest: runtimeBundleDigest(pluginRoot),
     host,
+    hostFamily: family,
     accepted: true,
-    checkedAt: new Date().toISOString(),
-    sot: sotFile,
-    html: htmlFile,
+    checkedAt: options.checkedAt || new Date().toISOString(),
+    artifacts: {
+      sot: { file: basename(sotFile), sha256: sha256File(sotFile) },
+      html: { file: basename(htmlFile), sha256: sha256File(htmlFile) }
+    },
     title: sot.title,
     schemaVersion: sot.schemaVersion
-  };
+  });
 }
 
 function main(argv) {

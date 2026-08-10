@@ -104,6 +104,7 @@ VibeSpec은 제품 구현 코드를 생성하거나 배포하지 않습니다. �
 - [라이브 데모](docs/live-demos.md)
 - [아키텍처와 데이터 경계](docs/architecture.md)
 - [개발 및 테스트](docs/development.md)
+- [릴리스 수용 검증](docs/releasing.md)
 - [기여 안내](CONTRIBUTING.md) · [보안](SECURITY.md)
 
 ## 라이선스

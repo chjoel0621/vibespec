@@ -1,0 +1,1020 @@
+{
+  "schemaVersion": "1.0",
+  "title": "AI Observability and Evaluation Operations System",
+  "lang": "en",
+  "prd": {
+    "oneLiner": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+    "goal": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+    "whyNow": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+    "category": "Internal operations system",
+    "platforms": [
+      "Web"
+    ],
+    "problem": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+    "solution": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+    "alternatives": "Email, chat, spreadsheets, and manual ledgers",
+    "differentiator": "Manage intake, processing, and operations data as one connected source of truth.",
+    "targets": [
+      {
+        "name": "Product, ML, and operations practitioners managing AI quality, cost, and safety",
+        "role": "Requester and operational user",
+        "needs": "Quickly register needed work and know its status.",
+        "pain": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change."
+      },
+      {
+        "name": "AI platform and ML operations coordinator",
+        "role": "Operations administrator",
+        "needs": "Manage priority and history and review operations metrics.",
+        "pain": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change."
+      },
+      {
+        "name": "System and policy administrator",
+        "role": "Operations and security administrator",
+        "needs": "Manage access, policy, and audit history.",
+        "pain": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change."
+      }
+    ],
+    "scenarios": [
+      {
+        "text": "An operational user registers required work and checks its status.",
+        "start": "P1"
+      },
+      {
+        "text": "An operator processes queued work and handles exceptions.",
+        "start": "P5"
+      },
+      {
+        "text": "System and policy administrator reviews policy and access.",
+        "start": "P9"
+      },
+      {
+        "text": "System and policy administrator reviews audit records and operating metrics.",
+        "start": "P10"
+      }
+    ],
+    "northStar": "Share of operations requests completed on time",
+    "kpis": [
+      {
+        "name": "On-time processing rate",
+        "target": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+        "baseline": "Not measured",
+        "method": "Monthly aggregation of state changes against target dates",
+        "refs": [
+          "F6"
+        ]
+      },
+      {
+        "name": "Operations visibility",
+        "target": "100% of key work tracked",
+        "baseline": "Not measured",
+        "method": "Share of records connected to reporting",
+        "refs": [
+          "F11"
+        ]
+      },
+      {
+        "name": "Auditable operations rate",
+        "target": "100% of key changes retained",
+        "baseline": "Not measured",
+        "method": "Monthly audit-log and change-history review",
+        "refs": [
+          "F12"
+        ]
+      }
+    ],
+    "inScope": [
+      "Trace, prompt, model version, evaluation set, and cost-baseline registration",
+      "Execution trace, prompt, model version, evaluation result, token, and cost-history lookup",
+      "Evaluation-criteria setup, execution observation, quality, safety, and cost review, model-or-prompt change approval, and re-evaluation handling",
+      "Response quality, evaluation pass rate, safety violation, latency, token usage, and model-cost reporting",
+      "Trace, prompt, model version, evaluation set, and cost-baseline registration validation and duplicate prevention",
+      "Search, filter, and history management",
+      "Owner, priority, and SLA management",
+      "Approval and policy review",
+      "Exception, rejection, and reprocessing",
+      "Notifications and subscriptions",
+      "External integration and data synchronization",
+      "Role, permission, and audit management"
+    ],
+    "nonGoals": [
+      "External customer portal",
+      "Replacing adjacent systems such as accounting or payroll"
+    ],
+    "assumptions": [
+      "User and organization data are available through company SSO.",
+      "Operators manage policy and classification criteria."
+    ],
+    "risks": [
+      "Weak initial classification can cause incorrect processing.",
+      "Stale source data can reduce operational trust."
+    ],
+    "openQuestions": [
+      "What defines urgent processing and approval?",
+      "What are the post-completion verification and reopen rules?"
+    ],
+    "constraints": [
+      "State, owner, and priority changes require audit logs.",
+      "Access is limited by role.",
+      "Permission, policy, and state changes require audit logs."
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "title": "Intake and data quality",
+      "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F1",
+          "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration",
+          "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration core processing rule",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration exception and audit handling",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration validation and duplicate prevention",
+          "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration validation and duplicate prevention core processing rule",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Trace, prompt, model version, evaluation set, and cost-baseline registration validation and duplicate prevention exception and audit handling",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Records and search",
+      "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F3",
+          "title": "Execution trace, prompt, model version, evaluation result, token, and cost-history lookup",
+          "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Execution trace, prompt, model version, evaluation result, token, and cost-history lookup core processing rule",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Execution trace, prompt, model version, evaluation result, token, and cost-history lookup exception and audit handling",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F4",
+          "title": "Search, filter, and history management",
+          "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Search, filter, and history management core processing rule",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Search, filter, and history management exception and audit handling",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Processing and ownership",
+      "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F5",
+          "title": "Evaluation-criteria setup, execution observation, quality, safety, and cost review, model-or-prompt change approval, and re-evaluation handling",
+          "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Evaluation-criteria setup, execution observation, quality, safety, and cost review, model-or-prompt change approval, and re-evaluation handling core processing rule",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Evaluation-criteria setup, execution observation, quality, safety, and cost review, model-or-prompt change approval, and re-evaluation handling exception and audit handling",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F6",
+          "title": "Owner, priority, and SLA management",
+          "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Owner, priority, and SLA management core processing rule",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Owner, priority, and SLA management exception and audit handling",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Approval and exceptions",
+      "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+      "status": "todo",
+      "priority": "high",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F7",
+          "title": "Approval and policy review",
+          "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Approval and policy review core processing rule",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Approval and policy review exception and audit handling",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F8",
+          "title": "Exception, rejection, and reprocessing",
+          "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Exception, rejection, and reprocessing core processing rule",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Exception, rejection, and reprocessing exception and audit handling",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "Notifications and integrations",
+      "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F9",
+          "title": "Notifications and subscriptions",
+          "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Notifications and subscriptions core processing rule",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Notifications and subscriptions exception and audit handling",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F10",
+          "title": "External integration and data synchronization",
+          "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "External integration and data synchronization core processing rule",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "External integration and data synchronization exception and audit handling",
+              "desc": "Connect traces, prompts, model versions, evaluations, costs, review evidence, and change-approval and re-evaluation results to support AI operating decisions. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Insights and controls",
+      "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+      "status": "todo",
+      "priority": "mid",
+      "acceptance": [
+        {
+          "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+          "done": false
+        }
+      ],
+      "features": [
+        {
+          "id": "F11",
+          "title": "Response quality, evaluation pass rate, safety violation, latency, token usage, and model-cost reporting",
+          "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+          "status": "todo",
+          "priority": "high",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Response quality, evaluation pass rate, safety violation, latency, token usage, and model-cost reporting core processing rule",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Response quality, evaluation pass rate, safety violation, latency, token usage, and model-cost reporting exception and audit handling",
+              "desc": "Prompts, model versions, execution traces, evaluation results, and cost data are disconnected, making it hard to judge whether an AI quality or cost change came from a specific change. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "F12",
+          "title": "Role, permission, and audit management",
+          "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+          "status": "todo",
+          "priority": "mid",
+          "acceptance": [
+            {
+              "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+              "done": false
+            }
+          ],
+          "specs": [
+            {
+              "title": "Role, permission, and audit management core processing rule",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            },
+            {
+              "title": "Role, permission, and audit management exception and audit handling",
+              "desc": "Keep pre-release evaluation pass rates at 95% or higher and identify quality regression or cost spikes before deployment. Retain change, failure, and reprocessing conditions with history.",
+              "acceptance": [
+                {
+                  "text": "Required context, changes, ownership, and status are retained in an auditable record.",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ia": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Start and intake",
+        "pages": [
+          {
+            "id": "P1",
+            "title": "Operations home",
+            "type": "top",
+            "surface": "screen",
+            "refs": [],
+            "children": [
+              {
+                "id": "P2",
+                "title": "Work inbox",
+                "type": "page",
+                "surface": "screen",
+                "refs": [
+                  "F1"
+                ],
+                "children": [
+                  {
+                    "id": "P3",
+                    "title": "Create work item",
+                    "type": "page",
+                    "surface": "modal",
+                    "refs": [
+                      "F1:0",
+                      "F1:1"
+                    ],
+                    "children": []
+                  },
+                  {
+                    "id": "P11",
+                    "title": "Input review",
+                    "type": "page",
+                    "surface": "panel",
+                    "refs": [
+                      "F2",
+                      "F2:0",
+                      "F2:1"
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Records and work execution",
+        "pages": [
+          {
+            "id": "P4",
+            "title": "Record detail",
+            "type": "top",
+            "surface": "screen",
+            "refs": [
+              "F3",
+              "F3:0"
+            ],
+            "children": [
+              {
+                "id": "P12",
+                "title": "Activity timeline",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F3:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P13",
+                "title": "Search and filters",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F4",
+                  "F4:0",
+                  "F4:1"
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "P5",
+            "title": "Processing workspace",
+            "type": "page",
+            "surface": "screen",
+            "refs": [
+              "F5",
+              "F5:0"
+            ],
+            "children": [
+              {
+                "id": "P14",
+                "title": "Processing exception",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F5:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P15",
+                "title": "Owner and due date",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F6",
+                  "F6:0",
+                  "F6:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Review and recovery",
+        "pages": [
+          {
+            "id": "P6",
+            "title": "Review queue",
+            "type": "top",
+            "surface": "screen",
+            "refs": [
+              "F7",
+              "F7:0"
+            ],
+            "children": [
+              {
+                "id": "P16",
+                "title": "Decision detail",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F7:1"
+                ],
+                "children": []
+              },
+              {
+                "id": "P17",
+                "title": "Reject and reprocess",
+                "type": "page",
+                "surface": "modal",
+                "refs": [
+                  "F8",
+                  "F8:0",
+                  "F8:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Notifications and integrations",
+        "pages": [
+          {
+            "id": "P7",
+            "title": "Notification center",
+            "type": "top",
+            "surface": "screen",
+            "refs": [
+              "F9",
+              "F9:0"
+            ],
+            "children": [
+              {
+                "id": "P18",
+                "title": "Subscription settings",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F9:1"
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "P19",
+            "title": "External integrations",
+            "type": "page",
+            "surface": "screen",
+            "refs": [
+              "F10",
+              "F10:0"
+            ],
+            "children": [
+              {
+                "id": "P20",
+                "title": "Synchronization failures",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F10:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Insights and administration",
+        "pages": [
+          {
+            "id": "P8",
+            "title": "Operations reports",
+            "type": "top",
+            "surface": "screen",
+            "refs": [
+              "F11",
+              "F11:0"
+            ],
+            "children": [
+              {
+                "id": "P21",
+                "title": "Report filters",
+                "type": "page",
+                "surface": "drawer",
+                "refs": [
+                  "F11:1"
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "P9",
+            "title": "Policy and access",
+            "type": "page",
+            "surface": "screen",
+            "refs": [
+              "F12",
+              "F12:0"
+            ],
+            "children": [
+              {
+                "id": "P10",
+                "title": "Audit history",
+                "type": "page",
+                "surface": "panel",
+                "refs": [
+                  "F12:1"
+                ],
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "start": "P1",
+    "transitions": [
+      {
+        "from": "P1",
+        "to": "P2",
+        "label": "View work"
+      },
+      {
+        "from": "P2",
+        "to": "P3",
+        "ref": "F1"
+      },
+      {
+        "from": "P3",
+        "to": "P11",
+        "ref": "F2"
+      },
+      {
+        "from": "P11",
+        "to": "P4",
+        "label": "Open after review"
+      },
+      {
+        "from": "P4",
+        "to": "P12",
+        "ref": "F3"
+      },
+      {
+        "from": "P4",
+        "to": "P13",
+        "ref": "F4"
+      },
+      {
+        "from": "P13",
+        "to": "P4",
+        "label": "Select result"
+      },
+      {
+        "from": "P4",
+        "to": "P5",
+        "ref": "F5"
+      },
+      {
+        "from": "P5",
+        "to": "P14",
+        "ref": "F5:1"
+      },
+      {
+        "from": "P5",
+        "to": "P15",
+        "ref": "F6"
+      },
+      {
+        "from": "P15",
+        "to": "P6",
+        "label": "Request review"
+      },
+      {
+        "from": "P6",
+        "to": "P16",
+        "ref": "F7"
+      },
+      {
+        "from": "P16",
+        "to": "P17",
+        "ref": "F8"
+      },
+      {
+        "from": "P17",
+        "to": "P5",
+        "label": "Reprocess"
+      },
+      {
+        "from": "P6",
+        "to": "P7",
+        "ref": "F9"
+      },
+      {
+        "from": "P7",
+        "to": "P18",
+        "ref": "F9:1"
+      },
+      {
+        "from": "P7",
+        "to": "P19",
+        "ref": "F10"
+      },
+      {
+        "from": "P19",
+        "to": "P20",
+        "ref": "F10:1"
+      },
+      {
+        "from": "P5",
+        "to": "P8",
+        "ref": "F11"
+      },
+      {
+        "from": "P8",
+        "to": "P21",
+        "ref": "F11:1"
+      },
+      {
+        "from": "P1",
+        "to": "P9",
+        "ref": "F12"
+      },
+      {
+        "from": "P9",
+        "to": "P10",
+        "ref": "F12:1"
+      },
+      {
+        "from": "P8",
+        "to": "P1",
+        "label": "Refresh operations status"
+      }
+    ]
+  }
+}

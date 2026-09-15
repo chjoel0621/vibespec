@@ -4,10 +4,13 @@ All notable changes to VibeSpec are documented here. VibeSpec follows semantic v
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-09-15
+
 ### Added
 
-- Added an opt-in planning lifecycle journal candidate with immutable snapshots, digest-bound completion receipts, interrupted-write recovery, scoped retired-ID protection, and pending review history.
+- Added an initial opt-in planning lifecycle journal with immutable snapshots, digest-bound completion receipts, interrupted-write recovery, scoped retired-ID protection, and pending review history.
 - Added explicit planning-review purposes and independent lifecycle evaluations, including a 92-case logic matrix, an 18-case shop-tree holdout, and 12 process/repair resilience cases.
+- Added Korean and English IT planning templates for AI observability/evaluation, data contracts, experimentation/A-B testing, and technical debt management.
 
 ### Changed
 
@@ -20,11 +23,12 @@ All notable changes to VibeSpec are documented here. VibeSpec follows semantic v
 - Preserve previous and current file paths in capture change summaries, without treating path-only moves as content edits or new identities.
 - Refuse recording when parent-impact traversal encounters a missing parent, with explicit affected-scope diagnostics instead of an internal TypeError.
 
-### Known release blockers
+### Compatibility and limits
 
-- Existing real-host acceptance records do not match the candidate runtime. Fresh Claude- and Codex-family evidence is required after the candidate is finalized.
+- SOT 1.0/1.1 remain compatible; existing workspaces are not automatically enrolled or migrated. Journal use requires explicit enrollment and whole-workspace backups.
+- Automated checks do not confer product approval. Human calibration, policy correctness, and real-service handoff effectiveness remain unassessed; the journal does not provide multi-file atomicity or power-loss durability.
 
-These entries describe an unreleased candidate, not changes already published in version 0.17.2.
+Fresh Claude Code and Codex CLI acceptance records match the released runtime. See the [verification record](docs/reports/2026-09-15-release-0.18.0.md) for results, historical failures, and boundaries.
 
 ## [0.17.2] - 2026-08-10
 

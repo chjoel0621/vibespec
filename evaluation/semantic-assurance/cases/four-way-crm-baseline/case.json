@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "four-way-crm-baseline",
+  "conceptId": "crm-sales-operations",
   "title": "CRM reviewer baseline candidate",
   "lane": "reviewer-baseline-candidate",
   "source": {

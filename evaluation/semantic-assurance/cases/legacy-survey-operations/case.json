@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-survey-operations",
+  "conceptId": "survey-feedback",
   "title": "Legacy survey and feedback operations template",
   "lane": "legacy-comparison",
   "source": {

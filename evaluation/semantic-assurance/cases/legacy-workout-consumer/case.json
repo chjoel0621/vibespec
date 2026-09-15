@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-workout-consumer",
+  "conceptId": "workout-tracker",
   "title": "Legacy workout consumer template",
   "lane": "legacy-comparison",
   "source": {

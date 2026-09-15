@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "weekchef-claude-ko",
+  "conceptId": "weekchef",
   "title": "WeekChef Korean Claude Code host output",
   "lane": "natural",
   "source": {

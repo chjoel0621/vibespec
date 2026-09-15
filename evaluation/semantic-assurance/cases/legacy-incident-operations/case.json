@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-incident-operations",
+  "conceptId": "incident-management",
   "title": "Legacy incident operations template",
   "lane": "legacy-comparison",
   "source": {

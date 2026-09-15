@@ -22,6 +22,29 @@ Claude-family hosts are `claude-code` and `cowork`. Codex-family hosts are `code
 
 If any runtime-bundle file changes after acceptance, its digest changes and the gate rejects the old records. Repeat both real-host checks before tagging.
 
+## Documentation and candidate audits
+
+Treat documentation as part of every release, not as a follow-up task:
+
+- Maintain `CHANGELOG.md` under **Unreleased** while preparing the candidate. Move entries to the actual version/date only when publishing that version; keep known blockers explicit.
+- Update affected usage, compatibility, migration, recovery, and troubleshooting guidance. Add links from the documentation index when a new workflow becomes user-facing.
+- Record the exact commands, pass/fail results, untested boundaries, and release decision in a dated report. Preserve earlier failures as historical evidence rather than rewriting them as successes.
+- Run repository path/privacy and Markdown-link checks after documentation edits. Keep private raw host outputs and workstation paths out of published material.
+- Finalize runtime-bundled documentation before collecting host acceptance evidence; changing it afterward also invalidates that evidence.
+
+For the lifecycle journal candidate, run all three audits from the repository root in addition to `check:all`:
+
+```text
+node evaluation/lifecycle/logic-matrix.mjs --write outputs/lifecycle-logic-release-new.json
+node evaluation/lifecycle/holdout.mjs --write outputs/lifecycle-holdout-release-new.json
+node evaluation/lifecycle/resilience.mjs --write outputs/lifecycle-resilience-release-new.json
+```
+
+The output parent directory must exist and each report path must be new. These are separate
+audits, not currently part of `check:all`. Exit code 1 blocks this candidate's publication;
+do not weaken expectations or relabel failures to proceed. Automated test success does not
+replace fresh installed-host evidence or the remote release gate.
+
 ## Canonical acceptance task
 
 Use a new writable task folder and a fresh task or session for each host. Install or update the release candidate, invoke VibeSpec explicitly, and request:

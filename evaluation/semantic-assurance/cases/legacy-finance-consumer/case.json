@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-finance-consumer",
+  "conceptId": "personal-finance",
   "title": "Legacy personal finance consumer template",
   "lane": "legacy-comparison",
   "source": {

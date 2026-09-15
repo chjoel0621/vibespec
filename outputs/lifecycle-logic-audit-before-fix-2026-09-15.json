@@ -1,0 +1,1580 @@
+{
+  "scope": "independent lifecycle candidate logic audit",
+  "humanApproval": "not-assessed",
+  "total": 92,
+  "passed": 88,
+  "failed": 4,
+  "results": [
+    {
+      "id": "campaign-consent/receipt-false/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-false/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": true,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": "completed, idempotent",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/receipt-true/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-false/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": true,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": "completed, idempotent",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "room-booking/receipt-true/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": true,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "pending-write",
+        "transaction": "pending",
+        "recovery": "completed, idempotent",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-false/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": false,
+        "capture": false,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "pending",
+        "recovery": "refused, bytes unchanged",
+        "capture": "refused, bytes unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/BB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/BA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/BX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/AB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/AA",
+      "category": "transaction",
+      "expectation": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": true,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "current",
+        "transaction": "complete",
+        "recovery": "completed, idempotent",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/AX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/XB",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/XA",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "crm-export/receipt-true/XX",
+      "category": "transaction",
+      "expectation": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": false,
+        "capture": true,
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "status": "external-drift",
+        "transaction": "complete",
+        "recovery": "refused, bytes unchanged",
+        "capture": "accepted, sources unchanged"
+      }
+    },
+    {
+      "id": "campaign-consent/stale-false-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": false,
+        "parentStale": false
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": false,
+          "parentStale": false
+        }
+      }
+    },
+    {
+      "id": "campaign-consent/stale-true-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": false,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": false,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "campaign-consent/stale-false-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "campaign-consent/stale-true-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "room-booking/stale-false-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": false,
+        "parentStale": false
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": false,
+          "parentStale": false
+        }
+      }
+    },
+    {
+      "id": "room-booking/stale-true-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": false,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": false,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "room-booking/stale-false-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "room-booking/stale-true-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "crm-export/stale-false-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": false,
+        "parentStale": false
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": false,
+          "parentStale": false
+        }
+      }
+    },
+    {
+      "id": "crm-export/stale-true-false",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": false,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": false,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "crm-export/stale-false-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": false,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": false,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "crm-export/stale-true-true",
+      "category": "staleness",
+      "expectation": {
+        "rootStale": true,
+        "childStale": true,
+        "parentStale": true
+      },
+      "pass": true,
+      "evidence": {
+        "actual": {
+          "rootStale": true,
+          "childStale": true,
+          "parentStale": true
+        }
+      }
+    },
+    {
+      "id": "replacements/object",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": true
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": {}
+      }
+    },
+    {
+      "id": "replacements/omitted",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": true
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": null
+      }
+    },
+    {
+      "id": "replacements/false",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": false,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": false
+      },
+      "error": "explicit replacement input type must be validated\n\ntrue !== false\n"
+    },
+    {
+      "id": "replacements/zero",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": false,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": 0
+      },
+      "error": "explicit replacement input type must be validated\n\ntrue !== false\n"
+    },
+    {
+      "id": "replacements/empty-string",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": false,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": ""
+      },
+      "error": "explicit replacement input type must be validated\n\ntrue !== false\n"
+    },
+    {
+      "id": "replacements/null",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": false,
+      "evidence": {
+        "accepted": true,
+        "error": null,
+        "cliExitCode": 0,
+        "cliError": "",
+        "recordCountAfterCli": 2,
+        "persistedReplacements": {},
+        "persistedInputReplacements": null
+      },
+      "error": "explicit replacement input type must be validated\n\ntrue !== false\n"
+    },
+    {
+      "id": "replacements/array",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "replacements must be an object",
+        "cliExitCode": 1,
+        "cliError": "[lifecycle] FAIL: replacements must be an object",
+        "recordCountAfterCli": 1
+      }
+    },
+    {
+      "id": "replacements/string",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "replacements must be an object",
+        "cliExitCode": 1,
+        "cliError": "[lifecycle] FAIL: replacements must be an object",
+        "recordCountAfterCli": 1
+      }
+    },
+    {
+      "id": "replacements/invalid-mapping",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "replacement requires a removed ID and an existing target",
+        "cliExitCode": 1,
+        "cliError": "[lifecycle] FAIL: replacement requires a removed ID and an existing target",
+        "recordCountAfterCli": 1
+      }
+    },
+    {
+      "id": "reason/normal",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": true
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": true,
+        "error": null
+      }
+    },
+    {
+      "id": "reason/whitespace",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "a change reason is required"
+      }
+    },
+    {
+      "id": "reason/empty",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "a change reason is required"
+      }
+    },
+    {
+      "id": "reason/null",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "a change reason is required"
+      }
+    },
+    {
+      "id": "reason/number",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "a change reason is required"
+      }
+    },
+    {
+      "id": "reason/omitted",
+      "category": "input-validation",
+      "expectation": {
+        "allowed": false
+      },
+      "pass": true,
+      "evidence": {
+        "accepted": false,
+        "error": "a change reason is required"
+      }
+    },
+    {
+      "id": "history/receipt-kind",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "completion receipt mismatch",
+        "captureError": "completion receipt mismatch"
+      }
+    },
+    {
+      "id": "history/receipt-digest",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "completion receipt mismatch",
+        "captureError": "completion receipt mismatch"
+      }
+    },
+    {
+      "id": "history/earlier-receipt-missing",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "incomplete earlier transaction",
+        "captureError": "incomplete earlier transaction"
+      }
+    },
+    {
+      "id": "history/record-tamper",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "journal digest mismatch",
+        "captureError": "journal digest mismatch"
+      }
+    },
+    {
+      "id": "history/head-record-missing",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "missing journal history or orphan completion receipt",
+        "captureError": "missing journal history or orphan completion receipt"
+      }
+    },
+    {
+      "id": "history/sequence-gap",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "journal sequence gap",
+        "captureError": "journal sequence gap"
+      }
+    },
+    {
+      "id": "history/unknown-history-entry",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "unknown journal entry",
+        "captureError": "unknown journal entry"
+      }
+    },
+    {
+      "id": "history/malformed-record-json",
+      "category": "integrity",
+      "expectation": {
+        "read": "refused",
+        "capture": "refused",
+        "bytes": "unchanged"
+      },
+      "pass": true,
+      "evidence": {
+        "readError": "Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+        "captureError": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+      }
+    },
+    {
+      "id": "campaign-consent/retired-reuse",
+      "category": "identity",
+      "expectation": {
+        "reuse": "refused",
+        "bytes": "unchanged",
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "retired": {
+          "id": "root/F3",
+          "sequence": 6,
+          "reason": "Explicit audit transition",
+          "replacement": "root/F1",
+          "recordDigest": "sha256:4628331906f8fc88befe43f3ad585dcf9032b1fda67b0544ed7d4f615b51d4c8"
+        },
+        "pendingReviews": 20
+      }
+    },
+    {
+      "id": "room-booking/retired-reuse",
+      "category": "identity",
+      "expectation": {
+        "reuse": "refused",
+        "bytes": "unchanged",
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "retired": {
+          "id": "root/F3",
+          "sequence": 6,
+          "reason": "Explicit audit transition",
+          "replacement": "root/F1",
+          "recordDigest": "sha256:afa2a1b6aa268b503639334ece89676a0c3977c0adbeb0a029242b1d5f3b1070"
+        },
+        "pendingReviews": 20
+      }
+    },
+    {
+      "id": "crm-export/retired-reuse",
+      "category": "identity",
+      "expectation": {
+        "reuse": "refused",
+        "bytes": "unchanged",
+        "productApproval": "not-assessed"
+      },
+      "pass": true,
+      "evidence": {
+        "retired": {
+          "id": "root/F3",
+          "sequence": 6,
+          "reason": "Explicit audit transition",
+          "replacement": "root/F1",
+          "recordDigest": "sha256:efad41ae18924d9cee129cb52bf4235e8b4647691606dbf632c8cedbed0a84f2"
+        },
+        "pendingReviews": 20
+      }
+    }
+  ]
+}

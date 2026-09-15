@@ -1,9 +1,13 @@
 // Advisory quality review, deliberately separate from structural validation.
 // A valid SOT can still be too vague for a team to implement confidently.
 const text = value => typeof value === "string" ? value.trim() : "";
-const vague = value => /^(works?|ok|done|todo|tbd|test|동작|정상|확인|추후|미정)$/i.test(text(value));
+// Deliberately narrow full-sentence patterns: these are prompts to review,
+// not a classifier for every ambiguous sentence or a product readiness score.
+const generic = value => /^(?:사용자가 이 기능을 (?:정상적으로 사용할 수 있다|편리하게 이용할 수 있도록 지원한다)|the feature works as expected|(?:enables|allows) the user to easily use this feature)[.!]?$/i.test(text(value));
+const vague = value => !text(value) || /^(works?|ok|done|todo|tbd|test|동작|정상|확인|추후|미정)[.!]?$/i.test(text(value)) || generic(value);
 const thin = value => text(value).length < 12;
 export const generationProfiles = ["operations", "consumer", "marketplace"];
+export const planningPurposes = ["overview", "current-state", "change"];
 
 const normalizedTitle = value => text(value).toLocaleLowerCase().replace(/[\s·/\\,_()\[\]-]+/g, "");
 const similarTitle = (left, right) => {
@@ -36,10 +40,13 @@ const consumerOperationLanguage = [
   /운영·보안 관리자/
 ];
 
-export function reviewSot(sot, { profile = "operations" } = {}) {
+export function reviewSot(sot, { profile = "operations", purpose = "current-state" } = {}) {
   if (!generationProfiles.includes(profile)) throw new Error("unsupported generation profile: " + profile);
+  if (!planningPurposes.includes(purpose)) throw new Error("unsupported planning purpose: " + purpose);
   const findings = [];
   const warn = (code, path, message) => findings.push({ severity: "warning", code, path, message });
+  const detailGap = (code, path, message) => findings.push({ severity: purpose === "overview" ? "info" : "warning", code, path, message });
+  const message = (ko, en) => sot.lang === "en" ? en : ko;
   const prd = sot.prd || {};
   for (const field of ["problem", "solution"]) {
     if (thin(prd[field])) warn("thin-prd", "$.prd." + field, field + " needs a concrete user/problem statement");
@@ -112,9 +119,19 @@ export function reviewSot(sot, { profile = "operations" } = {}) {
     for (const feature of requirement.features || []) {
       const base = "$.requirements[" + requirement.id + "].features[" + feature.id + "]";
       if (thin(feature.desc)) warn("thin-feature-description", base + ".desc", "feature needs an implementation-relevant description");
+      else if (generic(feature.desc)) warn("generic-feature-description", base + ".desc", message("실행 주체, 실행 조건과 관찰 가능한 결과는 무엇인가요?", "Who acts, under what condition, and what observable result follows?"));
       if (!Array.isArray(feature.acceptance) || !feature.acceptance.length) warn("missing-acceptance", base + ".acceptance", "feature has no acceptance criteria");
       (feature.acceptance || []).forEach((item, index) => {
         if (vague(item?.text)) warn("vague-acceptance", base + ".acceptance[" + index + "]", "acceptance criterion is too vague to verify");
+      });
+      (feature.specs || []).forEach((spec, index) => {
+        const path = `${base}.specs[${feature.id}:${index}]`;
+        if (!text(spec.desc)) detailGap("missing-spec-description", path + ".desc", message("상세 설명이 비어 있습니다. 주체·조건·결과를 적거나 개요에서 생략한 이유를 검토 기록에 남기세요.", "Describe the actor, condition and result, or record why this detail is deferred in the overview."));
+        else if (generic(spec.desc)) warn("generic-spec-description", path + ".desc", message("이 상세기능에서 실제로 바뀌는 사용자 상태나 결과는 무엇인가요?", "What user state or observable outcome changes in this sub-feature?"));
+        if (!Array.isArray(spec.acceptance) || !spec.acceptance.length) detailGap("missing-spec-acceptance", path + ".acceptance", message("수용 기준이 없습니다. 어떤 입력·상태에서 어떤 결과를 확인해야 하나요?", "No acceptance criteria: which input or state must produce which observable result?"));
+        (spec.acceptance || []).forEach((item, i) => {
+          if (vague(item?.text)) warn("vague-spec-acceptance", `${path}.acceptance[${i}]`, message("검수 가능한 조건과 결과를 적으세요. '정상 동작'만으로는 판정할 수 없습니다.", "State a testable condition and result; a generic claim of correct behavior cannot be verified."));
+        });
       });
       if ((pageRefs.get(feature.id) || []).length && !flowRefs.has(feature.id)) {
         warn("feature-without-flow-trigger", base, "feature appears in IA but no user-flow transition names it as a trigger");
@@ -131,5 +148,12 @@ export function reviewSot(sot, { profile = "operations" } = {}) {
   if (profile === "marketplace" && !sot.initiative && (prd.targets || []).length < 2) {
     warn("marketplace-needs-multiple-user-groups", "$.prd.targets", "marketplace plans should name at least two participant groups");
   }
-  return { valid: true, findings, summary: { warnings: findings.length } };
+  return {
+    valid: true, // Legacy advisory result; this does not run structural validation.
+    context: { profile, purpose },
+    assessmentScope: "advisory-content-only",
+    limitations: ["Not structural validation or product approval.", "Does not prove complete policies, exception paths, implementation or deployment.", "KPI measurement readiness is assessed separately."],
+    findings,
+    summary: { warnings: findings.filter(f => f.severity === "warning").length, information: findings.filter(f => f.severity === "info").length }
+  };
 }

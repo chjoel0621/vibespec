@@ -1,0 +1,155 @@
+{
+  "scope": "shop-tree lifecycle release holdout",
+  "productApproval": "not-assessed",
+  "total": 18,
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "id": "single-root-format-only",
+      "expected": "formatting and object-key order do not create drift or a new record",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "init-receipt-interruption",
+      "expected": "published enrollment recovers without rewriting source bytes",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "new-scope-capture-interruption",
+      "expected": "an interrupted capture with an added file completes only its receipt",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "rename-visible-in-handoff",
+      "expected": "a captured filename move is visible in change history without retiring the stable scope",
+      "pass": true,
+      "evidence": {
+        "changes": [
+          {
+            "scope": "payment",
+            "file": "initiatives/archive/payment.sot.json",
+            "previousFile": "initiatives/payment.sot.json",
+            "report": {
+              "changes": [],
+              "removedIds": [],
+              "unchanged": [
+                "flow",
+                "ia",
+                "initiative",
+                "lang",
+                "prd",
+                "requirements",
+                "schemaVersion",
+                "title"
+              ],
+              "impact": {},
+              "digest": {
+                "before": "sha256:722ad70d1cd7dc36106d70e28aafe3668c44bb33f4ddae209a6482b084565d8c",
+                "after": "sha256:722ad70d1cd7dc36106d70e28aafe3668c44bb33f4ddae209a6482b084565d8c"
+              }
+            },
+            "added": false
+          }
+        ],
+        "reviewCount": 0
+      }
+    },
+    {
+      "id": "retire-whole-scope",
+      "expected": "removing a leaf retires its local IDs and rejects its reintroduction",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "removed-parent-diagnostic",
+      "expected": "a dangling child produces an explicit tree diagnostic or controlled refusal, not an internal TypeError",
+      "pass": true,
+      "evidence": {
+        "outcome": "refused",
+        "errorName": "Error",
+        "message": "missing parent scope payment for refund; restore or repair parent references before recording"
+      }
+    },
+    {
+      "id": "deep-ancestor-impact",
+      "expected": "a root change reaches three descendants without marking their own unchanged checks stale",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BBB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BBA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BAB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BAA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-ABB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-ABA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-AAB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-AAA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "successive-sibling-merges",
+      "expected": "two sibling merges allocate distinct root IDs and retain both sets of manual review",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "many-captures-and-noops",
+      "expected": "20 distinct edits remain sequential and ten no-ops add no history",
+      "pass": true,
+      "evidence": {
+        "records": 21,
+        "pendingReviews": 21
+      }
+    },
+    {
+      "id": "unicode-workspace-cli",
+      "expected": "CLI operates in a Unicode and spaced folder with an unchanged source",
+      "pass": true,
+      "evidence": {
+        "cliExitCode": 0
+      }
+    }
+  ]
+}

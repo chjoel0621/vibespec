@@ -6,6 +6,16 @@ VibeSpec keeps the JSON SOT as the planning source and regenerates the HTML view
 
 Describe a product idea or attach a business plan, PRD draft, or meeting notes. VibeSpec creates a SOT JSON and viewer HTML. New plans declare how each KPI will be measured and include a derived KPI Measurement Check. A result that still needs a decision or supporting evidence can be delivered as a draft, but it is not labeled ready for approval or developer handoff.
 
+## Review purpose and result scope
+
+Use `review-sot.mjs <sot> --purpose overview|current-state|change` with the audience `--profile`. Purpose stays outside the SOT; the default is `current-state`.
+
+- `overview`: map the service and disclose deferred detail. Empty spec descriptions/criteria are informational.
+- `current-state`: describe observed behavior, evidence and unknown deployment state. Missing detail is advisory.
+- `change`: describe actors, preconditions, inputs, observable results, applicable exceptions and acceptance criteria.
+
+These purposes are separate from full/reduced runtime support. Structural PASS checks the data contract. Content review checks selected gaps and generic claims. Measurement `ready` checks declared KPI evidence. None grants product approval or proves complete planning, implementation or deployment. The reviewer keeps its legacy `valid: true` advisory field; this is not a structural verdict.
+
 ## Resolve a semantic decision
 
 In KPI Measurement Check, answer the question and choose **Save answer**. The answer is recorded in the SOT, but the decision remains open. Save the JSON, then attach it to Claude or Codex with the copy-ready request shown in the viewer.

@@ -5,6 +5,7 @@
 - Develop on a branch and keep changes scoped.
 - Never commit workstation paths, credentials, host acceptance artifacts containing private paths, or generated local caches.
 - Prefer squash merge for future feature PRs.
+- Keep affected user documentation and the Unreleased changelog aligned with behavior changes. Record release verification and known limitations before publication; follow the documentation checklist in [Releasing VibeSpec](docs/releasing.md).
 
 ## Viewer changes
 

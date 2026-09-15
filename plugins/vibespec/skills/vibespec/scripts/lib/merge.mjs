@@ -26,9 +26,14 @@ function maxNum(sot, prefix) {
   return max;
 }
 
-// planMerge(docs, initiativeId) → { ok, error?, errors?, main?, landed?, report?, staleSiblings? }
+// Optional reservedIds protects captured main-scope history. Legacy callers
+// retain the same allocation; no source document is modified to reserve IDs.
+// planMerge(docs, initiativeId, {reservedIds}) → { ok, error?, main?, landed?, report? }
 // docs: [{ name, sot }]. Pure — computes the merge but writes nothing.
-export function planMerge(docs, initiativeId) {
+export function planMerge(docs, initiativeId, { reservedIds = [] } = {}) {
+  if (!Array.isArray(reservedIds) || reservedIds.some(id => typeof id !== "string" || !/^[RFSPKED][1-9]\d*$/.test(id))) {
+    return { ok: false, error: "reservedIds must contain valid main-scope entity IDs" };
+  }
   const tree = validateTree(docs);
   if (!tree.valid) return { ok: false, error: "the tree has errors — fix them before merging", errors: tree.errors };
 
@@ -47,8 +52,9 @@ export function planMerge(docs, initiativeId) {
   if (!mainDoc) return { ok: false, error: "no main (1.0) document in the tree" };
 
   const M = clone(mainDoc.sot);
-  let nextP = maxNum(M, "P") + 1, nextF = maxNum(M, "F") + 1, nextR = maxNum(M, "R") + 1, nextS = maxNum(M, "S") + 1;
-  let nextK = maxNum(M, "K") + 1, nextE = maxNum(M, "E") + 1, nextD = maxNum(M, "D") + 1;
+  const nextId = prefix => Math.max(maxNum(M, prefix), ...reservedIds.filter(id => id.startsWith(prefix)).map(id => Number(id.slice(1))), 0) + 1;
+  let nextP = nextId("P"), nextF = nextId("F"), nextR = nextId("R"), nextS = nextId("S");
+  let nextK = nextId("K"), nextE = nextId("E"), nextD = nextId("D");
 
   // Pass 1: assign new main ids to the initiative's own nodes; record boundary resolutions.
   const reqMap = {}, featMap = {}, pageMap = {}, secMap = {}, pageResolve = {}, kpiMap = {}, eventMap = {}, decisionMap = {};

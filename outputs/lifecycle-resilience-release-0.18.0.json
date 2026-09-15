@@ -1,0 +1,98 @@
+{
+  "scope": "third-round lifecycle process and repair resilience",
+  "productApproval": "not-assessed",
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "results": [
+    {
+      "id": "whole-workspace-relocation",
+      "expected": "moving the workspace with its journal preserves status and history bytes",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "two-file-path-swap",
+      "expected": "swapping two scope file paths records both moves without changing identities",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "path-move-and-content-edit",
+      "expected": "a simultaneous move and edit retains its path history and content/descendant reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "restore-missing-parent-after-refusal",
+      "expected": "a refused parent deletion leaves history intact and an exact restore returns to current",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "repair-reparent-before-capture",
+      "expected": "explicitly repairing a surviving child's references permits capture and retires only the removed scope",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "process-exit-after-0-writes",
+      "expected": "a dead writer lock requires explicit unlock and its intent remains recoverable",
+      "pass": true,
+      "evidence": {
+        "workerExitCode": 23,
+        "recovered": true,
+        "recordCount": 2
+      }
+    },
+    {
+      "id": "process-exit-after-1-writes",
+      "expected": "a dead writer lock requires explicit unlock and its intent remains recoverable",
+      "pass": true,
+      "evidence": {
+        "workerExitCode": 23,
+        "recovered": true,
+        "recordCount": 2
+      }
+    },
+    {
+      "id": "process-exit-after-2-writes",
+      "expected": "a dead writer lock requires explicit unlock and its intent remains recoverable",
+      "pass": true,
+      "evidence": {
+        "workerExitCode": 23,
+        "recovered": true,
+        "recordCount": 2
+      }
+    },
+    {
+      "id": "cross-process-exclusive-writer",
+      "expected": "a second process cannot write while the first holds the journal lock",
+      "pass": true,
+      "evidence": {
+        "result": {
+          "competingExitCode": 1,
+          "locked": true
+        }
+      }
+    },
+    {
+      "id": "corrupt-lock-owner",
+      "expected": "malformed lock ownership is never guessed or silently removed",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "source-directory-junction",
+      "expected": "redirected initiative sources are refused without changing source or target files",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "invalid-source-json",
+      "expected": "malformed source JSON blocks status and capture without new history",
+      "pass": true,
+      "evidence": {}
+    }
+  ]
+}

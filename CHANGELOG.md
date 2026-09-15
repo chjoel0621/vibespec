@@ -2,6 +2,39 @@
 
 All notable changes to VibeSpec are documented here. VibeSpec follows semantic versioning.
 
+## [Unreleased]
+
+### Added
+
+- Added an opt-in planning lifecycle journal candidate with immutable snapshots, digest-bound completion receipts, interrupted-write recovery, scoped retired-ID protection, and pending review history.
+- Added explicit planning-review purposes and independent lifecycle evaluations, including a 92-case logic matrix, an 18-case shop-tree holdout, and 12 process/repair resilience cases.
+
+### Changed
+
+- Kept automated content/measurement checks separate from product approval and marked outdated evidence explicitly.
+- Added release documentation maintenance checks and required lifecycle-candidate audits before publication.
+
+### Fixed
+
+- Reject explicit non-object replacement maps, including `false`, `0`, empty strings, and `null`, instead of silently treating them as omitted input.
+- Preserve previous and current file paths in capture change summaries, without treating path-only moves as content edits or new identities.
+- Refuse recording when parent-impact traversal encounters a missing parent, with explicit affected-scope diagnostics instead of an internal TypeError.
+
+### Known release blockers
+
+- Existing real-host acceptance records do not match the candidate runtime. Fresh Claude- and Codex-family evidence is required after the candidate is finalized.
+
+These entries describe an unreleased candidate, not changes already published in version 0.17.2.
+
+## [0.17.2] - 2026-08-10
+
+### Added
+
+- Added the real-host release gate and portable acceptance records bound to the exact plugin version and runtime-bundle digest.
+- Verified independent full-mode generation on Claude Code and Codex CLI. No SOT schema migration was required from 0.17.1.
+
+This historical entry summarizes the [published 0.17.2 release](https://github.com/chjoel0621/vibespec/releases/tag/v0.17.2).
+
 ## [0.17.1] - 2026-08-05
 
 ### Added

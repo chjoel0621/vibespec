@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "four-way-habit-baseline",
+  "conceptId": "habit-routine",
   "title": "Habit tracker reviewer baseline candidate",
   "lane": "reviewer-baseline-candidate",
   "source": {

@@ -2,6 +2,7 @@
 
 - **Install and try VibeSpec:** [Getting started](getting-started.md)
 - **Understand the planning workflows:** [Workflows](workflows.md)
+- **Evaluate the opt-in planning-history candidate:** [Lifecycle journal](lifecycle-journal.md)
 - **Explore every live example:** [Live demos](live-demos.md)
 - **Understand the SOT and plugin architecture:** [Architecture](architecture.md)
 - **Build and test the repository:** [Development](development.md)

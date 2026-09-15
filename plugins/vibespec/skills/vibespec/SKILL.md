@@ -37,7 +37,9 @@ description: >-
 
 ## 지연 로드
 
-모드를 고른 뒤 `references/workflows/common.md`와 **해당 모드 하나만** 읽고 따른다. 관련 없는 모드 문서를 미리 읽지 않는다.
+사용자가 변경 이력 관리를 요청했거나 정규 제품 작업공간에 `history/lifecycle`이 있으면 `references/lifecycle-journal.md`를 먼저 읽는다. 등록된 작업공간의 지원되는 수정·재기준·병합은 이력 CLI를 사용하며, 거절을 직접 파일 쓰기로 우회하지 않는다. 이력 없는 기존 산출물은 자동 등록·이동하지 않는다.
+
+모드를 고른 뒤 `references/workflows/common.md`와 **해당 모드 하나만** 읽고 따른다. 관련 없는 모드 문서를 미리 읽지 않는다. common의 기획 목적(`overview|current-state|change`)도 요청에서 정하고 생성·내용 리뷰에 동일하게 적용한다. 전체/축소 런타임 모드와 혼동하지 않는다.
 
 - 신규 생성 → `references/workflows/create.md`
 - 수정·복구·마이그레이션 → `references/workflows/edit.md`
@@ -50,7 +52,7 @@ description: >-
 
 - 기존 SOT를 수정할 때 전체 JSON을 재생성하지 않는다. query + change-plan-v2 + dry-run/apply 경로를 사용한다.
 - ID는 안정 식별자다. 삭제한 ID를 재사용하지 않는다.
-- 구조 검증은 PASS까지 고치고, 내용 리뷰 경고는 해소하거나 의도적 예외를 사용자에게 설명한다.
+- 구조 검증은 PASS까지 고치고, 내용 리뷰 경고는 해소하거나 의도적 예외를 사용자에게 설명한다. 개요의 상세 누락 안내도 생략 이유와 함께 보고한다. 검사 통과만으로 기획 전체의 승인·개발 전달 준비 완료를 선언하지 않는다.
 - `semantic`이 있는 SOT는 KPI 측정 가능성 점검을 실행한다. 측정 준비도가 blocked이면 초안은 전달할 수 있지만 승인 가능·개발 전달 준비 완료라고 표현하지 않는다. 사람의 결정을 AI가 임의로 확정해 차단을 숨기지 않는다.
 - 산출물 JSON과 HTML은 같은 SOT에서 결정적으로 만든다.
 - `--apply`는 사용자가 요청한 쓰기 작업에서만 실행하고, 드라이런 결과와 영향 범위를 먼저 확인한다.

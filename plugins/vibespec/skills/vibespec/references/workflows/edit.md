@@ -18,6 +18,8 @@
 
 적용 뒤 validate-sot, review-sot, `semantic`이 있으면 review-semantic, 필요하면 validate-tree를 실행하고 HTML을 다시 만든다. KPI 측정 가능성 점검 보고서는 편집 전 결과를 재사용하지 않는다.
 
+review-sot의 `--purpose`는 구조도 교정이면 `overview`, 코드 기반 현행 최신화면 `current-state`, 상세 기능 변경이면 `change`로 지정한다. 변경 이유·근거·미검토 영향은 적용 영수증만으로 증명되지 않으므로 검토 기록과 최종 전달에 함께 남긴다.
+
 ## 복구와 마이그레이션
 
 inspect의 `invalidReason`을 먼저 고친다. 지원하지 않는 명시 버전을 다른 역할로 해석하지 않는다.

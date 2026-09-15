@@ -58,6 +58,22 @@ npm run package:plugin
 
 Real Claude/Codex sessions are not launched by normal CI. Before tagging a release, generate the two required portable host records and run `npm run check:host-acceptance`. Follow [Releasing VibeSpec](releasing.md) for the full procedure.
 
+The optional lifecycle candidate also has independent release audits, run from the repository root:
+
+```text
+node evaluation/lifecycle/logic-matrix.mjs --write outputs/lifecycle-logic-new.json
+node evaluation/lifecycle/holdout.mjs --write outputs/lifecycle-holdout-new.json
+node evaluation/lifecycle/resilience.mjs --write outputs/lifecycle-resilience-new.json
+```
+
+Use new report files in an existing output directory. The 92-case matrix covers receipt/file
+state combinations; the 18-case shop-tree holdout covers different workspace shapes, deep
+rebase recovery, file relocation/removal, successive merges, and repeated captures. The
+12-case resilience suite adds child-process interruption/locking, workspace relocation,
+multi-file moves, and explicit parent-reference repair. None of these independent audits
+is automatically run by `check:all`; all three must pass for this candidate's release. See
+[Lifecycle evaluation](../evaluation/lifecycle/README.md) for interpretation and current findings.
+
 ## Validate plans and trees
 
 Validate a generated or edited SOT:

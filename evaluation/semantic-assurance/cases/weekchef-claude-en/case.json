@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "weekchef-claude-en",
+  "conceptId": "weekchef",
   "title": "WeekChef English Claude Code host output",
   "lane": "natural",
   "source": {

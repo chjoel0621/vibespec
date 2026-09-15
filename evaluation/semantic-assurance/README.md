@@ -39,6 +39,15 @@ reported with raw counts rather than percentages alone.
 
 Every case has a `case.json`, an immutable source digest, and expected finding
 keys. Controlled mutations additionally carry Before and Resolved change plans.
+Every manifest also declares `conceptId`. The additive `distinctCoverage`
+summary counts only natural/controlled artifacts, deduplicating by concept and
+stable KPI ID. Locale/run variants must preserve KPI identity and measurement
+mode; a mode conflict fails evaluation. Candidate and legacy lanes are excluded.
+The old aggregate remains an artifact count for historical comparison.
+Coverage thresholds (8 concepts / 30 KPIs / 5 modes) are reported separately
+from human calibration, which this summary does **not** approve or evaluate.
+Approval-receipt verification remains follow-up work in the calibration design.
+
 Natural cases preserve host metadata, the exact file SHA-256, and adjudicated
 content-review findings. A semantic finding key is the rule id plus its sorted
 `subjectRefs`; display copy is intentionally excluded.

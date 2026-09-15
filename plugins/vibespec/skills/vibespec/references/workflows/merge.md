@@ -17,3 +17,5 @@
 병합은 요구사항·화면·flow를 제품 기획 ID 공간으로 재번호하고 boundary를 해소한다. PRD는 `inScope`만 자동 추가하며 `problem`, `solution`, `nonGoals`, `goal`은 사람이 검토할 항목으로 남긴다. 적용된 추가 기획은 삭제하지 않고 `landed`로 보존한다.
 
 제품 기획 digest가 바뀌므로 나머지 추가 기획의 stale을 보고하고 rebase로 이어간다. 최종 validate-sot/validate-tree와 제품 기획 HTML 재생성을 수행한다.
+
+병합 보고서의 manualPrdReview·manualSemanticReview는 자동 반영되지 않는다. 해당 항목의 반영 또는 해당 없음 판단을 검토 기록에 남기고, 미반영 항목이 있으면 기능 병합 완료와 기획 전체 통합 완료를 구분해 보고한다. 현재 도구는 이 후속 검토의 영속 완료 상태를 자동 관리하지 않는다.

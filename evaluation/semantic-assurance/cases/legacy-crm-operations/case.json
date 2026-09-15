@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-crm-operations",
+  "conceptId": "crm-sales-operations",
   "title": "Legacy CRM operations template",
   "lane": "legacy-comparison",
   "source": {

@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "meeting-room-no-show",
+  "conceptId": "meeting-room-no-show",
   "title": "회의실 노쇼율 측정 가능성",
   "lane": "controlled-mutation",
   "source": {

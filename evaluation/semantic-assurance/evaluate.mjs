@@ -7,6 +7,7 @@ import { sotDigest } from "../../plugins/vibespec/skills/vibespec/scripts/lib/c1
 import { reviewSot } from "../../plugins/vibespec/skills/vibespec/scripts/lib/content-review.mjs";
 import { reviewSemantic } from "../../plugins/vibespec/skills/vibespec/scripts/lib/semantic-engine.mjs";
 import { validateSot } from "../../plugins/vibespec/skills/vibespec/scripts/validate-sot.mjs";
+import { distinctCoverage } from "./coverage.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../..");
@@ -245,6 +246,7 @@ function main() {
   if (!directories.length) throw new Error(args.caseId ? `unknown case ${args.caseId}` : "no evaluation cases found");
 
   const results = directories.map(evaluateCase);
+  const coverage = distinctCoverage(results);
   if (args.write) {
     const output = resolve(repoRoot, args.write);
     mkdirSync(output, { recursive: true });
@@ -291,9 +293,11 @@ function main() {
   const output = {
     contractVersion: "semantic-evaluation-0.1",
     aggregate,
+    distinctCoverage: coverage,
     duplicateKpiGroups,
     cases: results.map(result => ({
       id: result.manifest.id,
+      conceptId: result.manifest.conceptId,
       lane: result.manifest.lane,
       sourceDigest: result.manifest.source.digest,
       quality: result.quality || null,
@@ -308,6 +312,7 @@ function main() {
       console.log(`[evaluation] PASS ${result.manifest.id}: ${readiness}, TP=${result.metrics.truePositive}, FP=0, FN=0`);
     }
     for (const group of duplicateKpiGroups) console.log(`[comparison] duplicate KPI signature ${group.signature}: ${group.cases.join(", ")}`);
+    console.log(`[coverage] ${coverage.uniqueConcepts}/8 unique concepts, ${coverage.uniqueAssessedKpis}/30 unique assessed KPIs, ${coverage.measurementModes.length}/5 modes; quantity gate=${coverage.coverageThresholdsMet ? "met" : "unmet"}; human calibration=${coverage.calibrationApproval}`);
     console.log(`[evaluation] ${aggregate.assessedCases} assessed + ${aggregate.comparisonCases} legacy comparison + ${aggregate.baselineCandidateCases} reviewer baseline candidate case(s), ${aggregate.sourceKpis} observed KPI(s), ${aggregate.kpis} assessed KPI(s), modes=${aggregate.measurementModes.join(",")}, candidateKpis=${aggregate.candidateKpis}, candidateModes=${aggregate.candidateMeasurementModes.join(",")}, ${aggregate.labelledFailures} labelled failure(s), TP=${aggregate.truePositive}, FP=${aggregate.falsePositive}, FN=${aggregate.falseNegative}`);
   }
 }

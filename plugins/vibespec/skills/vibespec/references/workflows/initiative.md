@@ -39,7 +39,7 @@
 
 ```text
 node "<VIBESPEC_SKILL_DIR>/scripts/validate-sot.mjs" "<추가 기획>"
-node "<VIBESPEC_SKILL_DIR>/scripts/review-sot.mjs" "<추가 기획>" --profile <operations|consumer|marketplace>
+node "<VIBESPEC_SKILL_DIR>/scripts/review-sot.mjs" "<추가 기획>" --profile <operations|consumer|marketplace> --purpose change
 node "<VIBESPEC_SKILL_DIR>/scripts/review-semantic.mjs" "<추가 기획>" --json
 node "<VIBESPEC_SKILL_DIR>/scripts/validate-tree.mjs" "<제품 폴더>"
 ```

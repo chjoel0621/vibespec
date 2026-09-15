@@ -97,7 +97,7 @@ document.documentElement.setAttribute("data-probe",[
   !document.querySelector(".sem-summary").textContent.includes("실패"),
   !!document.querySelector(".sem-next"),
   document.querySelector(".sem-mode").textContent.includes("이벤트 수"),
-  document.querySelector(".sem-scope").textContent.includes("현재 버전은 KPI가 기능과 데이터로 실제 측정 가능한지만 확인합니다"),
+  document.querySelector(".sem-scope").textContent.includes("선언된")&&document.querySelector(".sem-scope").textContent.includes("승인"),
   document.querySelectorAll(".sem-measure.issue").length===1,
   document.querySelector(".sem-measure.issue").textContent.includes("K1")&&document.querySelector(".sem-measure.issue").textContent.includes("확인 필요"),
   document.querySelectorAll(".sem-measure.clear").length===1,
@@ -159,8 +159,26 @@ commit();
 document.documentElement.setAttribute("data-probe",[
   SEMANTIC_REPORT_STALE,
   !!document.querySelector(".sem-notice.stale"),
-  document.querySelector(".sem-summary").textContent.includes("Check again")||document.querySelector(".sem-summary").textContent.includes("다시 점검 필요")
+  document.querySelector(".sem-summary").textContent.includes("Check again")||document.querySelector(".sem-summary").textContent.includes("다시 점검 필요"),
+  !document.querySelector(".sem-next.ready"),
+  [...document.querySelectorAll(".sem-kpi-status")].every(el=>/다시 점검 필요|Check again/.test(el.textContent))
 ].join("|"));
 </script>`;
-assert.equal(probe(semantic, report, STALE_HARNESS), "true|true|true", "editing must stale the embedded semantic verdict");
+assert.equal(probe(semantic, report, STALE_HARNESS), "true|true|true|true|true", "editing must stale every verdict, including the ready banner and KPI rows");
 console.log("[browser] PASS SOT edits invalidate the embedded semantic verdict");
+
+const ready = JSON.parse(JSON.stringify(semantic));
+ready.lang = "en";
+ready.prd.kpis = [ready.prd.kpis[1]];
+ready.semantic = { contractVersion: "semantic-0.1", events: [], decisions: [] };
+const READY_HARNESS = `<script>
+document.getElementById("semanticTab").click();
+document.documentElement.setAttribute("data-probe",[
+  !!document.querySelector(".sem-next.ready"),
+  document.querySelector(".sem-scope").textContent.includes("declared"),
+  document.querySelector(".sem-scope").textContent.includes("approval")
+].join("|"));
+</script>`;
+assert.equal(probe(ready, reviewSemantic(ready), READY_HARNESS), "true|true|true", "ready measurement must still explain its limited evidence and lack of product approval");
+assert.equal(probe(ready, reviewSemantic(ready), STALE_HARNESS), "true|true|true|true|true");
+console.log("[browser] PASS English ready results explain limits and become stale after editing");

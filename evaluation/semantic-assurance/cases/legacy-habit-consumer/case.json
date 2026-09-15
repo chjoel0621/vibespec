@@ -1,6 +1,7 @@
 {
   "contractVersion": "semantic-evaluation-0.1",
   "id": "legacy-habit-consumer",
+  "conceptId": "habit-routine",
   "title": "Legacy habit tracker consumer template",
   "lane": "legacy-comparison",
   "source": {

@@ -1,0 +1,137 @@
+{
+  "scope": "shop-tree lifecycle release holdout",
+  "productApproval": "not-assessed",
+  "total": 18,
+  "passed": 16,
+  "failed": 2,
+  "results": [
+    {
+      "id": "single-root-format-only",
+      "expected": "formatting and object-key order do not create drift or a new record",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "init-receipt-interruption",
+      "expected": "published enrollment recovers without rewriting source bytes",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "new-scope-capture-interruption",
+      "expected": "an interrupted capture with an added file completes only its receipt",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "rename-visible-in-handoff",
+      "expected": "a captured filename move is visible in change history without retiring the stable scope",
+      "pass": false,
+      "evidence": {
+        "changes": [],
+        "reviewCount": 0
+      },
+      "error": {
+        "name": "AssertionError",
+        "message": "file-only changes must not disappear from handoff history"
+      }
+    },
+    {
+      "id": "retire-whole-scope",
+      "expected": "removing a leaf retires its local IDs and rejects its reintroduction",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "removed-parent-diagnostic",
+      "expected": "a dangling child produces an explicit tree diagnostic or controlled refusal, not an internal TypeError",
+      "pass": false,
+      "evidence": {
+        "outcome": "refused",
+        "errorName": "TypeError",
+        "message": "Cannot read properties of undefined (reading 'sot')"
+      },
+      "error": {
+        "name": "AssertionError",
+        "message": "missing parent must not dereference an absent SOT"
+      }
+    },
+    {
+      "id": "deep-ancestor-impact",
+      "expected": "a root change reaches three descendants without marking their own unchanged checks stale",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BBB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BBA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BAB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-BAA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-ABB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-ABA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-AAB",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "deep-rebase-recovery-AAA",
+      "expected": "all known partial writes recover top-to-bottom and preserve pending reviews",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "successive-sibling-merges",
+      "expected": "two sibling merges allocate distinct root IDs and retain both sets of manual review",
+      "pass": true,
+      "evidence": {}
+    },
+    {
+      "id": "many-captures-and-noops",
+      "expected": "20 distinct edits remain sequential and ten no-ops add no history",
+      "pass": true,
+      "evidence": {
+        "records": 21,
+        "pendingReviews": 21
+      }
+    },
+    {
+      "id": "unicode-workspace-cli",
+      "expected": "CLI operates in a Unicode and spaced folder with an unchanged source",
+      "pass": true,
+      "evidence": {
+        "cliExitCode": 0
+      }
+    }
+  ]
+}

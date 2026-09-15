@@ -1,0 +1,22 @@
+{
+  "kind": "vibespec-host-acceptance",
+  "contractVersion": "host-acceptance-v1",
+  "pluginVersion": "0.18.0",
+  "pluginDigest": "3926cd8a4c83e7b10473af0406d545c9904c02cce92eaf3212922aa43f4b3d8e",
+  "host": "claude-code",
+  "hostFamily": "claude",
+  "accepted": true,
+  "checkedAt": "2026-09-15T06:23:42.355Z",
+  "artifacts": {
+    "sot": {
+      "file": "meeting-room.sot.json",
+      "sha256": "d2903b4fd340813fa41a4ca78e32d07b7767554d564cb10ebeff6bfb0e336527"
+    },
+    "html": {
+      "file": "meeting-room.html",
+      "sha256": "f1b17d90dc3b3f247088c41f280bee3dee5d160d92791487cee3085eef7f0b0c"
+    }
+  },
+  "title": "Meeting Room Booking",
+  "schemaVersion": "1.0"
+}

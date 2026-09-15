@@ -1,0 +1,22 @@
+{
+  "kind": "vibespec-host-acceptance",
+  "contractVersion": "host-acceptance-v1",
+  "pluginVersion": "0.18.0",
+  "pluginDigest": "3926cd8a4c83e7b10473af0406d545c9904c02cce92eaf3212922aa43f4b3d8e",
+  "host": "codex-cli",
+  "hostFamily": "codex",
+  "accepted": true,
+  "checkedAt": "2026-09-15T06:26:12.419Z",
+  "artifacts": {
+    "sot": {
+      "file": "meeting-room.sot.json",
+      "sha256": "be1953a5451b81a19e0f57a4d9ef3ae2153884f1a8029e987d33e85eda38770f"
+    },
+    "html": {
+      "file": "meeting-room.html",
+      "sha256": "f4f2351c6e4c47d0e4054ad7963194f015520fd34072288f144c37055a452f88"
+    }
+  },
+  "title": "Meeting Room Booking — Planning Draft",
+  "schemaVersion": "1.0"
+}
